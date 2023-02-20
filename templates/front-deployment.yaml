@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-front
+spec:
+  revisionHistoryLimit: 1
+  replicas: {{ .Values.replicas.front }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-front
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-front
+        app_revision: {{ .Release.Name }}_{{ .Release.Revision }}_front
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app_revision
+                    operator: In
+                    values:
+                      - {{ .Release.Name }}_{{ .Release.Revision }}_front
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: front
+          image: getlago/front:v{{ .Values.lago_release }}
+          imagePullPolicy: Always
+          env:
+            {{- toYaml .Values.front.environment | nindent 12 }}
+          ports:
+            - containerPort: {{ .Values.front.port }}
+              protocol: TCP
+              name: "front"
+          resources:
+            requests:
+              memory: {{ .Values.front.resources.memory }}
+              cpu: {{ .Values.front.resources.cpu }}
