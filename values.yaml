@@ -5,7 +5,7 @@ replicas:
   front: 1
   worker: 1
 
-lago_release: "0.22.1-beta"
+lago_release: "0.23.0-beta"
 
 # This "embedded" redis is for quick development purpose. NEVER USE IN PRODUCTION
 redis:
