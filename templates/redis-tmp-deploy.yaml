@@ -1,3 +1,4 @@
+{{- if .Values.redis.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -21,3 +22,4 @@ spec:
             - containerPort: 6379
               protocol: TCP
               name: "redis"
+{{- end -}}
