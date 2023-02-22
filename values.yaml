@@ -7,105 +7,105 @@ replicas:
 
 lago_release: "0.22.1-beta"
 
+# This "embedded" redis is for quick development purpose. NEVER USE IN PRODUCTION
+redis:
+  enabled: false
+
+hostname:
+  &hostname: "https://lago.corp.yourcompany.com"
+
+x-environment:
+    - &lago-api-url
+      name: LAGO_API_URL
+      value: "http://lago-api-svc.lago"
+    - &redis-url
+      name: REDIS_URL
+      # use "redis://lago-redis-svc.lago:6379" if you enable this chart embedded redis
+      value: "redis://redishost:6379"
+    - &rails-env
+      name: RAILS_ENV
+      value: "production"
+    - &lago-front-url
+      name: LAGO_FRONT_URL
+      value: "http://lago-front-svc.lago"
+    - &lago-disable-segment
+      name: LAGO_DISABLE_SEGMENT
+      value: "true"
+
+x-secrets:
+  - &db
+    name: DATABASE_URL
+    valueFrom:
+      secretKeyRef:
+        name: lago
+        key: db_url
+  # Used for session encryption
+  - &secret-key-base
+    name: SECRET_KEY_BASE
+    valueFrom:
+      secretKeyRef:
+        name: lago
+        key: sessions_secret_key_base
+  # Private key used for webhook signatures // private RSA key, base64 encoded
+  - &lago-rsa-private-key
+    name: LAGO_RSA_PRIVATE_KEY
+    valueFrom:
+      secretKeyRef:
+        name: lago
+        key: lago_rsa_private_key
+  # Encryption primary key used to secure sensitive values stored in the database
+  - &encryption-primary-key
+    name: ENCRYPTION_PRIMARY_KEY
+    valueFrom:
+      secretKeyRef:
+        name: lago
+        key: encryption_primary_key
+  # Encryption deterministic key used to secure sensitive values stored in the database
+  - &encryption-deterministic-key
+    name: ENCRYPTION_DETERMINISTIC_KEY
+    valueFrom:
+      secretKeyRef:
+        name: lago
+        key: encryption_deterministic_key
+  # Encryption key salt used to secure sensitive values stored in the database
+  - &encryption-key-derivation-salt
+    name: ENCRYPTION_KEY_DERIVATION_SALT
+    valueFrom:
+      secretKeyRef:
+        name: lago
+        key: encryption_key_derivation_salt
+
 api:
   port: 3000
   environment:
-    - name: LAGO_API_URL
-      value: "http://lago-api-svc.lago"
-    - name: DATABASE_URL
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: db_url
-    - name: REDIS_URL # This is a self contained redis for this deployment. Better use a properly managed one
-      value: "redis://lago-redis-svc.lago:6379"
-    - name: RAILS_ENV
-      value: "production"
-    - name: LAGO_FRONT_URL
-      value: "http://lago-front-svc.lago"
-    # Used for session encryption
-    - name: SECRET_KEY_BASE
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: sessions_secret_key_base
-    # Private key used for webhook signatures // private RSA key, base64 encoded
-    - name: LAGO_RSA_PRIVATE_KEY
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: lago_rsa_private_key
-   # Encryption primary key used to secure sensitive values stored in the database
-    - name: ENCRYPTION_PRIMARY_KEY
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: encryption_primary_key
-    # Encryption deterministic key used to secure sensitive values stored in the database
-    - name: ENCRYPTION_DETERMINISTIC_KEY
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: encryption_deterministic_key
-    # Encryption key salt used to secure sensitive values stored in the database
-    - name: ENCRYPTION_KEY_DERIVATION_SALT
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: encryption_key_derivation_salt
-    - name: LAGO_DISABLE_SEGMENT
-      value: "true"
+    - *lago-api-url
+    - *redis-url
+    - *rails-env
+    - *lago-front-url
+    - *lago-disable-segment
+    - *db
+    - *secret-key-base
+    - *lago-rsa-private-key
+    - *encryption-primary-key
+    - *encryption-deterministic-key
+    - *encryption-key-derivation-salt
   resources:
     cpu: "100m"
     memory: "128M"
 
 worker:
   environment:
-    - name: LAGO_API_URL
-      value: "http://lago-api-svc.lago"
-    - name: DATABASE_URL
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: db_url
-    - name: REDIS_URL
-      value: "redis://lago-redis-svc.lago:6379"
-    - name: LAGO_FRONT_URL
-      value: "http://lago-front-svc.lago"
-    - name: RAILS_ENV
-      value: "production"
-    # Used for session encryption
-    - name: SECRET_KEY_BASE
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: sessions_secret_key_base
-    # Private key used for webhook signatures
-    - name: LAGO_RSA_PRIVATE_KEY
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: lago_rsa_private_key
-   # Encryption primary key used to secure sensitive values stored in the database
-    - name: ENCRYPTION_PRIMARY_KEY
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: encryption_primary_key
-    # Encryption deterministic key used to secure sensitive values stored in the database
-    - name: ENCRYPTION_DETERMINISTIC_KEY
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: encryption_deterministic_key
-    # Encryption key salt used to secure sensitive values stored in the database
-    - name: ENCRYPTION_KEY_DERIVATION_SALT
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: encryption_key_derivation_salt
-    - name: LAGO_DISABLE_SEGMENT
-      value: "true"
+    - *lago-api-url
+    - *redis-url
+    - *rails-env
+    - *lago-front-url
+    - *lago-disable-segment
+    - *db
+    - *secret-key-base
+    - *lago-rsa-private-key
+    - *encryption-primary-key
+    - *encryption-deterministic-key
+    - *encryption-key-derivation-salt
   resources:
     cpu: "100m"
     memory: "128M"
@@ -114,9 +114,9 @@ front:
   port: 80
   environment:
     - name: API_URL
-      value: "https://lago.corp.yourcompany.com"
+      value: *hostname
     - name: CODEGEN_API
-      value: "https://lago.corp.yourcompany.com"
+      value: *hostname
     - name: APP_ENV
       value: "production"
     - name: LAGO_DISABLE_SIGNUP
@@ -127,49 +127,16 @@ front:
 
 clock:
   environment:
-    - name: LAGO_API_URL
-      value: "http://lago-api-svc.lago"
-    - name: DATABASE_URL
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: db_url
-    - name: REDIS_URL
-      value: "redis://lago-redis-svc.lago:6379"
-    - name: RAILS_ENV
-      value: "production"
-    - name: LAGO_FRONT_URL
-      value: "http://lago-front-svc.lago"
-    # Used for session encryption
-    - name: SECRET_KEY_BASE
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: sessions_secret_key_base
-    # Private key used for webhook signatures // private RSA key, base64 encoded
-    - name: LAGO_RSA_PRIVATE_KEY
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: lago_rsa_private_key
-   # Encryption primary key used to secure sensitive values stored in the database
-    - name: ENCRYPTION_PRIMARY_KEY
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: encryption_primary_key
-    # Encryption deterministic key used to secure sensitive values stored in the database
-    - name: ENCRYPTION_DETERMINISTIC_KEY
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: encryption_deterministic_key
-    # Encryption key salt used to secure sensitive values stored in the database
-    - name: ENCRYPTION_KEY_DERIVATION_SALT
-      valueFrom:
-        secretKeyRef:
-          name: lago
-          key: encryption_key_derivation_salt
+    - *lago-api-url
+    - *redis-url
+    - *rails-env
+    - *lago-front-url
+    - *db
+    - *secret-key-base
+    - *lago-rsa-private-key
+    - *encryption-primary-key
+    - *encryption-deterministic-key
+    - *encryption-key-derivation-salt
   resources:
     cpu: "100m"
     memory: "128M"
@@ -187,6 +154,5 @@ ingress:
       add_header Referrer-Policy "no-referrer";
       add_header Content-Security-Policy "default-src 'none'; script-src 'self';connect-src 'self';img-src 'self' data:; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com;base-uri 'self';form-action 'self'; manifest-src 'self'";
 
-
-    # Whitelist of IPs allowed to connect to the ingress (web UI)
-    nginx.ingress.kubernetes.io/whitelist-source-range: 1.2.3.4/32
+    # Whitelist of IPs allowed to connect to the ingress (web UI) - comma separated
+    nginx.ingress.kubernetes.io/whitelist-source-range: 1.2.3.4/32,2.3.4.5/32
