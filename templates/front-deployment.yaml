@@ -29,6 +29,10 @@ spec:
           image: getlago/front:v{{ .Values.lago_release }}
           imagePullPolicy: Always
           env:
+            - name: CODEGEN_API
+              value: {{ template "lago.url" . }}
+            - name: API_URL
+              value: {{ template "lago.url" . }}
             {{- toYaml .Values.front.environment | nindent 12 }}
           ports:
             - containerPort: {{ .Values.front.port }}
