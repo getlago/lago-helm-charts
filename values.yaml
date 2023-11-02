@@ -5,29 +5,29 @@ replicas:
   front: 1
   worker: 1
 
-lago_release: "0.23.0-beta"
+lago_release: "0.50.0-beta"
 
 # This "embedded" redis is for quick development purpose. NEVER USE IN PRODUCTION
 redis:
-  enabled: false
+  enabled: true
 
 hostname:
-  &hostname "lago.corp.yourcompany.com"
+  &hostname "lago.dev"
 
 x-environment:
     - &lago-api-url
       name: LAGO_API_URL
-      value: "http://lago-api-svc.lago"
+      value: "http://lago-api-svc.default"
     - &redis-url
       name: REDIS_URL
       # use "redis://lago-redis-svc.lago:6379" if you enable this chart embedded redis
-      value: "redis://redishost:6379"
+      value: "redis://lago-redis-svc.default:6379"
     - &rails-env
       name: RAILS_ENV
       value: "production"
     - &lago-front-url
       name: LAGO_FRONT_URL
-      value: "http://lago-front-svc.lago"
+      value: "http://lago-front-svc.default"
     - &lago-disable-segment
       name: LAGO_DISABLE_SEGMENT
       value: "true"

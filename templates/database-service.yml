@@ -1,0 +1,15 @@
+{{- if .Values.postgresql.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: {{ .Release.Name }}-postgresql
+  name: {{ .Release.Name }}-postgresql-svc
+spec:
+  ports:
+    - name: "5432"
+      port: 5432
+      targetPort: 5432
+  selector:
+    io.kompose.service: {{ .Release.Name }}-postgresql
+{{- end -}}

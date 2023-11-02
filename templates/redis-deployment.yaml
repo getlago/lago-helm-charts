@@ -1,0 +1,40 @@
+{{- if .Values.redis.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    lago.service: {{ .Release.Name }}-redis
+  name: {{ .Release.Name }}-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      lago.service: {{ .Release.Name }}-redis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        lago.network/lago-default: "true"
+        lago.service: {{ .Release.Name }}-redis
+    spec:
+      containers:
+        - args:
+            - --port
+            - "6379"
+          image: redis:6.2-alpine
+          name: {{ .Release.Name }}-redis
+          ports:
+            - containerPort: 6379
+              hostPort: 6379
+              protocol: TCP
+          resources: {}
+          # volumeMounts:
+          #   - mountPath: /data
+          #     name: lago-redis-data
+      restartPolicy: Always
+      # volumes:
+      #   - name: lago-redis-data
+      #     persistentVolumeClaim:
+      #       claimName: lago-redis-data
+{{- end -}}
