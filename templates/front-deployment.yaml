@@ -1,44 +1,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels:
+    io.lago.service: {{ .Release.Name }}-front
   name: {{ .Release.Name }}-front
 spec:
-  revisionHistoryLimit: 1
-  replicas: {{ .Values.replicas.front }}
+  replicas: 1
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-front
+      io.lago.service: {{ .Release.Name }}-front
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}-front
-        app_revision: {{ .Release.Name }}_{{ .Release.Revision }}_front
+        io.lago.service: {{ .Release.Name }}-front
     spec:
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: app_revision
-                    operator: In
-                    values:
-                      - {{ .Release.Name }}_{{ .Release.Revision }}_front
-              topologyKey: "kubernetes.io/hostname"
       containers:
-        - name: front
-          image: getlago/front:v{{ .Values.lago_release }}
-          imagePullPolicy: Always
-          env:
-            - name: CODEGEN_API
-              value: {{ template "lago.url" . }}
+        - env:
             - name: API_URL
-              value: {{ template "lago.url" . }}
-            {{- toYaml .Values.front.environment | nindent 12 }}
+              value: http://{{ .Release.Name }}-api-svc.{{ .Release.Namespace }}:3000
+            - name: APP_ENV
+              value: production
+            - name: CODEGEN_API
+              value: http://{{ .Release.Name }}-api-svc.{{ .Release.Namespace }}:3000
+            - name: LAGO_DISABLE_SIGNUP
+              value: {{ .Values.front.disable_signup | default "false" | quote }}
+            - name: LAGO_TEST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: rsaPrivateKey
+          image: getlago/front:v0.50.0-beta
+          name: {{ .Release.Name }}-front
           ports:
-            - containerPort: {{ .Values.front.port }}
+            - containerPort: {{ .Values.front.port | default 80 }}
+              hostPort: 80
               protocol: TCP
-              name: "front"
-          resources:
-            requests:
-              memory: {{ .Values.front.resources.memory }}
-              cpu: {{ .Values.front.resources.cpu }}
+          resources: {}
+      restartPolicy: Always

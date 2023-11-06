@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.lago.service: {{ .Release.Name }}-api
+  name: {{ .Release.Name }}-api
+spec:
+  replicas: {{ .Values.api.replicas | default 1 }}
+  selector:
+    matchLabels:
+      io.lago.service: {{ .Release.Name }}-api
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        io.lago.service: {{ .Release.Name }}-api
+    spec:
+      containers:
+        - args:
+            - ./scripts/start.sh
+          env:
+            - name: DATABASE_URL
+              value: postgresql://lago:changeme@db:5432/lago
+            - name: ENCRYPTION_DETERMINISTIC_KEY
+              value: your-encrpytion-deterministic-key
+            - name: ENCRYPTION_KEY_DERIVATION_SALT
+              value: your-encrpytion-derivation-salt
+            - name: ENCRYPTION_PRIMARY_KEY
+              value: your-encrpytion-primary-key
+            - name: LAGO_API_URL
+              value: http://{{ .Release.Name }}-api-svc.{{ .Release.Namespace }}:3000
+            - name: LAGO_AWS_S3_ACCESS_KEY_ID
+              value: azerty123456
+            - name: LAGO_AWS_S3_BUCKET
+              value: bucket
+            - name: LAGO_AWS_S3_ENDPOINT
+            - name: LAGO_AWS_S3_REGION
+              value: us-east-1
+            - name: LAGO_AWS_S3_SECRET_ACCESS_KEY
+              value: azerty123456
+            - name: LAGO_DISABLE_SEGMENT
+            - name: LAGO_FRONT_URL
+              value: http://localhost
+            - name: LAGO_GCS_BUCKET
+            - name: LAGO_GCS_PROJECT
+            - name: LAGO_LICENSE
+            - name: LAGO_OAUTH_PROXY_URL
+              value: https://proxy.getlago.com
+            - name: LAGO_PDF_URL
+              value: http://pdf:3000
+            - name: LAGO_REDIS_CACHE_PASSWORD
+            - name: LAGO_REDIS_CACHE_URL
+              value: redis://redis:6379
+            - name: LAGO_RSA_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: rsaPrivateKey
+            - name: LAGO_SIDEKIQ_WEB
+            - name: LAGO_USE_AWS_S3
+              value: "false"
+            - name: LAGO_USE_GCS
+              value: "false"
+            - name: RAILS_ENV
+              value: production
+            - name: RAILS_LOG_TO_STDOUT
+              value: "true"
+            - name: REDIS_PASSWORD
+            - name: REDIS_URL
+              value: redis://redis:6379
+            - name: RSA_PRIVATE_KEY
+            - name: SECRET_KEY_BASE
+              value: your-secret-key-base-hex-64
+            - name: SENTRY_DSN
+          image: getlago/api:v0.50.0-beta
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -f
+                - http://{{ .Release.Name }}-api-svc.{{ .Release.Namespace }}:3000/health
+          name: {{ .Release.Name }}-api
+          ports:
+            - containerPort: 3000
+              hostPort: 3000
+              protocol: TCP
+          resources: {}
+          #volumeMounts:
+          #  - mountPath: /app/storage
+          #    name: lago-storage-data
+      restartPolicy: Always
+      #volumes:
+      #  - name: lago-storage-data
+      #    persistentVolumeClaim:
+      #      claimName: lago-storage-data

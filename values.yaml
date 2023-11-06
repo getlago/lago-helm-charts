@@ -16,101 +16,101 @@ postgresql:
 hostname:
   &hostname "lago.dev"
 
-x-environment:
-    - &lago-api-url
-      name: LAGO_API_URL
-      value: "http://lago-api-svc.default"
-    - &redis-url
-      name: REDIS_URL
-      # use "redis://lago-redis-svc.lago:6379" if you enable this chart embedded redis
-      value: "redis://lago-redis-svc.default:6379"
-    - &rails-env
-      name: RAILS_ENV
-      value: "production"
-    - &lago-front-url
-      name: LAGO_FRONT_URL
-      value: "http://lago-front-svc.default"
-    - &lago-disable-segment
-      name: LAGO_DISABLE_SEGMENT
-      value: "true"
+# x-environment:
+#     - &lago-api-url
+#       name: LAGO_API_URL
+#       value: "http://lago-api-svc.default"
+#     - &redis-url
+#       name: REDIS_URL
+#       # use "redis://lago-redis-svc.lago:6379" if you enable this chart embedded redis
+#       value: "redis://lago-redis-svc.default:6379"
+#     - &rails-env
+#       name: RAILS_ENV
+#       value: "production"
+#     - &lago-front-url
+#       name: LAGO_FRONT_URL
+#       value: "http://lago-front-svc.default"
+#     - &lago-disable-segment
+#       name: LAGO_DISABLE_SEGMENT
+#       value: "true"
 
-x-secrets:
-  - &db
-    name: DATABASE_URL
-    valueFrom:
-      secretKeyRef:
-        name: lago
-        key: db_url
-  # Used for session encryption
-  - &secret-key-base
-    name: SECRET_KEY_BASE
-    valueFrom:
-      secretKeyRef:
-        name: lago
-        key: sessions_secret_key_base
-  # Private key used for webhook signatures // private RSA key, base64 encoded
-  - &lago-rsa-private-key
-    name: LAGO_RSA_PRIVATE_KEY
-    valueFrom:
-      secretKeyRef:
-        name: lago
-        key: lago_rsa_private_key
-  # Encryption primary key used to secure sensitive values stored in the database
-  - &encryption-primary-key
-    name: ENCRYPTION_PRIMARY_KEY
-    valueFrom:
-      secretKeyRef:
-        name: lago
-        key: encryption_primary_key
-  # Encryption deterministic key used to secure sensitive values stored in the database
-  - &encryption-deterministic-key
-    name: ENCRYPTION_DETERMINISTIC_KEY
-    valueFrom:
-      secretKeyRef:
-        name: lago
-        key: encryption_deterministic_key
-  # Encryption key salt used to secure sensitive values stored in the database
-  - &encryption-key-derivation-salt
-    name: ENCRYPTION_KEY_DERIVATION_SALT
-    valueFrom:
-      secretKeyRef:
-        name: lago
-        key: encryption_key_derivation_salt
+# x-secrets:
+#   - &db
+#     name: DATABASE_URL
+#     valueFrom:
+#       secretKeyRef:
+#         name: lago
+#         key: db_url
+#   # Used for session encryption
+#   - &secret-key-base
+#     name: SECRET_KEY_BASE
+#     valueFrom:
+#       secretKeyRef:
+#         name: lago
+#         key: sessions_secret_key_base
+#   # Private key used for webhook signatures // private RSA key, base64 encoded
+#   - &lago-rsa-private-key
+#     name: LAGO_RSA_PRIVATE_KEY
+#     valueFrom:
+#       secretKeyRef:
+#         name: lago
+#         key: lago_rsa_private_key
+#   # Encryption primary key used to secure sensitive values stored in the database
+#   - &encryption-primary-key
+#     name: ENCRYPTION_PRIMARY_KEY
+#     valueFrom:
+#       secretKeyRef:
+#         name: lago
+#         key: encryption_primary_key
+#   # Encryption deterministic key used to secure sensitive values stored in the database
+#   - &encryption-deterministic-key
+#     name: ENCRYPTION_DETERMINISTIC_KEY
+#     valueFrom:
+#       secretKeyRef:
+#         name: lago
+#         key: encryption_deterministic_key
+#   # Encryption key salt used to secure sensitive values stored in the database
+#   - &encryption-key-derivation-salt
+#     name: ENCRYPTION_KEY_DERIVATION_SALT
+#     valueFrom:
+#       secretKeyRef:
+#         name: lago
+#         key: encryption_key_derivation_salt
 
 api:
   port: 3000
   environment:
-    - *lago-api-url
-    - *redis-url
-    - *rails-env
-    - *lago-front-url
-    - *lago-disable-segment
-    - *db
-    - *secret-key-base
-    - *lago-rsa-private-key
-    - *encryption-primary-key
-    - *encryption-deterministic-key
-    - *encryption-key-derivation-salt
+    # - *lago-api-url
+    # - *redis-url
+    # - *rails-env
+    # - *lago-front-url
+    # - *lago-disable-segment
+    # - *db
+    # - *secret-key-base
+    # - *lago-rsa-private-key
+    # - *encryption-primary-key
+    # - *encryption-deterministic-key
+    # - *encryption-key-derivation-salt
   resources:
     cpu: "100m"
     memory: "128M"
 
-worker:
-  environment:
-    - *lago-api-url
-    - *redis-url
-    - *rails-env
-    - *lago-front-url
-    - *lago-disable-segment
-    - *db
-    - *secret-key-base
-    - *lago-rsa-private-key
-    - *encryption-primary-key
-    - *encryption-deterministic-key
-    - *encryption-key-derivation-salt
-  resources:
-    cpu: "100m"
-    memory: "128M"
+# worker:
+#   environment:
+#     - *lago-api-url
+#     - *redis-url
+#     - *rails-env
+#     - *lago-front-url
+#     - *lago-disable-segment
+#     - *db
+#     - *secret-key-base
+#     - *lago-rsa-private-key
+#     - *encryption-primary-key
+#     - *encryption-deterministic-key
+#     - *encryption-key-derivation-salt
+#   resources:
+#     cpu: "100m"
+#     memory: "128M"
 
 front:
   port: 80
@@ -123,21 +123,21 @@ front:
     cpu: "100m"
     memory: "128M"
 
-clock:
-  environment:
-    - *lago-api-url
-    - *redis-url
-    - *rails-env
-    - *lago-front-url
-    - *db
-    - *secret-key-base
-    - *lago-rsa-private-key
-    - *encryption-primary-key
-    - *encryption-deterministic-key
-    - *encryption-key-derivation-salt
-  resources:
-    cpu: "100m"
-    memory: "128M"
+# clock:
+#   environment:
+#     - *lago-api-url
+#     - *redis-url
+#     - *rails-env
+#     - *lago-front-url
+#     - *db
+#     - *secret-key-base
+#     - *lago-rsa-private-key
+#     - *encryption-primary-key
+#     - *encryption-deterministic-key
+#     - *encryption-key-derivation-salt
+#   resources:
+#     cpu: "100m"
+#     memory: "128M"
 
 ingress:
   annotations:
