@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    io.kompose.service: {{ .Release.Name }}-postgresql
+    io.lago.service: {{ .Release.Name }}-postgresql
   name: {{ .Release.Name }}-postgresql-svc
 spec:
   ports:
@@ -11,5 +11,5 @@ spec:
       port: 5432
       targetPort: 5432
   selector:
-    io.kompose.service: {{ .Release.Name }}-postgresql
+    io.lago.service: {{ .Release.Name }}-postgresql
 {{- end -}}

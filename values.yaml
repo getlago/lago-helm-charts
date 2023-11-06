@@ -10,6 +10,8 @@ lago_release: "0.50.0-beta"
 # This "embedded" redis is for quick development purpose. NEVER USE IN PRODUCTION
 redis:
   enabled: true
+postgresql:
+  enabled: true
 
 hostname:
   &hostname "lago.dev"
