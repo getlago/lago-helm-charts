@@ -2,26 +2,26 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.lago.service: {{ .Release.Name }}-api
-  name: {{ .Release.Name }}-api
+    io.lago.service: {{ .Release.Name }}-worker
+  name: {{ .Release.Name }}-worker
 spec:
-  replicas: {{ .Values.api.replicas }}
+  replicas: {{ .Values.worker.replicas }}
   selector:
     matchLabels:
-      io.lago.service: {{ .Release.Name }}-api
+      io.lago.service: {{ .Release.Name }}-worker
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        io.lago.service: {{ .Release.Name }}-api
+        io.lago.service: {{ .Release.Name }}-worker
     spec:
       containers:
         - args:
-            - ./scripts/start.sh
+            - ./scripts/start.worker.sh
           env:
             - name: RAILS_ENV
-              value: {{ .Values.api.rails.env }}
+              value: {{ .Values.worker.rails.env }}
             - name: LAGO_CLOUD
               value: "true"
             - name: DATABASE_URL
@@ -46,10 +46,8 @@ spec:
               value: {{ required "apiUrl value is required" .Values.apiUrl | quote }}
             - name: LAGO_FRONT_URL
               value: {{ required "frontUrl value is required" .Values.frontUrl | quote }}
-            - name: LAGO_SIDEKIQ_WEB
-              value: {{ .Values.api.sidekiqWeb.enabled | quote }}
             - name: RAILS_LOG_TO_STDOUT
-              value: {{ .Values.api.rails.logStdout | quote }}
+              value: {{ .Values.worker.rails.logStdout | quote }}
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -77,18 +75,10 @@ spec:
                   key: encryptionPrimaryKey
             - name: LAGO_DISABLE_SEGMENT
               value: {{ not .Values.global.segment.enabled | quote }}
-            - name: LAGO_DISABLE_SIGNUP
-              value: {{ not .Values.global.signup.enabled | quote }}
             - name: DATABASE_POOL
-              value: {{ mul .Values.api.rails.maxThreads .Values.api.rails.webConcurrency | quote }}
-            - name: RAILS_MAX_THREADS
-              value: {{ .Values.api.rails.maxThreads | quote }}
-            - name: RAILS_MIN_THREADS
-              value: "0"
-            - name: SIDEKIQ_EVENTS
-              value: "true"
-            - name: WEB_CONCURRENCY
-              value: {{ .Values.api.rails.webConcurrency | quote }}
+              value: {{ .Values.worker.rails.sidekiqConcurrency | quote }}
+            - name: SIDEKIQ_CONCURRENCY
+              value: {{ .Values.worker.rails.sidekiqConcurrency | quote }}
             {{ if .Values.global.license }}
             - name: LAGO_LICENSE
               valueFrom:
@@ -140,20 +130,11 @@ spec:
                   key: newRelicKey
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
-          livenessProbe:
-            exec:
-              command:
-                - curl
-                - -f
-                - http://{{ .Release.Name }}-api-svc.{{ .Release.Namespace }}:{{ .Values.api.service.port }}/health
-          name: {{ .Release.Name }}-api
-          ports:
-            - containerPort: 3000
-              protocol: TCP
+          name: {{ .Release.Name }}-worker
           resources:
             requests:
-              memory: {{ .Values.api.resources.memory }}
-              cpu: {{ .Values.api.resources.cpu }}
+              memory: {{ .Values.worker.resources.memory }}
+              cpu: {{ .Values.worker.resources.cpu }}
           {{ if not .Values.global.s3.enabled }}
           volumeMounts:
             - mountPath: /app/storage

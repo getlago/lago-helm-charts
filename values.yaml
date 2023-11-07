@@ -1,5 +1,7 @@
 version: "0.51.1-beta"
-hostname: lago.dev
+
+#apiUrl:
+#frontUrl:
 
 # Only for Development, Staging or PoC, you should use a managed Redis instance for Production
 redis:
@@ -82,21 +84,34 @@ api:
   resources:
     memory: 128
     cpu: "100m"
+  volumes:
+    storage: "10Gi"
 
 worker:
   replicas: 1
+  rails:
+    sidekiqConcurrency: 100
+    env: "production"
+    logStdout: true
   resources:
     memory: 128
     cpu: "100m"
 
-event-worker:
+eventsWorker:
   replicas: 1
+  rails:
+    sidekiqConcurrency: 100
+    env: "production"
+    logStdout: true
   resources:
     memory: 128
     cpu: "100m"
 
 clock:
   replicas: 1
+  rails:
+    env: "production"
+    logStdout: true
   resources:
     memory: 128
     cpu: "100m"

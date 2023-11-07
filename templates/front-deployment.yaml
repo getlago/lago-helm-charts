@@ -17,11 +17,11 @@ spec:
       containers:
         - env:
             - name: API_URL
-              value: http://{{ .Release.Name }}-api-svc.{{ .Release.Namespace }}:{{ .Values.api.service.port }}
+              value: {{ .Values.apiUrl | quote }}
             - name: APP_ENV
               value: production
             - name: CODEGEN_API
-              value: http://{{ .Release.Name }}-api-svc.{{ .Release.Namespace }}:{{ .Values.api.service.port }}
+              value: {{ .Values.apiUrl | quote }}
             - name: LAGO_DISABLE_SIGNUP
               value: {{ not .Values.global.signup.enabled | quote }}
           image: getlago/front:v{{ .Values.version }}
