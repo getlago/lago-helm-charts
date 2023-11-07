@@ -7,8 +7,8 @@ metadata:
   name: {{ .Release.Name}}-front-svc
 spec:
   ports:
-    - name: "80"
-      port: {{ .Values.front.port | default 80 }}
+    - name: "front"
+      port: {{ .Values.front.service.port }}
       targetPort: 80
   selector:
     io.lago.service: {{ .Release.Name }}-front

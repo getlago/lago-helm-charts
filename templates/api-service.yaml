@@ -7,8 +7,8 @@ metadata:
   name: {{.Release.Name}}-api-svc
 spec:
   ports:
-    - name: "3000"
-      port: {{ .Values.api.port | default 3000 }}
+    - name: "api"
+      port: {{ .Values.api.service.port }}
       targetPort: 3000
   selector:
     io.lago.service: {{ .Release.Name }}-api
