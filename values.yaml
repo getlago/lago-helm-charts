@@ -23,6 +23,8 @@ postgresql:
 global:
   # Define your Lago Premium License
   #license:
+  #databaseUrl:
+  #redisUrl:
 
   postgresql:
     auth:
