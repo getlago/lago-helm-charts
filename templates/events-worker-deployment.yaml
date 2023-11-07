@@ -2,26 +2,26 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.lago.service: {{ .Release.Name }}-clock
-  name: {{ .Release.Name }}-clock
+    io.lago.service: {{ .Release.Name }}-events-worker
+  name: {{ .Release.Name }}-events-worker
 spec:
-  replicas: {{ .Values.clock.replicas }}
+  replicas: {{ .Values.eventsWorker.replicas }}
   selector:
     matchLabels:
-      io.lago.service: {{ .Release.Name }}-clock
+      io.lago.service: {{ .Release.Name }}-events-worker
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        io.lago.service: {{ .Release.Name }}-clock
+        io.lago.service: {{ .Release.Name }}-events-worker
     spec:
       containers:
         - args:
-            - ./scripts/start.clock.sh
+            - ./scripts/start.events.worker.sh
           env:
             - name: RAILS_ENV
-              value: {{ .Values.clock.rails.env }}
+              value: {{ .Values.eventsWorker.rails.env }}
             - name: LAGO_CLOUD
               value: "true"
             - name: DATABASE_URL
@@ -35,7 +35,7 @@ spec:
                   name: {{ .Release.Name }}-secrets
                   key: redisUrl
             - name: RAILS_LOG_TO_STDOUT
-              value: {{ .Values.clock.rails.logStdout | quote }}
+              value: {{ .Values.eventsWorker.rails.logStdout | quote }}
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -61,6 +61,10 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Name }}-secrets
                   key: encryptionPrimaryKey
+            - name: DATABASE_POOL
+              value: {{ .Values.worker.rails.sidekiqConcurrency | quote }}
+            - name: SIDEKIQ_CONCURRENCY
+              value: {{ .Values.worker.rails.sidekiqConcurrency | quote }}
             {{ if .Values.global.newRelic.enabled }}
             - name: NEW_RELIC_KEY
               valueFrom:
@@ -69,9 +73,9 @@ spec:
                   key: newRelicKey
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
-          name: {{ .Release.Name }}-clock
+          name: {{ .Release.Name }}-events-worker
           resources:
             requests:
-              memory: {{ .Values.clock.resources.memory }}
-              cpu: {{ .Values.clock.resources.cpu }}
+              memory: {{ .Values.eventsWorker.resources.memory }}
+              cpu: {{ .Values.eventsWorker.resources.cpu }}
       restartPolicy: Always

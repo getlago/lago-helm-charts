@@ -1,12 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-front-svc
+  annotations:
+  labels:
+    io.lago.service: {{ .Release.Name }}-front
+  name: {{ .Release.Name}}-front-svc
 spec:
   ports:
-    - port: 80
-      targetPort: {{ .Values.front.port }}
-      protocol: TCP
-      name: front
+    - name: "front"
+      port: {{ .Values.front.service.port }}
+      targetPort: 80
   selector:
-    app: {{ .Release.Name }}-front
+    io.lago.service: {{ .Release.Name }}-front

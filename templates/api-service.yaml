@@ -1,12 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-api-svc
+  annotations:
+  labels:
+    io.lago.service: {{ .Release.Name }}-api
+  name: {{.Release.Name}}-api-svc
 spec:
   ports:
-    - port: {{ .Values.api.port }}
-      targetPort: {{ .Values.api.port }}
-      protocol: TCP
-      name: api
+    - name: "api"
+      port: {{ .Values.api.service.port }}
+      targetPort: 3000
   selector:
-    app: {{ .Release.Name }}-api
+    io.lago.service: {{ .Release.Name }}-api

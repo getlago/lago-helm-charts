@@ -1,44 +1,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels:
+    io.lago.service: {{ .Release.Name }}-front
   name: {{ .Release.Name }}-front
 spec:
-  revisionHistoryLimit: 1
-  replicas: {{ .Values.replicas.front }}
+  replicas: 1
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-front
+      io.lago.service: {{ .Release.Name }}-front
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}-front
-        app_revision: {{ .Release.Name }}_{{ .Release.Revision }}_front
+        io.lago.service: {{ .Release.Name }}-front
     spec:
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: app_revision
-                    operator: In
-                    values:
-                      - {{ .Release.Name }}_{{ .Release.Revision }}_front
-              topologyKey: "kubernetes.io/hostname"
       containers:
-        - name: front
-          image: getlago/front:v{{ .Values.lago_release }}
-          imagePullPolicy: Always
-          env:
-            - name: CODEGEN_API
-              value: {{ template "lago.url" . }}
+        - env:
             - name: API_URL
-              value: {{ template "lago.url" . }}
-            {{- toYaml .Values.front.environment | nindent 12 }}
+              value: {{ .Values.apiUrl | quote }}
+            - name: APP_ENV
+              value: production
+            - name: CODEGEN_API
+              value: {{ .Values.apiUrl | quote }}
+            - name: LAGO_DISABLE_SIGNUP
+              value: {{ not .Values.global.signup.enabled | quote }}
+          image: getlago/front:v{{ .Values.version }}
+          name: {{ .Release.Name }}-front
           ports:
-            - containerPort: {{ .Values.front.port }}
+            - containerPort: 80
               protocol: TCP
-              name: "front"
           resources:
             requests:
               memory: {{ .Values.front.resources.memory }}
               cpu: {{ .Values.front.resources.cpu }}
+      restartPolicy: Always

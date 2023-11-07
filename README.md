@@ -1,17 +1,12 @@
-# Lago chart
+# Lago Helm Chart
 
-## Status
-
-This chart does __NOT__ handle the bootstrap of the app (rake db:migrate, user creation, etc)
+Version: 0.3.0
+Lago Version : v0.51.1-beta
 
 ## Configuration
 
-Values in `values.yaml` allow configuration of most of the parts. Default scale is 1 for all deployments, this can be easily changed
+You can start with a very small configuration.
+The only fields required are `frontUrl` and `apiUrl`, since no ingress is managed with this version right now, you have to define the URL your application will be deployed to.
 
-A redis deployment and service are now optional. Set `redis.enabled` to `true` to create the deployment and related service for fast and easy prototyping
 
-It supposes you are using externaldns + certmanager for the ingress part (with a cluster issuer named `letsencrypt-prod`)
 
-## ToDo
-
-* Add switches/toggle for anti-affinity stuff ?
