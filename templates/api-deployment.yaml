@@ -155,12 +155,12 @@ spec:
           {{ if not .Values.global.s3.enabled }}
           volumeMounts:
             - mountPath: /app/storage
-              name: lago-storage-data
+              name: {{ .Release.Name }}-storage-data
           {{ end }}
       restartPolicy: Always
       {{ if not .Values.global.s3.enabled }}
       volumes:
-        - name: lago-storage-data
+        - name: {{ .Release.Name }}-storage-data
           persistentVolumeClaim:
-            claimName: lago-storage-data
+            claimName: {{ .Release.Name }}-storage-data
       {{ end }}
