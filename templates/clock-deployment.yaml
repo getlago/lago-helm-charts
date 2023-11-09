@@ -22,8 +22,6 @@ spec:
           env:
             - name: RAILS_ENV
               value: {{ .Values.clock.rails.env }}
-            - name: LAGO_CLOUD
-              value: "true"
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
