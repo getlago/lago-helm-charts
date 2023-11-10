@@ -10,6 +10,7 @@ metadata:
   {{- end }}
 {{ end }}
 spec:
+  ingressClassName: {{ .Values.global.ingress.className }}
   tls:
   - hosts:
     - {{ .Values.global.ingress.hostname }}

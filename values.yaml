@@ -63,6 +63,10 @@ global:
   # You can disable Lago's signup
   signup:
     enabled: true
+  #ingress:
+    #enabled: true
+    #className:
+    #annotations
 
 front:
   replicas: 1
