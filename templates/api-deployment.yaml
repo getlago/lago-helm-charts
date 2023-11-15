@@ -138,12 +138,6 @@ spec:
                   key: newRelicKey
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
-          livenessProbe:
-            exec:
-              command:
-                - curl
-                - -f
-                - http://{{ .Release.Name }}-api-svc.{{ .Release.Namespace }}:{{ .Values.api.service.port }}/health
           name: {{ .Release.Name }}-api
           ports:
             - containerPort: 3000
