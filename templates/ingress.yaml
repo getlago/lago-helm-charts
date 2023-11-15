@@ -13,21 +13,24 @@ spec:
   ingressClassName: {{ .Values.global.ingress.className }}
   tls:
   - hosts:
-    - {{ .Values.global.ingress.hostname }}
+    - {{ .Values.global.ingress.frontHostname }}
     secretName: {{ .Release.Name }}-ingress-secret
+    - {{ .Values.global.ingress.apiHostname }}
+    secretName: {{ .Release.Name }}-api-ingress-secret
   rules:
-  - host: {{ .Values.global.ingress.hostname }}
+  - host: {{ .Values.global.ingress.frontHostname }}
     http:
       paths:
-      - path: /
-        pathType: Prefix
+      - pathType: ImplementationSpecific
         backend:
           service:
             name: {{ .Release.Name }}-front-svc
             port:
               number: {{ .Values.front.service.port }}
-      - path: /api
-        pathType: Prefix
+  - host: {{ .Values.global.ingress.apiHostName }}
+    http:
+      paths:
+      - pathType: ImplementationSpecific
         backend:
           service:
             name: {{ .Release.Name }}-api-svc

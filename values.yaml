@@ -63,6 +63,8 @@ global:
     enabled: true
   
   #ingress:
+    #frontHostname:
+    #apiHostname:
     #className:
 
 front:
