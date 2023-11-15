@@ -23,6 +23,8 @@ postgresql:
 global:
   # Define your Lago Premium License
   #license:
+  # If you use a managed PG instance
+  # Should respect this format postgresql://USER:PASSWORD@HOST:PORT/DATABASE_NAME
   #databaseUrl:
   #redisUrl:
 
@@ -34,10 +36,6 @@ global:
     service:
       ports:
         postgresql: 5432
-
-  # If you use a managed PG instance
-  # Should respect this format postgresql://USER:PASSWORD@HOST:PORT/DATABASE_NAME
-  #databaseUrl:
 
   # You can disable segment tracking for Lago's internal purpose
   segment:
@@ -63,6 +61,9 @@ global:
   # You can disable Lago's signup
   signup:
     enabled: true
+  
+  #ingress:
+    #className:
 
 front:
   replicas: 1
