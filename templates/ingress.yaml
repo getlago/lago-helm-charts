@@ -20,14 +20,14 @@ spec:
     http:
       paths:
       - path: /
-        pathType: ImplementationSpecific
+        pathType: Prefix
         backend:
           service:
             name: {{ .Release.Name }}-front-svc
             port:
               number: {{ .Values.front.service.port }}
       - path: /api
-        pathType: ImplementationSpecific
+        pathType: Prefix
         backend:
           service:
             name: {{ .Release.Name }}-api-svc
