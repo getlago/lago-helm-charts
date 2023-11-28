@@ -32,6 +32,11 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Name }}-secrets
                   key: redisUrl
+            - name: LAGO_REDIS_CACHE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: redisUrl
             - name: RAILS_LOG_TO_STDOUT
               value: {{ .Values.eventsWorker.rails.logStdout | quote }}
             - name: LAGO_RSA_PRIVATE_KEY
