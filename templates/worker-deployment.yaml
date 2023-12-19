@@ -118,7 +118,7 @@ spec:
                   name: {{ .Release.Name }}-secrets
                   key: smtpPassword
             - name: LAGO_SMTP_PORT
-              value: {{ .Values.smtp.port }}
+              value: "{{ .Values.global.smtp.port }}"
             {{ end }}
             {{ if .Values.global.newRelic.enabled }}
             - name: NEW_RELIC_KEY
