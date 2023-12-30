@@ -16,6 +16,10 @@ spec:
       labels:
         io.lago.service: {{ .Release.Name }}-api
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - args:
             - ./scripts/start.sh

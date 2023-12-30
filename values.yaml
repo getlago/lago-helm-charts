@@ -3,6 +3,9 @@ version: "0.52.0-beta"
 #apiUrl:
 #frontUrl:
 
+imagePullSecrets: {}
+  #- name: ghcr-pull-secret
+
 # Only for Development, Staging or PoC, you should use a managed Redis instance for Production
 redis:
   enabled: true
@@ -57,11 +60,11 @@ global:
   newRelic:
     enabled: false
     #key
-  
+
   # You can disable Lago's signup
   signup:
     enabled: true
-  
+
   #ingress:
     #frontHostname:
     #apiHostname:
