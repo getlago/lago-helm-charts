@@ -3,6 +3,13 @@ version: "0.52.0-beta"
 #apiUrl:
 #frontUrl:
 
+secrets: {}
+  #rsaPrivateKey:
+  #secretKeyBase:
+  #encryptionPrimaryKey:
+  #encryptionDeterministicKey:
+  #encryptionKeyDerivationSalt:
+
 imagePullSecrets: {}
   #- name: ghcr-pull-secret
 
