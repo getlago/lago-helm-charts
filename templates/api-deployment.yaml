@@ -137,7 +137,7 @@ spec:
                   name: {{ .Release.Name }}-secrets
                   key: newRelicKey
             {{ end }}
-          image: getlago/api:v{{ .Values.version }}
+          image: {{ .Values.api.image.repository | default "getlago/api"}}:{{ .Values.api.image.tag | default (printf "v%s" .Values.version) }}
           name: {{ .Release.Name }}-api
           ports:
             - containerPort: 3000

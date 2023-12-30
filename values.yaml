@@ -76,6 +76,9 @@ front:
     cpu: "100m"
 
 api:
+  image: {}
+    #repository: ghcr.io/your-org/lago-api
+    #tag: v0.52.0-beta-fork1
   replicas: 1
   service:
     port: 3000
