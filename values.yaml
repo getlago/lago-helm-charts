@@ -1,4 +1,4 @@
-version: "0.52.0-beta"
+version: "0.53.3-beta"
 
 #apiUrl:
 #frontUrl:
@@ -89,7 +89,7 @@ front:
 api:
   image: {}
     #repository: ghcr.io/your-org/lago-api
-    #tag: v0.52.0-beta-fork1
+    #tag: v0.53.3-beta-fork1
   replicas: 1
   service:
     port: 3000
