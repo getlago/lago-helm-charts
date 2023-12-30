@@ -72,7 +72,8 @@ global:
   signup:
     enabled: true
 
-  #ingress:
+  ingress:
+    enabled: false
     #frontHostname:
     #apiHostname:
     #className:
