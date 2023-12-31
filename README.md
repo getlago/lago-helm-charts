@@ -1,12 +1,5 @@
-# Lago Helm Chart
+# Lago Helm Chart - Camille's fork
 
-Version: 0.3.0
-Lago Version : v0.51.1-beta
+This repository holds my fork of [Lago](https://getlago.com/)'s [Helm chart](https://github.com/getlago/lago-helm-charts).
 
-## Configuration
-
-You can start with a very small configuration.
-The only fields required are `frontUrl` and `apiUrl`, since no ingress is managed with this version right now, you have to define the URL your application will be deployed to.
-
-
-
+For more details, visit the corresponding Pull Request!
