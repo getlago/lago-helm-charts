@@ -101,7 +101,7 @@ api:
   sidekiqWeb:
     enabled: true
   resources:
-    memory: 128
+    memory: 1024
     cpu: "100m"
   volumes:
     storage: "10Gi"
@@ -113,7 +113,7 @@ worker:
     env: "production"
     logStdout: true
   resources:
-    memory: 128
+    memory: 512
     cpu: "100m"
 
 eventsWorker:
@@ -123,7 +123,7 @@ eventsWorker:
     env: "production"
     logStdout: true
   resources:
-    memory: 128
+    memory: 256
     cpu: "100m"
 
 clock:
@@ -132,7 +132,7 @@ clock:
     env: "production"
     logStdout: true
   resources:
-    memory: 128
+    memory: 256
     cpu: "100m"
 
 pdf:
