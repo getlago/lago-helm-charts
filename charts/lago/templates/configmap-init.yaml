@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "lago.fullname" . }}-init
+  labels:
+    {{- include "lago.labels" . | nindent 4 }}
+data:
+  check-database-available.sh: |-
+    #!/bin/bash
+    set -e
+    # Check database connection
+    echo "Checking database connection..."
+    until bundle exec rails db:version
+    do
+      echo "Unable to connect to database. Retrying in 5 seconds..."
+      sleep 5
+    done
+
+    echo "Connected to database successfully."
+  check-database-schema-exists.sh: |-
+    #!/bin/bash
+    set -e
+    # Check database connection
+    echo "Checking database connection..."
+    until bundle exec rails db:version
+    do
+      echo "Unable to connect to database. Retrying in 5 seconds..."
+      sleep 5
+    done
+
+    echo "Connected to database successfully."
+
+    #!/bin/bash
+    set -e
+    # Check migration status in a loop
+    echo "Checking migration status..."
+    while true
+    do
+      if [[ -z "$(bundle exec rails db:migrate:status | grep -e "^\s*down"  -e "migrations table does not exist")" ]]; then
+        echo "No pending migrations."
+        break
+      else
+        echo "Pending migrations detected. Retrying in 5 seconds..."
+        sleep 5
+      fi
+    done
+
+    echo "Database is up to date."

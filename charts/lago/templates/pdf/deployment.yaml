@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "lago.component.fullname" (dict "componentName" "pdf" "context" $) }}
+  labels:
+    {{- include "lago.component.labels" (dict "componentName" "pdf" "context" $) | nindent 4 }}
+spec:
+  {{- if not .Values.pdf.autoscaling.enabled }}
+  replicas: {{ .Values.pdf.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "lago.component.selectorLabels" (dict "componentName" "pdf" "context" $) | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.pdf.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "lago.component.labels" (dict "componentName" "pdf" "context" $) | nindent 8 }}
+        {{- with .Values.pdf.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.pdf.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "lago.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.pdf.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.pdf.securityContext | nindent 12 }}
+          image: "{{ .Values.pdf.image.repository }}:{{ .Values.pdf.image.tag }}"
+          imagePullPolicy: {{ .Values.pdf.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.pdf.resources | nindent 12 }}
+      {{- with .Values.pdf.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pdf.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pdf.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
