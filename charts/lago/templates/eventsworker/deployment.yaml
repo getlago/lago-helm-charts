@@ -1,0 +1,228 @@
+{{- if .Values.eventsworker.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "lago.component.fullname" (dict "componentName" "eventsworker" "context" $) }}
+  labels:
+    {{- include "lago.component.labels" (dict "componentName" "eventsworker" "context" $) | nindent 4 }}
+spec:
+  {{- if not .Values.eventsworker.autoscaling.enabled }}
+  replicas: {{ .Values.eventsworker.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "lago.component.selectorLabels" (dict "componentName" "eventsworker" "context" $) | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.eventsworker.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "lago.component.labels" (dict "componentName" "eventsworker" "context" $) | nindent 8 }}
+        {{- with .Values.eventsworker.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.eventsworker.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "lago.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.eventsworker.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: check-database-schema-exists
+          image: "{{ .Values.clock.image.repository }}:{{ .Values.clock.image.tag | default .Chart.AppVersion }}"
+          env:
+            - name: RAILS_ENV
+              value: {{ .Values.api.config.rails.env }}
+            - name: RAILS_LOG_TO_STDOUT
+              value: {{ .Values.api.config.rails.logStdout | quote }}
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lago.postgresqlSecretName" . }}
+                  key: {{ .Values.secrets.postgresql.secretKey }}
+            - name: DATABASE_URL
+              value: "postgres://{{ .Values.lagoConfig.postgresql.user }}:$(POSTGRESQL_PASSWORD)@{{ if .Values.lagoConfig.postgresql.enabled }}{{ .Release.Name }}-postgresql{{ else }}{{ .Values.lagoConfig.postgresql.host }}{{ end }}:{{ .Values.lagoConfig.postgresql.port }}/{{ .Values.lagoConfig.postgresql.db }}"
+            - name: LAGO_RSA_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lago.lagoCryptSecretName" . }}
+                  key: rsaPrivateKey
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lago.lagoCryptSecretName" . }}
+                  key: secretKeyBase
+            - name: ENCRYPTION_DETERMINISTIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lago.lagoCryptSecretName" . }}
+                  key: encryptionDeterministicKey
+            - name: ENCRYPTION_KEY_DERIVATION_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lago.lagoCryptSecretName" . }}
+                  key: encryptionKeyDerivationSalt
+            - name: ENCRYPTION_PRIMARY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lago.lagoCryptSecretName" . }}
+                  key: encryptionPrimaryKey
+            - name: LAGO_DISABLE_SEGMENT
+              value: {{ not .Values.lagoConfig.segment.enabled | quote }}
+            - name: SENTRY_DSN
+              value: {{ .Values.lagoConfig.sentry.enabled | quote }}
+          volumeMounts:
+            - name: {{ template "lago.fullname" . }}-init
+              mountPath: /app/scripts/start.sh
+              readOnly: true
+              subPath: check-database-schema-exists.sh
+      containers:
+        - name: eventsworker
+          args:
+            - ./scripts/start.events.worker.sh
+          env:
+            - name: SIDEKIQ_EVENTS
+              value: "true"
+            - name: RAILS_ENV
+              value: {{ .Values.eventsworker.config.rails.env }}
+            - name: RAILS_LOG_TO_STDOUT
+              value: {{ .Values.eventsworker.config.rails.logStdout | quote }}
+            - name: DATABASE_POOL
+              value: {{ .Values.eventsworker.config.rails.databasePoolSize | quote }}
+            - name: SIDEKIQ_CONCURRENCY
+              value: {{ .Values.eventsworker.config.rails.sidekiqConcurrency | quote }}
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lago.postgresqlSecretName" . }}
+                  key: {{ .Values.secrets.postgresql.secretKey }}
+            - name: DATABASE_URL
+              value: "postgres://{{ .Values.lagoConfig.postgresql.user }}:$(POSTGRESQL_PASSWORD)@{{ if .Values.lagoConfig.postgresql.enabled }}{{ .Release.Name }}-postgresql{{ else }}{{ .Values.lagoConfig.postgresql.host }}{{ end }}:{{ .Values.lagoConfig.postgresql.port }}/{{ .Values.lagoConfig.postgresql.db }}"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lago.redisSecretName" . }}
+                  key: {{ .Values.secrets.redis.secretKey }}
+            - name: REDIS_URL
+              value: "redis://:$(REDIS_PASSWORD)@{{ if .Values.lagoConfig.redis.enabled }}{{ .Release.Name }}-redis-master{{ else }}{{ .Values.lagoConfig.redis.host }}{{ end }}:{{ .Values.lagoConfig.redis.port }}"
+            - name: LAGO_REDIS_CACHE_URL
+              value: "redis://:$(REDIS_PASSWORD)@{{ if .Values.lagoConfig.redis.enabled }}{{ .Release.Name }}-redis-master{{ else }}{{ .Values.lagoConfig.redis.host }}{{ end }}:{{ .Values.lagoConfig.redis.port }}"
+            - name: LAGO_PDF_URL
+              value: {{ include "lago.pdfInternalUrl" . | quote }}
+            - name: LAGO_API_URL
+              value: {{ include "lago.apiInternalUrl" . | quote }}
+            - name: LAGO_FRONT_URL
+              value: {{ .Values.lagoConfig.front.url | quote }}
+            - name: LAGO_RSA_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lago.lagoCryptSecretName" . }}
+                  key: rsaPrivateKey
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lago.lagoCryptSecretName" . }}
+                  key: secretKeyBase
+            - name: ENCRYPTION_DETERMINISTIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lago.lagoCryptSecretName" . }}
+                  key: encryptionDeterministicKey
+            - name: ENCRYPTION_KEY_DERIVATION_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lago.lagoCryptSecretName" . }}
+                  key: encryptionKeyDerivationSalt
+            - name: ENCRYPTION_PRIMARY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lago.lagoCryptSecretName" . }}
+                  key: encryptionPrimaryKey
+            - name: LAGO_DISABLE_SEGMENT
+              value: {{ not .Values.lagoConfig.segment.enabled | quote }}
+            {{ if .Values.lagoConfig.license.enabled }}
+            - name: LAGO_LICENSE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lago.lagoLicenseSecretName" . }}
+                  key: {{ .Values.secrets.lagoLicense.secretKey }}
+            {{ end }}
+            {{ if .Values.lagoConfig.s3.enabled }}
+            - name: LAGO_USE_AWS_S3
+              value: "true"
+            - name: LAGO_AWS_S3_ACCESS_KEY_ID
+              value: {{ .Values.lagoConfig.s3.aws.accessKeyId | quote }}
+            - name: LAGO_AWS_S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lago.s3SecretName" . }}
+                  key: {{ .Values.secrets.s3.secretKey }}
+            - name: LAGO_AWS_S3_BUCKET
+              value: {{ .Values.lagoConfig.s3.aws.bucket | quote }}
+            - name: LAGO_AWS_S3_REGION
+              value: {{ .Values.lagoConfig.s3.aws.region | quote }}
+            - name: LAGO_AWS_S3_ENDPOINT
+              value: {{ .Values.lagoConfig.s3.aws.endpoint | quote }}
+            {{ end }}
+            {{ if .Values.lagoConfig.smtp.enabled }}
+            - name: LAGO_FROM_EMAIL
+              value: {{ .Values.lagoConfig.smtp.fromEmail }}
+            - name: LAGO_SMTP_USERNAME
+              value: {{ .Values.lagoConfig.smtp.username }}
+            - name: LAGO_SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template  "lago.smtpSecretName" . }}
+                  key: {{ .Values.secrets.smtp.secretKey }}
+            - name: LAGO_SMTP_ADDRESS
+              value: {{ .Values.lagoConfig.smtp.host }}
+            - name: LAGO_SMTP_PORT
+              value: "{{ .Values.lagoConfig.smtp.port }}"
+            {{ end }}
+            {{ if .Values.lagoConfig.newRelic.enabled }}
+            - name: NEW_RELIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template  "lago.newRelicSecretName" . }}
+                  key: {{ .Values.secrets.newRelic.secretKey }}
+            {{ end }}
+            - name: SENTRY_DSN
+              value: {{ .Values.lagoConfig.sentry.enabled | quote }}
+          securityContext:
+            {{- toYaml .Values.eventsworker.securityContext | nindent 12 }}
+          image: "{{ .Values.eventsworker.image.repository }}:{{ .Values.eventsworker.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.eventsworker.image.pullPolicy }}
+          livenessProbe:
+            exec:
+              command: ["/bin/bash", "-l", "-c", "bundle exec sidekiqmon processes | grep $(hostname) || exit 1"]
+          resources:
+            {{- toYaml .Values.eventsworker.resources | nindent 12 }}
+          {{- with .Values.eventsworker.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: {{ template "lago.fullname" . }}-init
+          configMap:
+            name: {{ template "lago.fullname" . }}-init
+            defaultMode: 0755
+      {{- with .Values.eventsworker.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.eventsworker.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.eventsworker.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.eventsworker.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

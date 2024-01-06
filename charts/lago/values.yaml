@@ -1,0 +1,615 @@
+# Default values for lago.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+secrets:
+  lagoLicense:
+    useExisting: false
+    secretKey: license
+    secretName: lago-license
+  lagoCrypt:
+    useExisting: false
+    secretName: lago-crypto
+  postgresql:
+    useExisting: false
+    secretKey: postgresql-pass
+    secretName: postgresql-pass
+  redis:
+    useExisting: false
+    secretKey: redis-password
+    secretName: redis-pass
+  smtp:
+    useExisting: false
+    secretKey: smtp-pass
+    secretName: smtp-pass
+  newRelic:
+    useExisting: false
+    secretKey: newrelic-pass
+    secretName: newrelic-pass
+  s3:
+    useExisting: false
+    secretKey: s3-accesskey
+    secretName: s3-secret
+
+lagoConfig:
+  license:
+    enabled: false
+    value: ""
+  lagoCrypt:
+    rsaPrivateKey:
+    secretKeyBase:
+    encryptionPrimaryKey:
+    encryptionDeterministicKey:
+    encryptionKeyDerivationSalt:
+  postgresql:
+    # enable / disable postgres subchart
+    enabled: true
+    host: lago-postgresql
+    port: 5432
+    user: lago
+    password: lago
+    db: lago
+    useExistingSecret: false
+    secretKey: password
+  redis:
+    # enable / disable redis subchart
+    enabled: true
+    host: lago-redis-master"
+    port: 6379
+    password: lago
+    useExistingSecret: false
+    secretKey: password
+  smtp:
+    enabled: false
+    host: localhost
+    port: 25
+    username: lago
+    password: lago
+    useExistingSecret: false
+    secretKey: password
+    fromEmail: "no-reply@localhost"
+  minio:
+    enabled: true
+  # You can enable/disable segment tracking for Lago's internal purpose
+  segment:
+    enabled: false
+  sentry:
+    enabled: false
+  s3:
+    enabled: false
+    aws:
+      accessKeyId: "lago"
+      secretAccessKey: "lagolago"
+      bucket: "lago"
+      region: "us-west-1"
+      endpoint: "http://lago-minio:9000"
+  newRelic:
+    enabled: false
+    apiKey: ""
+
+  # You can disable Lago's signup
+  signup:
+    enabled: true
+  front:
+    # public url - must be reachable from the outside
+    url:
+  api:
+    # public url - must be reachable from the outside
+    url:
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+api:
+  replicaCount: 1
+
+  image:
+    repository: getlago/api
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+
+  imagePullSecrets: []
+
+  podAnnotations: {}
+  podLabels: {}
+
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+  # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  # Additional volumes on the output Deployment definition.
+  volumes: []
+  # - name: foo
+  #   secret:
+  #     secretName: mysecret
+  #     optional: false
+
+  # Additional volumeMounts on the output Deployment definition.
+  volumeMounts: []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  # dedicated ingress for exposing api
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  # actual lago api configuration
+  config:
+    rails:
+      env: production
+      logStdout: true
+      minThreads: 0
+      maxThreads: 10
+      webConcurrency: 4
+    # if true, ensure you have the eventsworker deployment enabled!
+    sidekiqEvents: false
+    sidekiqWeb: true
+
+clock:
+  replicaCount: 1
+
+  image:
+    repository: getlago/api
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+
+  imagePullSecrets: []
+
+  podAnnotations: {}
+  podLabels: {}
+
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+  config:
+    rails:
+      env: production
+      logStdout: true
+
+
+front:
+  replicaCount: 1
+
+  image:
+    repository: getlago/front
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+
+  imagePullSecrets: []
+
+  podAnnotations: {}
+  podLabels: {}
+
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  # Additional volumes on the output Deployment definition.
+  volumes: []
+  # - name: foo
+  #   secret:
+  #     secretName: mysecret
+  #     optional: false
+
+  # Additional volumeMounts on the output Deployment definition.
+  volumeMounts: []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  # dedicated ingress for exposing front
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+
+
+pdf:
+  replicaCount: 1
+
+  image:
+    repository: getlago/lago-gotenberg
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "7.8.2"
+
+  imagePullSecrets: []
+
+  podAnnotations: {}
+  podLabels: {}
+
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+worker:
+  replicaCount: 1
+
+  image:
+    repository: getlago/api
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+
+  imagePullSecrets: []
+
+  podAnnotations: {}
+  podLabels: {}
+
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  # Additional volumes on the output Deployment definition.
+  volumes: []
+  # - name: foo
+  #   secret:
+  #     secretName: mysecret
+  #     optional: false
+
+  # Additional volumeMounts on the output Deployment definition.
+  volumeMounts: []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+  config:
+    rails:
+      env: production
+      logStdout: true
+      sidekiqConcurrency: 1
+      databasePoolSize: 1
+
+eventsworker:
+  # You can enable this eventsworker if you want to use a dedicated Sidekiq worker for the event ingestion.
+  # It is recommended if you have a high usage of events to not impact the other Sidekiq Jobs.
+  # ensure disabling event ingestion in the api config!
+  enabled: false
+
+  replicaCount: 1
+
+  image:
+    repository: getlago/api
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+
+  imagePullSecrets: []
+
+  podAnnotations: {}
+  podLabels: {}
+
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+  #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  # Additional volumes on the output Deployment definition.
+  volumes: []
+  # - name: foo
+  #   secret:
+  #     secretName: mysecret
+  #     optional: false
+
+  # Additional volumeMounts on the output Deployment definition.
+  volumeMounts: []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+  config:
+    rails:
+      env: production
+      logStdout: true
+      sidekiqConcurrency: 1
+      databasePoolSize: 1
+
+
+
+# settings for the postgres subchart
+postgresql:
+  auth:
+    username: "lago"
+    replicationUsername: repl_user
+    database: "lago"
+
+    # Passwords
+    postgresPassword: "lago"
+    password: "lago"
+    replicationPassword: "lago"
+
+    # To avoid passwords in your values.yaml, you can comment out the 3 lines above
+    # and use an existing Kubernetes secret. Remove the comments on the lines below
+    # and adjust them accordingly
+    #
+    # existingSecret: postgresql-pass
+    # secretKeys:
+    #   adminPasswordKey: postgresql-admin-password
+    #   userPasswordKey: postgresql-pass
+    #   replicationPasswordKey: postgresql-replication-password
+    #
+  primary:
+   # resources:
+     # limits: {}
+     # requests:
+       # memory: 256Mi
+       # cpu: 250m
+    persistence:
+      size: 1Gi
+
+# settings for the redis subchart
+redis:
+  architecture: standalone
+  auth:
+    password: lago
+    # To avoid passwords in your values.yaml, you can comment out the line above
+    # and use an existing Kubernetes secret. Remove the comments on the lines below
+    # and adjust them accordingly
+    #
+    # existingSecret: redis-pass
+    # existingSecretPasswordKey: redis-password
+  master:
+    persistence:
+      size: 1Gi
+    resources: {}
+    # limits:
+    #   cpu: 250m
+    #   memory: 256Mi
+    # requests:
+    #   cpu: 250m
+    #   memory: 256Mi
+
+# settings for the minio subchart
+minio:
+  mode: standalone
+  rootUser: "lago"
+  rootPassword: "lagolago"
+  replicas: 1
+  persistence:
+    size: 1Gi
+  resources: {}
+    # limits:
+    #   cpu: 250m
+    #   memory: 256Mi
+    # requests:
+    #   cpu: 250m
+    #   memory: 256Mi
+  buckets:
+    - name: lago
+      policy: none
+      purge: false

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "lago.component.fullname" (dict "componentName" "front" "context" $) }}
+  labels:
+    {{- include "lago.component.labels" (dict "componentName" "front" "context" $) | nindent 4 }}
+spec:
+  type: {{ .Values.front.service.type }}
+  ports:
+    - port: {{ .Values.front.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "lago.component.selectorLabels" (dict "componentName" "front" "context" $) | nindent 4 }}
