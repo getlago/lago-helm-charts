@@ -59,6 +59,8 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Name }}-secrets
                   key: encryptionPrimaryKey
+            - name: LAGO_LOG_LEVEL
+              value: {{ .Values.clock.rails.logLevel | quote }}
             {{ if .Values.global.newRelic.enabled }}
             - name: NEW_RELIC_KEY
               valueFrom:

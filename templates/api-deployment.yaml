@@ -87,6 +87,8 @@ spec:
               value: "true"
             - name: WEB_CONCURRENCY
               value: {{ .Values.api.rails.webConcurrency | quote }}
+            - name: LAGO_LOG_LEVEL
+              value: {{ .Values.api.rails.logLevel | quote }}
             {{ if .Values.global.license }}
             - name: LAGO_LICENSE
               valueFrom:
