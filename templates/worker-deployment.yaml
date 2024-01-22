@@ -77,6 +77,8 @@ spec:
               value: {{ .Values.worker.rails.sidekiqConcurrency | quote }}
             - name: SIDEKIQ_CONCURRENCY
               value: {{ .Values.worker.rails.sidekiqConcurrency | quote }}
+            - name: LAGO_LOG_LEVEL
+              value: {{ .Values.worker.rails.logLevel | quote }}
             {{ if .Values.global.license }}
             - name: LAGO_LICENSE
               valueFrom:

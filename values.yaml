@@ -1,4 +1,4 @@
-version: "0.54.1-beta"
+version: "0.54.2-beta"
 
 #apiUrl:
 #frontUrl:
@@ -56,7 +56,7 @@ global:
     #fromEmail:
   newRelic:
     enabled: false
-    #key
+    #key:
   
   # You can disable Lago's signup
   signup:
@@ -73,8 +73,8 @@ front:
   service:
     port: 80
   resources:
-    memory: 128
-    cpu: "100m"
+    memory: 512
+    cpu: "200m"
 
 api:
   replicas: 1
@@ -85,11 +85,12 @@ api:
     webConcurrency: 4
     env: "production"
     logStdout: true
+    logLevel: error
   sidekiqWeb:
     enabled: true
   resources:
-    memory: 128
-    cpu: "100m"
+    memory: 1024
+    cpu: "1000m"
   volumes:
     storage: "10Gi"
 
@@ -99,9 +100,10 @@ worker:
     sidekiqConcurrency: 100
     env: "production"
     logStdout: true
+    logLevel: error
   resources:
-    memory: 128
-    cpu: "100m"
+    memory: 1024
+    cpu: "1000m"
 
 eventsWorker:
   replicas: 1
@@ -109,17 +111,19 @@ eventsWorker:
     sidekiqConcurrency: 100
     env: "production"
     logStdout: true
+    logLevel: error
   resources:
-    memory: 128
-    cpu: "100m"
+    memory: 1024
+    cpu: "1000m"
 
 clock:
   replicas: 1
   rails:
     env: "production"
     logStdout: true
+    logLevel: info
   resources:
-    memory: 128
+    memory: 256
     cpu: "100m"
 
 pdf:
@@ -127,5 +131,5 @@ pdf:
   service:
     port: 3001
   resources:
-    memory: 128
-    cpu: "100m"
+    memory: 2048
+    cpu: "1000m"
