@@ -1,7 +1,7 @@
-version: "0.54.2-beta"
+version: "0.55.0-beta"
 
-#apiUrl:
-#frontUrl:
+# apiUrl:
+# frontUrl:
 
 # Only for Development, Staging or PoC, you should use a managed Redis instance for Production
 redis:
@@ -62,8 +62,8 @@ global:
   signup:
     enabled: true
   
-  #ingress:
-    #enabled:
+  ingress:
+    enabled: false
     #frontHostname:
     #apiHostname:
     #className:
