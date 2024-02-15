@@ -1,7 +1,7 @@
 version: "0.56.0-beta"
 
-# apiUrl: 
-# frontUrl:
+apiUrl: test
+frontUrl: test
 
 # Only for Development, Staging or PoC, you should use a managed Redis instance for Production
 redis:

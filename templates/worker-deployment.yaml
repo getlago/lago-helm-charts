@@ -156,6 +156,9 @@ spec:
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
           name: {{ .Release.Name }}-worker
+          livenessProbe:
+            exec:
+              command: ["/bin/bash", "-l", "-c", "bundle exec sidekiqmon processes | grep $(hostname) || exit 1"]
           resources:
             requests:
               memory: {{ .Values.worker.resources.memory }}

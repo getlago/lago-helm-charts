@@ -175,8 +175,17 @@ spec:
           image: getlago/api:v{{ .Values.version }}
           name: {{ .Release.Name }}-api
           ports:
-            - containerPort: 3000
+            - name: http
+              containerPort: 3000
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
           resources:
             requests:
               memory: {{ .Values.api.resources.memory }}
