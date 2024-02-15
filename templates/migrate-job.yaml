@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-migrate"
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}-migrate"
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    spec:
+      restartPolicy: Never
+      initContainers:
+        {{ if .Values.postgresql.enabled }}
+          - name: wait-for-postgresql
+            image: "docker.io/bitnami/kubectl:{{ printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor }}"
+            args:
+              - wait
+              - pod/{{ .Release.Name }}-postgresql-0
+              - --for=condition=ready
+              - --timeout=180s
+          {{ end }}
+      containers:
+        - name: lago-migrate
+          image: getlago/api:v{{ .Values.version }}
+          args:
+            - bundle
+            - exec
+            - rake
+            - db:migrate:primary
+          env:
+            - name: RAILS_ENV
+              value: {{ .Values.api.rails.env }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: databaseUrl
+            - name: LAGO_RSA_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: rsaPrivateKey
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: secretKeyBase
+      serviceAccountName: {{ .Values.global.serviceAccountName | default (printf "%s-serviceaccount" .Release.Name) }}
