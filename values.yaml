@@ -1,7 +1,7 @@
 version: "0.55.0-beta"
 
-# apiUrl:
-# frontUrl:
+apiUrl: https://toto.dev
+frontUrl: https://toto.dev
 
 # Only for Development, Staging or PoC, you should use a managed Redis instance for Production
 redis:
@@ -67,6 +67,8 @@ global:
     #frontHostname:
     #apiHostname:
     #className:
+  
+  #serviceAccountName: 
 
 front:
   replicas: 1
@@ -94,7 +96,6 @@ api:
     cpu: "1000m"
   volumes:
     storage: "10Gi"
-  # serviceAccountName:
   # podAnnotations:
 
 worker:
@@ -107,7 +108,6 @@ worker:
   resources:
     memory: 1024
     cpu: "1000m"
-  # serviceAccountName:
   # podAnnotations:
 
 eventsWorker:

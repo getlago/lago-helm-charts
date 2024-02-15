@@ -20,6 +20,16 @@ spec:
         {{ $key }}: {{ $value | quote }}
         {{ end }}
     spec:
+      initContainers:
+        {{ if .Values.redis.enabled }}
+        - name: wait-for-redis
+          image: "docker.io/bitnami/kubectl:{{ printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor }}"
+          args:
+            - wait
+            - pod/{{ .Release.Name }}-redis-master-0
+            - --for=condition=ready
+            - --timeout=180s
+        {{ end }}
       containers:
         - args:
             - ./scripts/start.clock.sh
@@ -79,3 +89,4 @@ spec:
               memory: {{ .Values.clock.resources.memory }}
               cpu: {{ .Values.clock.resources.cpu }}
       restartPolicy: Always
+      serviceAccountName: {{ .Values.global.serviceAccountName | default (printf "%s-serviceaccount" .Release.Name) }}
