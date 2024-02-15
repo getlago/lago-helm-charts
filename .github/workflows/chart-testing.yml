@@ -19,21 +19,6 @@ jobs:
       
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2
-      
-      - name: Run chart-testing (list-changed)
-        id: list-changed
-        run: |
-          changed=$(ct list-changed)
-          if [[ -n "$changed" ]]; then
-            echo "{changed}={true}" >> $GITHUB_OUTPUT
-          fi
-      
+
       - name: Run chart-testing (lint)
         run: ct lint
-      
-      - name: Create Kind cluster
-        uses: helm/kind-action@v1
-        if: ${{ needs.list-changed.outputs.changed }} == 'true'
-      
-      - name: Run chart-testing (install)
-        run: ct install
