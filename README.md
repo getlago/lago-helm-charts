@@ -1,7 +1,7 @@
 # Lago Helm Chart
 
-Version: 0.5.0
-Lago Version : v0.56.0-beta
+Version: 0.5.1
+Lago Version : v0.57.0-beta
 
 ## Configuration
 
