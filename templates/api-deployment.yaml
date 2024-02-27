@@ -23,7 +23,7 @@ spec:
       initContainers:
       {{ if .Values.postgresql.enabled }}
         - name: wait-for-postgresql
-          image: "docker.io/bitnami/kubectl:{{ printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor }}"
+          image: "docker.io/bitnami/kubectl:{{ printf "%s" .Values.global.kubectlVersion }}"
           args:
             - wait
             - pod/{{ .Release.Name }}-postgresql-0
@@ -32,7 +32,7 @@ spec:
       {{ end }}
       {{ if .Values.redis.enabled }}
         - name: wait-for-redis
-          image: "docker.io/bitnami/kubectl:{{ printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor }}"
+          image: "docker.io/bitnami/kubectl:{{ printf "%s" .Values.global.kubectlVersion }}"
           args:
             - wait
             - pod/{{ .Release.Name }}-redis-master-0
@@ -40,7 +40,7 @@ spec:
             - --timeout=180s
       {{ end }}
         - name: wait-for-migrations
-          image: "docker.io/bitnami/kubectl:{{ printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor }}"
+          image: "docker.io/bitnami/kubectl:{{ printf "%s" .Values.global.kubectlVersion }}"
           args:
             - wait
             - job/{{ .Release.Name }}-migrate

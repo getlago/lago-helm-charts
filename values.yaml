@@ -68,7 +68,8 @@ global:
     #apiHostname:
     #className:
   
-  #serviceAccountName: 
+  #serviceAccountName:
+  #kubeCtlVersion:
 
 front:
   replicas: 1
