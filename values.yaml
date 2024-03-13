@@ -47,6 +47,7 @@ global:
     #   secretAccessKey:
     #   bucket:
     #   region:
+    #   endpoint:
   smtp:
     enabled: false
     #address:
@@ -57,17 +58,17 @@ global:
   newRelic:
     enabled: false
     #key:
-  
+
   # You can disable Lago's signup
   signup:
     enabled: true
-  
+
   ingress:
     enabled: false
     #frontHostname:
     #apiHostname:
     #className:
-  
+
   #serviceAccountName:
   #kubeCtlVersion:
 
