@@ -38,12 +38,12 @@ spec:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: databaseUrl
             - name: REDIS_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: redisUrl
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:

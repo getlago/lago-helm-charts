@@ -26,8 +26,20 @@ global:
   # If you use a managed PG instance
   # Should respect this format postgresql://USER:PASSWORD@HOST:PORT/DATABASE_NAME
   #databaseUrl:
+  # Should respect standard redis URL format redis://..., redis+sentinel://...
   #redisUrl:
 
+  # If you wish to provide an existing secret with credentials in, then you can do so here.
+  # The following fields are required:
+  #  - databaseUrl: <SEE FORMAT ABOVE>
+  #  - redisUrl:
+  #  - awsS3AccessKeyId:
+  #  - awsS3SecretAccessKey:
+  #  - smtpUsername:
+  #  - smtpPassword:
+  #existingSecret: "lago-credentials"
+
+  # Not required if using existingSecret
   postgresql:
     auth:
       username: lago
@@ -42,6 +54,7 @@ global:
     enabled: true
   s3:
     enabled: false
+    # accessKeyId and secretAccessKey are not required here if using existingSecret
     # aws:
     #   accessKeyId:
     #   secretAccessKey:
@@ -49,6 +62,7 @@ global:
     #   region:
     #   endpoint:
   smtp:
+    # username and password are not required here if using existingSecret
     enabled: false
     #address:
     #username:

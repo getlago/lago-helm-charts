@@ -48,17 +48,17 @@ spec:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: databaseUrl
             - name: REDIS_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: redisUrl
             - name: LAGO_REDIS_CACHE_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: redisUrl
             - name: LAGO_PDF_URL
               {{- $pdfHost := printf "%s-pdf-svc.%s" .Release.Name .Release.Namespace}}
@@ -120,14 +120,14 @@ spec:
             - name: LAGO_AWS_S3_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: awsS3AccessKeyId
             {{ end }}
             {{ if .Values.global.s3.aws.secretAccessKey }}
             - name: LAGO_AWS_S3_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: awsS3SecretAccessKey
             {{ end }}
             - name: LAGO_AWS_S3_BUCKET
@@ -143,12 +143,12 @@ spec:
             - name: LAGO_SMTP_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: smtpUsername
             - name: LAGO_SMTP_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: smtpPassword
             - name: LAGO_SMTP_PORT
               value: "{{ .Values.global.smtp.port }}"
