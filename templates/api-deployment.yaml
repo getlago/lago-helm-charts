@@ -134,14 +134,14 @@ spec:
             - name: LAGO_AWS_S3_ENDPOINT
               value: {{ .Values.global.s3.aws.endpoint | quote }}
             {{ end }}
-            {{ if .Values.global.s3.aws.accessKeyId }}
+            {{ if or .Values.global.s3.aws.accessKeyId .Values.global.existingSecret }}
             - name: LAGO_AWS_S3_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
                   name: {{ include "secret-path" . }}
                   key: awsS3AccessKeyId
             {{ end }}
-            {{ if .Values.global.s3.aws.secretAccessKey }}
+            {{ if or .Values.global.s3.aws.secretAccessKey .Values.global.existingSecret }}
             - name: LAGO_AWS_S3_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
