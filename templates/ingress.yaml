@@ -5,7 +5,7 @@ metadata:
   name: {{ .Release.Name }}-ingress
   annotations:
 {{ if .Values.global.ingress.annotations }}
-  {{- with .Values.ingress.annotations }}
+  {{- with .Values.global.ingress.annotations }}
     {{- toYaml . | trim | nindent 4 }}
   {{- end }}
 {{ end }}
@@ -14,9 +14,8 @@ spec:
   tls:
   - hosts:
     - {{ .Values.global.ingress.frontHostname }}
-    secretName: {{ .Release.Name }}-ingress-secret
     - {{ .Values.global.ingress.apiHostname }}
-    secretName: {{ .Release.Name }}-api-ingress-secret
+    secretName: {{ .Release.Name }}-ingress-secret
   rules:
   - host: {{ .Values.global.ingress.frontHostname }}
     http:

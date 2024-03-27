@@ -23,22 +23,20 @@ spec:
       initContainers:
         {{ if .Values.redis.enabled }}
         - name: wait-for-redis
-          image: "docker.io/bitnami/kubectl:{{ printf "%s" .Values.global.kubectlVersion }}"
+          image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
           args:
             - wait
             - pod/{{ .Release.Name }}-redis-master-0
             - --for=condition=ready
             - --timeout=180s
         {{ end }}
-        {{ if .Values.global.kubectlVersion }}
         - name: wait-for-migrations
-          image: "docker.io/bitnami/kubectl:{{ printf "%s" .Values.global.kubectlVersion }}"
+          image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
           args:
             - wait
             - job/{{ .Release.Name }}-migrate
             - --for=condition=complete
             - --timeout=180s
-        {{ end }}
       containers:
         - args:
             - ./scripts/start.worker.sh
@@ -48,17 +46,17 @@ spec:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: databaseUrl
             - name: REDIS_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: redisUrl
             - name: LAGO_REDIS_CACHE_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: redisUrl
             - name: LAGO_PDF_URL
               {{- $pdfHost := printf "%s-pdf-svc.%s" .Release.Name .Release.Namespace}}
@@ -116,18 +114,18 @@ spec:
             - name: LAGO_AWS_S3_ENDPOINT
               value: {{ .Values.global.s3.aws.endpoint | quote }}
             {{ end }}
-            {{ if .Values.global.s3.aws.accessKeyId }}
+            {{ if or .Values.global.s3.aws.accessKeyId .Values.global.existingSecret }}
             - name: LAGO_AWS_S3_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: awsS3AccessKeyId
             {{ end }}
-            {{ if .Values.global.s3.aws.secretAccessKey }}
+            {{ if or .Values.global.s3.aws.secretAccessKey .Values.global.existingSecret }}
             - name: LAGO_AWS_S3_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: awsS3SecretAccessKey
             {{ end }}
             - name: LAGO_AWS_S3_BUCKET
@@ -143,12 +141,12 @@ spec:
             - name: LAGO_SMTP_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: smtpUsername
             - name: LAGO_SMTP_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: smtpPassword
             - name: LAGO_SMTP_PORT
               value: "{{ .Values.global.smtp.port }}"

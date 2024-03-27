@@ -17,7 +17,7 @@ spec:
       initContainers:
         {{ if .Values.postgresql.enabled }}
           - name: wait-for-postgresql
-            image: "docker.io/bitnami/kubectl:{{ printf "%s.%s" .Capabilities.KubeVersion.Major .Capabilities.KubeVersion.Minor }}"
+            image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
             args:
               - wait
               - pod/{{ .Release.Name }}-postgresql-0
@@ -38,12 +38,12 @@ spec:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: databaseUrl
             - name: REDIS_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "secret-path" . }}
                   key: redisUrl
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:
