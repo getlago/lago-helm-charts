@@ -23,22 +23,20 @@ spec:
       initContainers:
         {{ if .Values.redis.enabled }}
         - name: wait-for-redis
-          image: "docker.io/bitnami/kubectl:{{ printf "%s" .Values.global.kubectlVersion }}"
+          image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
           args:
             - wait
             - pod/{{ .Release.Name }}-redis-master-0
             - --for=condition=ready
             - --timeout=180s
         {{ end }}
-        {{ if .Values.global.kubectlVersion }}
         - name: wait-for-migrations
-          image: "docker.io/bitnami/kubectl:{{ printf "%s" .Values.global.kubectlVersion }}"
+          image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
           args:
             - wait
             - job/{{ .Release.Name }}-migrate
             - --for=condition=complete
             - --timeout=180s
-        {{ end }}
       containers:
         - args:
             - ./scripts/start.events.worker.sh

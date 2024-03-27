@@ -23,7 +23,7 @@ spec:
       initContainers:
         {{ if .Values.redis.enabled }}
         - name: wait-for-redis
-          image: "docker.io/bitnami/kubectl:{{ printf "%s" .Values.global.kubectlVersion }}"
+          image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
           args:
             - wait
             - pod/{{ .Release.Name }}-redis-master-0
