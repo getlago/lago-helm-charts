@@ -30,13 +30,13 @@ spec:
             - --for=condition=ready
             - --timeout=180s
         {{ end }}
-        - name: wait-for-migrations
-          image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
-          args:
-            - wait
-            - job/{{ .Release.Name }}-migrate
-            - --for=condition=complete
-            - --timeout=180s
+        # - name: wait-for-migrations
+        #   image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
+        #   args:
+        #     - wait
+        #     - job/{{ .Release.Name }}-migrate
+        #     - --for=condition=complete
+        #     - --timeout=180s
       containers:
         - args:
             - ./scripts/start.events.worker.sh
