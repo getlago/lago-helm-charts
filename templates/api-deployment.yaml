@@ -15,10 +15,13 @@ spec:
     metadata:
       labels:
         io.lago.service: {{ .Release.Name }}-api
-      annotations:
-        {{ range $key, $value := .Values.api.podAnnotations }}
+        {{- range $key, $value := .Values.api.podLabels }}
         {{ $key }}: {{ $value | quote }}
-        {{ end }}
+        {{- end }}
+      annotations:
+        {{- range $key, $value := .Values.api.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
     spec:
       initContainers:
       {{ if .Values.postgresql.enabled }}

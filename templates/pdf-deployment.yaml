@@ -13,10 +13,13 @@ spec:
     metadata:
       labels:
         io.lago.service: {{ .Release.Name }}-pdf
-      annotations:
-        {{ range $key, $value := .Values.pdf.podAnnotations }}
+        {{- range $key, $value := .Values.pdf.podLabels }}
         {{ $key }}: {{ $value | quote }}
-        {{ end }}
+        {{- end }}
+      annotations:
+        {{- range $key, $value := .Values.pdf.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
     spec:
       containers:
         - image: getlago/lago-gotenberg:7.8.2

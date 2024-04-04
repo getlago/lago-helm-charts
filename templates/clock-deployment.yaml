@@ -15,10 +15,13 @@ spec:
     metadata:
       labels:
         io.lago.service: {{ .Release.Name }}-clock
-      annotations:
-        {{ range $key, $value := .Values.clock.podAnnotations }}
+        {{- range $key, $value := .Values.clock.podLabels }}
         {{ $key }}: {{ $value | quote }}
-        {{ end }}
+        {{- end }}
+      annotations:
+        {{- range $key, $value := .Values.clock.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
     spec:
       initContainers:
         {{ if .Values.redis.enabled }}
