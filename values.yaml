@@ -83,6 +83,11 @@ global:
     #apiHostname:
     #className:
 
+  networkPolicy:
+    enabled: false
+    egress: []
+    ingress: []
+
   #serviceAccountName:
 
   # If kubectlVersion is not supplied it will be inferred using the version of the cluster that Lago is deployed on.
