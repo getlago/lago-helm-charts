@@ -62,4 +62,8 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Name }}-secrets
                   key: secretKeyBase
+          {{- with .Values.job.migrate.resources }}
+          resources:
+            {{- toYaml . | nindent 12}}
+          {{- end }}
       serviceAccountName: {{ .Values.global.serviceAccountName | default (printf "%s-serviceaccount" .Release.Name) }}

@@ -87,9 +87,9 @@ spec:
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
           name: {{ .Release.Name }}-clock
+          {{- with .Values.clock.resources }}
           resources:
-            requests:
-              memory: {{ .Values.clock.resources.memory }}
-              cpu: {{ .Values.clock.resources.cpu }}
+            {{- toYaml . | nindent 12}}
+          {{- end }}
       restartPolicy: Always
       serviceAccountName: {{ .Values.global.serviceAccountName | default (printf "%s-serviceaccount" .Release.Name) }}

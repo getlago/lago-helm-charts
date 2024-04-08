@@ -98,8 +98,9 @@ front:
   service:
     port: 80
   resources:
-    memory: 512
-    cpu: "200m"
+    requests:
+      memory: 512Mi
+      cpu: "200m"
   podAnnotations: {}
   podLabels: {}
 
@@ -116,8 +117,9 @@ api:
   sidekiqWeb:
     enabled: true
   resources:
-    memory: 1024
-    cpu: "1000m"
+    requests:
+      memory: 1Gi
+      cpu: "1000m"
   volumes:
     storage: "10Gi"
   podAnnotations: {}
@@ -131,8 +133,9 @@ worker:
     logStdout: true
     logLevel: error
   resources:
-    memory: 1024
-    cpu: "1000m"
+    requests:
+      memory: 1Gi
+      cpu: "1000m"
   podAnnotations: {}
   podLabels: {}
 
@@ -144,8 +147,9 @@ eventsWorker:
     logStdout: true
     logLevel: error
   resources:
-    memory: 1024
-    cpu: "1000m"
+    requests:
+      memory: 1Gi
+      cpu: "1000m"
   podAnnotations: {}
   podLabels: {}
 
@@ -156,8 +160,9 @@ clock:
     logStdout: true
     logLevel: info
   resources:
-    memory: 256
-    cpu: "100m"
+    requests:
+      memory: 256Mi
+      cpu: "100m"
   podAnnotations: {}
   podLabels: {}
 
@@ -166,8 +171,9 @@ pdf:
   service:
     port: 3001
   resources:
-    memory: 2048
-    cpu: "1000m"
+    requests:
+      memory: 2Gi
+      cpu: "1000m"
   podAnnotations: {}
   podLabels: {}
 
@@ -175,3 +181,4 @@ job:
   migrate:
     podAnnotations: {}
     podLabels: {}
+    resources: {}

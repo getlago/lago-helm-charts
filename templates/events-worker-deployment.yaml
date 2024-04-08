@@ -103,10 +103,10 @@ spec:
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
           name: {{ .Release.Name }}-events-worker
+          {{- with .Values.eventsWorker.resources }}
           resources:
-            requests:
-              memory: {{ .Values.eventsWorker.resources.memory }}
-              cpu: {{ .Values.eventsWorker.resources.cpu }}
+            {{- toYaml . | nindent 12}}
+          {{- end }}
           livenessProbe:
             exec:
               command: ["/bin/bash", "-l", "-c", "bundle exec sidekiqmon processes | grep $(hostname) || exit 1"]
