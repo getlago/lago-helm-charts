@@ -27,8 +27,8 @@ spec:
           ports:
             - containerPort: 3000
               protocol: TCP
+          {{- with .Values.pdf.resources }}
           resources:
-            requests:
-              memory: {{ .Values.pdf.resources.memory }}
-              cpu: {{ .Values.pdf.resources.cpu }}
+            {{- toYaml . | nindent 12}}
+          {{- end }}
       restartPolicy: Always

@@ -193,10 +193,10 @@ spec:
             httpGet:
               path: /health
               port: http
+          {{- with .Values.api.resources }}
           resources:
-            requests:
-              memory: {{ .Values.api.resources.memory }}
-              cpu: {{ .Values.api.resources.cpu }}
+            {{- toYaml . | nindent 12}}
+          {{- end }}
           {{ if not .Values.global.s3.enabled }}
           volumeMounts:
             - mountPath: /app/storage

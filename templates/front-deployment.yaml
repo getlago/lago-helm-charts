@@ -36,8 +36,8 @@ spec:
           ports:
             - containerPort: 80
               protocol: TCP
+          {{- with .Values.front.resources }}
           resources:
-            requests:
-              memory: {{ .Values.front.resources.memory }}
-              cpu: {{ .Values.front.resources.cpu }}
+            {{- toYaml . | nindent 12}}
+          {{- end }}
       restartPolicy: Always

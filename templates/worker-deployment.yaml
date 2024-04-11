@@ -166,10 +166,10 @@ spec:
           livenessProbe:
             exec:
               command: ["/bin/bash", "-l", "-c", "bundle exec sidekiqmon processes | grep $(hostname) || exit 1"]
+          {{- with .Values.worker.resources }}
           resources:
-            requests:
-              memory: {{ .Values.worker.resources.memory }}
-              cpu: {{ .Values.worker.resources.cpu }}
+            {{- toYaml . | nindent 12}}
+          {{- end }}
           {{ if not .Values.global.s3.enabled }}
           volumeMounts:
             - mountPath: /app/storage
