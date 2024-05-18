@@ -13,8 +13,8 @@ spec:
   ingressClassName: {{ .Values.global.ingress.className }}
   tls:
   - hosts:
-    - {{ .Values.global.ingress.frontHostname }}
-    - {{ .Values.global.ingress.apiHostname }}
+    - {{ .Values.frontUrlDomain }}
+    - {{ .Values.apiUrlDomain }}
     secretName: {{ .Release.Name }}-ingress-secret
   rules:
   - host: {{ .Values.global.ingress.frontHostname }}

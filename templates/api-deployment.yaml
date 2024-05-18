@@ -73,9 +73,9 @@ spec:
               {{- $pdfHost := printf "%s-pdf-svc.%s" .Release.Name .Release.Namespace}}
               value: {{ printf "http://%s:%v" $pdfHost .Values.pdf.service.port | quote }}
             - name: LAGO_API_URL
-              value: {{ required "apiUrl value is required" .Values.apiUrl | quote }}
+              value: {{ include "apiUrl" . | quote }}
             - name: LAGO_FRONT_URL
-              value: {{ required "frontUrl value is required" .Values.frontUrl | quote }}
+              value: {{ include "frontUrl" . | quote }}
             - name: LAGO_SIDEKIQ_WEB
               value: {{ .Values.api.sidekiqWeb.enabled | quote }}
             - name: RAILS_LOG_TO_STDOUT
