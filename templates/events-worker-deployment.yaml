@@ -37,7 +37,7 @@ spec:
           image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
           args:
             - wait
-            - job/{{ .Release.Name }}-migrate
+            - job/{{ include "migrateJobName" . }}
             - --for=condition=complete
             - --timeout=180s
       containers:
