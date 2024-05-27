@@ -5,6 +5,7 @@ metadata:
   labels:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:
+  ttlSecondsAfterFinished: {{ .Values.job.migrate.ttlSecondsAfterFinished }}
   template:
     metadata:
       name: "{{ .Release.Name }}-migrate"
