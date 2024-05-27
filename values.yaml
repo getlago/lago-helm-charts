@@ -179,7 +179,7 @@ pdf:
 
 job:
   migrate:
-    ttlSecondsAfterFinished: 60s
+    ttlSecondsAfterFinished: 60
     podAnnotations: {}
     podLabels: {}
     resources: {}
