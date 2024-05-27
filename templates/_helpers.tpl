@@ -20,3 +20,4 @@
 {{- else -}}
 {{ printf "%s-migrate-%s" .Release.Name (.Values | toYaml | cat .Chart.Version | sha256sum | trunc 8) }}
 {{- end }}
+{{- end}}
