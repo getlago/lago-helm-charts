@@ -1,7 +1,9 @@
 version: "1.2.1"
 
-# apiUrl: mydomain.dev
-# frontUrl: mydomain.dev
+#apiUrlScheme: https
+apiUrlDomain: api-lago.example.com
+#frontUrlScheme: https
+frontUrlDomain: lago.example.com
 
 # Only for Development, Staging or PoC, you should use a managed Redis instance for Production
 redis:

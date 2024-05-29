@@ -24,11 +24,11 @@ spec:
       containers:
         - env:
             - name: API_URL
-              value: {{ .Values.apiUrl | quote }}
+              value: {{ include "apiUrl" . | quote }}
             - name: APP_ENV
               value: production
             - name: CODEGEN_API
-              value: {{ .Values.apiUrl | quote }}
+              value: {{ include "apiUrl" . | quote }}
             - name: LAGO_DISABLE_SIGNUP
               value: {{ not .Values.global.signup.enabled | quote }}
           image: getlago/front:v{{ .Values.version }}
