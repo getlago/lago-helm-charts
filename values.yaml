@@ -179,6 +179,7 @@ pdf:
 
 job:
   migrate:
+    nameOverride: null
     podAnnotations: {}
     podLabels: {}
     resources: {}
