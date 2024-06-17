@@ -6,9 +6,9 @@ version: 1.4.0
 dependencies:
   - name: postgresql
     version: "13.2.2"
-    repository: file://charts
+    repository: "file://./chart_deps"
     condition: postgresql.enabled
   - name: redis
     version: "18.2.1"
-    repository: file://charts
+    repository: "file://./chart_deps"
     condition: redis.enabled
