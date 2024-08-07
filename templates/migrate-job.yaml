@@ -38,7 +38,7 @@ spec:
             - bundle
             - exec
             - rake
-            - db:migrate:primary
+            - db:migrate
           env:
             - name: RAILS_ENV
               value: {{ .Values.api.rails.env }}
