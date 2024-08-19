@@ -1,7 +1,7 @@
 # Lago Helm Chart
 
-Version: 1.8.2
-Lago Version : v1.8.2
+Version: 1.9.0
+Lago Version : v1.9.0
 
 ## Configuration
 
