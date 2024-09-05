@@ -1,4 +1,4 @@
-version: "1.8.2"
+version: '1.10.0'
 
 # apiUrl: mydomain.dev
 # frontUrl: mydomain.dev
@@ -100,7 +100,7 @@ front:
   resources:
     requests:
       memory: 512Mi
-      cpu: "200m"
+      cpu: '200m'
   podAnnotations: {}
   podLabels: {}
 
@@ -111,7 +111,7 @@ api:
   rails:
     maxThreads: 10
     webConcurrency: 4
-    env: "production"
+    env: 'production'
     logStdout: true
     logLevel: error
   sidekiqWeb:
@@ -119,9 +119,9 @@ api:
   resources:
     requests:
       memory: 1Gi
-      cpu: "1000m"
+      cpu: '1000m'
   volumes:
-    storage: "10Gi"
+    storage: '10Gi'
   podAnnotations: {}
   podLabels: {}
 
@@ -129,13 +129,13 @@ worker:
   replicas: 1
   rails:
     sidekiqConcurrency: 100
-    env: "production"
+    env: 'production'
     logStdout: true
     logLevel: error
   resources:
     requests:
       memory: 1Gi
-      cpu: "1000m"
+      cpu: '1000m'
   podAnnotations: {}
   podLabels: {}
 
@@ -143,26 +143,26 @@ eventsWorker:
   replicas: 1
   rails:
     sidekiqConcurrency: 100
-    env: "production"
+    env: 'production'
     logStdout: true
     logLevel: error
   resources:
     requests:
       memory: 1Gi
-      cpu: "1000m"
+      cpu: '1000m'
   podAnnotations: {}
   podLabels: {}
 
 clock:
   replicas: 1
   rails:
-    env: "production"
+    env: 'production'
     logStdout: true
     logLevel: info
   resources:
     requests:
       memory: 256Mi
-      cpu: "100m"
+      cpu: '100m'
   podAnnotations: {}
   podLabels: {}
 
@@ -173,7 +173,7 @@ pdf:
   resources:
     requests:
       memory: 2Gi
-      cpu: "1000m"
+      cpu: '1000m'
   podAnnotations: {}
   podLabels: {}
 
