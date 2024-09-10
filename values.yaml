@@ -192,3 +192,6 @@ job:
     podAnnotations: {}
     podLabels: {}
     resources: {}
+
+minio:
+  fullnameOverride: "{{ .Release.Name }}-minio"
