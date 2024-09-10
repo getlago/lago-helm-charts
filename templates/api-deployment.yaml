@@ -128,32 +128,59 @@ spec:
                   name: {{ .Release.Name }}-secrets
                   key: license
             {{ end }}
+
             {{ if .Values.global.s3.enabled }}
-            - name: LAGO_USE_AWS_S3
-              value: "true"
-            {{ if .Values.global.s3.aws.endpoint }}
-            - name: LAGO_AWS_S3_ENDPOINT
-              value: {{ .Values.global.s3.aws.endpoint | quote }}
+              - name: LAGO_USE_AWS_S3
+                value: "true"  
+
+              {{ if .Values.global.s3.aws.endpoint or .Values.global.s3.minio.endpoint }}
+              - name: LAGO_AWS_S3_ENDPOINT
+                value: {{ if eq .Values.global.s3.provider "minio" }}
+                          {{ .Values.global.s3.minio.endpoint | quote }}
+                        {{ else }}
+                          {{ .Values.global.s3.aws.endpoint | quote }}
+                        {{ end }}
+              {{ end }}
+
+              {{ if or .Values.global.s3.aws.accessKeyId .Values.global.s3.minio.accessKeyId .Values.global.existingSecret }}
+              - name: LAGO_AWS_S3_ACCESS_KEY_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ include "secret-path" . }}
+                    key: {{ if eq .Values.global.s3.provider "minio" }}
+                            minioAccessKeyId
+                          {{ else }}
+                            awsS3AccessKeyId
+                          {{ end }}
+              {{ end }}
+
+              {{ if or .Values.global.s3.aws.secretAccessKey .Values.global.s3.minio.secretAccessKey .Values.global.existingSecret }}
+              - name: LAGO_AWS_S3_SECRET_ACCESS_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ include "secret-path" . }}
+                    key: {{ if eq .Values.global.s3.provider "minio" }}
+                            minioSecretAccessKey
+                          {{ else }}
+                            awsS3SecretAccessKey
+                          {{ end }}
+              {{ end }}
+
+              - name: LAGO_AWS_S3_BUCKET
+                value: {{ if eq .Values.global.s3.provider "minio" }}
+                          {{ .Values.global.s3.minio.bucket | quote }}
+                        {{ else }}
+                          {{ .Values.global.s3.aws.bucket | quote }}
+                        {{ end }}
+
+              - name: LAGO_AWS_S3_REGION
+                value: {{ if eq .Values.global.s3.provider "minio" }}
+                          {{ .Values.global.s3.minio.region | quote }}
+                        {{ else }}
+                          {{ .Values.global.s3.aws.region | quote }}
+                        {{ end }}
             {{ end }}
-            {{ if or .Values.global.s3.aws.accessKeyId .Values.global.existingSecret }}
-            - name: LAGO_AWS_S3_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "secret-path" . }}
-                  key: awsS3AccessKeyId
-            {{ end }}
-            {{ if or .Values.global.s3.aws.secretAccessKey .Values.global.existingSecret }}
-            - name: LAGO_AWS_S3_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "secret-path" . }}
-                  key: awsS3SecretAccessKey
-            {{ end }}
-            - name: LAGO_AWS_S3_BUCKET
-              value: {{ .Values.global.s3.aws.bucket | quote }}
-            - name: LAGO_AWS_S3_REGION
-              value: {{ .Values.global.s3.aws.region | quote }}
-            {{ end }}
+
             {{ if .Values.global.smtp.enabled }}
             - name: LAGO_FROM_EMAIL
               value: {{ .Values.global.smtp.fromEmail }}
