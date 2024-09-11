@@ -156,7 +156,7 @@ spec:
 
           {{ if or .Values.global.s3.enabled .Values.minio.enabled }}
             - name: LAGO_USE_AWS_S3
-              value: "true"  # Toujours "true" même pour MinIO
+              value: "true"
 
             {{ if or .Values.global.s3.aws.endpoint .Values.minio.endpoint }}
             - name: LAGO_AWS_S3_ENDPOINT
