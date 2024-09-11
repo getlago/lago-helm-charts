@@ -44,8 +44,12 @@ spec:
       {{ end }}
       {{ if .Values.minio.enabled }}
         - name: wait-for-minio
-          image: busybox
-          command: ['sh', '-c', 'until nc -z {{ .Release.Name }}-minio 9000; do sleep 5; done']
+          image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
+          args:
+            - wait
+            - pod/{{ .Release.Name }}-minio-0
+            - --for=condition=ready
+            - --timeout=180s
 
         - name: create-minio-bucket
           image: minio/mc
