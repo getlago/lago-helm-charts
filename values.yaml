@@ -53,22 +53,13 @@ global:
   segment:
     enabled: true
   s3:
-    enabled: true
-    provider: aws # or 'minio' to switch between S3 and MinIO
-    #aws:
-     # accessKeyId and secretAccessKey are not required here if using existingSecret
-    #  accessKeyId: "<your-aws-access-key>"
-    #  secretAccessKey: "<your-aws-secret-key>"
-    #  bucket: "<your-aws-bucket>"
-    #  region: "<your-aws-region>"
-    #  endpoint: "https://s3.<region>.amazonaws.com" # Leave empty for default AWS S3 endpoint
-    #minio:
-    #  enabled: false # Enable this to switch to MinIO
-    #  accessKeyId: "<your-minio-access-key>" # Can be stored in a Kubernetes secret
-    #  secretAccessKey: "<your-minio-secret-key>" # Can be stored in a Kubernetes secret
-    #  bucket: "<your-minio-bucket>"
-    #  region: "us-east-1" # You can keep this default
-    #  endpoint: "http://minio-service.minio-namespace.svc.cluster.local:9000" # Internal URL to access MinIO within your cluster
+    enabled: false
+    # accessKeyId and secretAccessKey are not required here if using existingSecret
+    #accessKeyId: "<your-aws-access-key>"
+    #secretAccessKey: "<your-aws-secret-key>"
+    #bucket: "<your-aws-bucket>"
+    #region: "<your-aws-region>"
+    #endpoint: "https://s3.<region>.amazonaws.com" # Leave empty for default AWS S3 endpoint
 
   smtp:
     # username and password are not required here if using existingSecret
@@ -194,4 +185,9 @@ job:
     resources: {}
 
 minio:
-  fullnameOverride: "{{ .Release.Name }}-minio"
+  enable: false
+  #fullnameOverride: "{{ .Release.Name }}-minio"  
+  #rootUser: "your-minio-access-key" 
+  #rootPassword: "your-minio-secret-key"  
+  #persistence:
+  #  size: 10Gi 

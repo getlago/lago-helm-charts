@@ -15,4 +15,4 @@ dependencies:
   - name: minio
     version: '5.2.0'
     repository: https://charts.min.io/
-    condition: s3.provider == "minio" and s3.enabled == true
+    condition: minio.enabled == true
