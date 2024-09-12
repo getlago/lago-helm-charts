@@ -58,12 +58,12 @@ spec:
             - name: MINIO_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: minio-credentials
+                  name: {{ .Release.Name }}-minio
                   key: rootUser
             - name: MINIO_SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: minio-credentials
+                  name: {{ .Release.Name }}-minio
                   key: rootPassword
       {{ end }}
         - name: wait-for-migrations
@@ -158,34 +158,34 @@ spec:
             - name: LAGO_USE_AWS_S3
               value: "true"
 
-            {{ if or .Values.global.s3.aws.endpoint .Values.minio.endpoint }}
+            {{ if or .Values.global.s3.endpoint .Values.minio.endpoint }}
             - name: LAGO_AWS_S3_ENDPOINT
               value: {{ if .Values.minio.enabled }}
                         {{ .Values.minio.endpoint | quote }}
                       {{ else }}
-                        {{ .Values.global.s3.aws.endpoint | quote }}
+                        {{ .Values.global.s3.endpoint | quote }}
                       {{ end }}
             {{ end }}
 
-            {{ if or .Values.global.s3.aws.accessKeyId .Values.minio.accessKeyId .Values.global.existingSecret }}
+            {{ if or .Values.global.s3.accessKeyId .Values.minio.accessKeyId .Values.global.existingSecret }}
             - name: LAGO_AWS_S3_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
                   name: {{ include "secret-path" . }}
                   key: {{ if .Values.minio.enabled }}
-                          minioAccessKeyId
+                          rootUser
                         {{ else }}
                           awsS3AccessKeyId
                         {{ end }}
             {{ end }}
 
-            {{ if or .Values.global.s3.aws.secretAccessKey .Values.minio.secretAccessKey .Values.global.existingSecret }}
+            {{ if or .Values.global.s3.secretAccessKey .Values.minio.secretAccessKey .Values.global.existingSecret }}
             - name: LAGO_AWS_S3_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ include "secret-path" . }}
                   key: {{ if .Values.minio.enabled }}
-                          minioSecretAccessKey
+                          rootPassword
                         {{ else }}
                           awsS3SecretAccessKey
                         {{ end }}
@@ -195,7 +195,7 @@ spec:
               value: {{ if .Values.minio.enabled }}
                         {{ .Values.minio.bucket | quote }}
                       {{ else }}
-                        {{ .Values.global.s3.aws.bucket | quote }}
+                        {{ .Values.global.s3.bucket | quote }}
                       {{ end }}
           {{ end }}
 

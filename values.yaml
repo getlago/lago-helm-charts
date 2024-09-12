@@ -186,8 +186,6 @@ job:
 
 minio:
   enable: false
-  #fullnameOverride: "{{ .Release.Name }}-minio"  
-  #rootUser: "your-minio-access-key" 
-  #rootPassword: "your-minio-secret-key"  
+  fullnameOverride: "{{ .Release.Name }}-minio"  
   #persistence:
   #  size: 10Gi 
