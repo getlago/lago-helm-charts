@@ -157,10 +157,10 @@ spec:
           {{ if or .Values.global.s3.enabled .Values.minio.enabled }}
             - name: LAGO_USE_AWS_S3
               value: "true"
-            {{ if .Values.minio.enabled }}
+          {{- if .Values.minio.enabled }}
             - name: LAGO_AWS_S3_PATH_STYLE
               value: "true"
-            {{ end }}
+          {{- end }}
             {{ if or .Values.global.s3.endpoint .Values.minio.endpoint }}
             - name: LAGO_AWS_S3_ENDPOINT
               value: {{ if .Values.minio.enabled }}
