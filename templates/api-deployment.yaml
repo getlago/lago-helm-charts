@@ -50,21 +50,6 @@ spec:
             - pod/{{ .Release.Name }}-minio-0
             - --for=condition=ready
             - --timeout=180s
-
-        - name: create-minio-bucket
-          image: minio/mc
-          command: ["sh", "-c", "mc alias set myminio http://{{ .Release.Name }}-minio:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY && mc mb myminio/{{ .Values.minio.bucket }} || echo 'Bucket already exists'"]
-          env:
-            - name: MINIO_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-minio
-                  key: rootUser
-            - name: MINIO_SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-minio
-                  key: rootPassword
       {{ end }}
         - name: wait-for-migrations
           image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
@@ -205,7 +190,7 @@ spec:
 
             - name: LAGO_AWS_S3_BUCKET
               value: {{ if .Values.minio.enabled }}
-                        {{ .Values.minio.bucket | quote }}
+                        {{ (index .Values.minio.buckets 0).name | quote }}
                       {{ else }}
                         {{ .Values.global.s3.bucket | quote }}
                       {{ end }}
