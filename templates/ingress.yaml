@@ -15,7 +15,6 @@ spec:
   - hosts:
     - {{ .Values.global.ingress.frontHostname }}
     - {{ .Values.global.ingress.apiHostname }}
-    - {{ .Values.global.ingress.minioHostname }}
     secretName: {{ .Release.Name }}-ingress-secret
   rules:
   - host: {{ .Values.global.ingress.frontHostname }}
@@ -36,14 +35,4 @@ spec:
             name: {{ .Release.Name }}-api-svc
             port:
               number: {{ .Values.api.service.port }}
-  - host: {{ .Values.global.ingress.minioHostname }}
-    http:
-      paths:
-      - path: /
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: {{ .Values.minio.service.name }}
-            port:
-              number: {{ .Values.minio.service.port }}
 {{ end }}
