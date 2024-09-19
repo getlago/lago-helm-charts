@@ -160,14 +160,14 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ if .Values.minio.enabled }}
-                          {{ .Release.Name }}-minio  # Utiliser le secret spécifique à MinIO si minio.enabled
+                          {{ .Release.Name }}-minio  
                         {{ else }}
-                          {{ include "secret-path" . }}  # Utiliser le secret standard pour AWS S3
+                          {{ include "secret-path" . }}  
                         {{ end }}
                   key: {{ if .Values.minio.enabled }}
-                          rootUser  # Utiliser rootUser pour MinIO
+                          rootUser  
                         {{ else }}
-                          awsS3AccessKeyId  # Utiliser awsS3AccessKeyId pour AWS S3
+                          awsS3AccessKeyId  
                         {{ end }}
             {{ end }}
 
@@ -176,14 +176,14 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ if .Values.minio.enabled }}
-                          {{ .Release.Name }}-minio  # Utiliser le secret spécifique à MinIO si minio.enabled
+                          {{ .Release.Name }}-minio  
                         {{ else }}
-                          {{ include "secret-path" . }}  # Utiliser le secret standard pour AWS S3
+                          {{ include "secret-path" . }}  
                         {{ end }}
                   key: {{ if .Values.minio.enabled }}
-                          rootPassword  # Utiliser rootPassword pour MinIO
+                          rootPassword  
                         {{ else }}
-                          awsS3SecretAccessKey  # Utiliser awsS3SecretAccessKey pour AWS S3
+                          awsS3SecretAccessKey  
                         {{ end }}
             {{ end }}
 
