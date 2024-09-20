@@ -185,7 +185,7 @@ job:
     resources: {}
 
 minio:
-  enabled: true
+  enabled: false
   # replicas: 2
   # fullnameOverride: "my-lago-minio"
   # endpoint: "http://minio.lago.dev"
