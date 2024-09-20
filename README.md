@@ -23,6 +23,7 @@ helm install my-lago-release . \
   --set apiUrl=mydomain.dev \
   --set frontUrl=mydomain.dev
 
+
 ## Configuration
 
 ### Global Parameters
