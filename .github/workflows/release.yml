@@ -1,3 +1,10 @@
+name: Release Charts
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
   release:
     permissions:
@@ -28,7 +35,7 @@ jobs:
       - name: Deploy to GitHub Pages
         run: |
           git checkout gh-pages
-          helm repo index . --url https://<username>.github.io/<repo>
+          helm repo index . --url https://getlago.github.io/lago-helm-charts
           git add .
           git commit -m "Update Helm repo index"
           git push origin gh-pages
