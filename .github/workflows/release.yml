@@ -1,9 +1,12 @@
 name: Release Charts
 
 on:
-  push:
-    tags:
-      - "*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
+        default: '1.0.0'
 
 jobs:
   release:
@@ -37,5 +40,5 @@ jobs:
           git checkout gh-pages
           helm repo index . --url https://getlago.github.io/lago-helm-charts
           git add .
-          git commit -m "Update Helm repo index"
+          git commit -m "Update Helm repo index for tag ${{ github.event.inputs.tag }}"
           git push origin gh-pages
