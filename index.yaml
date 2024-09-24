@@ -3,16 +3,36 @@ entries:
   lago:
   - apiVersion: v1
     appVersion: 1.0.0
-    created: "2024-04-05T15:34:30.50393984+02:00"
-    description: Lago open source billing app
+    created: "2024-09-24T11:42:16.543155726Z"
+    description: the Lago open source billing app
     digest: 50a684223c7ab4539609530b608119d8e0f9a51dd98ef8d28eb297e5862c178d
     name: lago
     urls:
-    - https://charts.getlago.com/lago-1.0.0.tgz
+    - https://getlago.github.io/lago-helm-charts/lago-1.0.0.tgz
     version: 1.0.0
+  minio:
+  - apiVersion: v1
+    appVersion: RELEASE.2024-04-18T19-09-19Z
+    created: "2024-09-24T11:42:16.54448829Z"
+    description: High Performance Object Storage
+    digest: 8ef4212d7d51be6c8192b3e91138a9ca918ca56142c42500028cfd3b80e0b2dd
+    home: https://min.io
+    icon: https://min.io/resources/img/logo/MINIO_wordmark.png
     keywords:
-    - lago
-    - billing
+    - minio
+    - storage
+    - object-storage
+    - s3
+    - cluster
+    maintainers:
+    - email: dev@minio.io
+      name: MinIO, Inc
+    name: minio
+    sources:
+    - https://github.com/minio/minio
+    urls:
+    - https://getlago.github.io/lago-helm-charts/charts/minio-5.2.0.tgz
+    version: 5.2.0
   postgresql:
   - annotations:
       category: Database
@@ -26,7 +46,7 @@ entries:
       licenses: Apache-2.0
     apiVersion: v2
     appVersion: 16.0.0
-    created: "2024-04-05T15:34:30.50646306+02:00"
+    created: "2024-09-24T11:42:16.548746491Z"
     dependencies:
     - name: common
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -53,7 +73,7 @@ entries:
     sources:
     - https://github.com/bitnami/charts/tree/main/bitnami/postgresql
     urls:
-    - https://charts.getlago.com/charts/postgresql-13.2.2.tgz
+    - https://getlago.github.io/lago-helm-charts/charts/postgresql-13.2.2.tgz
     version: 13.2.2
   redis:
   - annotations:
@@ -70,7 +90,7 @@ entries:
       licenses: Apache-2.0
     apiVersion: v2
     appVersion: 7.2.3
-    created: "2024-04-05T15:34:30.50890698+02:00"
+    created: "2024-09-24T11:42:16.553757995Z"
     dependencies:
     - name: common
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -94,6 +114,6 @@ entries:
     sources:
     - https://github.com/bitnami/charts/tree/main/bitnami/redis
     urls:
-    - https://charts.getlago.com/charts/redis-18.2.1.tgz
+    - https://getlago.github.io/lago-helm-charts/charts/redis-18.2.1.tgz
     version: 18.2.1
-generated: "2024-04-05T15:34:30.495175101+02:00"
+generated: "2024-09-24T11:42:16.529189353Z"
