@@ -1,4 +1,4 @@
-version: '1.11.0'
+version: '1.12.2'
 
 # apiUrl: mydomain.dev
 # frontUrl: mydomain.dev
@@ -198,7 +198,7 @@ minio:
   #     memory: "1Gi"
   #     cpu: "1"
   # persistence:
-  #   size: 10Gi 
+  #   size: 10Gi
   # ingress:
   #   enabled: true
   #   ingressClassName: nginx
