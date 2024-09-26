@@ -70,24 +70,34 @@ helm install my-lago-release . \
 
 ### Frontend Configuration
 
-| Parameter                          | Description                                        | Default   |
-|-------------------------------------|----------------------------------------------------|-----------|
-| `front.replicas`                    | Number of frontend replicas                        | `1`       |
-| `front.service.port`                | Frontend service port                              | `80`      |
-| `front.resources.requests.memory`   | Memory request for the frontend                    | `512Mi`   |
-| `front.resources.requests.cpu`      | CPU request for the frontend                       | `200m`    |
+| Parameter                           | Description                                         | Default      |
+|--------------------------------------|-----------------------------------------------------|--------------|
+| `front.replicas`                     | Number of frontend replicas                         | `1`          |
+| `front.service.port`                 | Frontend service port                               | `80`         |
+| `front.resources.requests.memory`    | Memory request for the frontend                     | `512Mi`      |
+| `front.resources.requests.cpu`       | CPU request for the frontend                        | `200m`       |
+| `front.podAnnotations`               | Annotations to add to the frontend pod              | `{}`         |
+| `front.podLabels`                    | Labels to add to the frontend pod                   | `{}`         |
+
 
 ### API Configuration
 
-| Parameter                          | Description                                        | Default   |
-|-------------------------------------|----------------------------------------------------|-----------|
-| `api.replicas`                      | Number of API replicas                             | `1`       |
-| `api.service.port`                  | API service port                                   | `3000`    |
-| `api.rails.maxThreads`              | Maximum number of threads for the Rails app        | `10`      |
-| `api.rails.webConcurrency`          | Web concurrency setting for Rails                  | `4`       |
-| `api.rails.env`                     | Rails environment                                  | `production` |
-| `api.resources.requests.memory`     | Memory request for the API                         | `1Gi`     |
-| `api.resources.requests.cpu`        | CPU request for the API                            | `1000m`   |
+| Parameter                           | Description                                         | Default      |
+|--------------------------------------|-----------------------------------------------------|--------------|
+| `api.replicas`                       | Number of API replicas                              | `1`          |
+| `api.service.port`                   | API service port                                    | `3000`       |
+| `api.rails.maxThreads`               | Maximum number of threads for the Rails app         | `10`         |
+| `api.rails.webConcurrency`           | Web concurrency setting for Rails                   | `4`          |
+| `api.rails.env`                      | Rails environment                                   | `production` |
+| `api.rails.logStdout`                | Enable or disable logging to stdout                 | `true`       |
+| `api.rails.logLevel`                 | Log level for the Rails app                         | `error`      |
+| `api.sidekiqWeb.enabled`             | Enable or disable Sidekiq Web                       | `true`       |
+| `api.resources.requests.memory`      | Memory request for the API                          | `1Gi`        |
+| `api.resources.requests.cpu`         | CPU request for the API                             | `1000m`      |
+| `api.volumes.accessModes`            | Access mode for the API's persistent storage        | `ReadWriteOnce` |
+| `api.volumes.storage`                | Storage size for the API's persistent volume claim  | `10Gi`       |
+| `api.podAnnotations`                 | Annotations to add to the API pod                   | `{}`         |
+| `api.podLabels`                      | Labels to add to the API pod                        | `{}`         |
 
 ### Worker Configuration
 
