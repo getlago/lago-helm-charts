@@ -2,6 +2,10 @@
 
 This Helm chart deploys the Lago billing system with various optional dependencies such as Redis, PostgreSQL, and MinIO. Below are details about configuring the chart for different environments.
 
+[![Lago Release](https://img.shields.io/github/v/release/getlago/lago)](https://github.com/getlago/lago/releases)
+
+[![Helm Chart Release](https://img.shields.io/github/v/release/getlago/lago-helm-charts)](https://github.com/getlago/lago-helm-charts/releases)
+
 ## Prerequisites
 
 - Kubernetes 1.19+
@@ -13,16 +17,18 @@ This Helm chart deploys the Lago billing system with various optional dependenci
 
 To install the chart with the release name `my-lago-release`:
 
+```
 helm install my-lago-release .
-
+```
 You can customize the installation by overriding values in `values.yaml` with your own. The full list of configurable parameters can be found in the following sections.
 
 ### Sample Command
 
+```sh
 helm install my-lago-release . \
   --set apiUrl=mydomain.dev \
   --set frontUrl=mydomain.dev
-
+```
 
 ## Configuration
 
@@ -109,7 +115,13 @@ helm install my-lago-release . \
 | `minio.buckets[].versioning`        | Enable versioning for the bucket                   | `false`   |
 | `minio.buckets[].objectlocking`     | Enable object locking for the bucket               | `false`   |
 
+## Storage Recommendation
 
+We **strongly recommend** using either **Amazon S3** or **MinIO** for object storage when deploying Lago. These solutions provide reliable, scalable storage that can be accessed by multiple pods without encountering issues.
+
+If neither S3 nor MinIO is configured, the system will default to using a Persistent Volume Claim (PVC). However, this approach is **strongly discouraged** as it can lead to issues such as multi-attach errors when volumes are accessed by more than one pod simultaneously. For this reason, it is important to configure S3 or MinIO to avoid potential complications with PVCs.
+
+By opting for S3 or MinIO, you ensure better reliability and scalability for your deployment.
 
 For additional customization, refer to the comments in `values.yaml`.
 

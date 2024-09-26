@@ -121,6 +121,7 @@ api:
       memory: 1Gi
       cpu: '1000m'
   volumes:
+    accessModes: ReadWriteOnce
     storage: '10Gi'
   podAnnotations: {}
   podLabels: {}
