@@ -2,9 +2,13 @@
 
 This Helm chart deploys the Lago billing system with various optional dependencies such as Redis, PostgreSQL, and MinIO. Below are details about configuring the chart for different environments.
 
-[![Lago Release](https://img.shields.io/github/v/release/getlago/lago)](https://github.com/getlago/lago/releases)
+## Current Releases
 
-[![Helm Chart Release](https://img.shields.io/github/v/release/getlago/lago-helm-charts)](https://github.com/getlago/lago-helm-charts/releases)
+| Project            | Release Badge                                                                                       |
+|--------------------|-----------------------------------------------------------------------------------------------------|
+| **Lago**           | [![Lago Release](https://img.shields.io/github/v/release/getlago/lago)](https://github.com/getlago/lago/releases) |
+| **Helm Chart**     | [![Helm Chart Release](https://img.shields.io/github/v/release/getlago/lago-helm-charts)](https://github.com/getlago/lago-helm-charts/releases) |
+
 
 ## Prerequisites
 
@@ -139,4 +143,6 @@ For additional customization, refer to the comments in `values.yaml`.
 
 To uninstall/delete the `my-lago-release`:
 
+```
 helm delete my-lago-release
+```
