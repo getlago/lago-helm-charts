@@ -1,0 +1,4 @@
+owner: getlago
+git-repo: lago-helm-charts
+charts-repo-url: https://charts.getlago.com
+packages-with-index: true
