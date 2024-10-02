@@ -31,4 +31,11 @@ spec:
           resources:
             {{- toYaml . | nindent 12}}
           {{- end }}
+          env:
+            {{- with .Values.pdf.extraEnv }}
+            {{- range $key, $value := . }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}
       restartPolicy: Always

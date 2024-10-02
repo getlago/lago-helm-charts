@@ -130,6 +130,12 @@ spec:
               value: {{ .Values.api.rails.webConcurrency | quote }}
             - name: LAGO_LOG_LEVEL
               value: {{ .Values.api.rails.logLevel | quote }}
+            {{- with .Values.api.extraEnv }}
+            {{- range $key, $value := . }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}
             {{ if .Values.global.license }}
             - name: LAGO_LICENSE
               valueFrom:
@@ -245,13 +251,13 @@ spec:
           resources:
             {{- toYaml . | nindent 12}}
           {{- end }}
-          {{ if not .Values.global.s3.enabled }}
+          {{- if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) -}}
           volumeMounts:
             - mountPath: /app/storage
               name: {{ .Release.Name }}-storage-data
           {{ end }}
       restartPolicy: Always
-      {{ if not .Values.global.s3.enabled }}
+      {{- if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) -}}
       volumes:
         - name: {{ .Release.Name }}-storage-data
           persistentVolumeClaim:

@@ -1,4 +1,4 @@
-{{- if not .Values.global.s3.enabled and not .Values.minio.enabled -}}
+{{- if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
