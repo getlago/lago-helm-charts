@@ -70,6 +70,12 @@ spec:
               value: {{ required "frontUrl value is required" .Values.frontUrl | quote }}
             - name: RAILS_LOG_TO_STDOUT
               value: {{ .Values.worker.rails.logStdout | quote }}
+            {{- with .Values.worker.extraEnv }}
+            {{- range $key, $value := . }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:

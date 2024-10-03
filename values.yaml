@@ -103,6 +103,8 @@ front:
       cpu: '200m'
   podAnnotations: {}
   podLabels: {}
+  extraEnv: {}
+
 
 api:
   replicas: 1
@@ -123,6 +125,7 @@ api:
   volumes:
     accessModes: ReadWriteOnce
     storage: '10Gi'
+  extraEnv: {}
   podAnnotations: {}
   podLabels: {}
 
@@ -139,6 +142,7 @@ worker:
       cpu: '1000m'
   podAnnotations: {}
   podLabels: {}
+  extraEnv: {}
 
 eventsWorker:
   replicas: 1
@@ -153,6 +157,8 @@ eventsWorker:
       cpu: '1000m'
   podAnnotations: {}
   podLabels: {}
+  extraEnv: {}
+
 
 clock:
   replicas: 1
@@ -166,6 +172,8 @@ clock:
       cpu: '100m'
   podAnnotations: {}
   podLabels: {}
+  extraEnv: {}
+
 
 pdf:
   replicas: 1
@@ -177,6 +185,8 @@ pdf:
       cpu: '1000m'
   podAnnotations: {}
   podLabels: {}
+  extraEnv: {}
+
 
 job:
   migrate:
