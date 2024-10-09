@@ -202,7 +202,7 @@ spec:
                       {{ end }}
             - name: LAGO_AWS_S3_REGION
               value: {{ if .Values.global.s3.enabled }}
-                        {{ .Values.global.s3.aws.region | quote }}
+                        {{ .Values.global.s3.region | quote }}
                       {{ else if .Values.minio.enabled }}
                         {{ default "us-east-1" .Values.minio.region | quote }}
                       {{ end }}
