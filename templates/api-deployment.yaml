@@ -251,13 +251,13 @@ spec:
           resources:
             {{- toYaml . | nindent 12}}
           {{- end }}
-          {{- if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) -}}
+          {{- if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) }}
           volumeMounts:
             - mountPath: /app/storage
               name: {{ .Release.Name }}-storage-data
           {{ end }}
       restartPolicy: Always
-      {{- if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) -}}
+      {{- if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) }}
       volumes:
         - name: {{ .Release.Name }}-storage-data
           persistentVolumeClaim:
