@@ -5,7 +5,7 @@ metadata:
     io.lago.service: {{ .Release.Name }}-pdf
   name: {{ .Release.Name }}-pdf
 spec:
-  replicas: 1
+  replicas: {{ .Values.pdf.replicas }}
   selector:
     matchLabels:
       io.lago.service: {{ .Release.Name }}-pdf
