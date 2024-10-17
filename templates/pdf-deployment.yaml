@@ -22,7 +22,7 @@ spec:
         {{- end }}
     spec:
       containers:
-        - image: getlago/lago-gotenberg:7.8.2
+        - image: getlago/lago-gotenberg:7.10
           name: {{ .Release.Name }}-pdf
           ports:
             - containerPort: 3000
