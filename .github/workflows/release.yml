@@ -30,6 +30,15 @@ jobs:
       - name: Update Dependencies
         run: helm dependency update .  
 
+      - name: Update Chart and Values Versions
+        run: |
+          sed -i "s/^version:.*/version: ${{ github.event.inputs.tag }}/" Chart.yaml
+          sed -i "s/^appVersion:.*/appVersion: '${{ github.event.inputs.tag }}'/" Chart.yaml
+          sed -i "s/^version:.*/version: ${{ github.event.inputs.tag }}/" values.yaml
+          git add Chart.yaml values.yaml
+          git commit -m "chore(release): update chart, appVersion, and values versions to ${{ github.event.inputs.tag }}"
+          git push origin main
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
         with:
