@@ -32,10 +32,11 @@ jobs:
 
       - name: Update Chart and Values Versions
         run: |
-          sed -i '' "s/^version:.*/version: ${{ github.event.inputs.tag }}/" Chart.yaml
-          sed -i '' "s/^version:.*/version: ${{ github.event.inputs.tag }}/" values.yaml
+          sed -i "s/^version:.*/version: ${{ github.event.inputs.tag }}/" Chart.yaml
+          sed -i "s/^appVersion:.*/appVersion: '${{ github.event.inputs.tag }}'/" Chart.yaml
+          sed -i "s/^version:.*/version: ${{ github.event.inputs.tag }}/" values.yaml
           git add Chart.yaml values.yaml
-          git commit -m "Update chart and values versions to ${{ github.event.inputs.tag }}"
+          git commit -m "chore(release): update chart, appVersion, and values versions to ${{ github.event.inputs.tag }}"
           git push origin main
 
       - name: Run chart-releaser
@@ -46,3 +47,10 @@ jobs:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Deploy to GitHub Pages
+        run: |
+          git checkout gh-pages
+          git pull origin main --rebase --autostash 
+          helm repo index . --url https://getlago.github.io/charts
+          git add .
+          git commit -m "Update Helm repo index for tag ${{ github.event.inputs.tag }}"
+          git push origin gh-pages
