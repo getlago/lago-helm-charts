@@ -1,0 +1,47 @@
+name: Release Charts
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Lint Chart - Main chart
+        run: helm lint .  
+
+      - name: Update Dependencies
+        run: helm dependency update .  
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.6.0
+        with:
+          charts_dir: "."
+          config: cr.yaml
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Deploy to GitHub Pages
+        run: |
+          git checkout gh-pages
+          helm repo index . --url https://getlago.github.io/lago-helm-charts
+          git add .
+          git commit -m "Update Helm repo index for tag ${{ github.event.inputs.tag }}"
+          git push origin gh-pages

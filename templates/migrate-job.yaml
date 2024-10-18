@@ -1,13 +1,13 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ .Release.Name }}-migrate"
+  name: "{{ include "migrateJobName" . }}"
   labels:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:
   template:
     metadata:
-      name: "{{ .Release.Name }}-migrate"
+      name: "{{ include "migrateJobName" . }}"
       labels:
         app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
         app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -22,15 +22,24 @@ spec:
     spec:
       restartPolicy: Never
       initContainers:
-        {{ if .Values.postgresql.enabled }}
-          - name: wait-for-postgresql
-            image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
-            args:
-              - wait
-              - pod/{{ .Release.Name }}-postgresql-0
-              - --for=condition=ready
-              - --timeout=180s
-          {{ end }}
+        {{- if .Values.postgresql.enabled }}
+        - name: wait-for-postgresql
+          image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
+          args:
+            - wait
+            - pod/{{ .Release.Name }}-postgresql-0
+            - --for=condition=ready
+            - --timeout=180s
+        {{- end }}
+        {{- if .Values.redis.enabled }}
+        - name: wait-for-redis
+          image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
+          args:
+            - wait
+            - pod/{{ .Release.Name }}-redis-master-0
+            - --for=condition=ready
+            - --timeout=180s
+        {{- end }}
       containers:
         - name: lago-migrate
           image: getlago/api:v{{ .Values.version }}
@@ -38,7 +47,7 @@ spec:
             - bundle
             - exec
             - rake
-            - db:migrate:primary
+            - db:migrate
           env:
             - name: RAILS_ENV
               value: {{ .Values.api.rails.env }}
@@ -62,4 +71,8 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Name }}-secrets
                   key: secretKeyBase
+          {{- with .Values.job.migrate.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
       serviceAccountName: {{ .Values.global.serviceAccountName | default (printf "%s-serviceaccount" .Release.Name) }}

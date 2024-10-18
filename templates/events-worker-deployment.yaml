@@ -37,7 +37,7 @@ spec:
           image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
           args:
             - wait
-            - job/{{ .Release.Name }}-migrate
+            - job/{{ include "migrateJobName" . }}
             - --for=condition=complete
             - --timeout=180s
       containers:
@@ -63,6 +63,12 @@ spec:
                   key: redisUrl
             - name: RAILS_LOG_TO_STDOUT
               value: {{ .Values.eventsWorker.rails.logStdout | quote }}
+            {{- with .Values.eventsWorker.extraEnv }}
+            {{- range $key, $value := . }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -103,10 +109,10 @@ spec:
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
           name: {{ .Release.Name }}-events-worker
+          {{- with .Values.eventsWorker.resources }}
           resources:
-            requests:
-              memory: {{ .Values.eventsWorker.resources.memory }}
-              cpu: {{ .Values.eventsWorker.resources.cpu }}
+            {{- toYaml . | nindent 12}}
+          {{- end }}
           livenessProbe:
             exec:
               command: ["/bin/bash", "-l", "-c", "bundle exec sidekiqmon processes | grep $(hostname) || exit 1"]

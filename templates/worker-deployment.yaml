@@ -37,7 +37,7 @@ spec:
           image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
           args:
             - wait
-            - job/{{ .Release.Name }}-migrate
+            - job/{{ include "migrateJobName" . }}
             - --for=condition=complete
             - --timeout=180s
       containers:
@@ -70,6 +70,12 @@ spec:
               value: {{ required "frontUrl value is required" .Values.frontUrl | quote }}
             - name: RAILS_LOG_TO_STDOUT
               value: {{ .Values.worker.rails.logStdout | quote }}
+            {{- with .Values.worker.extraEnv }}
+            {{- range $key, $value := . }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -113,18 +119,18 @@ spec:
             {{ if .Values.global.s3.enabled }}
             - name: LAGO_USE_AWS_S3
               value: "true"
-            {{ if .Values.global.s3.aws.endpoint }}
+            {{ if .Values.global.s3.endpoint }}
             - name: LAGO_AWS_S3_ENDPOINT
-              value: {{ .Values.global.s3.aws.endpoint | quote }}
+              value: {{ .Values.global.s3.endpoint | quote }}
             {{ end }}
-            {{ if or .Values.global.s3.aws.accessKeyId .Values.global.existingSecret }}
+            {{ if or .Values.global.s3.accessKeyId .Values.global.existingSecret }}
             - name: LAGO_AWS_S3_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
                   name: {{ include "secret-path" . }}
                   key: awsS3AccessKeyId
             {{ end }}
-            {{ if or .Values.global.s3.aws.secretAccessKey .Values.global.existingSecret }}
+            {{ if or .Values.global.s3.secretAccessKey .Values.global.existingSecret }}
             - name: LAGO_AWS_S3_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
@@ -132,9 +138,9 @@ spec:
                   key: awsS3SecretAccessKey
             {{ end }}
             - name: LAGO_AWS_S3_BUCKET
-              value: {{ .Values.global.s3.aws.bucket | quote }}
+              value: {{ .Values.global.s3.bucket | quote }}
             - name: LAGO_AWS_S3_REGION
-              value: {{ .Values.global.s3.aws.region | quote }}
+              value: {{ .Values.global.s3.region | quote }}
             {{ end }}
             {{ if .Values.global.smtp.enabled }}
             - name: LAGO_FROM_EMAIL
@@ -166,10 +172,10 @@ spec:
           livenessProbe:
             exec:
               command: ["/bin/bash", "-l", "-c", "bundle exec sidekiqmon processes | grep $(hostname) || exit 1"]
+          {{- with .Values.worker.resources }}
           resources:
-            requests:
-              memory: {{ .Values.worker.resources.memory }}
-              cpu: {{ .Values.worker.resources.cpu }}
+            {{- toYaml . | nindent 12}}
+          {{- end }}
           {{ if not .Values.global.s3.enabled }}
           volumeMounts:
             - mountPath: /app/storage

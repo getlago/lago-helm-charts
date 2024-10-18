@@ -1,4 +1,4 @@
-version: "1.0.0"
+version: '1.12.3'
 
 # apiUrl: mydomain.dev
 # frontUrl: mydomain.dev
@@ -55,12 +55,12 @@ global:
   s3:
     enabled: false
     # accessKeyId and secretAccessKey are not required here if using existingSecret
-    # aws:
-    #   accessKeyId:
-    #   secretAccessKey:
-    #   bucket:
-    #   region:
-    #   endpoint:
+    #accessKeyId: "<your-aws-access-key>"
+    #secretAccessKey: "<your-aws-secret-key>"
+    #bucket: "<your-aws-bucket>"
+    #region: "<your-aws-region>"
+    #endpoint: "https://s3.<region>.amazonaws.com" # Leave empty for default AWS S3 endpoint
+
   smtp:
     # username and password are not required here if using existingSecret
     enabled: false
@@ -98,10 +98,13 @@ front:
   service:
     port: 80
   resources:
-    memory: 512
-    cpu: "200m"
+    requests:
+      memory: 512Mi
+      cpu: '200m'
   podAnnotations: {}
   podLabels: {}
+  extraEnv: {}
+
 
 api:
   replicas: 1
@@ -110,16 +113,19 @@ api:
   rails:
     maxThreads: 10
     webConcurrency: 4
-    env: "production"
+    env: 'production'
     logStdout: true
     logLevel: error
   sidekiqWeb:
     enabled: true
   resources:
-    memory: 1024
-    cpu: "1000m"
+    requests:
+      memory: 1Gi
+      cpu: '1000m'
   volumes:
-    storage: "10Gi"
+    accessModes: ReadWriteOnce
+    storage: '10Gi'
+  extraEnv: {}
   podAnnotations: {}
   podLabels: {}
 
@@ -127,51 +133,96 @@ worker:
   replicas: 1
   rails:
     sidekiqConcurrency: 100
-    env: "production"
+    env: 'production'
     logStdout: true
     logLevel: error
   resources:
-    memory: 1024
-    cpu: "1000m"
+    requests:
+      memory: 1Gi
+      cpu: '1000m'
   podAnnotations: {}
   podLabels: {}
+  extraEnv: {}
 
 eventsWorker:
   replicas: 1
   rails:
     sidekiqConcurrency: 100
-    env: "production"
+    env: 'production'
     logStdout: true
     logLevel: error
   resources:
-    memory: 1024
-    cpu: "1000m"
+    requests:
+      memory: 1Gi
+      cpu: '1000m'
   podAnnotations: {}
   podLabels: {}
+  extraEnv: {}
+
 
 clock:
   replicas: 1
   rails:
-    env: "production"
+    env: 'production'
     logStdout: true
     logLevel: info
   resources:
-    memory: 256
-    cpu: "100m"
+    requests:
+      memory: 256Mi
+      cpu: '100m'
   podAnnotations: {}
   podLabels: {}
+  extraEnv: {}
+
 
 pdf:
   replicas: 1
   service:
     port: 3001
   resources:
-    memory: 2048
-    cpu: "1000m"
+    requests:
+      memory: 2Gi
+      cpu: '1000m'
   podAnnotations: {}
   podLabels: {}
+  extraEnv: {}
+
 
 job:
   migrate:
+    nameOverride: null
     podAnnotations: {}
     podLabels: {}
+    resources: {}
+
+minio:
+  enabled: false
+  # replicas: 2
+  # fullnameOverride: "my-lago-minio"
+  # endpoint: "http://minio.lago.dev"
+  # nameOverride: "minio"
+  # resources:
+  #   requests:
+  #     memory: "512Mi"
+  #     cpu: "500m"
+  #   limits:
+  #     memory: "1Gi"
+  #     cpu: "1"
+  # persistence:
+  #   size: 10Gi
+  # ingress:
+  #   enabled: true
+  #   ingressClassName: nginx
+  #   labels: {}
+  #   annotations: {}
+  #   path: /
+  #   hosts:
+  #     - minio.lago.dev
+  #   tls: []
+  # Note : only the first one will be used
+  # buckets:
+  #   - name: my-lago-minio
+  #     policy: none
+  #     purge: false
+  #     versioning: false
+  #     objectlocking: false

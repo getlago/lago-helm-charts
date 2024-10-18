@@ -51,6 +51,12 @@ spec:
                   key: redisUrl
             - name: RAILS_LOG_TO_STDOUT
               value: {{ .Values.clock.rails.logStdout | quote }}
+            {{- with .Values.clock.extraEnv }}
+            {{- range $key, $value := . }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -87,9 +93,9 @@ spec:
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
           name: {{ .Release.Name }}-clock
+          {{- with .Values.clock.resources }}
           resources:
-            requests:
-              memory: {{ .Values.clock.resources.memory }}
-              cpu: {{ .Values.clock.resources.cpu }}
+            {{- toYaml . | nindent 12}}
+          {{- end }}
       restartPolicy: Always
       serviceAccountName: {{ .Values.global.serviceAccountName | default (printf "%s-serviceaccount" .Release.Name) }}

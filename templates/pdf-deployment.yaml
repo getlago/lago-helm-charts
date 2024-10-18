@@ -5,7 +5,7 @@ metadata:
     io.lago.service: {{ .Release.Name }}-pdf
   name: {{ .Release.Name }}-pdf
 spec:
-  replicas: 1
+  replicas: {{ .Values.pdf.replicas }}
   selector:
     matchLabels:
       io.lago.service: {{ .Release.Name }}-pdf
@@ -22,13 +22,20 @@ spec:
         {{- end }}
     spec:
       containers:
-        - image: getlago/lago-gotenberg:7.8.2
+        - image: getlago/lago-gotenberg:7.10
           name: {{ .Release.Name }}-pdf
           ports:
             - containerPort: 3000
               protocol: TCP
+          {{- with .Values.pdf.resources }}
           resources:
-            requests:
-              memory: {{ .Values.pdf.resources.memory }}
-              cpu: {{ .Values.pdf.resources.cpu }}
+            {{- toYaml . | nindent 12}}
+          {{- end }}
+          env:
+            {{- with .Values.pdf.extraEnv }}
+            {{- range $key, $value := . }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}
       restartPolicy: Always
