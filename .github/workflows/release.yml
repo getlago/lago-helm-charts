@@ -25,10 +25,10 @@ jobs:
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
       - name: Lint Chart - Main chart
-        run: helm lint .  
+        run: helm lint .
 
       - name: Update Dependencies
-        run: helm dependency update .  
+        run: helm dependency update .
 
       - name: Update Chart and Values Versions
         run: |
@@ -49,7 +49,7 @@ jobs:
       - name: Deploy to GitHub Pages
         run: |
           git checkout gh-pages
-          git pull origin main --rebase --autostash 
+          git pull origin main --rebase --autostash
           helm repo index . --url https://getlago.github.io/charts
           git add .
           git commit -m "Update Helm repo index for tag ${{ github.event.inputs.tag }}"
