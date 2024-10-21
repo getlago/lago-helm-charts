@@ -1,0 +1,43 @@
+name: Create Release PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  create-release-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Update Chart and Values Versions
+        run: |
+          sed -i "s/^version:.*/version: ${{ github.event.inputs.tag }}/" Chart.yaml
+          sed -i "s/^appVersion:.*/appVersion: '${{ github.event.inputs.tag }}'/" Chart.yaml
+          sed -i "s/^version:.*/version: ${{ github.event.inputs.tag }}/" values.yaml
+
+      - name: Commit changes
+        run: |
+          git checkout -b release/${{ github.event.inputs.tag }}
+          git add Chart.yaml values.yaml
+          git commit -m "chore(release): update chart, appVersion, and values versions to ${{ github.event.inputs.tag }}"
+          git push origin release/${{ github.event.inputs.tag }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: "chore(release): update chart, appVersion, and values versions to ${{ github.event.inputs.tag }}"
+          branch: release/${{ github.event.inputs.tag }}
+          title: "Release ${{ github.event.inputs.tag }}"
+          body: "This PR updates the chart versions to ${{ github.event.inputs.tag }}."
+          labels: release
