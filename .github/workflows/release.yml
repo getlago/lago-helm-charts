@@ -39,7 +39,7 @@ jobs:
       - name: Deploy to GitHub Pages
         run: |
           git checkout gh-pages
-          git pull origin gh-pages
+          git pull origin main --rebase --autostash
           helm repo index . --url https://getlago.github.io/charts
           git add .
           git commit -m "Update Helm repo index after release"
