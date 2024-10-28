@@ -37,6 +37,7 @@ jobs:
         with:
           commit-message: "chore(release): update to ${{ github.event.inputs.tag }}"
           branch: release/${{ github.event.inputs.tag }}
+          base: main  
           title: "Release ${{ github.event.inputs.tag }}"
           body: "This PR updates the chart versions to ${{ github.event.inputs.tag }}."
           labels: release
