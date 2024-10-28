@@ -116,32 +116,69 @@ spec:
                   name: {{ .Release.Name }}-secrets
                   key: license
             {{ end }}
-            {{ if .Values.global.s3.enabled }}
+
+            {{ if or .Values.global.s3.enabled .Values.minio.enabled }}
             - name: LAGO_USE_AWS_S3
               value: "true"
-            {{ if .Values.global.s3.endpoint }}
+            {{- if .Values.minio.enabled }}
+            - name: LAGO_AWS_S3_PATH_STYLE
+              value: "true"
+            {{- end }}
+            {{ if or .Values.global.s3.endpoint .Values.minio.endpoint }}
             - name: LAGO_AWS_S3_ENDPOINT
-              value: {{ .Values.global.s3.endpoint | quote }}
+              value: {{ if .Values.minio.enabled }}
+                        {{ .Values.minio.endpoint | quote }}
+                      {{ else }}
+                        {{ .Values.global.s3.endpoint | quote }}
+                      {{ end }}
             {{ end }}
-            {{ if or .Values.global.s3.accessKeyId .Values.global.existingSecret }}
+
+            {{ if or .Values.global.s3.accessKeyId .Values.minio.enabled .Values.global.existingSecret }}
             - name: LAGO_AWS_S3_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "secret-path" . }}
-                  key: awsS3AccessKeyId
+                  name: {{ if .Values.minio.enabled }}
+                          {{ .Release.Name }}-minio
+                        {{ else }}
+                          {{ include "secret-path" . }}
+                        {{ end }}
+                  key: {{ if .Values.minio.enabled }}
+                          rootUser
+                        {{ else }}
+                          awsS3AccessKeyId
+                        {{ end }}
             {{ end }}
-            {{ if or .Values.global.s3.secretAccessKey .Values.global.existingSecret }}
+
+            {{ if or .Values.global.s3.secretAccessKey .Values.minio.enabled .Values.global.existingSecret }}
             - name: LAGO_AWS_S3_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "secret-path" . }}
-                  key: awsS3SecretAccessKey
+                  name: {{ if .Values.minio.enabled }}
+                          {{ .Release.Name }}-minio
+                        {{ else }}
+                          {{ include "secret-path" . }}
+                        {{ end }}
+                  key: {{ if .Values.minio.enabled }}
+                          rootPassword
+                        {{ else }}
+                          awsS3SecretAccessKey
+                        {{ end }}
             {{ end }}
+
             - name: LAGO_AWS_S3_BUCKET
-              value: {{ .Values.global.s3.bucket | quote }}
+              value: {{ if .Values.minio.enabled }}
+                        {{ (index .Values.minio.buckets 0).name | quote }}
+                      {{ else }}
+                        {{ .Values.global.s3.bucket | quote }}
+                      {{ end }}
             - name: LAGO_AWS_S3_REGION
-              value: {{ .Values.global.s3.region | quote }}
+              value: {{ if .Values.global.s3.enabled }}
+                        {{ .Values.global.s3.region | quote }}
+                      {{ else if .Values.minio.enabled }}
+                        {{ default "us-east-1" .Values.minio.region | quote }}
+                      {{ end }}
             {{ end }}
+
             {{ if .Values.global.smtp.enabled }}
             - name: LAGO_FROM_EMAIL
               value: {{ .Values.global.smtp.fromEmail }}
@@ -176,13 +213,13 @@ spec:
           resources:
             {{- toYaml . | nindent 12}}
           {{- end }}
-          {{- if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) }}
+          {{ if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) }}
           volumeMounts:
             - mountPath: /app/storage
               name: {{ .Release.Name }}-storage-data
           {{ end }}
       restartPolicy: Always
-      {{- if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) }}
+      {{ if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) }}
       volumes:
         - name: {{ .Release.Name }}-storage-data
           persistentVolumeClaim:
