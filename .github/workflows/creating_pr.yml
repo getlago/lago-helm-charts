@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Configure Git
         run: |
@@ -25,19 +27,16 @@ jobs:
           sed -i "s/^appVersion:.*/appVersion: '${{ github.event.inputs.tag }}'/" Chart.yaml
           sed -i "s/^version:.*/version: ${{ github.event.inputs.tag }}/" values.yaml
 
-      - name: Commit changes
-        run: |
-          git checkout -b release/${{ github.event.inputs.tag }}
-          git add Chart.yaml values.yaml
-          git commit -m "chore(release): update to ${{ github.event.inputs.tag }}"
-          git push origin release/${{ github.event.inputs.tag }}
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
           commit-message: "chore(release): update to ${{ github.event.inputs.tag }}"
           branch: release/${{ github.event.inputs.tag }}
-          base: main  
+          base: main
           title: "Release ${{ github.event.inputs.tag }}"
           body: "This PR updates the chart versions to ${{ github.event.inputs.tag }}."
           labels: release
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: true
+          update-existing-pr: true  
