@@ -172,10 +172,10 @@ spec:
           livenessProbe:
             exec:
               command: ["/bin/bash", "-l", "-c", "bundle exec sidekiqmon processes | grep $(hostname) || exit 1"]
-            initialDelaySeconds: {{ .Values.worker.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.worker.livenessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.worker.livenessProbe.timeoutSeconds }}
-            failureThreshold: {{ .Values.worker.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.worker.livenessProbe.initialDelaySeconds | default 0 }}
+            periodSeconds: {{ .Values.worker.livenessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.worker.livenessProbe.timeoutSeconds | default 1 }}
+            failureThreshold: {{ .Values.worker.livenessProbe.failureThreshold | default 3 }}
           {{- with .Values.worker.resources }}
           resources:
             {{- toYaml . | nindent 12}}
