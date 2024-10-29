@@ -43,19 +43,12 @@ jobs:
         if: env.has_release_label == 'true'
         run: helm dependency update .
 
-      - name: Run chart-releaser
-        if: env.has_release_label == 'true'
-        uses: helm/chart-releaser-action@v1.6.0
-        with:
-          config: cr.yaml
-        env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-
       - name: Deploy to GitHub Pages
         if: env.has_release_label == 'true'
         run: |
           git checkout gh-pages
           git pull origin gh-pages --rebase
+          helm package . --destination charts/
           helm repo index . --url https://getlago.github.io/charts
           git add .
           git commit -m "Update Helm repo index after release"
