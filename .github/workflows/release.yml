@@ -47,10 +47,11 @@ jobs:
         if: env.has_release_label == 'true'
         run: |
           git checkout gh-pages
-          git pull origin gh-pages --rebase
+          git pull origin main --rebase
           helm package . --destination charts/
           helm repo index . --url https://getlago.github.io/charts
           git add .
+          git add charts/
           git commit -m "Update Helm repo index after release"
           git push origin gh-pages
 
