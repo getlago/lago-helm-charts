@@ -53,3 +53,29 @@ jobs:
           git add .
           git commit -m "Update Helm repo index after release"
           git push origin gh-pages
+
+      - name: Extract version from Chart.yaml
+        if: env.has_release_label == 'true'
+        id: get_version
+        run: |
+          version=$(grep '^version:' Chart.yaml | awk '{print $2}')
+          echo "Extracted version: $version"
+          echo "version=$version" >> $GITHUB_ENV
+
+      - name: Create Git tag
+        if: env.has_release_label == 'true'
+        run: |
+          git tag "v${{ env.version }}"
+          git push origin "v${{ env.version }}"
+
+      - name: Create GitHub Release
+        if: env.has_release_label == 'true'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "v${{ env.version }}"
+          release_name: "Release v${{ env.version }}"
+          body: "Release of version v${{ env.version }}"
+          draft: false
+          prerelease: false
