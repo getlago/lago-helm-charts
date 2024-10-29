@@ -143,6 +143,11 @@ worker:
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
+  livenessProbe:
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 3
 
 eventsWorker:
   replicas: 1
@@ -158,6 +163,11 @@ eventsWorker:
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
+  livenessProbe:
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 3
 
 
 clock:
