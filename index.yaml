@@ -2,8 +2,8 @@ apiVersion: v1
 entries:
   lago:
   - apiVersion: v2
-    appVersion: 1.12.3
-    created: "2024-10-29T15:47:25.644300652Z"
+    appVersion: 1.14.5
+    created: "2024-10-30T09:45:48.493787571Z"
     dependencies:
     - condition: postgresql.enabled
       name: postgresql
@@ -18,14 +18,14 @@ entries:
       repository: https://charts.min.io/
       version: 5.2.0
     description: the Lago open source billing app
-    digest: 3c2ef5608468ea765aba23dde82481e50f4cca688d491abf7702e6d6c59d1c16
+    digest: 08db04163810b6f072f110fd235ca2ebd6c31930990d9340bd0405dd45a5dade
     name: lago
     urls:
-    - https://getlago.github.io/charts/charts/lago-1.12.3.tgz
-    version: 1.12.3
+    - https://getlago.github.io/charts/charts/lago-1.14.5.tgz
+    version: 1.14.5
   - apiVersion: v1
     appVersion: 1.0.0
-    created: "2024-10-29T15:47:25.631349237Z"
+    created: "2024-10-30T09:45:48.481891244Z"
     description: the Lago open source billing app
     digest: 50a684223c7ab4539609530b608119d8e0f9a51dd98ef8d28eb297e5862c178d
     name: lago
@@ -35,7 +35,7 @@ entries:
   minio:
   - apiVersion: v1
     appVersion: RELEASE.2024-04-18T19-09-19Z
-    created: "2024-10-29T15:47:25.645597963Z"
+    created: "2024-10-30T09:45:48.49508115Z"
     description: High Performance Object Storage
     digest: 8ef4212d7d51be6c8192b3e91138a9ca918ca56142c42500028cfd3b80e0b2dd
     home: https://min.io
@@ -68,7 +68,7 @@ entries:
       licenses: Apache-2.0
     apiVersion: v2
     appVersion: 16.0.0
-    created: "2024-10-29T15:47:25.64899984Z"
+    created: "2024-10-30T09:45:48.499238704Z"
     dependencies:
     - name: common
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -112,7 +112,7 @@ entries:
       licenses: Apache-2.0
     apiVersion: v2
     appVersion: 7.2.3
-    created: "2024-10-29T15:47:25.654202394Z"
+    created: "2024-10-30T09:45:48.503352819Z"
     dependencies:
     - name: common
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -138,4 +138,4 @@ entries:
     urls:
     - https://getlago.github.io/charts/charts/redis-18.2.1.tgz
     version: 18.2.1
-generated: "2024-10-29T15:47:25.615963604Z"
+generated: "2024-10-30T09:45:48.4670113Z"
