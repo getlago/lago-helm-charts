@@ -55,6 +55,7 @@ jobs:
           git add .
           git commit -m "Update Helm repo index after release"
           git pull --rebase
+          git status
           git push origin gh-pages
 
       - name: Extract version from Chart.yaml
