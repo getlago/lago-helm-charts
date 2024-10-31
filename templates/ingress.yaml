@@ -4,35 +4,69 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}-ingress
   annotations:
-{{ if .Values.global.ingress.annotations }}
+{{- if .Values.global.ingress.annotations }}
   {{- with .Values.global.ingress.annotations }}
     {{- toYaml . | trim | nindent 4 }}
   {{- end }}
-{{ end }}
+{{- end }}
 spec:
   ingressClassName: {{ .Values.global.ingress.className }}
   tls:
-  - hosts:
-    - {{ .Values.global.ingress.frontHostname }}
-    - {{ .Values.global.ingress.apiHostname }}
-    secretName: {{ .Release.Name }}-ingress-secret
+{{- if .Values.LAGO_DOMAIN }}
+    - hosts:
+        - {{ .Values.LAGO_DOMAIN }}
+      secretName: {{ .Release.Name }}-ingress-secret
+{{- else }}
+    - hosts:
+{{- if .Values.global.ingress.frontHostname }}
+        - {{ .Values.global.ingress.frontHostname }}
+{{- end }}
+{{- if .Values.global.ingress.apiHostname }}
+        - {{ .Values.global.ingress.apiHostname }}
+{{- end }}
+      secretName: {{ .Release.Name }}-ingress-secret
+{{- end }}
   rules:
-  - host: {{ .Values.global.ingress.frontHostname }}
-    http:
-      paths:
-      - pathType: ImplementationSpecific
-        backend:
-          service:
-            name: {{ .Release.Name }}-front-svc
-            port:
-              number: {{ .Values.front.service.port }}
-  - host: {{ .Values.global.ingress.apiHostname }}
-    http:
-      paths:
-      - pathType: ImplementationSpecific
-        backend:
-          service:
-            name: {{ .Release.Name }}-api-svc
-            port:
-              number: {{ .Values.api.service.port }}
+{{- if .Values.LAGO_DOMAIN }}
+    - host: {{ .Values.LAGO_DOMAIN }}
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-api-svc
+                port:
+                  number: {{ .Values.api.service.port }}
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-front-svc
+                port:
+                  number: {{ .Values.front.service.port }}
+{{- else }}
+{{- if .Values.global.ingress.frontHostname }}
+    - host: {{ .Values.global.ingress.frontHostname }}
+      http:
+        paths:
+          - pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ .Release.Name }}-front-svc
+                port:
+                  number: {{ .Values.front.service.port }}
+{{- end }}
+{{- if .Values.global.ingress.apiHostname }}
+    - host: {{ .Values.global.ingress.apiHostname }}
+      http:
+        paths:
+          - pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ .Release.Name }}-api-svc
+                port:
+                  number: {{ .Values.api.service.port }}
+{{- end }}
+{{- end }}
 {{ end }}
