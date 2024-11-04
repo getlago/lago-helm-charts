@@ -17,6 +17,34 @@ This Helm chart deploys the Lago billing system with various optional dependenci
 - Persistent storage provisioner enabled in the cluster
 - Optionally: A managed Redis, Minio and PostgreSQL service for production environments
 
+### Ingress Configuration for Path-Based Routing with LAGO_DOMAIN
+
+To streamline the deployment and eliminate CORS issues due to multiple domains, we now use path-based routing through a single variable, `LAGO_DOMAIN`. This setup enables the API and frontend to share the same domain (e.g., `https://lago.dev`) with distinct paths (`/api` for the backend and `/` for the frontend), thereby simplifying the deployment process for users.
+
+#### NGINX Ingress Configuration
+
+For users deploying with an NGINX ingress controller, it is crucial to rewrite API requests to remove the `/api` prefix before they reach the backend. To do this, specific annotations must be added to the ingress configuration, along with enabling the `configuration-snippet` directive in the NGINX controller. This configuration will ensure that the backend only sees requests as if they were served from the root path.
+
+Here is the required configuration within the ingress:
+
+```yaml
+{{- if .Values.LAGO_DOMAIN }}
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^/api(/|$)(.*) /$2 break;
+{{- end }}
+```
+
+- **Explanation**: The `rewrite-target` annotation specifies that the request should be served from the root, while `configuration-snippet` applies a rewrite rule. This rule removes the `/api` prefix from incoming requests, allowing the backend to respond to requests as if they were directly under `/`.
+
+#### Non-NGINX Ingress Controllers
+
+If you are using a different ingress controller, you must implement equivalent rewrite rules with the appropriate annotations. This is essential to maintain the unified domain setup and ensure that requests routed through `/api` are properly rewritten before reaching the backend. Check your ingress controller’s documentation for similar rewrite configuration options and apply them to match the `/api` removal shown above.
+
+Failure to configure this rewrite properly can lead to API requests failing due to incorrect routing or path mismatches.
+
+
 ## Installation
 
 To install the chart with the release name `my-lago-release`:
