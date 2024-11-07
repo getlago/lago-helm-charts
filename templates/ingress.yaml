@@ -16,7 +16,7 @@ metadata:
     # Additional annotations when LAGO_DOMAIN is set
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      rewrite ^/api(/|$)(.*) /$2 break;
+      rewrite ^/api/(.*) /$1 break;
 {{- end }}
 spec:
   ingressClassName: {{ .Values.global.ingress.className }}
@@ -40,7 +40,7 @@ spec:
     - host: {{ .Values.LAGO_DOMAIN }}
       http:
         paths:
-          - path: /api
+          - path: /api/
             pathType: Prefix
             backend:
               service:
@@ -59,7 +59,7 @@ spec:
     - host: {{ .Values.global.ingress.frontHostname }}
       http:
         paths:
-          - path: /
+          - path: 
             pathType: ImplementationSpecific
             backend:
               service:
@@ -71,7 +71,7 @@ spec:
     - host: {{ .Values.global.ingress.apiHostname }}
       http:
         paths:
-          - path: /
+          - path: 
             pathType: ImplementationSpecific
             backend:
               service:
