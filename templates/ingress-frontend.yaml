@@ -1,0 +1,29 @@
+{{- if and .Values.global.ingress.enabled (hasKey .Values "LAGO_DOMAIN") (ne .Values.LAGO_DOMAIN "") }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-front-ingress
+  annotations:
+  {{- if .Values.global.ingress.annotations }}
+    {{- with .Values.global.ingress.annotations }}
+      {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.global.ingress.className }}
+  rules:
+  - host: {{ .Values.LAGO_DOMAIN }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Release.Name }}-front-svc
+            port:
+              number: {{ .Values.front.service.port }}
+  tls:
+  - hosts:
+      - {{ .Values.LAGO_DOMAIN }}
+    secretName: {{ .Release.Name }}-ingress-secret
+{{- end }}

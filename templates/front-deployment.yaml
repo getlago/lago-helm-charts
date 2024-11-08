@@ -24,11 +24,19 @@ spec:
       containers:
         - env:
             - name: API_URL
-              value: {{ .Values.apiUrl | quote }}
+              value: {{- if .Values.LAGO_DOMAIN }}
+                        "https://{{ .Values.LAGO_DOMAIN }}/api"
+                      {{- else }}
+                        {{ required "apiUrl value is required" .Values.apiUrl | quote }}
+                      {{- end }}
             - name: APP_ENV
               value: production
             - name: CODEGEN_API
-              value: {{ .Values.apiUrl | quote }}
+              value: {{- if .Values.LAGO_DOMAIN }}
+                        "https://{{ .Values.LAGO_DOMAIN }}/api"
+                      {{- else }}
+                        {{ required "apiUrl value is required" .Values.apiUrl | quote }}
+                      {{- end }}
             - name: LAGO_DISABLE_SIGNUP
               value: {{ not .Values.global.signup.enabled | quote }}
             {{- with .Values.front.extraEnv }}

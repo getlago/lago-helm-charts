@@ -17,6 +17,62 @@ This Helm chart deploys the Lago billing system with various optional dependenci
 - Persistent storage provisioner enabled in the cluster
 - Optionally: A managed Redis, Minio and PostgreSQL service for production environments
 
+### Ingress Configuration for Path-Based Routing with LAGO_DOMAIN
+
+Our deployment now uses path-based routing with a single domain variable, `LAGO_DOMAIN`. This configuration allows the API and frontend to share the same domain (e.g., `https://lago.dev`), using distinct paths: `/api/` for backend requests and `/` for the frontend. This setup simplifies deployment and avoids CORS issues that can arise with multiple domains.
+
+#### NGINX Ingress Configuration
+
+To ensure proper routing and avoid conflicts, **make sure all API paths are prefixed with `/api/`**. This is critical, as omitting this prefix could lead to unexpected behavior, such as frontend pages with similar paths (like `/api-keys`) being mistakenly routed to the backend.
+
+The recommended approach is to use two separate Ingress configurations:
+
+1. **Frontend Ingress**: Routes requests at the root path `/`, serving frontend traffic.
+2. **API Ingress**: Routes requests with the `/api/` prefix to the backend, with a rewrite rule to strip `/api/` before forwarding to the backend service.
+
+Here’s a brief example configuration:
+
+```yaml
+# Frontend Ingress
+- host: {{ .Values.LAGO_DOMAIN }}
+  http:
+    paths:
+    - path: /
+      pathType: Prefix
+      backend:
+        service:
+          name: {{ .Release.Name }}-front-svc
+          port:
+            number: {{ .Values.front.service.port }}
+
+# API Ingress with rewrite
+- host: {{ .Values.LAGO_DOMAIN }}
+  http:
+    paths:
+    - path: /api/(.*)
+      pathType: Prefix
+      backend:
+        service:
+          name: {{ .Release.Name }}-api-svc
+          port:
+            number: {{ .Values.api.service.port }}
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /$1
+```
+
+This configuration ensures:
+
+- **Frontend** requests are served at `/`, with no `/api/` prefix.
+- **API** requests are served at `/api/` and automatically rewritten to remove the prefix before reaching the backend.
+
+#### Non-NGINX Ingress Controllers
+
+For other ingress controllers, use similar path-based routing rules, ensuring that `/api/` is stripped from API requests before they reach the backend. Check your ingress controller’s documentation for equivalent rewrite configurations.
+
+---
+
+This setup avoids path conflicts and ensures consistent routing behavior.
+
 ## Installation
 
 To install the chart with the release name `my-lago-release`:

@@ -1,7 +1,15 @@
 version: 1.15.0
 
+
+#Note: If LAGO_DOMAIN is set, these variables (apiUrl & frontUrl) will be overridden.
 # apiUrl: mydomain.dev
 # frontUrl: mydomain.dev
+
+# By setting the LAGO_DOMAIN variable, your application will be available directly on the specified domain. 
+# For example, if LAGO_DOMAIN is set to getmydomain.dev, your GetLago instance will be accessible at https://getmydomain.dev,
+# and your API at https://getmydomain.dev/api/api/v1. Note that adding this variable changes the domain structure:
+# your application will no longer be accessible at api.getmydomain.dev and app.getmydomain.dev.
+#LAGO_DOMAIN: mydomain.dev
 
 # Only for Development, Staging or PoC, you should use a managed Redis instance for Production
 redis:
@@ -79,6 +87,7 @@ global:
 
   ingress:
     enabled: false
+    #Note: If LAGO_DOMAIN is set, frontHostname & apiHostname will be ignored.
     #frontHostname:
     #apiHostname:
     #className:
@@ -209,7 +218,7 @@ minio:
   enabled: false
   # replicas: 2
   # fullnameOverride: "my-lago-minio"
-  # endpoint: "http://minio.lago.dev"
+  # endpoint: "http://minio.mydomain.dev"
   # nameOverride: "minio"
   # resources:
   #   requests:
@@ -227,7 +236,7 @@ minio:
   #   annotations: {}
   #   path: /
   #   hosts:
-  #     - minio.lago.dev
+  #     - minio.mydomain.dev
   #   tls: []
   # Note : only the first one will be used
   # buckets:
