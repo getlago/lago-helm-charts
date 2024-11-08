@@ -19,7 +19,7 @@ This Helm chart deploys the Lago billing system with various optional dependenci
 
 ### Ingress Configuration for Path-Based Routing with LAGO_DOMAIN
 
-To streamline the deployment and eliminate CORS issues due to multiple domains, we now use path-based routing through a single variable, `LAGO_DOMAIN`. This setup enables the API and frontend to share the same domain (e.g., `https://lago.dev`) with distinct paths (`/api` for the backend and `/` for the frontend), thereby simplifying the deployment process for users.
+To streamline the deployment and eliminate CORS issues due to multiple domains, we now use path-based routing through a single variable, `LAGO_DOMAIN`. This setup enables the API and frontend to share the same domain (e.g., `https://lago.dev`) with distinct paths (`/api/` for the backend and `/` for the frontend), thereby simplifying the deployment process for users.
 
 #### NGINX Ingress Configuration
 
@@ -32,11 +32,11 @@ Here is the required configuration within the ingress:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      rewrite ^/api(/|$)(.*) /$2 break;
+      rewrite ^/api/(.*) /$1 break;
 {{- end }}
 ```
 
-- **Explanation**: The `rewrite-target` annotation specifies that the request should be served from the root, while `configuration-snippet` applies a rewrite rule. This rule removes the `/api` prefix from incoming requests, allowing the backend to respond to requests as if they were directly under `/`.
+- **Explanation**: The `rewrite-target` annotation specifies that the request should be served from the root, while `configuration-snippet` applies a rewrite rule. This rule removes the `/api/` prefix from incoming requests, allowing the backend to respond to requests as if they were directly under `/`.
 
 #### Non-NGINX Ingress Controllers
 
