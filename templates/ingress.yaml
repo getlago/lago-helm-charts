@@ -1,83 +1,38 @@
-{{ if .Values.global.ingress.enabled }}
+{{- if and .Values.global.ingress.enabled (or (not (hasKey .Values "LAGO_DOMAIN")) (eq .Values.LAGO_DOMAIN "")) }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-ingress
   annotations:
-{{- if .Values.global.ingress.annotations }}
+{{ if .Values.global.ingress.annotations }}
   {{- with .Values.global.ingress.annotations }}
     {{- toYaml . | trim | nindent 4 }}
   {{- end }}
-{{- end }}
-{{- if .Values.LAGO_DOMAIN }}
-    # We need to rewrite API requests so that the backend does not see the "/api" prefix in the URL.
-    # It is essential to enable "configuration-snippet" in the NGINX controller for this rewrite to function correctly.
-    # If a different ingress controller is used, ensure it is configured to handle the rewrite with appropriate annotations.
-    # Additional annotations when LAGO_DOMAIN is set
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      rewrite ^/api/(.*) /$1 break;
-{{- end }}
+{{ end }}
 spec:
   ingressClassName: {{ .Values.global.ingress.className }}
   tls:
-{{- if .Values.LAGO_DOMAIN }}
-    - hosts:
-        - {{ .Values.LAGO_DOMAIN }}
-      secretName: {{ .Release.Name }}-ingress-secret
-{{- else }}
-    - hosts:
-{{- if .Values.global.ingress.frontHostname }}
-        - {{ .Values.global.ingress.frontHostname }}
-{{- end }}
-{{- if .Values.global.ingress.apiHostname }}
-        - {{ .Values.global.ingress.apiHostname }}
-{{- end }}
-      secretName: {{ .Release.Name }}-ingress-secret
-{{- end }}
+  - hosts:
+    - {{ .Values.global.ingress.frontHostname }}
+    - {{ .Values.global.ingress.apiHostname }}
+    secretName: {{ .Release.Name }}-ingress-secret
   rules:
-{{- if .Values.LAGO_DOMAIN }}
-    - host: {{ .Values.LAGO_DOMAIN }}
-      http:
-        paths:
-          - path: /api/
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ .Release.Name }}-api-svc
-                port:
-                  number: {{ .Values.api.service.port }}
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ .Release.Name }}-front-svc
-                port:
-                  number: {{ .Values.front.service.port }}
-{{- else }}
-{{- if .Values.global.ingress.frontHostname }}
-    - host: {{ .Values.global.ingress.frontHostname }}
-      http:
-        paths:
-          - path: 
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: {{ .Release.Name }}-front-svc
-                port:
-                  number: {{ .Values.front.service.port }}
-{{- end }}
-{{- if .Values.global.ingress.apiHostname }}
-    - host: {{ .Values.global.ingress.apiHostname }}
-      http:
-        paths:
-          - path: 
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: {{ .Release.Name }}-api-svc
-                port:
-                  number: {{ .Values.api.service.port }}
-{{- end }}
-{{- end }}
+  - host: {{ .Values.global.ingress.frontHostname }}
+    http:
+      paths:
+      - pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {{ .Release.Name }}-front-svc
+            port:
+              number: {{ .Values.front.service.port }}
+  - host: {{ .Values.global.ingress.apiHostname }}
+    http:
+      paths:
+      - pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {{ .Release.Name }}-api-svc
+            port:
+              number: {{ .Values.api.service.port }}
 {{ end }}

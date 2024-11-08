@@ -19,75 +19,59 @@ This Helm chart deploys the Lago billing system with various optional dependenci
 
 ### Ingress Configuration for Path-Based Routing with LAGO_DOMAIN
 
-To streamline the deployment and eliminate CORS issues due to multiple domains, we now use path-based routing through a single variable, `LAGO_DOMAIN`. This setup enables the API and frontend to share the same domain (e.g., `https://lago.dev`) with distinct paths (`/api/` for the backend and `/` for the frontend), thereby simplifying the deployment process for users.
+Our deployment now uses path-based routing with a single domain variable, `LAGO_DOMAIN`. This configuration allows the API and frontend to share the same domain (e.g., `https://lago.dev`), using distinct paths: `/api/` for backend requests and `/` for the frontend. This setup simplifies deployment and avoids CORS issues that can arise with multiple domains.
 
 #### NGINX Ingress Configuration
 
-For users deploying with an NGINX ingress controller, it is crucial to rewrite API requests to remove the `/api` prefix before they reach the backend. To do this, specific annotations must be added to the ingress configuration, along with enabling the `configuration-snippet` directive in the NGINX controller. This configuration will ensure that the backend only sees requests as if they were served from the root path.
+To ensure proper routing and avoid conflicts, **make sure all API paths are prefixed with `/api/`**. This is critical, as omitting this prefix could lead to unexpected behavior, such as frontend pages with similar paths (like `/api-keys`) being mistakenly routed to the backend.
 
-##### Enabling Configuration Snippet
+The recommended approach is to use two separate Ingress configurations:
 
-Locate your NGINX ConfigMap:
+1. **Frontend Ingress**: Routes requests at the root path `/`, serving frontend traffic.
+2. **API Ingress**: Routes requests with the `/api/` prefix to the backend, with a rewrite rule to strip `/api/` before forwarding to the backend service.
 
-```shell
- kubectl get cm -n ingress-nginx
-```
-
-Edit the ConfigMap:
-```
-kubectl edit cm nginx-ingress-ingress-nginx-controller -n ingress-nginx
-```
-
-You should see something like this:
+Here’s a brief example configuration:
 
 ```yaml
-# Please edit the object below. Lines beginning with a '#' will be ignored,
-# and an empty file will abort the edit. If an error occurs while saving this file will be
-# reopened with the relevant failures.
-#
-apiVersion: v1
-data:
-  allow-snippet-annotations: "false"
-kind: ConfigMap
-metadata:
-  annotations:
-    meta.helm.sh/release-name: nginx-ingress
-    meta.helm.sh/release-namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/component: controller
-    app.kubernetes.io/instance: nginx-ingress
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-  name: nginx-ingress-ingress-nginx-controller
-  namespace: ingress-nginx
+# Frontend Ingress
+- host: {{ .Values.LAGO_DOMAIN }}
+  http:
+    paths:
+    - path: /
+      pathType: Prefix
+      backend:
+        service:
+          name: {{ .Release.Name }}-front-svc
+          port:
+            number: {{ .Values.front.service.port }}
+
+# API Ingress with rewrite
+- host: {{ .Values.LAGO_DOMAIN }}
+  http:
+    paths:
+    - path: /api/(.*)
+      pathType: Prefix
+      backend:
+        service:
+          name: {{ .Release.Name }}-api-svc
+          port:
+            number: {{ .Values.api.service.port }}
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /$1
 ```
 
-Change the line `allow-snippet-annotations: "false"` to `allow-snippet-annotations: "true"` and save the file.
+This configuration ensures:
 
-
-##### Applying Rewrite on NGINX Ingress:
-
-Here is the required configuration within the ingress:
-
-```yaml
-{{- if .Values.LAGO_DOMAIN }}
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      rewrite ^/api/(.*) /$1 break;
-{{- end }}
-```
-
-
-- **Explanation**: The `rewrite-target` annotation specifies that the request should be served from the root, while `configuration-snippet` applies a rewrite rule. This rule removes the `/api/` prefix from incoming requests, allowing the backend to respond to requests as if they were directly under `/`.
+- **Frontend** requests are served at `/`, with no `/api/` prefix.
+- **API** requests are served at `/api/` and automatically rewritten to remove the prefix before reaching the backend.
 
 #### Non-NGINX Ingress Controllers
 
-If you are using a different ingress controller, you must implement equivalent rewrite rules with the appropriate annotations. This is essential to maintain the unified domain setup and ensure that requests routed through `/api/` are properly rewritten before reaching the backend. Check your ingress controller’s documentation for similar rewrite configuration options and apply them to match the `/api/` removal shown above.
+For other ingress controllers, use similar path-based routing rules, ensuring that `/api/` is stripped from API requests before they reach the backend. Check your ingress controller’s documentation for equivalent rewrite configurations.
 
-Failure to configure this rewrite properly can lead to API requests failing due to incorrect routing or path mismatches.
+---
 
+This setup avoids path conflicts and ensures consistent routing behavior.
 
 ## Installation
 
