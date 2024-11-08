@@ -25,6 +25,49 @@ To streamline the deployment and eliminate CORS issues due to multiple domains, 
 
 For users deploying with an NGINX ingress controller, it is crucial to rewrite API requests to remove the `/api` prefix before they reach the backend. To do this, specific annotations must be added to the ingress configuration, along with enabling the `configuration-snippet` directive in the NGINX controller. This configuration will ensure that the backend only sees requests as if they were served from the root path.
 
+##### Enabling Configuration Snippet
+
+Locate your NGINX ConfigMap:
+
+```shell
+ kubectl get cm -n ingress-nginx
+```
+
+Edit the ConfigMap:
+```
+kubectl edit cm nginx-ingress-ingress-nginx-controller -n ingress-nginx
+```
+
+You should see something like this:
+
+```yaml
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+data:
+  allow-snippet-annotations: "false"
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: nginx-ingress
+    meta.helm.sh/release-namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: nginx-ingress
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+  name: nginx-ingress-ingress-nginx-controller
+  namespace: ingress-nginx
+```
+
+Change the line `allow-snippet-annotations: "false"` to `allow-snippet-annotations: "true"` and save the file.
+
+
+##### Applying Rewrite on NGINX Ingress:
+
 Here is the required configuration within the ingress:
 
 ```yaml
@@ -36,11 +79,12 @@ Here is the required configuration within the ingress:
 {{- end }}
 ```
 
+
 - **Explanation**: The `rewrite-target` annotation specifies that the request should be served from the root, while `configuration-snippet` applies a rewrite rule. This rule removes the `/api/` prefix from incoming requests, allowing the backend to respond to requests as if they were directly under `/`.
 
 #### Non-NGINX Ingress Controllers
 
-If you are using a different ingress controller, you must implement equivalent rewrite rules with the appropriate annotations. This is essential to maintain the unified domain setup and ensure that requests routed through `/api` are properly rewritten before reaching the backend. Check your ingress controller’s documentation for similar rewrite configuration options and apply them to match the `/api` removal shown above.
+If you are using a different ingress controller, you must implement equivalent rewrite rules with the appropriate annotations. This is essential to maintain the unified domain setup and ensure that requests routed through `/api/` are properly rewritten before reaching the backend. Check your ingress controller’s documentation for similar rewrite configuration options and apply them to match the `/api/` removal shown above.
 
 Failure to configure this rewrite properly can lead to API requests failing due to incorrect routing or path mismatches.
 
