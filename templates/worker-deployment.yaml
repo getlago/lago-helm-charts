@@ -23,6 +23,18 @@ spec:
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
+      {{- with .Values.worker.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.worker.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.worker.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       initContainers:
         {{ if .Values.redis.enabled }}
         - name: wait-for-redis
@@ -62,7 +74,7 @@ spec:
                   name: {{ include "secret-path" . }}
                   key: redisUrl
             - name: LAGO_PDF_URL
-              {{- $pdfHost := printf "%s-pdf-svc.%s" .Release.Name .Release.Namespace}}
+              {{- $pdfHost := printf "%s-pdf-svc.%s" .Release.Name .Release.Namespace }}
               value: {{ printf "http://%s:%v" $pdfHost .Values.pdf.service.port | quote }}
             - name: LAGO_API_URL
               value: {{ required "apiUrl value is required" .Values.apiUrl | quote }}
@@ -70,12 +82,6 @@ spec:
               value: {{ required "frontUrl value is required" .Values.frontUrl | quote }}
             - name: RAILS_LOG_TO_STDOUT
               value: {{ .Values.worker.rails.logStdout | quote }}
-            {{- with .Values.worker.extraEnv }}
-            {{- range $key, $value := . }}
-            - name: {{ $key }}
-              value: {{ $value | quote }}
-            {{- end }}
-            {{- end }}
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -109,6 +115,12 @@ spec:
               value: {{ .Values.worker.rails.sidekiqConcurrency | quote }}
             - name: LAGO_LOG_LEVEL
               value: {{ .Values.worker.rails.logLevel | quote }}
+            {{- with .Values.worker.extraEnv }}
+            {{- range $key, $value := . }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}
             {{ if .Values.global.license }}
             - name: LAGO_LICENSE
               valueFrom:
@@ -120,20 +132,19 @@ spec:
             {{ if or .Values.global.s3.enabled .Values.minio.enabled }}
             - name: LAGO_USE_AWS_S3
               value: "true"
-            {{- if .Values.minio.enabled }}
+              {{- if .Values.minio.enabled }}
             - name: LAGO_AWS_S3_PATH_STYLE
               value: "true"
-            {{- end }}
-            {{ if or .Values.global.s3.endpoint .Values.minio.endpoint }}
+              {{- end }}
+            {{- if or .Values.global.s3.endpoint .Values.minio.endpoint }}
             - name: LAGO_AWS_S3_ENDPOINT
               value: {{ if .Values.minio.enabled }}
                         {{ .Values.minio.endpoint | quote }}
                       {{ else }}
                         {{ .Values.global.s3.endpoint | quote }}
                       {{ end }}
-            {{ end }}
-
-            {{ if or .Values.global.s3.accessKeyId .Values.minio.enabled .Values.global.existingSecret }}
+            {{- end }}
+            {{- if or .Values.global.s3.accessKeyId .Values.minio.enabled .Values.global.existingSecret }}
             - name: LAGO_AWS_S3_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -147,9 +158,8 @@ spec:
                         {{ else }}
                           awsS3AccessKeyId
                         {{ end }}
-            {{ end }}
-
-            {{ if or .Values.global.s3.secretAccessKey .Values.minio.enabled .Values.global.existingSecret }}
+            {{- end }}
+            {{- if or .Values.global.s3.secretAccessKey .Values.minio.enabled .Values.global.existingSecret }}
             - name: LAGO_AWS_S3_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
@@ -163,8 +173,7 @@ spec:
                         {{ else }}
                           awsS3SecretAccessKey
                         {{ end }}
-            {{ end }}
-
+            {{- end }}
             - name: LAGO_AWS_S3_BUCKET
               value: {{ if .Values.minio.enabled }}
                         {{ (index .Values.minio.buckets 0).name | quote }}

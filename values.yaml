@@ -40,8 +40,7 @@ global:
   #  - awsS3SecretAccessKey:
   #  - smtpUsername:
   #  - smtpPassword:
-  #existingSecret: "lago-credentials"
-
+  #existingSecret: "lago-credentials"  
   # Not required if using existingSecret
   postgresql:
     auth:
@@ -107,6 +106,9 @@ front:
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
 
 
 api:
@@ -131,6 +133,10 @@ api:
   extraEnv: {}
   podAnnotations: {}
   podLabels: {}
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
+
 
 worker:
   replicas: 1
@@ -151,6 +157,10 @@ worker:
     periodSeconds: 10
     timeoutSeconds: 1
     failureThreshold: 3
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
+
 
 eventsWorker:
   replicas: 1
@@ -171,6 +181,9 @@ eventsWorker:
     periodSeconds: 10
     timeoutSeconds: 1
     failureThreshold: 3
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
 
 
 clock:
@@ -186,6 +199,9 @@ clock:
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
 
 
 pdf:
@@ -199,6 +215,9 @@ pdf:
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
 
 
 job:

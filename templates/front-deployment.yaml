@@ -5,7 +5,7 @@ metadata:
     io.lago.service: {{ .Release.Name }}-front
   name: {{ .Release.Name }}-front
 spec:
-  replicas: 1
+  replicas: {{ .Values.front.replicas }}
   selector:
     matchLabels:
       io.lago.service: {{ .Release.Name }}-front
@@ -21,6 +21,18 @@ spec:
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
+      {{- with .Values.front.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.front.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.front.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - env:
             - name: API_URL
