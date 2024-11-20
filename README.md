@@ -204,6 +204,7 @@ minio:
 - **First Bucket Name**: The first bucket in the `buckets` list should match the `fullnameOverride` to ensure consistent bucket naming conventions.
 - **Ingress Configuration**: Make sure the `hosts` in the ingress section match your MinIO endpoint URL.
 
+
 ## Storage Recommendation
 
 We **strongly recommend** using either **Amazon S3** or **MinIO** for object storage when deploying Lago. These solutions provide reliable, scalable storage that can be accessed by multiple pods without encountering issues.
