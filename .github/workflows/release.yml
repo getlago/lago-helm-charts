@@ -49,8 +49,8 @@ jobs:
       - name: Deploy to GitHub Pages
         if: env.has_release_label == 'true'
         run: |
-          helm package . --destination charts/
-          helm repo index . --url https://getlago.github.io/charts
+          helm package . --destination artifacts/
+          helm repo index . --url https://charts.getlago.com/
           git add .
           git commit -m "Update Helm repo index after release"
           git pull
@@ -73,12 +73,12 @@ jobs:
 
       - name: Create GitHub Release
         if: env.has_release_label == 'true'
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: "v${{ env.version }}"
-          release_name: "Release v${{ env.version }}"
-          body: "Release of version v${{ env.version }}"
+          name: "Release v${{ env.version }}"
+          generate_release_notes: true
           draft: false
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,7 +1,10 @@
 version: 1.15.0
 
-# apiUrl: mydomain.dev
-# frontUrl: mydomain.dev
+# Required: Set the URLs for your API and Frontend services
+# Replace these placeholders with the actual domain names.
+apiUrl: "" # Example: https://api.mydomain.dev
+frontUrl: "" # Example: https://app.mydomain.dev
+
 
 # Only for Development, Staging or PoC, you should use a managed Redis instance for Production
 redis:
