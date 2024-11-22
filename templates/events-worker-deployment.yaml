@@ -23,6 +23,18 @@ spec:
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
+      {{- with .Values.eventsWorker.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.eventsWorker.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.eventsWorker.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       initContainers:
         {{ if .Values.redis.enabled }}
         - name: wait-for-redis
@@ -63,12 +75,6 @@ spec:
                   key: redisUrl
             - name: RAILS_LOG_TO_STDOUT
               value: {{ .Values.eventsWorker.rails.logStdout | quote }}
-            {{- with .Values.eventsWorker.extraEnv }}
-            {{- range $key, $value := . }}
-            - name: {{ $key }}
-              value: {{ $value | quote }}
-            {{- end }}
-            {{- end }}
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -95,11 +101,17 @@ spec:
                   name: {{ .Release.Name }}-secrets
                   key: encryptionPrimaryKey
             - name: DATABASE_POOL
-              value: {{ .Values.worker.rails.sidekiqConcurrency | quote }}
+              value: {{ .Values.eventsWorker.rails.sidekiqConcurrency | quote }}
             - name: SIDEKIQ_CONCURRENCY
-              value: {{ .Values.worker.rails.sidekiqConcurrency | quote }}
+              value: {{ .Values.eventsWorker.rails.sidekiqConcurrency | quote }}
             - name: LAGO_LOG_LEVEL
-              value: {{ .Values.worker.rails.logLevel | quote }}
+              value: {{ .Values.eventsWorker.rails.logLevel | quote }}
+            {{- with .Values.eventsWorker.extraEnv }}
+            {{- range $key, $value := . }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}
             {{ if .Values.global.newRelic.enabled }}
             - name: NEW_RELIC_KEY
               valueFrom:
@@ -111,7 +123,7 @@ spec:
           name: {{ .Release.Name }}-events-worker
           {{- with .Values.eventsWorker.resources }}
           resources:
-            {{- toYaml . | nindent 12}}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           livenessProbe:
             exec:

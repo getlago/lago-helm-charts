@@ -23,8 +23,20 @@ spec:
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
+      {{- with .Values.api.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       initContainers:
-      {{ if .Values.postgresql.enabled }}
+        {{ if .Values.postgresql.enabled }}
         - name: wait-for-postgresql
           image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
           args:
@@ -32,8 +44,8 @@ spec:
             - pod/{{ .Release.Name }}-postgresql-0
             - --for=condition=ready
             - --timeout=180s
-      {{ end }}
-      {{ if .Values.redis.enabled }}
+        {{ end }}
+        {{ if .Values.redis.enabled }}
         - name: wait-for-redis
           image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
           args:
@@ -41,8 +53,8 @@ spec:
             - pod/{{ .Release.Name }}-redis-master-0
             - --for=condition=ready
             - --timeout=180s
-      {{ end }}
-      {{ if .Values.minio.enabled }}
+        {{ end }}
+        {{ if .Values.minio.enabled }}
         - name: wait-for-minio
           image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
           args:
@@ -50,7 +62,7 @@ spec:
             - pod/{{ .Release.Name }}-minio-0
             - --for=condition=ready
             - --timeout=180s
-      {{ end }}
+        {{ end }}
         - name: wait-for-migrations
           image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
           args:
@@ -136,15 +148,13 @@ spec:
               value: {{ $value | quote }}
             {{- end }}
             {{- end }}
-            {{ if .Values.global.license }}
+           {{ if .Values.global.license }}
             - name: LAGO_LICENSE
               valueFrom:
                 secretKeyRef:
                   name: {{ .Release.Name }}-secrets
                   key: license
             {{ end }}
-
-
           {{ if or .Values.global.s3.enabled .Values.minio.enabled }}
             - name: LAGO_USE_AWS_S3
               value: "true"
@@ -160,7 +170,6 @@ spec:
                         {{ .Values.global.s3.endpoint | quote }}
                       {{ end }}
             {{ end }}
-
             {{ if or .Values.global.s3.accessKeyId .Values.minio.enabled .Values.global.existingSecret }}
             - name: LAGO_AWS_S3_ACCESS_KEY_ID
               valueFrom:
@@ -176,7 +185,6 @@ spec:
                           awsS3AccessKeyId  
                         {{ end }}
             {{ end }}
-
             {{ if or .Values.global.s3.secretAccessKey .Values.minio.enabled .Values.global.existingSecret }}
             - name: LAGO_AWS_S3_SECRET_ACCESS_KEY
               valueFrom:
@@ -192,8 +200,6 @@ spec:
                           awsS3SecretAccessKey  
                         {{ end }}
             {{ end }}
-
-
             - name: LAGO_AWS_S3_BUCKET
               value: {{ if .Values.minio.enabled }}
                         {{ (index .Values.minio.buckets 0).name | quote }}
@@ -207,7 +213,6 @@ spec:
                         {{ default "us-east-1" .Values.minio.region | quote }}
                       {{ end }}
           {{ end }}
-
             {{ if .Values.global.smtp.enabled }}
             - name: LAGO_FROM_EMAIL
               value: {{ .Values.global.smtp.fromEmail }}
