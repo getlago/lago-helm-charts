@@ -21,6 +21,18 @@ spec:
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
+      {{- with .Values.pdf.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pdf.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pdf.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - image: getlago/lago-gotenberg:7.10
           name: {{ .Release.Name }}-pdf
@@ -29,7 +41,7 @@ spec:
               protocol: TCP
           {{- with .Values.pdf.resources }}
           resources:
-            {{- toYaml . | nindent 12}}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
             {{- with .Values.pdf.extraEnv }}
