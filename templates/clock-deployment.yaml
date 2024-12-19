@@ -90,6 +90,8 @@ spec:
                   key: encryptionPrimaryKey
             - name: LAGO_LOG_LEVEL
               value: {{ .Values.clock.rails.logLevel | quote }}
+            - name: SIDEKIQ_WEBHOOK
+              value: {{ .Values.webhookWorker.enabled | quote }}
             {{- with .Values.clock.extraEnv }}
             {{- range $key, $value := . }}
             - name: {{ $key }}
