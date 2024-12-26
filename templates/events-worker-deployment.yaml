@@ -108,6 +108,8 @@ spec:
               value: {{ .Values.eventsWorker.rails.logLevel | quote }}
             - name: SIDEKIQ_WEBHOOK
               value: {{ .Values.webhookWorker.enabled | quote }}
+            - name: SIDEKIQ_BILLING
+              value: {{ .Values.billingWorker.enabled | quote}}
             {{- with .Values.eventsWorker.extraEnv }}
             {{- range $key, $value := . }}
             - name: {{ $key }}

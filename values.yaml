@@ -215,6 +215,30 @@ pdf:
   nodeSelector: {}
   affinity: {}
 
+billingWorker:
+  enabled: true
+  replicas: 1
+  rails:
+    sidekiqConcurrency: 10
+    env: 'production'
+    logStdout: true
+    logLevel: info
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: '1100m'
+  podAnnotations: {}
+  podLabels: {}
+  extraEnv: {}
+  livenessProbe:
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 3
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
+
 webhookWorker:
   enabled: true
   replicas: 1
