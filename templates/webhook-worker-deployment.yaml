@@ -1,37 +1,38 @@
+{{- if .Values.webhookWorker.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.lago.service: {{ .Release.Name }}-events-worker
-  name: {{ .Release.Name }}-events-worker
+    io.lago.service: {{ .Release.Name }}-webhook-worker
+  name: {{ .Release.Name }}-webhook-worker
 spec:
-  replicas: {{ .Values.eventsWorker.replicas }}
+  replicas: {{ .Values.webhookWorker.replicas }}
   selector:
     matchLabels:
-      io.lago.service: {{ .Release.Name }}-events-worker
+      io.lago.service: {{ .Release.Name }}-webhook-worker
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        io.lago.service: {{ .Release.Name }}-events-worker
-        {{- range $key, $value := .Values.eventsWorker.podLabels }}
+        io.lago.service: {{ .Release.Name }}-webhook-worker
+        {{- range $key, $value := .Values.webhookWorker.podLabels }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
       annotations:
-        {{- range $key, $value := .Values.eventsWorker.podAnnotations }}
+        {{- range $key, $value := .Values.webhookWorker.podAnnotations }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
-      {{- with .Values.eventsWorker.tolerations }}
+      {{- with .Values.webhookWorker.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.eventsWorker.nodeSelector }}
+      {{- with .Values.webhookWorker.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.eventsWorker.affinity }}
+      {{- with .Values.webhookWorker.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -54,10 +55,10 @@ spec:
             - --timeout=180s
       containers:
         - args:
-            - ./scripts/start.events.worker.sh
+            - ./scripts/start.webhook.worker.sh
           env:
             - name: RAILS_ENV
-              value: {{ .Values.eventsWorker.rails.env }}
+              value: {{ .Values.webhookWorker.rails.env }}
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
@@ -74,7 +75,7 @@ spec:
                   name: {{ include "secret-path" . }}
                   key: redisUrl
             - name: RAILS_LOG_TO_STDOUT
-              value: {{ .Values.eventsWorker.rails.logStdout | quote }}
+              value: {{ .Values.webhookWorker.rails.logStdout | quote }}
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -101,14 +102,14 @@ spec:
                   name: {{ .Release.Name }}-secrets
                   key: encryptionPrimaryKey
             - name: DATABASE_POOL
-              value: {{ .Values.eventsWorker.rails.sidekiqConcurrency | quote }}
+              value: {{ .Values.webhookWorker.rails.sidekiqConcurrency | quote }}
             - name: SIDEKIQ_CONCURRENCY
-              value: {{ .Values.eventsWorker.rails.sidekiqConcurrency | quote }}
-            - name: LAGO_LOG_LEVEL
-              value: {{ .Values.eventsWorker.rails.logLevel | quote }}
+              value: {{ .Values.webhookWorker.rails.sidekiqConcurrency | quote }}
             - name: SIDEKIQ_WEBHOOK
-              value: {{ .Values.webhookWorker.enabled | quote }}
-            {{- with .Values.eventsWorker.extraEnv }}
+              value: "true"
+            - name: LAGO_LOG_LEVEL
+              value: {{ .Values.webhookWorker.rails.logLevel | quote }}
+            {{- with .Values.webhookWorker.extraEnv }}
             {{- range $key, $value := . }}
             - name: {{ $key }}
               value: {{ $value | quote }}
@@ -122,17 +123,18 @@ spec:
                   key: newRelicKey
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
-          name: {{ .Release.Name }}-events-worker
-          {{- with .Values.eventsWorker.resources }}
+          name: {{ .Release.Name }}-webhook-worker
+          {{- with .Values.webhookWorker.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           livenessProbe:
             exec:
               command: ["/bin/bash", "-l", "-c", "bundle exec sidekiqmon processes | grep $(hostname) || exit 1"]
-            initialDelaySeconds: {{ .Values.eventsWorker.livenessProbe.initialDelaySeconds | default 0 }}
-            periodSeconds: {{ .Values.eventsWorker.livenessProbe.periodSeconds | default 10 }}
-            timeoutSeconds: {{ .Values.eventsWorker.livenessProbe.timeoutSeconds | default 1 }}
-            failureThreshold: {{ .Values.eventsWorker.livenessProbe.failureThreshold | default 3 }}
+            initialDelaySeconds: {{ .Values.webhookWorker.livenessProbe.initialDelaySeconds | default 0 }}
+            periodSeconds: {{ .Values.webhookWorker.livenessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.webhookWorker.livenessProbe.timeoutSeconds | default 1 }}
+            failureThreshold: {{ .Values.webhookWorker.livenessProbe.failureThreshold | default 3 }}
       restartPolicy: Always
       serviceAccountName: {{ .Values.global.serviceAccountName | default (printf "%s-serviceaccount" .Release.Name) }}
+{{- end -}}

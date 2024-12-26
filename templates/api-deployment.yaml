@@ -142,6 +142,8 @@ spec:
               value: {{ .Values.api.rails.webConcurrency | quote }}
             - name: LAGO_LOG_LEVEL
               value: {{ .Values.api.rails.logLevel | quote }}
+            - name: SIDEKIQ_WEBHOOK
+              value: {{ .Values.webhookWorker.enabled | quote }}
             {{- with .Values.api.extraEnv }}
             {{- range $key, $value := . }}
             - name: {{ $key }}
