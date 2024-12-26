@@ -1,4 +1,4 @@
-version: 1.17.2
+version: 1.17.4
 
 # Required: Set the URLs for your API and Frontend services
 # Replace these placeholders with the actual domain names.
@@ -110,7 +110,6 @@ front:
   nodeSelector: {}
   affinity: {}
 
-
 api:
   replicas: 1
   service:
@@ -137,18 +136,17 @@ api:
   nodeSelector: {}
   affinity: {}
 
-
 worker:
   replicas: 1
   rails:
-    sidekiqConcurrency: 100
+    sidekiqConcurrency: 20
     env: 'production'
     logStdout: true
     logLevel: error
   resources:
     requests:
       memory: 1Gi
-      cpu: '1000m'
+      cpu: '1100m'
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
@@ -160,19 +158,19 @@ worker:
   tolerations: []
   nodeSelector: {}
   affinity: {}
-
 
 eventsWorker:
+  enabled: true
   replicas: 1
   rails:
-    sidekiqConcurrency: 100
+    sidekiqConcurrency: 20
     env: 'production'
     logStdout: true
     logLevel: error
   resources:
     requests:
       memory: 1Gi
-      cpu: '1000m'
+      cpu: '1100m'
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
@@ -184,7 +182,6 @@ eventsWorker:
   tolerations: []
   nodeSelector: {}
   affinity: {}
-
 
 clock:
   replicas: 1
@@ -203,7 +200,6 @@ clock:
   nodeSelector: {}
   affinity: {}
 
-
 pdf:
   replicas: 1
   service:
@@ -219,6 +215,29 @@ pdf:
   nodeSelector: {}
   affinity: {}
 
+webhookWorker:
+  enabled: true
+  replicas: 1
+  rails:
+    sidekiqConcurrency: 20
+    env: 'production'
+    logStdout: true
+    logLevel: info
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: '1100m'
+  podAnnotations: {}
+  podLabels: {}
+  extraEnv: {}
+  livenessProbe:
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 3
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
 
 job:
   migrate:
