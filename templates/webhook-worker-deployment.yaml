@@ -102,11 +102,11 @@ spec:
                   name: {{ .Release.Name }}-secrets
                   key: encryptionPrimaryKey
             - name: DATABASE_POOL
-              value: 20
+              value: {{ .Values.webhookWorker.rails.sidekiqConcurrency | quote }}
             - name: SIDEKIQ_CONCURRENCY
-              value: 20
+              value: {{ .Values.webhookWorker.rails.sidekiqConcurrency | quote }}
             - name: SIDEKIQ_WEBHOOK
-              value: true
+              value: "true"
             - name: LAGO_LOG_LEVEL
               value: {{ .Values.webhookWorker.rails.logLevel | quote }}
             {{- with .Values.webhookWorker.extraEnv }}

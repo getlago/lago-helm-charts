@@ -1,4 +1,4 @@
-version: 1.17.2
+version: 1.17.4
 
 # Required: Set the URLs for your API and Frontend services
 # Replace these placeholders with the actual domain names.
@@ -219,6 +219,7 @@ webhookWorker:
   enabled: true
   replicas: 1
   rails:
+    sidekiqConcurrency: 20
     env: 'production'
     logStdout: true
     logLevel: info
