@@ -1,65 +1,48 @@
+{{- if .Values.billingWorker.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.lago.service: {{ .Release.Name }}-api
-  name: {{ .Release.Name }}-api
+    io.lago.service: {{ .Release.Name }}-billing-worker
+  name: {{ .Release.Name }}-billing-worker
 spec:
-  replicas: {{ .Values.api.replicas }}
+  replicas: {{ .Values.billingWorker.replicas }}
   selector:
     matchLabels:
-      io.lago.service: {{ .Release.Name }}-api
+      io.lago.service: {{ .Release.Name }}-billing-worker
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        io.lago.service: {{ .Release.Name }}-api
-        {{- range $key, $value := .Values.api.podLabels }}
+        io.lago.service: {{ .Release.Name }}-billing-worker
+        {{- range $key, $value := .Values.billingWorker.podLabels }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
       annotations:
-        {{- range $key, $value := .Values.api.podAnnotations }}
+        {{- range $key, $value := .Values.billingWorker.podAnnotations }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
-      {{- with .Values.api.tolerations }}
+      {{- with .Values.billingWorker.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.api.nodeSelector }}
+      {{- with .Values.billingWorker.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.api.affinity }}
+      {{- with .Values.billingWorker.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       initContainers:
-        {{ if .Values.postgresql.enabled }}
-        - name: wait-for-postgresql
-          image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
-          args:
-            - wait
-            - pod/{{ .Release.Name }}-postgresql-0
-            - --for=condition=ready
-            - --timeout=180s
-        {{ end }}
         {{ if .Values.redis.enabled }}
         - name: wait-for-redis
           image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
           args:
             - wait
             - pod/{{ .Release.Name }}-redis-master-0
-            - --for=condition=ready
-            - --timeout=180s
-        {{ end }}
-        {{ if .Values.minio.enabled }}
-        - name: wait-for-minio
-          image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
-          args:
-            - wait
-            - pod/{{ .Release.Name }}-minio-0
             - --for=condition=ready
             - --timeout=180s
         {{ end }}
@@ -71,10 +54,10 @@ spec:
             - --for=condition=complete
             - --timeout=180s
       containers:
-        - args: ["./scripts/start.api.sh"]
+        - args: ["./scripts/start.billing.worker.sh"]
           env:
             - name: RAILS_ENV
-              value: {{ .Values.api.rails.env }}
+              value: {{ .Values.billingWorker.rails.env }}
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
@@ -91,16 +74,14 @@ spec:
                   name: {{ include "secret-path" . }}
                   key: redisUrl
             - name: LAGO_PDF_URL
-              {{- $pdfHost := printf "%s-pdf-svc.%s" .Release.Name .Release.Namespace}}
+              {{- $pdfHost := printf "%s-pdf-svc.%s" .Release.Name .Release.Namespace }}
               value: {{ printf "http://%s:%v" $pdfHost .Values.pdf.service.port | quote }}
             - name: LAGO_API_URL
               value: {{ required "apiUrl value is required" .Values.apiUrl | quote }}
             - name: LAGO_FRONT_URL
               value: {{ required "frontUrl value is required" .Values.frontUrl | quote }}
-            - name: LAGO_SIDEKIQ_WEB
-              value: {{ .Values.api.sidekiqWeb.enabled | quote }}
             - name: RAILS_LOG_TO_STDOUT
-              value: {{ .Values.api.rails.logStdout | quote }}
+              value: {{ .Values.billingWorker.rails.logStdout | quote }}
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -128,82 +109,75 @@ spec:
                   key: encryptionPrimaryKey
             - name: LAGO_DISABLE_SEGMENT
               value: {{ not .Values.global.segment.enabled | quote }}
-            - name: LAGO_DISABLE_SIGNUP
-              value: {{ not .Values.global.signup.enabled | quote }}
             - name: DATABASE_POOL
-              value: {{ mul .Values.api.rails.maxThreads .Values.api.rails.webConcurrency | quote }}
-            - name: RAILS_MAX_THREADS
-              value: {{ .Values.api.rails.maxThreads | quote }}
-            - name: RAILS_MIN_THREADS
-              value: "0"
-            - name: SIDEKIQ_EVENTS
-              value: "true"
-            - name: WEB_CONCURRENCY
-              value: {{ .Values.api.rails.webConcurrency | quote }}
+              value: {{ .Values.billingWorker.rails.sidekiqConcurrency | quote }}
+            - name: SIDEKIQ_CONCURRENCY
+              value: {{ .Values.billingWorker.rails.sidekiqConcurrency | quote }}
             - name: LAGO_LOG_LEVEL
-              value: {{ .Values.api.rails.logLevel | quote }}
+              value: {{ .Values.billingWorker.rails.logLevel | quote }}
             - name: SIDEKIQ_WEBHOOK
               value: {{ .Values.webhookWorker.enabled | quote }}
             - name: SIDEKIQ_BILLING
               value: {{ .Values.billingWorker.enabled | quote }}
-            {{- with .Values.api.extraEnv }}
+            {{- with .Values.billingWorker.extraEnv }}
             {{- range $key, $value := . }}
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
             {{- end }}
-           {{ if .Values.global.license }}
+            {{ if .Values.global.license }}
             - name: LAGO_LICENSE
               valueFrom:
                 secretKeyRef:
                   name: {{ .Release.Name }}-secrets
                   key: license
             {{ end }}
-          {{ if or .Values.global.s3.enabled .Values.minio.enabled }}
+
+            {{ if or .Values.global.s3.enabled .Values.minio.enabled }}
             - name: LAGO_USE_AWS_S3
               value: "true"
-          {{- if .Values.minio.enabled }}
+              {{- if .Values.minio.enabled }}
             - name: LAGO_AWS_S3_PATH_STYLE
               value: "true"
-          {{- end }}
-            {{ if or .Values.global.s3.endpoint .Values.minio.endpoint }}
+              {{- end }}
+            {{- if or .Values.global.s3.endpoint .Values.minio.endpoint }}
             - name: LAGO_AWS_S3_ENDPOINT
               value: {{ if .Values.minio.enabled }}
                         {{ .Values.minio.endpoint | quote }}
                       {{ else }}
                         {{ .Values.global.s3.endpoint | quote }}
                       {{ end }}
-            {{ end }}
-            {{ if or .Values.global.s3.accessKeyId .Values.minio.enabled .Values.global.existingSecret }}
+            {{- end }}
+            {{- if or .Values.global.s3.accessKeyId .Values.minio.enabled .Values.global.existingSecret }}
             - name: LAGO_AWS_S3_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
                   name: {{ if .Values.minio.enabled }}
-                          {{ .Release.Name }}-minio  
+                          {{ .Release.Name }}-minio
                         {{ else }}
-                          {{ include "secret-path" . }}  
+                          {{ include "secret-path" . }}
                         {{ end }}
                   key: {{ if .Values.minio.enabled }}
-                          rootUser  
+                          rootUser
                         {{ else }}
-                          awsS3AccessKeyId  
+                          awsS3AccessKeyId
                         {{ end }}
-            {{ end }}
-            {{ if or .Values.global.s3.secretAccessKey .Values.minio.enabled .Values.global.existingSecret }}
+            {{- end }}
+            {{- if or .Values.global.s3.secretAccessKey .Values.minio.enabled .Values.global.existingSecret }}
             - name: LAGO_AWS_S3_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ if .Values.minio.enabled }}
-                          {{ .Release.Name }}-minio  
+                          {{ .Release.Name }}-minio
                         {{ else }}
-                          {{ include "secret-path" . }}  
+                          {{ include "secret-path" . }}
                         {{ end }}
                   key: {{ if .Values.minio.enabled }}
-                          rootPassword  
+                          rootPassword
                         {{ else }}
-                          awsS3SecretAccessKey  
+                          awsS3SecretAccessKey
                         {{ end }}
-            {{ end }}
+            {{- end }}
             - name: LAGO_AWS_S3_BUCKET
               value: {{ if .Values.minio.enabled }}
                         {{ (index .Values.minio.buckets 0).name | quote }}
@@ -216,7 +190,8 @@ spec:
                       {{ else if .Values.minio.enabled }}
                         {{ default "us-east-1" .Values.minio.region | quote }}
                       {{ end }}
-          {{ end }}
+            {{ end }}
+
             {{ if .Values.global.smtp.enabled }}
             - name: LAGO_FROM_EMAIL
               value: {{ .Values.global.smtp.fromEmail }}
@@ -243,33 +218,22 @@ spec:
                   key: newRelicKey
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
-          name: {{ .Release.Name }}-api
-          ports:
-            - name: http
-              containerPort: 3000
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: http
-          {{- with .Values.api.resources }}
+          name: {{ .Release.Name }}-billing-worker
+          {{- with .Values.billingWorker.resources }}
           resources:
             {{- toYaml . | nindent 12}}
           {{- end }}
-          {{- if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) }}
+          {{ if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) }}
           volumeMounts:
             - mountPath: /app/storage
               name: {{ .Release.Name }}-storage-data
           {{ end }}
       restartPolicy: Always
-      {{- if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) }}
+      {{ if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) }}
       volumes:
         - name: {{ .Release.Name }}-storage-data
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-storage-data
       {{ end }}
       serviceAccountName: {{ .Values.global.serviceAccountName | default (printf "%s-serviceaccount" .Release.Name) }}
+{{- end -}}

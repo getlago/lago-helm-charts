@@ -53,8 +53,7 @@ spec:
             - --for=condition=complete
             - --timeout=180s
       containers:
-        - args:
-            - ./scripts/start.worker.sh
+        - args: ["./scripts/start.worker.sh"]
           env:
             - name: RAILS_ENV
               value: {{ .Values.worker.rails.env }}
@@ -117,6 +116,8 @@ spec:
               value: {{ .Values.worker.rails.logLevel | quote }}
             - name: SIDEKIQ_WEBHOOK
               value: {{ .Values.webhookWorker.enabled | quote }}
+            - name: SIDEKIQ_BILLING
+              value: {{ .Values.billingWorker.enabled | quote}}
             {{- with .Values.worker.extraEnv }}
             {{- range $key, $value := . }}
             - name: {{ $key }}
