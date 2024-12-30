@@ -118,6 +118,8 @@ spec:
               value: {{ .Values.webhookWorker.enabled | quote }}
             - name: SIDEKIQ_BILLING
               value: {{ .Values.billingWorker.enabled | quote}}
+            - name: SIDEKIQ_CLOCK
+              value: {{ .Values.clockWorker.enabled | quote}}
             {{- with .Values.worker.extraEnv }}
             {{- range $key, $value := . }}
             - name: {{ $key }}
