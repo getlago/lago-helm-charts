@@ -53,8 +53,7 @@ spec:
             - --for=condition=complete
             - --timeout=180s
       containers:
-        - args:
-            - ./scripts/start.events.worker.sh
+        - args: ["./scripts/start.events.worker.sh"]
           env:
             - name: RAILS_ENV
               value: {{ .Values.eventsWorker.rails.env }}

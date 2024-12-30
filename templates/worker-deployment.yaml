@@ -53,8 +53,7 @@ spec:
             - --for=condition=complete
             - --timeout=180s
       containers:
-        - args:
-            - ./scripts/start.worker.sh
+        - args: ["./scripts/start.worker.sh"]
           env:
             - name: RAILS_ENV
               value: {{ .Values.worker.rails.env }}

@@ -81,9 +81,10 @@ global:
 
   ingress:
     enabled: false
-    #frontHostname:
-    #apiHostname:
-    #className:
+    frontHostname:
+    apiHostname:
+    className:
+    annotations: {}
 
   networkPolicy:
     enabled: false
