@@ -54,8 +54,7 @@ spec:
             - --for=condition=complete
             - --timeout=180s
       containers:
-        - args:
-            - ./scripts/start.webhook.worker.sh
+        - args: ["./scripts/start.webhook.worker.sh"]
           env:
             - name: RAILS_ENV
               value: {{ .Values.webhookWorker.rails.env }}
@@ -107,6 +106,8 @@ spec:
               value: {{ .Values.webhookWorker.rails.sidekiqConcurrency | quote }}
             - name: SIDEKIQ_WEBHOOK
               value: "true"
+            - name: SIDEKIQ_BILLING
+              value: {{ .Values.billingWorker.enabled | quote }}
             - name: LAGO_LOG_LEVEL
               value: {{ .Values.webhookWorker.rails.logLevel | quote }}
             {{- with .Values.webhookWorker.extraEnv }}

@@ -46,8 +46,7 @@ spec:
             - --timeout=180s
         {{ end }}
       containers:
-        - args:
-            - ./scripts/start.clock.sh
+        - args: ["./scripts/start.clock.sh"]
           env:
             - name: RAILS_ENV
               value: {{ .Values.clock.rails.env }}
