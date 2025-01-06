@@ -110,7 +110,7 @@ spec:
             - name: LAGO_DISABLE_SEGMENT
               value: {{ not .Values.global.segment.enabled | quote }}
             - name: DATABASE_POOL
-              value: {{ .Values.billingWorker.rails.sidekiqConcurrency | quote }}
+              value: {{ (mul .Values.billingWorker.rails.sidekiqConcurrency 2) | quote }}
             - name: SIDEKIQ_CONCURRENCY
               value: {{ .Values.billingWorker.rails.sidekiqConcurrency | quote }}
             - name: LAGO_LOG_LEVEL
