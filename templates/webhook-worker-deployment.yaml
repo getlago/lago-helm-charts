@@ -110,6 +110,8 @@ spec:
               value: {{ .Values.billingWorker.enabled | quote }}
             - name: SIDEKIQ_CLOCK
               value: {{ .Values.clockWorker.enabled | quote }}
+            - name: LAGO_API_URL
+              value: {{ required "apiUrl value is required" .Values.apiUrl | quote }}
             - name: LAGO_LOG_LEVEL
               value: {{ .Values.webhookWorker.rails.logLevel | quote }}
             {{- with .Values.webhookWorker.extraEnv }}
