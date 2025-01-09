@@ -1,38 +1,38 @@
-{{- if .Values.clockWorker.enabled -}}
+{{- if .Values.pdfWorker.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.lago.service: {{ .Release.Name }}-clock-worker
-  name: {{ .Release.Name }}-clock-worker
+    io.lago.service: {{ .Release.Name }}-pdf-worker
+  name: {{ .Release.Name }}-pdf-worker
 spec:
-  replicas: {{ .Values.clockWorker.replicas }}
+  replicas: {{ .Values.pdfWorker.replicas }}
   selector:
     matchLabels:
-      io.lago.service: {{ .Release.Name }}-clock-worker
+      io.lago.service: {{ .Release.Name }}-pdf-worker
   strategy:
-    type: Recreate
+    type: RollingUpdate
   template:
     metadata:
       labels:
-        io.lago.service: {{ .Release.Name }}-clock-worker
-        {{- range $key, $value := .Values.clockWorker.podLabels }}
+        io.lago.service: {{ .Release.Name }}-pdf-worker
+        {{- range $key, $value := .Values.pdfWorker.podLabels }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
       annotations:
-        {{- range $key, $value := .Values.clockWorker.podAnnotations }}
+        {{- range $key, $value := .Values.pdfWorker.podAnnotations }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
-      {{- with .Values.clockWorker.tolerations }}
+      {{- with .Values.pdfWorker.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.clockWorker.nodeSelector }}
+      {{- with .Values.pdfWorker.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.clockWorker.affinity }}
+      {{- with .Values.pdfWorker.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -54,10 +54,10 @@ spec:
             - --for=condition=complete
             - --timeout=180s
       containers:
-        - args: ["./scripts/start.clock.worker.sh"]
+        - args: ["./scripts/start.pdfs.worker.sh"]
           env:
             - name: RAILS_ENV
-              value: {{ .Values.clockWorker.rails.env }}
+              value: {{ .Values.pdfWorker.rails.env }}
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
@@ -81,7 +81,7 @@ spec:
             - name: LAGO_FRONT_URL
               value: {{ required "frontUrl value is required" .Values.frontUrl | quote }}
             - name: RAILS_LOG_TO_STDOUT
-              value: {{ .Values.clockWorker.rails.logStdout | quote }}
+              value: {{ .Values.pdfWorker.rails.logStdout | quote }}
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -110,20 +110,20 @@ spec:
             - name: LAGO_DISABLE_SEGMENT
               value: {{ not .Values.global.segment.enabled | quote }}
             - name: DATABASE_POOL
-              value: {{ .Values.billingWorker.rails.sidekiqConcurrency | quote }}
+              value: {{ .Values.pdfWorker.rails.sidekiqConcurrency | quote }}
             - name: SIDEKIQ_CONCURRENCY
-              value: {{ .Values.billingWorker.rails.sidekiqConcurrency | quote }}
+              value: {{ .Values.pdfWorker.rails.sidekiqConcurrency | quote }}
             - name: LAGO_LOG_LEVEL
-              value: {{ .Values.billingWorker.rails.logLevel | quote }}
+              value: {{ .Values.pdfWorker.rails.logLevel | quote }}
             - name: SIDEKIQ_WEBHOOK
               value: {{ .Values.webhookWorker.enabled | quote }}
             - name: SIDEKIQ_BILLING
-              value: {{ .Values.billingWorker.enabled | quote }}
+              value: {{ .Values.billingWorker.enabled | quote}}
             - name: SIDEKIQ_CLOCK
-              value: {{ .Values.clockWorker.enabled | quote }}
+              value: {{ .Values.clockWorker.enabled | quote}}
             - name: SIDEKIQ_PDFS
               value: {{ .Values.pdfWorker.enabled | quote}}
-            {{- with .Values.clockWorker.extraEnv }}
+            {{- with .Values.pdfWorker.extraEnv }}
             {{- range $key, $value := . }}
             - name: {{ $key }}
               value: {{ $value | quote }}
@@ -196,6 +196,24 @@ spec:
                       {{ end }}
             {{ end }}
 
+            {{ if .Values.global.smtp.enabled }}
+            - name: LAGO_FROM_EMAIL
+              value: {{ .Values.global.smtp.fromEmail }}
+            - name: LAGO_SMTP_ADDRESS
+              value: {{ .Values.global.smtp.address }}
+            - name: LAGO_SMTP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secret-path" . }}
+                  key: smtpUsername
+            - name: LAGO_SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secret-path" . }}
+                  key: smtpPassword
+            - name: LAGO_SMTP_PORT
+              value: "{{ .Values.global.smtp.port }}"
+            {{ end }}
             {{ if .Values.global.newRelic.enabled }}
             - name: NEW_RELIC_KEY
               valueFrom:
@@ -204,8 +222,15 @@ spec:
                   key: newRelicKey
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
-          name: {{ .Release.Name }}-clock-worker
-          {{- with .Values.clockWorker.resources }}
+          name: {{ .Release.Name }}-pdf-worker
+          livenessProbe:
+            exec:
+              command: ["/bin/bash", "-l", "-c", "bundle exec sidekiqmon processes | grep $(hostname) || exit 1"]
+            initialDelaySeconds: {{ .Values.pdfWorker.livenessProbe.initialDelaySeconds | default 0 }}
+            periodSeconds: {{ .Values.pdfWorker.livenessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.pdfWorker.livenessProbe.timeoutSeconds | default 1 }}
+            failureThreshold: {{ .Values.pdfWorker.livenessProbe.failureThreshold | default 3 }}
+          {{- with .Values.pdfWorker.resources }}
           resources:
             {{- toYaml . | nindent 12}}
           {{- end }}
