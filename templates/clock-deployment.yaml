@@ -10,7 +10,7 @@ spec:
     matchLabels:
       io.lago.service: {{ .Release.Name }}-clock
   strategy:
-    type: Recreate
+    type: RollingUpdate
   template:
     metadata:
       labels:

@@ -10,7 +10,7 @@ spec:
     matchLabels:
       io.lago.service: {{ .Release.Name }}-worker
   strategy:
-    type: Recreate
+    type: RollingUpdate
   template:
     metadata:
       labels:
