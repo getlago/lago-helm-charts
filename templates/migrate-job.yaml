@@ -42,7 +42,7 @@ spec:
         {{- end }}
       containers:
         - name: lago-migrate
-          image: getlago/api:v{{ .Values.version }}
+          image: {{ .Values.job.image.repository }}:v{{ .Values.version }}
           args:
             - ./scripts/migrate.sh
           env:

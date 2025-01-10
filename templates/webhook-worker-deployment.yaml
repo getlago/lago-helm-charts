@@ -125,7 +125,7 @@ spec:
                   name: {{ .Release.Name }}-secrets
                   key: newRelicKey
             {{ end }}
-          image: getlago/api:v{{ .Values.version }}
+          image: {{ .Values.webhookWorker.image.repository }}:v{{ .Values.version }}
           name: {{ .Release.Name }}-webhook-worker
           {{- with .Values.webhookWorker.resources }}
           resources:

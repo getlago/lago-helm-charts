@@ -124,7 +124,7 @@ spec:
                   name: {{ .Release.Name }}-secrets
                   key: newRelicKey
             {{ end }}
-          image: getlago/api:v{{ .Values.version }}
+          image: {{ .Values.eventsWorker.image.repository }}:v{{ .Values.version }}
           name: {{ .Release.Name }}-events-worker
           {{- with .Values.eventsWorker.resources }}
           resources:

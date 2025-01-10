@@ -49,7 +49,7 @@ spec:
               value: {{ $value | quote }}
             {{- end }}
             {{- end }}
-          image: getlago/front:v{{ .Values.version }}
+          image: {{ .Values.front.image.repository }}:v{{ .Values.version }}
           name: {{ .Release.Name }}-front
           ports:
             - containerPort: 80

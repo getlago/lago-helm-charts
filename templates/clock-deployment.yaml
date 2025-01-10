@@ -104,7 +104,7 @@ spec:
                   name: {{ .Release.Name }}-secrets
                   key: newRelicKey
             {{ end }}
-          image: getlago/api:v{{ .Values.version }}
+          image: {{ .Values.clock.image.repository }}:v{{ .Values.version }}
           name: {{ .Release.Name }}-clock
           {{- with .Values.clock.resources }}
           resources:

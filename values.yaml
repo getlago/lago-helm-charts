@@ -97,6 +97,8 @@ global:
   #kubectlVersion: 1.29
 
 front:
+  image:
+    repository: getlago/front
   replicas: 1
   service:
     port: 80
@@ -112,6 +114,8 @@ front:
   affinity: {}
 
 api:
+  image:
+    repository: getlago/api
   replicas: 1
   service:
     port: 3000
@@ -138,6 +142,8 @@ api:
   affinity: {}
 
 worker:
+  image:
+    repository: getlago/api
   replicas: 1
   rails:
     sidekiqConcurrency: 20
@@ -161,6 +167,8 @@ worker:
   affinity: {}
 
 eventsWorker:
+  image:
+    repository: getlago/api
   enabled: true
   replicas: 1
   rails:
@@ -185,6 +193,8 @@ eventsWorker:
   affinity: {}
 
 clockWorker:
+  image:
+    repository: getlago/api
   enabled: true
   replicas: 1
   rails:
@@ -209,6 +219,8 @@ clockWorker:
   affinity: {}
 
 clock:
+  image:
+    repository: getlago/api
   replicas: 1
   rails:
     env: 'production'
@@ -226,6 +238,8 @@ clock:
   affinity: {}
 
 pdf:
+  image:
+    repository: getlago/lago-gotenberg
   replicas: 1
   service:
     port: 3001
@@ -241,6 +255,8 @@ pdf:
   affinity: {}
 
 billingWorker:
+  image:
+    repository: getlago/api
   enabled: true
   replicas: 1
   rails:
@@ -265,6 +281,8 @@ billingWorker:
   affinity: {}
 
 webhookWorker:
+  image:
+    repository: getlago/api
   enabled: true
   replicas: 1
   rails:
@@ -289,6 +307,8 @@ webhookWorker:
   affinity: {}
 
 job:
+  image:
+    repository: getlago/api
   migrate:
     nameOverride: null
     podAnnotations: {}

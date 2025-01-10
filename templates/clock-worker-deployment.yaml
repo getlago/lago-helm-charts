@@ -201,7 +201,7 @@ spec:
                   name: {{ .Release.Name }}-secrets
                   key: newRelicKey
             {{ end }}
-          image: getlago/api:v{{ .Values.version }}
+          image: {{ .Values.clockWorker.image.repository }}:v{{ .Values.version }}
           name: {{ .Release.Name }}-clock-worker
           {{- with .Values.clockWorker.resources }}
           resources:
