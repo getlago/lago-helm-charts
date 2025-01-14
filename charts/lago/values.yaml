@@ -2,8 +2,8 @@ version: 1.17.4
 
 # Required: Set the URLs for your API and Frontend services
 # Replace these placeholders with the actual domain names.
-apiUrl: "" # Example: https://api.mydomain.dev
-frontUrl: "" # Example: https://app.mydomain.dev
+apiUrl: ""   # Example: https://api.mydomain.dev
+frontUrl: ""   # Example: https://app.mydomain.dev
 
 # Only for Development, Staging or PoC, you should use a managed Redis instance for Production
 redis:
@@ -24,12 +24,12 @@ postgresql:
 
 global:
   # Define your Lago Premium License
-  #license:
+  # license:
   # If you use a managed PG instance
   # Should respect this format postgresql://USER:PASSWORD@HOST:PORT/DATABASE_NAME
-  #databaseUrl:
+  # databaseUrl:
   # Should respect standard redis URL format redis://..., redis+sentinel://...
-  #redisUrl:
+  # redisUrl:
 
   # If you wish to provide an existing secret with credentials in, then you can do so here.
   # The following fields are required:
@@ -39,7 +39,7 @@ global:
   #  - awsS3SecretAccessKey:
   #  - smtpUsername:
   #  - smtpPassword:
-  #existingSecret: "lago-credentials"
+  # existingSecret: "lago-credentials"
   # Not required if using existingSecret
   postgresql:
     auth:
@@ -56,23 +56,23 @@ global:
   s3:
     enabled: false
     # accessKeyId and secretAccessKey are not required here if using existingSecret
-    #accessKeyId: "<your-aws-access-key>"
-    #secretAccessKey: "<your-aws-secret-key>"
-    #bucket: "<your-aws-bucket>"
-    #region: "<your-aws-region>"
-    #endpoint: "https://s3.<region>.amazonaws.com" # Leave empty for default AWS S3 endpoint
+    # accessKeyId: "<your-aws-access-key>"
+    # secretAccessKey: "<your-aws-secret-key>"
+    # bucket: "<your-aws-bucket>"
+    # region: "<your-aws-region>"
+    # endpoint: "https://s3.<region>.amazonaws.com" # Leave empty for default AWS S3 endpoint
 
   smtp:
     # username and password are not required here if using existingSecret
     enabled: false
-    #address:
-    #username:
-    #password:
-    #port:
-    #fromEmail:
+    # address:
+    # username:
+    # password:
+    # port:
+    # fromEmail:
   newRelic:
     enabled: false
-    #key:
+    # key:
 
   # You can disable Lago's signup
   signup:
@@ -90,10 +90,10 @@ global:
     egress: []
     ingress: []
 
-  #serviceAccountName:
+  # serviceAccountName:
 
   # If kubectlVersion is not supplied it will be inferred using the version of the cluster that Lago is deployed on.
-  #kubectlVersion: 1.29
+  # kubectlVersion: 1.29
 
 front:
   replicas: 1
