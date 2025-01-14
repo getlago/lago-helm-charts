@@ -1,37 +1,38 @@
+{{- if .Values.pdfWorker.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.lago.service: {{ .Release.Name }}-worker
-  name: {{ .Release.Name }}-worker
+    io.lago.service: {{ .Release.Name }}-pdf-worker
+  name: {{ .Release.Name }}-pdf-worker
 spec:
-  replicas: {{ .Values.worker.replicas }}
+  replicas: {{ .Values.pdfWorker.replicas }}
   selector:
     matchLabels:
-      io.lago.service: {{ .Release.Name }}-worker
+      io.lago.service: {{ .Release.Name }}-pdf-worker
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        io.lago.service: {{ .Release.Name }}-worker
-        {{- range $key, $value := .Values.worker.podLabels }}
+        io.lago.service: {{ .Release.Name }}-pdf-worker
+        {{- range $key, $value := .Values.pdfWorker.podLabels }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
       annotations:
-        {{- range $key, $value := .Values.worker.podAnnotations }}
+        {{- range $key, $value := .Values.pdfWorker.podAnnotations }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
-      {{- with .Values.worker.tolerations }}
+      {{- with .Values.pdfWorker.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.worker.nodeSelector }}
+      {{- with .Values.pdfWorker.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.worker.affinity }}
+      {{- with .Values.pdfWorker.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -53,10 +54,10 @@ spec:
             - --for=condition=complete
             - --timeout=180s
       containers:
-        - args: ["./scripts/start.worker.sh"]
+        - args: ["./scripts/start.pdfs.worker.sh"]
           env:
             - name: RAILS_ENV
-              value: {{ .Values.worker.rails.env }}
+              value: {{ .Values.pdfWorker.rails.env }}
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
@@ -80,7 +81,7 @@ spec:
             - name: LAGO_FRONT_URL
               value: {{ required "frontUrl value is required" .Values.frontUrl | quote }}
             - name: RAILS_LOG_TO_STDOUT
-              value: {{ .Values.worker.rails.logStdout | quote }}
+              value: {{ .Values.pdfWorker.rails.logStdout | quote }}
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -109,11 +110,11 @@ spec:
             - name: LAGO_DISABLE_SEGMENT
               value: {{ not .Values.global.segment.enabled | quote }}
             - name: DATABASE_POOL
-              value: {{ .Values.worker.rails.sidekiqConcurrency | quote }}
+              value: {{ .Values.pdfWorker.rails.sidekiqConcurrency | quote }}
             - name: SIDEKIQ_CONCURRENCY
-              value: {{ .Values.worker.rails.sidekiqConcurrency | quote }}
+              value: {{ .Values.pdfWorker.rails.sidekiqConcurrency | quote }}
             - name: LAGO_LOG_LEVEL
-              value: {{ .Values.worker.rails.logLevel | quote }}
+              value: {{ .Values.pdfWorker.rails.logLevel | quote }}
             - name: SIDEKIQ_WEBHOOK
               value: {{ .Values.webhookWorker.enabled | quote }}
             - name: SIDEKIQ_BILLING
@@ -122,7 +123,7 @@ spec:
               value: {{ .Values.clockWorker.enabled | quote}}
             - name: SIDEKIQ_PDFS
               value: {{ .Values.pdfWorker.enabled | quote}}
-            {{- with .Values.worker.extraEnv }}
+            {{- with .Values.pdfWorker.extraEnv }}
             {{- range $key, $value := . }}
             - name: {{ $key }}
               value: {{ $value | quote }}
@@ -221,15 +222,15 @@ spec:
                   key: newRelicKey
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
-          name: {{ .Release.Name }}-worker
+          name: {{ .Release.Name }}-pdf-worker
           livenessProbe:
             exec:
               command: ["/bin/bash", "-l", "-c", "bundle exec sidekiqmon processes | grep $(hostname) || exit 1"]
-            initialDelaySeconds: {{ .Values.worker.livenessProbe.initialDelaySeconds | default 0 }}
-            periodSeconds: {{ .Values.worker.livenessProbe.periodSeconds | default 10 }}
-            timeoutSeconds: {{ .Values.worker.livenessProbe.timeoutSeconds | default 1 }}
-            failureThreshold: {{ .Values.worker.livenessProbe.failureThreshold | default 3 }}
-          {{- with .Values.worker.resources }}
+            initialDelaySeconds: {{ .Values.pdfWorker.livenessProbe.initialDelaySeconds | default 0 }}
+            periodSeconds: {{ .Values.pdfWorker.livenessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.pdfWorker.livenessProbe.timeoutSeconds | default 1 }}
+            failureThreshold: {{ .Values.pdfWorker.livenessProbe.failureThreshold | default 3 }}
+          {{- with .Values.pdfWorker.resources }}
           resources:
             {{- toYaml . | nindent 12}}
           {{- end }}
@@ -246,3 +247,4 @@ spec:
             claimName: {{ .Release.Name }}-storage-data
       {{ end }}
       serviceAccountName: {{ .Values.global.serviceAccountName | default (printf "%s-serviceaccount" .Release.Name) }}
+{{- end -}}

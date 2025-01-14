@@ -121,6 +121,8 @@ spec:
               value: {{ .Values.billingWorker.enabled | quote }}
             - name: SIDEKIQ_CLOCK
               value: {{ .Values.clockWorker.enabled | quote }}
+            - name: SIDEKIQ_PDFS
+              value: {{ .Values.pdfWorker.enabled | quote}}
             {{- with .Values.billingWorker.extraEnv }}
             {{- range $key, $value := . }}
             - name: {{ $key }}

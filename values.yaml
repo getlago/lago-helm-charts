@@ -5,7 +5,6 @@ version: 1.17.4
 apiUrl: "" # Example: https://api.mydomain.dev
 frontUrl: "" # Example: https://app.mydomain.dev
 
-
 # Only for Development, Staging or PoC, you should use a managed Redis instance for Production
 redis:
   enabled: true
@@ -40,7 +39,7 @@ global:
   #  - awsS3SecretAccessKey:
   #  - smtpUsername:
   #  - smtpPassword:
-  #existingSecret: "lago-credentials"  
+  #existingSecret: "lago-credentials"
   # Not required if using existingSecret
   postgresql:
     auth:
@@ -103,7 +102,7 @@ front:
   resources:
     requests:
       memory: 512Mi
-      cpu: '200m'
+      cpu: "200m"
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
@@ -118,7 +117,7 @@ api:
   rails:
     maxThreads: 10
     webConcurrency: 4
-    env: 'production'
+    env: "production"
     logStdout: true
     logLevel: error
   sidekiqWeb:
@@ -126,10 +125,10 @@ api:
   resources:
     requests:
       memory: 1Gi
-      cpu: '1000m'
+      cpu: "1000m"
   volumes:
     accessModes: ReadWriteOnce
-    storage: '10Gi'
+    storage: "10Gi"
   extraEnv: {}
   podAnnotations: {}
   podLabels: {}
@@ -141,13 +140,13 @@ worker:
   replicas: 1
   rails:
     sidekiqConcurrency: 20
-    env: 'production'
+    env: "production"
     logStdout: true
     logLevel: error
   resources:
     requests:
       memory: 1Gi
-      cpu: '1100m'
+      cpu: "1100m"
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
@@ -165,13 +164,13 @@ eventsWorker:
   replicas: 1
   rails:
     sidekiqConcurrency: 20
-    env: 'production'
+    env: "production"
     logStdout: true
     logLevel: error
   resources:
     requests:
       memory: 1Gi
-      cpu: '1100m'
+      cpu: "1100m"
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
@@ -189,13 +188,13 @@ clockWorker:
   replicas: 1
   rails:
     sidekiqConcurrency: 20
-    env: 'production'
+    env: "production"
     logStdout: true
     logLevel: error
   resources:
     requests:
       memory: 1Gi
-      cpu: '1100m'
+      cpu: "1100m"
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
@@ -211,13 +210,13 @@ clockWorker:
 clock:
   replicas: 1
   rails:
-    env: 'production'
+    env: "production"
     logStdout: true
     logLevel: info
   resources:
     requests:
       memory: 256Mi
-      cpu: '100m'
+      cpu: "100m"
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
@@ -232,7 +231,7 @@ pdf:
   resources:
     requests:
       memory: 2Gi
-      cpu: '1000m'
+      cpu: "1000m"
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
@@ -245,13 +244,37 @@ billingWorker:
   replicas: 1
   rails:
     sidekiqConcurrency: 10
-    env: 'production'
+    env: "production"
     logStdout: true
     logLevel: info
   resources:
     requests:
       memory: 1Gi
-      cpu: '1100m'
+      cpu: "1100m"
+  podAnnotations: {}
+  podLabels: {}
+  extraEnv: {}
+  livenessProbe:
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 3
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
+
+pdfWorker:
+  enabled: true
+  replicas: 1
+  rails:
+    sidekiqConcurrency: 10
+    env: "production"
+    logStdout: true
+    logLevel: info
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: "1100m"
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
@@ -269,13 +292,13 @@ webhookWorker:
   replicas: 1
   rails:
     sidekiqConcurrency: 20
-    env: 'production'
+    env: "production"
     logStdout: true
     logLevel: info
   resources:
     requests:
       memory: 1Gi
-      cpu: '1100m'
+      cpu: "1100m"
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
