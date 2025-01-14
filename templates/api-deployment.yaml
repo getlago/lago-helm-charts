@@ -10,7 +10,7 @@ spec:
     matchLabels:
       io.lago.service: {{ .Release.Name }}-api
   strategy:
-    type: Recreate
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -181,14 +181,14 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ if .Values.minio.enabled }}
-                          {{ .Release.Name }}-minio  
+                          {{ .Release.Name }}-minio
                         {{ else }}
-                          {{ include "secret-path" . }}  
+                          {{ include "secret-path" . }}
                         {{ end }}
                   key: {{ if .Values.minio.enabled }}
-                          rootUser  
+                          rootUser
                         {{ else }}
-                          awsS3AccessKeyId  
+                          awsS3AccessKeyId
                         {{ end }}
             {{ end }}
             {{ if or .Values.global.s3.secretAccessKey .Values.minio.enabled .Values.global.existingSecret }}
@@ -196,14 +196,14 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ if .Values.minio.enabled }}
-                          {{ .Release.Name }}-minio  
+                          {{ .Release.Name }}-minio
                         {{ else }}
-                          {{ include "secret-path" . }}  
+                          {{ include "secret-path" . }}
                         {{ end }}
                   key: {{ if .Values.minio.enabled }}
-                          rootPassword  
+                          rootPassword
                         {{ else }}
-                          awsS3SecretAccessKey  
+                          awsS3SecretAccessKey
                         {{ end }}
             {{ end }}
             - name: LAGO_AWS_S3_BUCKET

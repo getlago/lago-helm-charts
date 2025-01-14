@@ -9,6 +9,8 @@ spec:
   selector:
     matchLabels:
       io.lago.service: {{ .Release.Name }}-front
+  strategy:
+    type: RollingUpdate
   template:
     metadata:
       labels:
