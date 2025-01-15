@@ -30,10 +30,8 @@ pdf:
 billingWorker:
   enabled: false
 
-
 pdfWorker:
   enabled: false
-
 
 webhookWorker:
   enabled: false
