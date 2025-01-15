@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "1.18.0"
 description: the Lago open source billing app
 name: lago
-version: 1.18.0
+version: 1.18.1
 dependencies:
   - name: postgresql
     version: "13.2.2"

@@ -317,6 +317,7 @@ job:
     podAnnotations: {}
     podLabels: {}
     resources: {}
+    loadSchema: false
 
 minio:
   enabled: false
