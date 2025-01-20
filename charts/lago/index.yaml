@@ -1,0 +1,132 @@
+apiVersion: v1
+entries:
+  lago:
+  - apiVersion: v2
+    appVersion: 1.18.0
+    created: "2025-01-20T11:21:25.533697+01:00"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 13.2.2
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 18.2.1
+    - condition: minio.enabled
+      name: minio
+      repository: https://charts.min.io/
+      version: 5.2.0
+    description: the Lago open source billing app
+    digest: 63669285016bc9148a324ab2b559b43ed5a73f31620905221614a1ab15230591
+    name: lago
+    urls:
+    - https://charts.getlago.com/artifacts/lago-1.18.0.tgz
+    version: 1.18.0
+  minio:
+  - apiVersion: v1
+    appVersion: RELEASE.2024-04-18T19-09-19Z
+    created: "2025-01-20T11:21:25.53597+01:00"
+    description: High Performance Object Storage
+    digest: 8ef4212d7d51be6c8192b3e91138a9ca918ca56142c42500028cfd3b80e0b2dd
+    home: https://min.io
+    icon: https://min.io/resources/img/logo/MINIO_wordmark.png
+    keywords:
+    - minio
+    - storage
+    - object-storage
+    - s3
+    - cluster
+    maintainers:
+    - email: dev@minio.io
+      name: MinIO, Inc
+    name: minio
+    sources:
+    - https://github.com/minio/minio
+    urls:
+    - https://charts.getlago.com/charts/minio-5.2.0.tgz
+    version: 5.2.0
+  postgresql:
+  - annotations:
+      category: Database
+      images: |
+        - name: os-shell
+          image: docker.io/bitnami/os-shell:11-debian-11-r90
+        - name: postgres-exporter
+          image: docker.io/bitnami/postgres-exporter:0.15.0-debian-11-r0
+        - name: postgresql
+          image: docker.io/bitnami/postgresql:16.0.0-debian-11-r15
+      licenses: Apache-2.0
+    apiVersion: v2
+    appVersion: 16.0.0
+    created: "2025-01-20T11:21:25.538672+01:00"
+    dependencies:
+    - name: common
+      repository: oci://registry-1.docker.io/bitnamicharts
+      tags:
+      - bitnami-common
+      version: 2.x.x
+    description: PostgreSQL (Postgres) is an open source object-relational database
+      known for reliability and data integrity. ACID-compliant, it supports foreign
+      keys, joins, views, triggers and stored procedures.
+    digest: 582427e5ebe97d09d35991e3d15eaa5bb0091a9c66dfa33d17b05b29bdcdc252
+    home: https://bitnami.com
+    icon: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-220x234.png
+    keywords:
+    - postgresql
+    - postgres
+    - database
+    - sql
+    - replication
+    - cluster
+    maintainers:
+    - name: VMware, Inc.
+      url: https://github.com/bitnami/charts
+    name: postgresql
+    sources:
+    - https://github.com/bitnami/charts/tree/main/bitnami/postgresql
+    urls:
+    - https://charts.getlago.com/charts/postgresql-13.2.2.tgz
+    version: 13.2.2
+  redis:
+  - annotations:
+      category: Database
+      images: |
+        - name: os-shell
+          image: docker.io/bitnami/os-shell:11-debian-11-r90
+        - name: redis-exporter
+          image: docker.io/bitnami/redis-exporter:1.55.0-debian-11-r0
+        - name: redis-sentinel
+          image: docker.io/bitnami/redis-sentinel:7.2.3-debian-11-r0
+        - name: redis
+          image: docker.io/bitnami/redis:7.2.3-debian-11-r0
+      licenses: Apache-2.0
+    apiVersion: v2
+    appVersion: 7.2.3
+    created: "2025-01-20T11:21:25.542209+01:00"
+    dependencies:
+    - name: common
+      repository: oci://registry-1.docker.io/bitnamicharts
+      tags:
+      - bitnami-common
+      version: 2.x.x
+    description: Redis(R) is an open source, advanced key-value store. It is often
+      referred to as a data structure server since keys can contain strings, hashes,
+      lists, sets and sorted sets.
+    digest: fc27c2d4d72b23642b4df4ce6257ca31fa32febcbbb7b854b74c0a3ef5e922d1
+    home: https://bitnami.com
+    icon: https://bitnami.com/assets/stacks/redis/img/redis-stack-220x234.png
+    keywords:
+    - redis
+    - keyvalue
+    - database
+    maintainers:
+    - name: VMware, Inc.
+      url: https://github.com/bitnami/charts
+    name: redis
+    sources:
+    - https://github.com/bitnami/charts/tree/main/bitnami/redis
+    urls:
+    - https://charts.getlago.com/charts/redis-18.2.1.tgz
+    version: 18.2.1
+generated: "2025-01-20T11:21:25.524312+01:00"
