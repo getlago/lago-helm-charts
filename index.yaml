@@ -43,7 +43,7 @@ entries:
     digest: 656d65109eadb7583610e2b853ff79213355a21e0c0521dead9084877e957f14
     name: lago
     urls:
-    - lago-1.18.1.tgz
+    - https://github.com/getlago/lago-helm-charts/releases/download/lago-1.18.1/lago-1.18.1.tgz
     version: 1.18.1
   - apiVersion: v2
     appVersion: 1.18.0
