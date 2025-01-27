@@ -19,10 +19,15 @@ This Helm chart deploys the Lago billing system with various optional dependenci
 
 ## Installation
 
-To install the chart with the release name `my-lago-release`:
+First, add this repo:
+```
+helm repo add lago https://charts.getlago.com
+```
+
+afterwards, you can install the latest version of lago with:
 
 ```
-helm install my-lago-release .
+helm install lago lago/lago -f values.yaml
 ```
 You can customize the installation by overriding values in `values.yaml` with your own. The full list of configurable parameters can be found in the following sections.
 
@@ -38,19 +43,22 @@ helm install my-lago-release . \
 
 ### Global Parameters
 
-| Parameter                  | Description                                                                                         | Default       |
-|----------------------------|-----------------------------------------------------------------------------------------------------|---------------|
-| `global.license`            | Lago Premium License key                                                                            | `""`          |
+| Parameter                   | Description                                                                                          | Default       |
+|-----------------------------|------------------------------------------------------------------------------------------------------|---------------|
+| `version`                   | Which lago version to use                                                                            | `"1.19.1"`    |
+| `apiUrl`                    | Url used for the api deployment                                                                      | `""`          |
+| `frontUrl`                  | Url used for the frontend application                                                                | `""`          |
+| `global.license`            | Lago Premium License key                                                                             | `""`          |
 | `global.databaseUrl`        | PostgreSQL connection string, should follow this format: postgresql://USER:PASSWORD@HOST:PORT/DB     | `""`          |
-| `global.redisUrl`           | Redis connection string, should follow this format: redis://... or redis+sentinel://...             | `""`          |
+| `global.redisUrl`           | Redis connection string, should follow this format: redis://... or redis+sentinel://...              | `""`          |
 | `global.existingSecret`     | Name of the secret containing sensitive values (database URL, Redis URL, AWS keys, SMTP credentials) | `""`          |
-| `global.s3.enabled`         | Enable S3 storage for file uploads                                                                  | `false`       |
-| `global.s3.accessKeyId`     | AWS S3 access key ID (not required if using existing secret)                                        | `""`          |
-| `global.s3.secretAccessKey` | AWS S3 secret access key (not required if using existing secret)                                    | `""`          |
-| `global.s3.bucket`          | AWS S3 bucket name                                                                                  | `""`          |
-| `global.smtp.enabled`       | Enable SMTP configuration for email sending                                                         | `false`       |
-| `global.signup.enabled`     | Enable or disable Lago's signup feature                                                             | `true`        |
-| `global.ingress.enabled`    | Enable ingress resources for the application                                                        | `false`       |
+| `global.s3.enabled`         | Enable S3 storage for file uploads                                                                   | `false`       |
+| `global.s3.accessKeyId`     | AWS S3 access key ID (not required if using existing secret)                                         | `""`          |
+| `global.s3.secretAccessKey` | AWS S3 secret access key (not required if using existing secret)                                     | `""`          |
+| `global.s3.bucket`          | AWS S3 bucket name                                                                                   | `""`          |
+| `global.smtp.enabled`       | Enable SMTP configuration for email sending                                                          | `false`       |
+| `global.signup.enabled`     | Enable or disable Lago's signup feature                                                              | `true`        |
+| `global.ingress.enabled`    | Enable ingress resources for the application                                                         | `false`       |
 
 ### Redis Configuration
 
@@ -220,5 +228,5 @@ For additional customization, refer to the comments in `values.yaml`.
 To uninstall/delete the `my-lago-release`:
 
 ```
-helm delete my-lago-release
+helm delete lago/lago
 ```
