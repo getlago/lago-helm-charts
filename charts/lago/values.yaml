@@ -357,7 +357,7 @@ job:
 minio:
   enabled: false
   replicas: 1
-  fullnameOverride: {{ .Release.Name }}-minio
+  fullnameOverride: lago-minio
   endpoint: "http://minio.lago.dev"
   nameOverride: "minio"
   resources:
