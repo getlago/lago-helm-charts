@@ -1,4 +1,4 @@
-version: 1.20.0
+version: 1.20.1
 
 # Required: Set the URLs for your API and Frontend services
 # Replace these placeholders with the actual domain names.
@@ -126,6 +126,11 @@ api:
     requests:
       memory: 1Gi
       cpu: "1000m"
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
   volumes:
     accessModes: ReadWriteOnce
     storage: "10Gi"
@@ -147,6 +152,11 @@ worker:
     requests:
       memory: 1Gi
       cpu: "1100m"
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
@@ -195,6 +205,11 @@ clockWorker:
     requests:
       memory: 1Gi
       cpu: "1100m"
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
@@ -232,6 +247,11 @@ pdf:
     requests:
       memory: 2Gi
       cpu: "1000m"
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
@@ -251,6 +271,11 @@ billingWorker:
     requests:
       memory: 1Gi
       cpu: "1100m"
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 100
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
@@ -275,6 +300,11 @@ pdfWorker:
     requests:
       memory: 1Gi
       cpu: "1100m"
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
@@ -299,6 +329,11 @@ webhookWorker:
     requests:
       memory: 1Gi
       cpu: "1100m"
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
   podAnnotations: {}
   podLabels: {}
   extraEnv: {}
@@ -321,32 +356,31 @@ job:
 
 minio:
   enabled: false
-  # replicas: 2
-  # fullnameOverride: "my-lago-minio"
-  # endpoint: "http://minio.lago.dev"
-  # nameOverride: "minio"
-  # resources:
-  #   requests:
-  #     memory: "512Mi"
-  #     cpu: "500m"
-  #   limits:
-  #     memory: "1Gi"
-  #     cpu: "1"
-  # persistence:
-  #   size: 10Gi
-  # ingress:
-  #   enabled: true
-  #   ingressClassName: nginx
-  #   labels: {}
-  #   annotations: {}
-  #   path: /
-  #   hosts:
-  #     - minio.lago.dev
-  #   tls: []
-  # Note : only the first one will be used
-  # buckets:
-  #   - name: my-lago-minio
-  #     policy: none
-  #     purge: false
-  #     versioning: false
-  #     objectlocking: false
+  replicas: 1
+  fullnameOverride: lago-minio
+  endpoint: "http://minio.lago.dev"
+  nameOverride: "minio"
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1"
+  persistence:
+    size: 10Gi
+  ingress:
+    enabled: false
+    ingressClassName: nginx
+    labels: {}
+    annotations: {}
+    path: /
+    hosts:
+      - minio.lago.dev
+    tls: []
+  buckets:
+    - name: lago
+      policy: none
+      purge: false
+      versioning: false
+      objectlocking: false
