@@ -144,6 +144,8 @@ spec:
               value: {{ .Values.api.rails.logLevel | quote }}
             - name: SIDEKIQ_WEBHOOK
               value: {{ .Values.webhookWorker.enabled | quote }}
+            - name: SIDEKIQ_PDFS
+              value: {{ .Values.pdfWorker.enabled | quote }}
             - name: SIDEKIQ_BILLING
               value: {{ .Values.billingWorker.enabled | quote }}
             - name: SIDEKIQ_CLOCK
