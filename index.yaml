@@ -2,6 +2,28 @@ apiVersion: v1
 entries:
   lago:
   - apiVersion: v2
+    appVersion: 1.20.2
+    created: "2025-02-06T10:29:50.547922792Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 13.2.2
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 18.2.1
+    - condition: minio.enabled
+      name: minio
+      repository: https://charts.min.io/
+      version: 5.2.0
+    description: the Lago open source billing app
+    digest: c2a753eec68389f266e66324a21b8bfd84b96eca684f2d4b179250533bcbf808
+    name: lago
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/lago-1.20.2/lago-1.20.2.tgz
+    version: 1.20.2
+  - apiVersion: v2
     appVersion: 1.20.1
     created: "2025-01-31T11:24:45.687096188Z"
     dependencies:
@@ -296,4 +318,4 @@ entries:
     urls:
     - https://charts.getlago.com/artifacts/lago-1.0.0.tgz
     version: 1.0.0
-generated: "2025-01-31T11:24:45.687201867Z"
+generated: "2025-02-06T10:29:50.548032036Z"
