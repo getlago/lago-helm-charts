@@ -239,6 +239,18 @@ spec:
             - name: LAGO_SMTP_PORT
               value: "{{ .Values.global.smtp.port }}"
             {{ end }}
+            {{ if .Values.global.googleAuth.enabled }}
+            - name: GOOGLE_AUTH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secret-path" . }}
+                  key: googleAuthClientId
+            - name: GOOGLE_AUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secret-path" . }}
+                  key: googleAuthClientSecret
+            {{ end }}
             {{ if .Values.global.newRelic.enabled }}
             - name: NEW_RELIC_KEY
               valueFrom:
