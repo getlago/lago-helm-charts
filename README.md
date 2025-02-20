@@ -50,6 +50,7 @@ helm install my-lago-release . \
 | `global.s3.bucket`          | AWS S3 bucket name                                                                                  | `""`          |
 | `global.smtp.enabled`       | Enable SMTP configuration for email sending                                                         | `false`       |
 | `global.signup.enabled`     | Enable or disable Lago's signup feature                                                             | `true`        |
+| `global.googleAuth.enabled` | Enable or disable logging through Google Auth                                                                | `true`        |
 | `global.ingress.enabled`    | Enable ingress resources for the application                                                        | `false`       |
 
 ### Redis Configuration

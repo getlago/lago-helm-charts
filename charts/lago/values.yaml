@@ -39,6 +39,8 @@ global:
   #  - awsS3SecretAccessKey:
   #  - smtpUsername:
   #  - smtpPassword:
+  #  - googleAuthClientId:
+  #  - googleAuthClientSecret:
   # existingSecret: "lago-credentials"
   # Not required if using existingSecret
   postgresql:
@@ -77,6 +79,12 @@ global:
   # You can disable Lago's signup
   signup:
     enabled: true
+
+  googleAuth:
+    # clientId and clientSecret are not required here if using existingSecret
+    enabled: false
+    # clientId:
+    # clientSecret:
 
   ingress:
     enabled: false
