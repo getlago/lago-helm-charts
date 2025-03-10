@@ -205,6 +205,23 @@ minio:
 - **First Bucket Name**: The first bucket in the `buckets` list should match the `fullnameOverride` to ensure consistent bucket naming conventions.
 - **Ingress Configuration**: Make sure the `hosts` in the ingress section match your MinIO endpoint URL.
 
+### Secrets
+
+The chart supports using an existing secret to store sensitive values such as database URLs, Redis URLs, AWS keys, and SMTP credentials. To use an existing secret, set the `global.existingSecret` parameter to the name of the secret.
+If you use an existing secret, the following keys are expected:
+
+- `databaseUrl` (required)
+- `redisUrl` (required)
+- `encryptionPrimaryKey` (required)
+- `encryptionDeterministicKey` (required)
+- `encryptionKeyDerivationSalt` (required)
+- `awsS3AccessKeyId` (optional)
+- `awsS3SecretAccessKey` (optional)
+- `smtpUsername` (optional)
+- `smtpPassword` (optional)
+- `googleAuthClientId` (optional)
+- `googleAuthClientSecret` (optionals)
+
 
 ## Storage Recommendation
 
