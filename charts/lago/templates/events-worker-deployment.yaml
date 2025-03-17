@@ -87,17 +87,17 @@ spec:
             - name: ENCRYPTION_DETERMINISTIC_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "encryption-secret-path" . }}
                   key: encryptionDeterministicKey
             - name: ENCRYPTION_KEY_DERIVATION_SALT
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "encryption-secret-path" . }}
                   key: encryptionKeyDerivationSalt
             - name: ENCRYPTION_PRIMARY_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
+                  name: {{ include "encryption-secret-path" . }}
                   key: encryptionPrimaryKey
             - name: DATABASE_POOL
               value: {{ .Values.eventsWorker.rails.sidekiqConcurrency | quote }}
