@@ -80,6 +80,10 @@ global:
   signup:
     enabled: true
 
+  # You can disable Lago's pdf generation
+  pdf:
+    enabled: true
+
   googleAuth:
     # clientId and clientSecret are not required here if using existingSecret
     enabled: false
