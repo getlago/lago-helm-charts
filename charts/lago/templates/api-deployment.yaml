@@ -130,6 +130,8 @@ spec:
               value: {{ not .Values.global.segment.enabled | quote }}
             - name: LAGO_DISABLE_SIGNUP
               value: {{ not .Values.global.signup.enabled | quote }}
+            - name: LAGO_DISABLE_PDF_GENERATION
+              value: {{ not .Values.global.pdf.enabled | quote }}
             - name: DATABASE_POOL
               value: {{ mul .Values.api.rails.maxThreads .Values.api.rails.webConcurrency | quote }}
             - name: RAILS_MAX_THREADS

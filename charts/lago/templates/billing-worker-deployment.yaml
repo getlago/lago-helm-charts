@@ -109,6 +109,8 @@ spec:
                   key: encryptionPrimaryKey
             - name: LAGO_DISABLE_SEGMENT
               value: {{ not .Values.global.segment.enabled | quote }}
+            - name: LAGO_DISABLE_PDF_GENERATION
+              value: {{ not .Values.global.pdf.enabled | quote }}
             - name: DATABASE_POOL
               value: {{ (mul .Values.billingWorker.rails.sidekiqConcurrency 2) | quote }}
             - name: SIDEKIQ_CONCURRENCY
