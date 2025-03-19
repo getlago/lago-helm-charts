@@ -212,15 +212,19 @@ If you use an existing secret, the following keys are expected:
 
 - `databaseUrl` (required)
 - `redisUrl` (required)
-- `encryptionPrimaryKey` (required)
-- `encryptionDeterministicKey` (required)
-- `encryptionKeyDerivationSalt` (required)
 - `awsS3AccessKeyId` (optional)
 - `awsS3SecretAccessKey` (optional)
 - `smtpUsername` (optional)
 - `smtpPassword` (optional)
 - `googleAuthClientId` (optional)
 - `googleAuthClientSecret` (optionals)
+
+If you want to provide an existing secret for the encryption keys, you can also set the `encryption.existingSecret` parameter to the name of the secret.
+The following keys are expected:
+
+- `encryptionPrimaryKey` (required)
+- `encryptionDeterministicKey` (required)
+- `encryptionKeyDerivationSalt` (required)
 
 
 ## Storage Recommendation

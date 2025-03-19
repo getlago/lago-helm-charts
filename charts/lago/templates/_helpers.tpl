@@ -6,6 +6,14 @@
 {{- end }}
 {{- end}}
 
+{{- define "encryption-secret-path" }}
+{{- if .Values.encryption.existingSecret -}}
+{{ .Values.encryption.existingSecret }}
+{{- else -}}
+{{ .Release.Name }}-secrets
+{{- end }}
+{{- end}}
+
 {{- define "kubectlVersion" }}
 {{- if .Values.global.kubectlVersion -}}
 {{ .Values.global.kubectlVersion }}
