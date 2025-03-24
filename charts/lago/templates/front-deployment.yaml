@@ -45,6 +45,8 @@ spec:
               value: {{ .Values.apiUrl | quote }}
             - name: LAGO_DISABLE_SIGNUP
               value: {{ not .Values.global.signup.enabled | quote }}
+            - name: LAGO_DISABLE_PDF_GENERATION
+              value: {{ not .Values.global.pdf.enabled | quote }}
             {{- with .Values.front.extraEnv }}
             {{- range $key, $value := . }}
             - name: {{ $key }}
