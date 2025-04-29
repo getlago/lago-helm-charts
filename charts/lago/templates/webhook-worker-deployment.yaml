@@ -116,6 +116,8 @@ spec:
               value: {{ required "apiUrl value is required" .Values.apiUrl | quote }}
             - name: LAGO_LOG_LEVEL
               value: {{ .Values.webhookWorker.rails.logLevel | quote }}
+            - name: SIDEKIQ_PAYMENTS
+              value: {{ .Values.paymentWorker.enabled | quote }}
             {{- with .Values.webhookWorker.extraEnv }}
             {{- range $key, $value := . }}
             - name: {{ $key }}

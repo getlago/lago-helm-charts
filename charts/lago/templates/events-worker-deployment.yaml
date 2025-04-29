@@ -113,6 +113,8 @@ spec:
               value: {{ .Values.clockWorker.enabled | quote}}
             - name: SIDEKIQ_PDFS
               value: {{ .Values.pdfWorker.enabled | quote}}
+            - name: SIDEKIQ_PAYMENTS
+              value: {{ .Values.paymentWorker.enabled | quote }}
             {{- with .Values.eventsWorker.extraEnv }}
             {{- range $key, $value := . }}
             - name: {{ $key }}

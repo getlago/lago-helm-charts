@@ -1,38 +1,38 @@
-{{- if .Values.clockWorker.enabled -}}
+{{- if .Values.paymentWorker.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.lago.service: {{ .Release.Name }}-clock-worker
-  name: {{ .Release.Name }}-clock-worker
+    io.lago.service: {{ .Release.Name }}-payment-worker
+  name: {{ .Release.Name }}-payment-worker
 spec:
-  replicas: {{ .Values.clockWorker.replicas }}
+  replicas: {{ .Values.paymentWorker.replicas }}
   selector:
     matchLabels:
-      io.lago.service: {{ .Release.Name }}-clock-worker
+      io.lago.service: {{ .Release.Name }}-payment-worker
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        io.lago.service: {{ .Release.Name }}-clock-worker
-        {{- range $key, $value := .Values.clockWorker.podLabels }}
+        io.lago.service: {{ .Release.Name }}-payment-worker
+        {{- range $key, $value := .Values.paymentWorker.podLabels }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
       annotations:
-        {{- range $key, $value := .Values.clockWorker.podAnnotations }}
+        {{- range $key, $value := .Values.paymentWorker.podAnnotations }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
-      {{- with .Values.clockWorker.tolerations }}
+      {{- with .Values.paymentWorker.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.clockWorker.nodeSelector }}
+      {{- with .Values.paymentWorker.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.clockWorker.affinity }}
+      {{- with .Values.paymentWorker.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -54,10 +54,10 @@ spec:
             - --for=condition=complete
             - --timeout=180s
       containers:
-        - args: ["./scripts/start.clock.worker.sh"]
+        - args: ["./scripts/start.payments.worker.sh"]
           env:
             - name: RAILS_ENV
-              value: {{ .Values.clockWorker.rails.env }}
+              value: {{ .Values.paymentWorker.rails.env }}
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
@@ -81,7 +81,7 @@ spec:
             - name: LAGO_FRONT_URL
               value: {{ required "frontUrl value is required" .Values.frontUrl | quote }}
             - name: RAILS_LOG_TO_STDOUT
-              value: {{ .Values.clockWorker.rails.logStdout | quote }}
+              value: {{ .Values.paymentWorker.rails.logStdout | quote }}
             - name: LAGO_RSA_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -112,11 +112,11 @@ spec:
             - name: LAGO_DISABLE_PDF_GENERATION
               value: {{ not .Values.global.pdf.enabled | quote }}
             - name: DATABASE_POOL
-              value: {{ .Values.billingWorker.rails.sidekiqConcurrency | quote }}
+              value: {{ (mul .Values.paymentWorker.rails.sidekiqConcurrency 2) | quote }}
             - name: SIDEKIQ_CONCURRENCY
-              value: {{ .Values.billingWorker.rails.sidekiqConcurrency | quote }}
+              value: {{ .Values.paymentWorker.rails.sidekiqConcurrency | quote }}
             - name: LAGO_LOG_LEVEL
-              value: {{ .Values.billingWorker.rails.logLevel | quote }}
+              value: {{ .Values.paymentWorker.rails.logLevel | quote }}
             - name: SIDEKIQ_WEBHOOK
               value: {{ .Values.webhookWorker.enabled | quote }}
             - name: SIDEKIQ_BILLING
@@ -127,7 +127,7 @@ spec:
               value: {{ .Values.pdfWorker.enabled | quote}}
             - name: SIDEKIQ_PAYMENTS
               value: {{ .Values.paymentWorker.enabled | quote }}
-            {{- with .Values.clockWorker.extraEnv }}
+            {{- with .Values.paymentWorker.extraEnv }}
             {{- range $key, $value := . }}
             - name: {{ $key }}
               value: {{ $value | quote }}
@@ -200,6 +200,24 @@ spec:
                       {{ end }}
             {{ end }}
 
+            {{ if .Values.global.smtp.enabled }}
+            - name: LAGO_FROM_EMAIL
+              value: {{ .Values.global.smtp.fromEmail }}
+            - name: LAGO_SMTP_ADDRESS
+              value: {{ .Values.global.smtp.address }}
+            - name: LAGO_SMTP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secret-path" . }}
+                  key: smtpUsername
+            - name: LAGO_SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secret-path" . }}
+                  key: smtpPassword
+            - name: LAGO_SMTP_PORT
+              value: "{{ .Values.global.smtp.port }}"
+            {{ end }}
             {{ if .Values.global.newRelic.enabled }}
             - name: NEW_RELIC_KEY
               valueFrom:
@@ -208,8 +226,8 @@ spec:
                   key: newRelicKey
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
-          name: {{ .Release.Name }}-clock-worker
-          {{- with .Values.clockWorker.resources }}
+          name: {{ .Release.Name }}-payment-worker
+          {{- with .Values.paymentWorker.resources }}
           resources:
             {{- toYaml . | nindent 12}}
           {{- end }}

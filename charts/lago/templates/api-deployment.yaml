@@ -152,6 +152,8 @@ spec:
               value: {{ .Values.billingWorker.enabled | quote }}
             - name: SIDEKIQ_CLOCK
               value: {{ .Values.clockWorker.enabled | quote }}
+            - name: SIDEKIQ_PAYMENTS
+              value: {{ .Values.paymentWorker.enabled | quote }}
             {{- with .Values.api.extraEnv }}
             {{- range $key, $value := . }}
             - name: {{ $key }}
