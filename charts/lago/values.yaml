@@ -1,4 +1,4 @@
-version: 1.23.0
+version: 1.26.1
 
 # Required: Set the URLs for your API and Frontend services
 # Replace these placeholders with the actual domain names.
@@ -337,6 +337,35 @@ pdfWorker:
   affinity: {}
 
 webhookWorker:
+  enabled: true
+  replicas: 1
+  rails:
+    sidekiqConcurrency: 20
+    env: "production"
+    logStdout: true
+    logLevel: info
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: "1100m"
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
+  podAnnotations: {}
+  podLabels: {}
+  extraEnv: {}
+  livenessProbe:
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 3
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
+
+paymentWorker:
   enabled: true
   replicas: 1
   rails:
