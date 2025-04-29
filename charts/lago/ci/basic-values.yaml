@@ -35,3 +35,6 @@ pdfWorker:
 
 webhookWorker:
   enabled: false
+
+paymentWorker:
+  enabled: false

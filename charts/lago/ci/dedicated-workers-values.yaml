@@ -55,3 +55,10 @@ webhookWorker:
     requests:
       memory: '512Mi'
       cpu: "200m"
+
+paymentWorker:
+  enabled: true
+  resources:
+    requests:
+      memory: '512Mi'
+      cpu: "200m"
