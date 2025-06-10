@@ -209,6 +209,16 @@ spec:
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
           name: {{ .Release.Name }}-clock-worker
+          {{- if .Values.clockWorker.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.clockWorker.livenessProbe.httpPath }}
+              port: {{ .Values.clockWorker.livenessProbe.httpPort }}
+            initialDelaySeconds: {{ .Values.clockWorker.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.clockWorker.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.clockWorker.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.clockWorker.livenessProbe.failureThreshold }}
+          {{- end }}
           {{- with .Values.clockWorker.resources }}
           resources:
             {{- toYaml . | nindent 12}}

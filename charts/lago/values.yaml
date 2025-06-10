@@ -180,6 +180,9 @@ worker:
   podLabels: {}
   extraEnv: {}
   livenessProbe:
+    enabled: true
+    httpPath: /
+    httpPort: 8080
     initialDelaySeconds: 0
     periodSeconds: 10
     timeoutSeconds: 1
@@ -204,6 +207,9 @@ eventsWorker:
   podLabels: {}
   extraEnv: {}
   livenessProbe:
+    enabled: true
+    httpPath: /
+    httpPort: 8080
     initialDelaySeconds: 0
     periodSeconds: 10
     timeoutSeconds: 1
@@ -233,6 +239,9 @@ clockWorker:
   podLabels: {}
   extraEnv: {}
   livenessProbe:
+    enabled: true
+    httpPath: /
+    httpPort: 8080
     initialDelaySeconds: 0
     periodSeconds: 10
     timeoutSeconds: 1
@@ -299,6 +308,9 @@ billingWorker:
   podLabels: {}
   extraEnv: {}
   livenessProbe:
+    enabled: true
+    httpPath: /
+    httpPort: 8080
     initialDelaySeconds: 0
     periodSeconds: 10
     timeoutSeconds: 1
@@ -328,6 +340,9 @@ pdfWorker:
   podLabels: {}
   extraEnv: {}
   livenessProbe:
+    enabled: true
+    httpPath: /
+    httpPort: 8080
     initialDelaySeconds: 0
     periodSeconds: 10
     timeoutSeconds: 1
@@ -357,6 +372,9 @@ webhookWorker:
   podLabels: {}
   extraEnv: {}
   livenessProbe:
+    enabled: true
+    httpPath: /
+    httpPort: 8080
     initialDelaySeconds: 0
     periodSeconds: 10
     timeoutSeconds: 1
@@ -386,6 +404,9 @@ paymentWorker:
   podLabels: {}
   extraEnv: {}
   livenessProbe:
+    enabled: true
+    httpPath: /
+    httpPort: 8080
     initialDelaySeconds: 0
     periodSeconds: 10
     timeoutSeconds: 1

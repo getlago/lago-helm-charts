@@ -227,6 +227,16 @@ spec:
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
           name: {{ .Release.Name }}-payment-worker
+          {{- if .Values.paymentWorker.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.paymentWorker.livenessProbe.httpPath }}
+              port: {{ .Values.paymentWorker.livenessProbe.httpPort }}
+            initialDelaySeconds: {{ .Values.paymentWorker.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.paymentWorker.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.paymentWorker.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.paymentWorker.livenessProbe.failureThreshold }}
+          {{- end }}
           {{- with .Values.paymentWorker.resources }}
           resources:
             {{- toYaml . | nindent 12}}
