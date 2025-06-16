@@ -126,28 +126,135 @@ helm install my-lago-release . \
 | `worker.rails.logLevel`             | Log level for Worker                              | `error`   |
 | `worker.resources.requests.memory`  | Memory request for Worker                         | `1Gi`     |
 | `worker.resources.requests.cpu`     | CPU request for Worker                            | `1000m`   |
+| `worker.livenessProbe.enabled`      | Enable or disable liveness probe                   | `true`    |
+| `worker.livenessProbe.httpPath`     | HTTP path for liveness probe                       | `/`       |
+| `worker.livenessProbe.httpPort`     | HTTP port for liveness probe                       | `8080`    |
 | `worker.livenessProbe.initialDelaySeconds` | Liveness probe initial delay                    | `0`       |
 | `worker.livenessProbe.periodSeconds`       | Liveness probe period                            | `10`      |
 | `worker.livenessProbe.timeoutSeconds`      | Liveness probe timeout                           | `1`       |
 | `worker.livenessProbe.failureThreshold`    | Liveness probe failure threshold                | `3`       |
 
+### Events Worker Configuration
 
-### Event Worker Configuration
-
-| Parameter                       | Description                                | Default   |
-|---------------------------------|--------------------------------------------|-----------|
-| `eventsWorker.tolerations`      | Pod tolerations for Events Worker pods     | `[]`      |
-| `eventsWorker.nodeSelector`     | Node selector for Events Worker pods       | `{}`      |
-| `eventsWorker.affinity`         | Affinity rules for Events Worker pods      | `{}`      |
-| `eventsWorker.replicas`         | Number of Events Worker replicas           | `1`       |
-| `eventsWorker.rails.sidekiqConcurrency` | Sidekiq concurrency for Events Worker  | `100`     |
-| `eventsWorker.rails.env`        | Events Worker environment                  | `production` |
-| `eventsWorker.resources.requests.memory` | Memory request for Events Worker       | `1Gi`     |
-| `eventsWorker.resources.requests.cpu` | CPU request for Events Worker           | `1000m`   |
+| Parameter                          | Description                                        | Default   |
+|-------------------------------------|----------------------------------------------------|-----------|
+| `eventsWorker.tolerations`         | Pod tolerations for Events Worker pods            | `[]`      |
+| `eventsWorker.nodeSelector`        | Node selector for Events Worker pods              | `{}`      |
+| `eventsWorker.affinity`            | Affinity rules for Events Worker pods             | `{}`      |
+| `eventsWorker.replicas`            | Number of Events Worker replicas                  | `1`       |
+| `eventsWorker.rails.sidekiqConcurrency` | Sidekiq concurrency for Events Worker         | `100`     |
+| `eventsWorker.rails.env`           | Events Worker environment                         | `production` |
+| `eventsWorker.resources.requests.memory` | Memory request for Events Worker              | `1Gi`     |
+| `eventsWorker.resources.requests.cpu` | CPU request for Events Worker                  | `1000m`   |
+| `eventsWorker.livenessProbe.enabled` | Enable or disable liveness probe                  | `true`    |
+| `eventsWorker.livenessProbe.httpPath` | HTTP path for liveness probe                     | `/`       |
+| `eventsWorker.livenessProbe.httpPort` | HTTP port for liveness probe                     | `8080`    |
 | `eventsWorker.livenessProbe.initialDelaySeconds` | Liveness probe initial delay          | `0`       |
 | `eventsWorker.livenessProbe.periodSeconds`       | Liveness probe period                  | `10`      |
 | `eventsWorker.livenessProbe.timeoutSeconds`      | Liveness probe timeout                 | `1`       |
 | `eventsWorker.livenessProbe.failureThreshold`    | Liveness probe failure threshold       | `3`       |
+
+### Clock Worker Configuration
+
+| Parameter                          | Description                                        | Default   |
+|-------------------------------------|----------------------------------------------------|-----------|
+| `clockWorker.tolerations`          | Pod tolerations for Clock Worker pods             | `[]`      |
+| `clockWorker.nodeSelector`         | Node selector for Clock Worker pods               | `{}`      |
+| `clockWorker.affinity`             | Affinity rules for Clock Worker pods              | `{}`      |
+| `clockWorker.replicas`             | Number of Clock Worker replicas                   | `1`       |
+| `clockWorker.rails.sidekiqConcurrency` | Sidekiq concurrency for Clock Worker          | `100`     |
+| `clockWorker.rails.env`            | Clock Worker environment                          | `production` |
+| `clockWorker.resources.requests.memory` | Memory request for Clock Worker               | `1Gi`     |
+| `clockWorker.resources.requests.cpu` | CPU request for Clock Worker                    | `1000m`   |
+| `clockWorker.livenessProbe.enabled` | Enable or disable liveness probe                  | `true`    |
+| `clockWorker.livenessProbe.httpPath` | HTTP path for liveness probe                     | `/`       |
+| `clockWorker.livenessProbe.httpPort` | HTTP port for liveness probe                     | `8080`    |
+| `clockWorker.livenessProbe.initialDelaySeconds` | Liveness probe initial delay          | `0`       |
+| `clockWorker.livenessProbe.periodSeconds`       | Liveness probe period                  | `10`      |
+| `clockWorker.livenessProbe.timeoutSeconds`      | Liveness probe timeout                 | `1`       |
+| `clockWorker.livenessProbe.failureThreshold`    | Liveness probe failure threshold       | `3`       |
+
+### Billing Worker Configuration
+
+| Parameter                          | Description                                        | Default   |
+|-------------------------------------|----------------------------------------------------|-----------|
+| `billingWorker.tolerations`        | Pod tolerations for Billing Worker pods           | `[]`      |
+| `billingWorker.nodeSelector`       | Node selector for Billing Worker pods             | `{}`      |
+| `billingWorker.affinity`           | Affinity rules for Billing Worker pods            | `{}`      |
+| `billingWorker.replicas`           | Number of Billing Worker replicas                 | `1`       |
+| `billingWorker.rails.sidekiqConcurrency` | Sidekiq concurrency for Billing Worker        | `100`     |
+| `billingWorker.rails.env`          | Billing Worker environment                        | `production` |
+| `billingWorker.resources.requests.memory` | Memory request for Billing Worker             | `1Gi`     |
+| `billingWorker.resources.requests.cpu` | CPU request for Billing Worker                  | `1000m`   |
+| `billingWorker.livenessProbe.enabled` | Enable or disable liveness probe                  | `true`    |
+| `billingWorker.livenessProbe.httpPath` | HTTP path for liveness probe                     | `/`       |
+| `billingWorker.livenessProbe.httpPort` | HTTP port for liveness probe                     | `8080`    |
+| `billingWorker.livenessProbe.initialDelaySeconds` | Liveness probe initial delay          | `0`       |
+| `billingWorker.livenessProbe.periodSeconds`       | Liveness probe period                  | `10`      |
+| `billingWorker.livenessProbe.timeoutSeconds`      | Liveness probe timeout                 | `1`       |
+| `billingWorker.livenessProbe.failureThreshold`    | Liveness probe failure threshold       | `3`       |
+
+### PDF Worker Configuration
+
+| Parameter                          | Description                                        | Default   |
+|-------------------------------------|----------------------------------------------------|-----------|
+| `pdfWorker.tolerations`            | Pod tolerations for PDF Worker pods               | `[]`      |
+| `pdfWorker.nodeSelector`           | Node selector for PDF Worker pods                 | `{}`      |
+| `pdfWorker.affinity`               | Affinity rules for PDF Worker pods                | `{}`      |
+| `pdfWorker.replicas`               | Number of PDF Worker replicas                     | `1`       |
+| `pdfWorker.rails.sidekiqConcurrency` | Sidekiq concurrency for PDF Worker              | `100`     |
+| `pdfWorker.rails.env`              | PDF Worker environment                            | `production` |
+| `pdfWorker.resources.requests.memory` | Memory request for PDF Worker                   | `1Gi`     |
+| `pdfWorker.resources.requests.cpu` | CPU request for PDF Worker                      | `1000m`   |
+| `pdfWorker.livenessProbe.enabled`  | Enable or disable liveness probe                  | `true`    |
+| `pdfWorker.livenessProbe.httpPath` | HTTP path for liveness probe                     | `/`       |
+| `pdfWorker.livenessProbe.httpPort` | HTTP port for liveness probe                     | `8080`    |
+| `pdfWorker.livenessProbe.initialDelaySeconds` | Liveness probe initial delay          | `0`       |
+| `pdfWorker.livenessProbe.periodSeconds`       | Liveness probe period                  | `10`      |
+| `pdfWorker.livenessProbe.timeoutSeconds`      | Liveness probe timeout                 | `1`       |
+| `pdfWorker.livenessProbe.failureThreshold`    | Liveness probe failure threshold       | `3`       |
+
+### Webhook Worker Configuration
+
+| Parameter                          | Description                                        | Default   |
+|-------------------------------------|----------------------------------------------------|-----------|
+| `webhookWorker.tolerations`        | Pod tolerations for Webhook Worker pods           | `[]`      |
+| `webhookWorker.nodeSelector`       | Node selector for Webhook Worker pods             | `{}`      |
+| `webhookWorker.affinity`           | Affinity rules for Webhook Worker pods            | `{}`      |
+| `webhookWorker.replicas`           | Number of Webhook Worker replicas                 | `1`       |
+| `webhookWorker.rails.sidekiqConcurrency` | Sidekiq concurrency for Webhook Worker        | `100`     |
+| `webhookWorker.rails.env`          | Webhook Worker environment                        | `production` |
+| `webhookWorker.resources.requests.memory` | Memory request for Webhook Worker             | `1Gi`     |
+| `webhookWorker.resources.requests.cpu` | CPU request for Webhook Worker                  | `1000m`   |
+| `webhookWorker.livenessProbe.enabled` | Enable or disable liveness probe                  | `true`    |
+| `webhookWorker.livenessProbe.httpPath` | HTTP path for liveness probe                     | `/`       |
+| `webhookWorker.livenessProbe.httpPort` | HTTP port for liveness probe                     | `8080`    |
+| `webhookWorker.livenessProbe.initialDelaySeconds` | Liveness probe initial delay          | `0`       |
+| `webhookWorker.livenessProbe.periodSeconds`       | Liveness probe period                  | `10`      |
+| `webhookWorker.livenessProbe.timeoutSeconds`      | Liveness probe timeout                 | `1`       |
+| `webhookWorker.livenessProbe.failureThreshold`    | Liveness probe failure threshold       | `3`       |
+
+### Payment Worker Configuration
+
+| Parameter                          | Description                                        | Default   |
+|-------------------------------------|----------------------------------------------------|-----------|
+| `paymentWorker.tolerations`        | Pod tolerations for Payment Worker pods           | `[]`      |
+| `paymentWorker.nodeSelector`       | Node selector for Payment Worker pods             | `{}`      |
+| `paymentWorker.affinity`           | Affinity rules for Payment Worker pods            | `{}`      |
+| `paymentWorker.replicas`           | Number of Payment Worker replicas                 | `1`       |
+| `paymentWorker.rails.sidekiqConcurrency` | Sidekiq concurrency for Payment Worker        | `100`     |
+| `paymentWorker.rails.env`          | Payment Worker environment                        | `production` |
+| `paymentWorker.resources.requests.memory` | Memory request for Payment Worker             | `1Gi`     |
+| `paymentWorker.resources.requests.cpu` | CPU request for Payment Worker                  | `1000m`   |
+| `paymentWorker.livenessProbe.enabled` | Enable or disable liveness probe                  | `true`    |
+| `paymentWorker.livenessProbe.httpPath` | HTTP path for liveness probe                     | `/`       |
+| `paymentWorker.livenessProbe.httpPort` | HTTP port for liveness probe                     | `8080`    |
+| `paymentWorker.livenessProbe.initialDelaySeconds` | Liveness probe initial delay          | `0`       |
+| `paymentWorker.livenessProbe.periodSeconds`       | Liveness probe period                  | `10`      |
+| `paymentWorker.livenessProbe.timeoutSeconds`      | Liveness probe timeout                 | `1`       |
+| `paymentWorker.livenessProbe.failureThreshold`    | Liveness probe failure threshold       | `3`       |
+
+**Note on Readiness Probes:** Currently, readiness probes are not explicitly configured for any of the components in this Helm chart.
 
 
 
