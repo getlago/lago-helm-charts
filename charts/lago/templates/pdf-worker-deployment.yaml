@@ -227,13 +227,16 @@ spec:
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
           name: {{ .Release.Name }}-pdf-worker
+          {{- if .Values.pdfWorker.livenessProbe.enabled }}
           livenessProbe:
-            exec:
-              command: ["/bin/bash", "-l", "-c", "bundle exec sidekiqmon processes | grep $(hostname) || exit 1"]
-            initialDelaySeconds: {{ .Values.pdfWorker.livenessProbe.initialDelaySeconds | default 0 }}
-            periodSeconds: {{ .Values.pdfWorker.livenessProbe.periodSeconds | default 10 }}
-            timeoutSeconds: {{ .Values.pdfWorker.livenessProbe.timeoutSeconds | default 1 }}
-            failureThreshold: {{ .Values.pdfWorker.livenessProbe.failureThreshold | default 3 }}
+            httpGet:
+              path: {{ .Values.pdfWorker.livenessProbe.httpPath }}
+              port: {{ .Values.pdfWorker.livenessProbe.httpPort }}
+            initialDelaySeconds: {{ .Values.pdfWorker.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.pdfWorker.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.pdfWorker.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.pdfWorker.livenessProbe.failureThreshold }}
+          {{- end }}
           {{- with .Values.pdfWorker.resources }}
           resources:
             {{- toYaml . | nindent 12}}

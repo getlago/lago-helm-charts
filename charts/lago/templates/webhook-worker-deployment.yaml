@@ -137,13 +137,16 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- if .Values.webhookWorker.livenessProbe.enabled }}
           livenessProbe:
-            exec:
-              command: ["/bin/bash", "-l", "-c", "bundle exec sidekiqmon processes | grep $(hostname) || exit 1"]
-            initialDelaySeconds: {{ .Values.webhookWorker.livenessProbe.initialDelaySeconds | default 0 }}
-            periodSeconds: {{ .Values.webhookWorker.livenessProbe.periodSeconds | default 10 }}
-            timeoutSeconds: {{ .Values.webhookWorker.livenessProbe.timeoutSeconds | default 1 }}
-            failureThreshold: {{ .Values.webhookWorker.livenessProbe.failureThreshold | default 3 }}
+            httpGet:
+              path: {{ .Values.webhookWorker.livenessProbe.httpPath }}
+              port: {{ .Values.webhookWorker.livenessProbe.httpPort }}
+            initialDelaySeconds: {{ .Values.webhookWorker.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.webhookWorker.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.webhookWorker.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.webhookWorker.livenessProbe.failureThreshold }}
+          {{- end }}
       restartPolicy: Always
       serviceAccountName: {{ .Values.global.serviceAccountName | default (printf "%s-serviceaccount" .Release.Name) }}
 {{- end -}}

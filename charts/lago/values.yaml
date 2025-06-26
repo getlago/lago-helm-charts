@@ -1,4 +1,4 @@
-version: 1.26.1
+version: 1.30.0
 
 # Required: Set the URLs for your API and Frontend services
 # Replace these placeholders with the actual domain names.
@@ -156,6 +156,14 @@ api:
   extraEnv: {}
   podAnnotations: {}
   podLabels: {}
+  livenessProbe:
+    enabled: true
+    httpPath: /health
+    httpPort: 3000
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 3
   tolerations: []
   nodeSelector: {}
   affinity: {}
@@ -180,6 +188,9 @@ worker:
   podLabels: {}
   extraEnv: {}
   livenessProbe:
+    enabled: true
+    httpPath: /
+    httpPort: 8080
     initialDelaySeconds: 0
     periodSeconds: 10
     timeoutSeconds: 1
@@ -204,6 +215,9 @@ eventsWorker:
   podLabels: {}
   extraEnv: {}
   livenessProbe:
+    enabled: true
+    httpPath: /
+    httpPort: 8080
     initialDelaySeconds: 0
     periodSeconds: 10
     timeoutSeconds: 1
@@ -233,6 +247,9 @@ clockWorker:
   podLabels: {}
   extraEnv: {}
   livenessProbe:
+    enabled: true
+    httpPath: /
+    httpPort: 8080
     initialDelaySeconds: 0
     periodSeconds: 10
     timeoutSeconds: 1
@@ -299,6 +316,9 @@ billingWorker:
   podLabels: {}
   extraEnv: {}
   livenessProbe:
+    enabled: true
+    httpPath: /
+    httpPort: 8080
     initialDelaySeconds: 0
     periodSeconds: 10
     timeoutSeconds: 1
@@ -328,6 +348,9 @@ pdfWorker:
   podLabels: {}
   extraEnv: {}
   livenessProbe:
+    enabled: true
+    httpPath: /
+    httpPort: 8080
     initialDelaySeconds: 0
     periodSeconds: 10
     timeoutSeconds: 1
@@ -357,6 +380,9 @@ webhookWorker:
   podLabels: {}
   extraEnv: {}
   livenessProbe:
+    enabled: true
+    httpPath: /
+    httpPort: 8080
     initialDelaySeconds: 0
     periodSeconds: 10
     timeoutSeconds: 1
@@ -386,6 +412,9 @@ paymentWorker:
   podLabels: {}
   extraEnv: {}
   livenessProbe:
+    enabled: true
+    httpPath: /
+    httpPort: 8080
     initialDelaySeconds: 0
     periodSeconds: 10
     timeoutSeconds: 1

@@ -227,6 +227,16 @@ spec:
             {{ end }}
           image: getlago/api:v{{ .Values.version }}
           name: {{ .Release.Name }}-billing-worker
+          {{- if .Values.billingWorker.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.billingWorker.livenessProbe.httpPath }}
+              port: {{ .Values.billingWorker.livenessProbe.httpPort }}
+            initialDelaySeconds: {{ .Values.billingWorker.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.billingWorker.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.billingWorker.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.billingWorker.livenessProbe.failureThreshold }}
+          {{- end }}
           {{- with .Values.billingWorker.resources }}
           resources:
             {{- toYaml . | nindent 12}}
