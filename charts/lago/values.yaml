@@ -156,6 +156,14 @@ api:
   extraEnv: {}
   podAnnotations: {}
   podLabels: {}
+  livenessProbe:
+    enabled: true
+    httpPath: /health
+    httpPort: 3000
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 3
   tolerations: []
   nodeSelector: {}
   affinity: {}

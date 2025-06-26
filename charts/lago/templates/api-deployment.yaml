@@ -268,10 +268,16 @@ spec:
             - name: http
               containerPort: 3000
               protocol: TCP
+          {{- if .Values.api.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
-              path: /health
-              port: http
+              path: {{ .Values.api.livenessProbe.httpPath }}
+              port: {{ .Values.api.livenessProbe.httpPort }}
+            initialDelaySeconds: {{ .Values.api.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.api.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.api.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.api.livenessProbe.failureThreshold }}
+          {{- end }}
           readinessProbe:
             httpGet:
               path: /health

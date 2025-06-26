@@ -110,6 +110,13 @@ helm install my-lago-release . \
 | `api.volumes.storage`               | Storage size for the API's persistent volume claim | `10Gi`       |
 | `api.podAnnotations`                | Annotations to add to the API pod                  | `{}`         |
 | `api.podLabels`                     | Labels to add to the API pod                       | `{}`         |
+| `api.livenessProbe.enabled`         | Enable or disable liveness probe                   | `true`       |
+| `api.livenessProbe.httpPath`        | HTTP path for liveness probe                       | `/health`    |
+| `api.livenessProbe.httpPort`        | HTTP port for liveness probe                       | `3000`       |
+| `api.livenessProbe.initialDelaySeconds` | Liveness probe initial delay                   | `0`          |
+| `api.livenessProbe.periodSeconds`       | Liveness probe period                          | `10`         |
+| `api.livenessProbe.timeoutSeconds`      | Liveness probe timeout                         | `1`          |
+| `api.livenessProbe.failureThreshold`    | Liveness probe failure threshold               | `3`          |
 
 
 ### Worker Configuration
