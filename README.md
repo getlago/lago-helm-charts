@@ -106,6 +106,7 @@ helm install my-lago-release . \
 | `api.sidekiqWeb.enabled`            | Enable or disable Sidekiq Web                      | `true`       |
 | `api.resources.requests.memory`     | Memory request for the API                         | `1Gi`        |
 | `api.resources.requests.cpu`        | CPU request for the API                            | `1000m`      |
+| `api.volumes.storageClassName`      | Storage class name API's persistent storage        | `""`         |
 | `api.volumes.accessModes`           | Access mode for the API's persistent storage       | `ReadWriteOnce` |
 | `api.volumes.storage`               | Storage size for the API's persistent volume claim | `10Gi`       |
 | `api.podAnnotations`                | Annotations to add to the API pod                  | `{}`         |
