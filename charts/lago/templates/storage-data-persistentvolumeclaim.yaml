@@ -6,6 +6,9 @@ metadata:
     io.lago.service: {{ .Release.Name }}-storage-data
   name: {{ .Release.Name }}-storage-data
 spec:
+  {{- if .Values.api.volumes.storageClassName }}
+  storageClassName: {{ .Values.api.volumes.storageClassName }}
+  {{- end }}
   accessModes:
     - {{ .Values.api.volumes.accessModes | default "ReadWriteOnce" }}
   resources:

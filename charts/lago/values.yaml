@@ -151,6 +151,7 @@ api:
     maxReplicas: 3
     targetCPUUtilizationPercentage: 80
   volumes:
+    storageClassName: ""
     accessModes: ReadWriteOnce
     storage: "10Gi"
   extraEnv: {}
