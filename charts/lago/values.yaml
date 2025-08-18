@@ -30,6 +30,7 @@ global:
   # databaseUrl:
   # Should respect standard redis URL format redis://..., redis+sentinel://...
   # redisUrl:
+  # redisCacheUrl:
 
   # If you wish to provide an existing secret with credentials in, then you can do so here.
   # The following fields are required:
