@@ -1,4 +1,4 @@
-version: 1.32.0
+version: 1.32.4
 
 # Required: Set the URLs for your API and Frontend services
 # Replace these placeholders with the actual domain names.
@@ -30,6 +30,7 @@ global:
   # databaseUrl:
   # Should respect standard redis URL format redis://..., redis+sentinel://...
   # redisUrl:
+  # redisCacheUrl:
 
   # If you wish to provide an existing secret with credentials in, then you can do so here.
   # The following fields are required:

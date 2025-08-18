@@ -89,7 +89,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ include "secret-path" . }}
-                  key: redisUrl
+                  key: redisCacheUrl
             - name: LAGO_PDF_URL
               {{- $pdfHost := printf "%s-pdf-svc.%s" .Release.Name .Release.Namespace}}
               value: {{ printf "http://%s:%v" $pdfHost .Values.pdf.service.port | quote }}

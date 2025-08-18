@@ -71,7 +71,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ include "secret-path" . }}
-                  key: redisUrl
+                  key: redisCacheUrl
             - name: RAILS_LOG_TO_STDOUT
               value: {{ .Values.clock.rails.logStdout | quote }}
             - name: LAGO_RSA_PRIVATE_KEY
