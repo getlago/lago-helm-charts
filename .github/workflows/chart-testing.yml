@@ -42,13 +42,6 @@ jobs:
         with:
           python-version: "3.10"
           check-latest: true
-      
-      - name: Get Docker host IP usable in kind
-        id: docker_host_ip
-        run: |
-          # For Linux runners, get docker host gateway IP (default subnet)
-          ip=$(docker network inspect kind -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
-          echo "host_ip=$ip" >> $GITHUB_OUTPUT
 
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.6.1
@@ -68,6 +61,12 @@ jobs:
       - name: Create kind cluster
         uses: helm/kind-action@v1.12.0
         if: steps.list-changed.outputs.changed == 'true'
+
+      - name: Get Docker host IP usable in kind
+        id: docker_host_ip
+        run: |
+          ip=$(docker network inspect kind -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
+          echo "host_ip=$ip" >> $GITHUB_OUTPUT
 
       - name: Run chart-testing (install)
         if: steps.list-changed.outputs.changed == 'true'
