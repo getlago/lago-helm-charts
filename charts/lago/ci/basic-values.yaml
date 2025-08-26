@@ -21,10 +21,18 @@ worker:
       cpu: "200m"
 
 eventsWorker:
-  enabled: false
+  enabled: true
+  resources:
+    requests:
+      memory: '512Mi'
+      cpu: "200m"
 
 clockWorker:
-  enabled: false
+  enabled: true
+  resources:
+    requests:
+      memory: '512Mi'
+      cpu: "200m"
 
 pdf:
   resources:
@@ -33,13 +41,29 @@ pdf:
       cpu: "200m"
 
 billingWorker:
-  enabled: false
+  enabled: true
+  resources:
+    requests:
+      memory: '512Mi'
+      cpu: "200m"
 
 pdfWorker:
-  enabled: false
+  enabled: true
+  resources:
+    requests:
+      memory: '512Mi'
+      cpu: "200m"
 
 webhookWorker:
-  enabled: false
+  enabled: true
+  resources:
+    requests:
+      memory: '512Mi'
+      cpu: "200m"
 
 paymentWorker:
-  enabled: false
+  enabled: true
+  resources:
+    requests:
+      memory: '512Mi'
+      cpu: "200m"
