@@ -5,27 +5,6 @@ name: Lint and Test Charts
 jobs:
   lint:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-      redis:
-        image: redis
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -60,13 +39,13 @@ jobs:
       - name: Create kind cluster
         uses: helm/kind-action@v1.12.0
         if: steps.list-changed.outputs.changed == 'true'
+      
+      - name: Install Postgres
+        run: kubectl apply -f ./charts/lago/ci/postgres.yml
 
-      - name: Get Docker host IP usable in kind
-        id: docker_host_ip
-        run: |
-          ip=$(docker network inspect kind -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
-          echo "host_ip=$ip" >> $GITHUB_OUTPUT
+      - name: Install Redis
+        run: kubectl apply -f ./charts/lago/ci/redis.yml
 
       - name: Run chart-testing (install)
         if: steps.list-changed.outputs.changed == 'true'
-        run: ct install --config ct.yaml --helm-extra-set-args "--set=global.databaseUrl=postgres://postgres:postgres@${{ steps.docker_host_ip.outputs.host_ip }}:5432/lago"
+        run: ct install --config ct.yaml --namespace lago
