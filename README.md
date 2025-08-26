@@ -1,13 +1,6 @@
 # Lago Helm Chart
 
-This Helm chart deploys the Lago billing system with various optional dependencies such as Redis, PostgreSQL, and MinIO. Below are details about configuring the chart for different environments.
-
-## Current Releases
-
-| Project            | Release Badge                                                                                       |
-|--------------------|-----------------------------------------------------------------------------------------------------|
-| **Lago**           | [![Lago Release](https://img.shields.io/github/v/release/getlago/lago)](https://github.com/getlago/lago/releases) |
-| **Helm Chart**     | [![Helm Chart Release](https://img.shields.io/github/v/release/getlago/lago-helm-charts)](https://github.com/getlago/lago-helm-charts/releases) |
+This Helm chart deploys the Lago billing system with optional dependencies on MinIO. Below are details about configuring the chart for different environments.
 
 
 ## Prerequisites
@@ -15,7 +8,9 @@ This Helm chart deploys the Lago billing system with various optional dependenci
 - Kubernetes 1.19+
 - Helm 3.5+
 - Persistent storage provisioner enabled in the cluster
-- Optionally: A managed Redis, Minio and PostgreSQL service for production environments
+- Optionally: Minio ervice for staging environments
+
+:warning: Please note that we strongly recommend to use managed PostgreSQL, REDIS and S3 in a production environment.
 
 ## Installation
 
@@ -52,26 +47,6 @@ helm install my-lago-release . \
 | `global.signup.enabled`     | Enable or disable Lago's signup feature                                                             | `true`        |
 | `global.googleAuth.enabled` | Enable or disable logging through Google Auth                                                                | `true`        |
 | `global.ingress.enabled`    | Enable ingress resources for the application                                                        | `false`       |
-
-### Redis Configuration
-
-| Parameter                      | Description                                         | Default   |
-|---------------------------------|-----------------------------------------------------|-----------|
-| `redis.enabled`                 | Enable Redis as a dependency                        | `true`    |
-| `redis.image.tag`               | Redis image tag                                     | `6.2.14`  |
-| `redis.replica.replicaCount`    | Number of Redis replicas                            | `0`       |
-| `redis.auth.enabled`            | Enable Redis authentication                         | `false`   |
-| `redis.master.service.ports`    | Redis service port                                  | `6379`    |
-
-### PostgreSQL Configuration
-
-| Parameter                          | Description                                        | Default   |
-|-------------------------------------|----------------------------------------------------|-----------|
-| `postgresql.enabled`                | Enable PostgreSQL as a dependency                  | `true`    |
-| `global.postgresql.auth.username`   | PostgreSQL database username                       | `lago`    |
-| `global.postgresql.auth.password`   | PostgreSQL database password                       | `lago`    |
-| `global.postgresql.auth.database`   | PostgreSQL database name                           | `lago`    |
-| `global.postgresql.service.ports`   | PostgreSQL service port                            | `5432`    |
 
 ### Frontend Configuration
 
@@ -344,11 +319,11 @@ The following keys are expected:
 
 ## Storage Recommendation
 
-We **strongly recommend** using either **Amazon S3** or **MinIO** for object storage when deploying Lago. These solutions provide reliable, scalable storage that can be accessed by multiple pods without encountering issues.
+We **strongly recommend** using either **Amazon S3** alternatives for object storage when deploying Lago. These solutions provide reliable, scalable storage that can be accessed by multiple pods without encountering issues.
 
 If neither S3 nor MinIO is configured, the system will default to using a Persistent Volume Claim (PVC). However, this approach is **strongly discouraged** as it can lead to issues such as multi-attach errors when volumes are accessed by more than one pod simultaneously. For this reason, it is important to configure S3 or MinIO to avoid potential complications with PVCs.
 
-By opting for S3 or MinIO, you ensure better reliability and scalability for your deployment.
+By opting for S3 or alternatives, you ensure better reliability and scalability for your deployment.
 
 For additional customization, refer to the comments in `values.yaml`.
 
