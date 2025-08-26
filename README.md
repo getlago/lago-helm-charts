@@ -8,7 +8,7 @@ This Helm chart deploys the Lago billing system with optional dependencies on Mi
 - Kubernetes 1.19+
 - Helm 3.5+
 - Persistent storage provisioner enabled in the cluster
-- Optionally: Minio ervice for staging environments
+- Optionally: Minio service for staging environments
 
 :warning: Please note that we strongly recommend to use managed PostgreSQL, REDIS and S3 in a production environment.
 
