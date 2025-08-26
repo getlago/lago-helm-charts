@@ -1,5 +1,10 @@
 apiUrl: "api.lago.dev"
 frontUrl: "front.lago.dev"
+
+global:
+  databaseUrl: postgres://postgres:postgres@postgres:5432/postgres
+  redisUrl: redis://redis:6379
+
 job:
   migrate:
     loadSchema: true
