@@ -15,6 +15,8 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          - 5432:5432
       redis:
         image: redis
         options: >-
@@ -22,6 +24,8 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          - 6379:6379
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,6 +42,13 @@ jobs:
         with:
           python-version: "3.10"
           check-latest: true
+      
+      - name: Get Docker host IP usable in kind
+        id: docker_host_ip
+        run: |
+          # For Linux runners, get docker host gateway IP (default subnet)
+          ip=$(docker network inspect kind -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
+          echo "host_ip=$ip" >> $GITHUB_OUTPUT
 
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.6.1
