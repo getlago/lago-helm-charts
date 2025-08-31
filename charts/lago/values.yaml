@@ -5,29 +5,14 @@ version: 1.32.4
 apiUrl: ""   # Example: https://api.mydomain.dev
 frontUrl: ""   # Example: https://app.mydomain.dev
 
-# Only for Development, Staging or PoC, you should use a managed Redis instance for Production
-redis:
-  enabled: true
-  image:
-    tag: 6.2.14
-  replica:
-    replicaCount: 0
-  auth:
-    enabled: false
-  master:
-    service:
-      ports:
-        redis: 6379
-# Only for Development, Staging or PoC, you should use a managed PostgreSQL instance for Production
-postgresql:
-  enabled: true
-
 global:
   # Define your Lago Premium License
   # license:
+
   # If you use a managed PG instance
   # Should respect this format postgresql://USER:PASSWORD@HOST:PORT/DATABASE_NAME
   # databaseUrl:
+
   # Should respect standard redis URL format redis://..., redis+sentinel://...
   # redisUrl:
   # redisCacheUrl:
@@ -43,15 +28,6 @@ global:
   #  - googleAuthClientId:
   #  - googleAuthClientSecret:
   # existingSecret: "lago-credentials"
-  # Not required if using existingSecret
-  postgresql:
-    auth:
-      username: lago
-      password: lago
-      database: lago
-    service:
-      ports:
-        postgresql: 5432
 
   # You can disable segment tracking for Lago's internal purpose
   segment:

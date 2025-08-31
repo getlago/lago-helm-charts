@@ -2,16 +2,8 @@ apiVersion: v2
 appVersion: "1.32.4"
 description: the Lago open source billing app
 name: lago
-version: 1.24.2
+version: 1.25.0
 dependencies:
-  - name: postgresql
-    version: "13.2.2"
-    repository: https://charts.bitnami.com/bitnami
-    condition: postgresql.enabled
-  - name: redis
-    version: "18.2.1"
-    repository: https://charts.bitnami.com/bitnami
-    condition: redis.enabled
   - name: minio
     version: "5.2.0"
     repository: https://charts.min.io/

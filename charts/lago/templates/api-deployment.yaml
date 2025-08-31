@@ -36,24 +36,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       initContainers:
-        {{ if .Values.postgresql.enabled }}
-        - name: wait-for-postgresql
-          image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
-          args:
-            - wait
-            - pod/{{ .Release.Name }}-postgresql-0
-            - --for=condition=ready
-            - --timeout=180s
-        {{ end }}
-        {{ if .Values.redis.enabled }}
-        - name: wait-for-redis
-          image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
-          args:
-            - wait
-            - pod/{{ .Release.Name }}-redis-master-0
-            - --for=condition=ready
-            - --timeout=180s
-        {{ end }}
         {{ if .Values.minio.enabled }}
         - name: wait-for-minio
           image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
