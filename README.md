@@ -70,6 +70,13 @@ You can use the provided `Taskfile.yaml` to easily set up a local development en
 | `global.kubectl.imageRegistry`   | Docker registry with kubectl image (for init containers)                                                | `docker.io`       |
 | `global.kubectl.imageRepository` | Docker repository with kubectl image (for init containers)                                              | `rancher/kubectl` |
 | `global.kubectl.imageTag`        | Tag of kubectl Docker image (for init containers) - if unset (default) it is set to k8s cluster version | `""`              |
+| `global.clickhouse.enabled`                | Enable ClickHouse integration within Lago                                      | `false`             |
+| `global.clickhouse.kafka.tls`              | Enable TLS support for Kafka when using ClickHouse                             | `true `             |
+| `global.clickhouse.kafka.saslMechanisms`   | Kafka SASL mechanism                                                           | `"SCRAM-SHA-512"`   |
+| `global.clickhouse.kafka.securityProtocol` | Kafka Security protocol                                                        | `"SASL_SSL"`        |
+| `global.clickhouse.kafka.consumerGroup`    | Kafka consumer group name                                                      | `"events_consumer"` |
+| `global.clickhouse.kafka.boostrapServers`  | *(Required)* Kafka list of endpoints                                           | `[]`                |
+| `global.clickhouse.kafka.topics`           | Dictionary of Kafka topics                                                     | {...}               |
 
 ### Frontend Configuration
 
@@ -139,6 +146,39 @@ You can use the provided `Taskfile.yaml` to easily set up a local development en
 | `worker.livenessProbe.periodSeconds`       | Liveness probe period                            | `10`      |
 | `worker.livenessProbe.timeoutSeconds`      | Liveness probe timeout                           | `1`       |
 | `worker.livenessProbe.failureThreshold`    | Liveness probe failure threshold                | `3`       |
+
+
+### Events Consumer Configuration
+
+| Parameter                                  | Description                                         | Default        |
+|--------------------------------------------|-----------------------------------------------------|----------------|
+| `eventsConsumer.databasePool`              | Size of the database connection pool                | `10`           |
+| `eventsConsumer.tolerations`               | Pod tolerations for Events Consumer pods            | `[]`           |
+| `eventsConsumer.nodeSelector`              | Node selector for Events Consumer pods              | `{}`           |
+| `eventsConsumer.affinity`                  | Affinity rules for Events Consumer pods             | `{}`           |
+| `eventsConsumer.rails.env`                 | Events Consumer environment                         | `production`   |
+| `eventsConsumer.rails.logStdout`           | Enable or disable logging to stdout                 | `true`         |
+| `eventsConsumer.rails.logLevel`            | Log level for the Rails app                         | `error`        |
+| `eventsConsumer.resources.requests.memory` | Memory request for Events Consumer                  | `1Gi`          |
+| `eventsConsumer.resources.requests.cpu`    | CPU request for Events Consumer                     | `1100m`        |
+| `eventsConsumer.podAnnotations`            | Annotations to add to the Events Consumer pod       | `{}`           |
+| `eventsConsumer.podLabels`                 | Labels to add to the Events Consumer pod            | `{}`           |
+| `eventsConsumer.extraEnv`                  | Additional environment variables for pods           | `{}`           |
+
+### Events Processor Configuration
+
+| Parameter                                   | Description                                         | Default        |
+|---------------------------------------------|-----------------------------------------------------|----------------|
+| `eventsProcessor.databasePool`              | Size of the database connection pool                | `10`           |
+| `eventsProcessor.env`                       | Events Processor environment                        | `production`   |
+| `eventsProcessor.tolerations`               | Pod tolerations for Events Processor pods           | `[]`           |
+| `eventsProcessor.nodeSelector`              | Node selector for Events Processor pods             | `{}`           |
+| `eventsProcessor.affinity`                  | Affinity rules for Events Processor pods            | `{}`           |
+| `eventsProcessor.resources.requests.memory` | Memory request for Events Processor                 | `1Gi`          |
+| `eventsProcessor.resources.requests.cpu`    | CPU request for Events Processor                    | `1100m`        |
+| `eventsProcessor.podAnnotations`            | Annotations to add to the Events Processor pod      | `{}`           |
+| `eventsProcessor.podLabels`                 | Labels to add to the Events Processor pod           | `{}`           |
+| `eventsProcessor.extraEnv`                  | Additional environment variables for pods           | `{}`           |
 
 ### Events Worker Configuration
 
