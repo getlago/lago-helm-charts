@@ -38,7 +38,7 @@ spec:
       initContainers:
         {{ if .Values.minio.enabled }}
         - name: wait-for-minio
-          image: "{{ .Values.global.kubectl.imageRegistry }}/rancher/kubectl:{{ include "kubectlVersion" . }}"
+          image: "{{ .Values.global.kubectl.imageRegistry }}/{{ .Values.global.kubectl.imageRepository }}:{{ include "kubectlVersion" . }}"
           args:
             - wait
             - pod/{{ .Release.Name }}-minio-0
@@ -46,7 +46,7 @@ spec:
             - --timeout=180s
         {{ end }}
         - name: wait-for-migrations
-          image: "{{ .Values.global.kubectl.imageRegistry }}/rancher/kubectl:{{ include "kubectlVersion" . }}"
+          image: "{{ .Values.global.kubectl.imageRegistry }}/{{ .Values.global.kubectl.imageRepository }}:{{ include "kubectlVersion" . }}"
           args:
             - wait
             - job/{{ include "migrateJobName" . }}

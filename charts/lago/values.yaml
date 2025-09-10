@@ -81,6 +81,7 @@ global:
 
   kubectl:
     imageRegistry: docker.io
+    imageRepository: rancher/kubectl
 
 encryption:
   # The following fields are required:
