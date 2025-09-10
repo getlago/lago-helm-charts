@@ -38,7 +38,7 @@ spec:
       {{- end }}
       initContainers:
         - name: wait-for-migrations
-          image: "docker.io/rancher/kubectl:{{ include "kubectlVersion" . }}"
+          image: "{{ .Values.global.kubectl.imageRegistry }}/rancher/kubectl:{{ include "kubectlVersion" . }}"
           args:
             - wait
             - job/{{ include "migrateJobName" . }}

@@ -79,6 +79,9 @@ global:
     egress: []
     ingress: []
 
+  kubectl:
+    imageRegistry: docker.io
+
 encryption:
   # The following fields are required:
   #  - encryptionPrimaryKey:
