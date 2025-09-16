@@ -1,0 +1,17 @@
+on: pull_request
+
+name: Unit tests Charts
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm and run tests
+        uses: d3adb5/helm-unittest-action@v2
+        with:
+          helm-version: v3.18.4
