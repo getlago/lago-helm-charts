@@ -1,0 +1,41 @@
+version: 3
+
+tasks:
+  lint:
+    desc: Lint the chart
+    preconditions:
+      - sh: command -v ct
+        msg: "❌ chart-testing not found (see: https://github.com/helm/chart-testing)"
+    cmd: ct lint --config ct.yaml
+
+  kind:up:
+    desc: Create a kind cluster
+    preconditions:
+      - sh: command -v kind
+        msg: "❌ kind not found"
+    cmd: kind create cluster --name lago
+
+  kind:down:
+    desc: Delete the kind cluster
+    cmd: kind delete cluster --name lago
+
+  test:unit:
+    desc: Run unit tests for the
+    preconditions:
+      - sh: helm unittest -h
+        msg: "❌ helm unittest not found (see: https://github.com/helm-unittest/helm-unittest)"
+    cmd: helm unittest ./charts/lago
+
+  test:e2e:
+    desc: Create a kind cluster and deploy the chart
+    preconditions:
+      - sh: command -v kubectl
+        msg: "❌ kubectl not found"
+      - sh: command -v ct
+        msg: "❌ chart-testing not found (see: https://github.com/helm/chart-testing)"
+    cmds:
+      - task: kind:up
+      - kubectl create namespace lago
+      - kubectl apply -f charts/lago/ci/postgres.yml
+      - kubectl apply -f charts/lago/ci/redis.yml
+      - ct install --config ct.yaml --namespace lago

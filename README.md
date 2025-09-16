@@ -29,6 +29,26 @@ helm install my-lago-release . \
   --set frontUrl=mydomain.dev
 ```
 
+## Development Setup
+
+You can use the provided `Taskfile.yaml` to easily set up a local development environment with [Task](https://taskfile.dev/).
+
+### Prerequisites
+
+- [Task](https://taskfile.dev/) installed (`brew install go-task` or see their docs)
+- [kind](https://kind.sigs.k8s.io/) (Kubernetes in Docker)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [helm](https://helm.sh/)
+- [ct (chart-testing)](https://github.com/helm/chart-testing)
+- [helm-unittest](https://github.com/helm-unittest/helm-unittest)
+
+### Use Taskfile
+
+- List all task: `task --list`
+- Run end to end tests: `task e2e`
+- Run lint: `task lint`
+- ...
+
 ## Configuration
 
 ### Global Parameters
