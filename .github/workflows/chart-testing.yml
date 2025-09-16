@@ -37,16 +37,19 @@ jobs:
         run: ct lint --config ct.yaml
 
       - name: Create kind cluster
-        uses: helm/kind-action@v1.12.0
         if: steps.list-changed.outputs.changed == 'true'
+        uses: helm/kind-action@v1.12.0
 
       - name: Create lago namespace
+        if: steps.list-changed.outputs.changed == 'true'
         run: kubectl create namespace lago
-      
+
       - name: Install Postgres
+        if: steps.list-changed.outputs.changed == 'true'
         run: kubectl apply -f ./charts/lago/ci/postgres.yml
 
       - name: Install Redis
+        if: steps.list-changed.outputs.changed == 'true'
         run: kubectl apply -f ./charts/lago/ci/redis.yml
 
       - name: Run chart-testing (install)
