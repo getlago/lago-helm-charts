@@ -89,7 +89,7 @@ encryption:
   # serviceAccountName:
 
   # If kubectlVersion is not supplied it will be inferred using the version of the cluster that Lago is deployed on.
-  # kubectlVersion: 1.29
+  # kubectlVersion: 1.29.0
 
 front:
   replicas: 1

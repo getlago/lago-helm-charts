@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "1.32.4"
 description: the Lago open source billing app
 name: lago
-version: 1.25.1
+version: 1.25.2
 dependencies:
   - name: minio
     version: "5.2.0"
