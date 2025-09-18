@@ -18,7 +18,7 @@
 {{- if .Values.global.kubectlVersion -}}
 {{ .Values.global.kubectlVersion }}
 {{- else -}}
-{{ printf "%s.%s" .Capabilities.KubeVersion.Major (regexReplaceAll "[^0-9]" .Capabilities.KubeVersion.Minor "") }}
+{{ .Capabilities.KubeVersion }}
 {{- end }}
 {{- end}}
 

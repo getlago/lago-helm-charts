@@ -38,7 +38,7 @@ spec:
       {{- end }}
       initContainers:
         - name: wait-for-migrations
-          image: "docker.io/bitnami/kubectl:{{ include "kubectlVersion" . }}"
+          image: "docker.io/rancher/kubectl:{{ include "kubectlVersion" . }}"
           args:
             - wait
             - job/{{ include "migrateJobName" . }}
