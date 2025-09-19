@@ -53,20 +53,23 @@ You can use the provided `Taskfile.yaml` to easily set up a local development en
 
 ### Global Parameters
 
-| Parameter                  | Description                                                                                         | Default       |
-|----------------------------|-----------------------------------------------------------------------------------------------------|---------------|
-| `global.license`            | Lago Premium License key                                                                            | `""`          |
-| `global.databaseUrl`        | PostgreSQL connection string, should follow this format: postgresql://USER:PASSWORD@HOST:PORT/DB     | `""`          |
-| `global.redisUrl`           | Redis connection string, should follow this format: redis://... or redis+sentinel://...             | `""`          |
-| `global.existingSecret`     | Name of the secret containing sensitive values (database URL, Redis URL, AWS keys, SMTP credentials) | `""`          |
-| `global.s3.enabled`         | Enable S3 storage for file uploads                                                                  | `false`       |
-| `global.s3.accessKeyId`     | AWS S3 access key ID (not required if using existing secret)                                        | `""`          |
-| `global.s3.secretAccessKey` | AWS S3 secret access key (not required if using existing secret)                                    | `""`          |
-| `global.s3.bucket`          | AWS S3 bucket name                                                                                  | `""`          |
-| `global.smtp.enabled`       | Enable SMTP configuration for email sending                                                         | `false`       |
-| `global.signup.enabled`     | Enable or disable Lago's signup feature                                                             | `true`        |
-| `global.googleAuth.enabled` | Enable or disable logging through Google Auth                                                                | `true`        |
-| `global.ingress.enabled`    | Enable ingress resources for the application                                                        | `false`       |
+| Parameter                        | Description                                                                                             | Default           |
+|----------------------------------|---------------------------------------------------------------------------------------------------------|-------------------|
+| `global.license`                 | Lago Premium License key                                                                                | `""`              |
+| `global.databaseUrl`             | PostgreSQL connection string, should follow this format: postgresql://USER:PASSWORD@HOST:PORT/DB        | `""`              |
+| `global.redisUrl`                | Redis connection string, should follow this format: redis://... or redis+sentinel://...                 | `""`              |
+| `global.existingSecret`          | Name of the secret containing sensitive values (database URL, Redis URL, AWS keys, SMTP credentials)    | `""`              |
+| `global.s3.enabled`              | Enable S3 storage for file uploads                                                                      | `false`           |
+| `global.s3.accessKeyId`          | AWS S3 access key ID (not required if using existing secret)                                            | `""`              |
+| `global.s3.secretAccessKey`      | AWS S3 secret access key (not required if using existing secret)                                        | `""`              |
+| `global.s3.bucket`               | AWS S3 bucket name                                                                                      | `""`              |
+| `global.smtp.enabled`            | Enable SMTP configuration for email sending                                                             | `false`           |
+| `global.signup.enabled`          | Enable or disable Lago's signup feature                                                                 | `true`            |
+| `global.googleAuth.enabled`      | Enable or disable logging through Google Auth                                                           | `true`            |
+| `global.ingress.enabled`         | Enable ingress resources for the application                                                            | `false`           |
+| `global.kubectl.imageRegistry`   | Docker registry with kubectl image (for init containers)                                                | `docker.io`       |
+| `global.kubectl.imageRepository` | Docker repository with kubectl image (for init containers)                                              | `rancher/kubectl` |
+| `global.kubectl.imageTag`        | Tag of kubectl Docker image (for init containers) - if unset (default) it is set to k8s cluster version | `""`              |
 
 ### Frontend Configuration
 

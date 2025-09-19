@@ -79,6 +79,12 @@ global:
     egress: []
     ingress: []
 
+  kubectl:
+    imageRegistry: docker.io
+    imageRepository: rancher/kubectl
+    # If imageTag is not supplied it will be inferred using the version of the cluster that Lago is deployed on.
+    # imageTag: 1.29.0
+
 encryption:
   # The following fields are required:
   #  - encryptionPrimaryKey:
@@ -87,9 +93,6 @@ encryption:
   existingSecret:
 
   # serviceAccountName:
-
-  # If kubectlVersion is not supplied it will be inferred using the version of the cluster that Lago is deployed on.
-  # kubectlVersion: 1.29.0
 
 front:
   replicas: 1

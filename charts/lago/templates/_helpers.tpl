@@ -15,8 +15,8 @@
 {{- end}}
 
 {{- define "kubectlVersion" }}
-{{- if .Values.global.kubectlVersion -}}
-{{ .Values.global.kubectlVersion }}
+{{- if .Values.global.kubectl.imageTag -}}
+{{ .Values.global.kubectl.imageTag }}
 {{- else -}}
 {{ .Capabilities.KubeVersion }}
 {{- end }}
