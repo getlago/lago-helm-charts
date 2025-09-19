@@ -3,6 +3,20 @@ entries:
   lago:
   - apiVersion: v2
     appVersion: 1.32.4
+    created: "2025-09-19T10:27:38.299421017Z"
+    dependencies:
+    - condition: minio.enabled
+      name: minio
+      repository: https://charts.min.io/
+      version: 5.2.0
+    description: the Lago open source billing app
+    digest: ce6e4e14dc5ac78e6dc1078eb7f48b2a65db402a2c5b1c0e00acf4378eeb2441
+    name: lago
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/lago-1.26.0/lago-1.26.0.tgz
+    version: 1.26.0
+  - apiVersion: v2
+    appVersion: 1.32.4
     created: "2025-09-18T13:09:35.782898965Z"
     dependencies:
     - condition: minio.enabled
@@ -602,4 +616,4 @@ entries:
     urls:
     - https://charts.getlago.com/artifacts/lago-1.0.0.tgz
     version: 1.0.0
-generated: "2025-09-18T13:09:35.783186305Z"
+generated: "2025-09-19T10:27:38.299942928Z"
