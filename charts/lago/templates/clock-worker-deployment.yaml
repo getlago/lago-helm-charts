@@ -36,14 +36,6 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      initContainers:
-        - name: wait-for-migrations
-          image: "{{ .Values.global.kubectl.imageRegistry }}/{{ .Values.global.kubectl.imageRepository }}:{{ include "kubectlVersion" . }}"
-          args:
-            - wait
-            - job/{{ include "migrateJobName" . }}
-            - --for=condition=complete
-            - --timeout=180s
       containers:
         - args: ["./scripts/start.clock.worker.sh"]
           env:
