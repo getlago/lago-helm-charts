@@ -1,4 +1,8 @@
-version: 1.32.4
+version: 1.33.4
+
+# EXAMPLE CONFIGURATION - Lago Events Processing Components
+# This is a standalone example demonstrating Lago's events processing capabilities
+# For production deployments, refer to the official Lago documentation
 
 # Required: Set the URLs for your API and Frontend services
 # Replace these placeholders with the actual domain names.
@@ -71,7 +75,7 @@ global:
     enabled: false
     frontHostname:
     apiHostname:
-    className:
+    className: nginx
     annotations: {}
 
   networkPolicy:
@@ -84,6 +88,35 @@ global:
     imageRepository: rancher/kubectl
     # If imageTag is not supplied it will be inferred using the version of the cluster that Lago is deployed on.
     # imageTag: 1.29.0
+
+  clickhouse:
+    enabled: false
+    port: 9000
+    host: clickhouse
+    ssl: true
+    # username and password are not required here if using existingSecret
+    username: ""
+    password: ""
+    kafka:
+      # username and password are not required here if using existingSecret
+      # username:
+      # password:
+      tls: true
+      saslMechanisms: SCRAM-SHA-512
+      securityProtocol: SASL_SSL
+      consumerGroup: events_consumer
+      # you must provide a list of Kafka servers if clickhouse is enabled
+      # bootstrapServers:
+      #   - "kafka-server:9092"
+      topics:
+        eventsChargedInAdvance: events_charged_in_advance
+        eventsDeadLetter: events_dead_letter
+        eventsEnriched: events_enriched
+        eventsEnrichedExpanded: events_enriched_expanded
+        eventsRaw: events_raw
+        activityLogs: activity_logs
+        apiLogs: api_logs
+
 
 encryption:
   # The following fields are required:
@@ -176,6 +209,38 @@ worker:
     periodSeconds: 10
     timeoutSeconds: 1
     failureThreshold: 3
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
+
+
+eventsConsumer:
+  databasePool: 10
+  rails:
+    env: "production"
+    logStdout: true
+    logLevel: error
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: "1100m"
+  podAnnotations: {}
+  podLabels: {}
+  extraEnv: {}
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
+
+eventsProcessor:
+  databasePool: 10
+  env: "production"
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: "1100m"
+  podAnnotations: {}
+  podLabels: {}
+  extraEnv: {}
   tolerations: []
   nodeSelector: {}
   affinity: {}
@@ -410,7 +475,14 @@ job:
     podAnnotations: {}
     podLabels: {}
     resources: {}
+    extraEnv: {}
     loadSchema: false
+  topics:
+    resources: {}
+    extraEnv: {}
+    podAnnotations: {}
+    podLabels: {}
+
 
 minio:
   enabled: false
