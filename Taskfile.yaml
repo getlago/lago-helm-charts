@@ -35,7 +35,6 @@ tasks:
         msg: "❌ chart-testing not found (see: https://github.com/helm/chart-testing)"
     cmds:
       - task: kind:up
-      - kubectl create namespace lago
       - kubectl apply -f charts/lago/ci/postgres.yml
       - kubectl apply -f charts/lago/ci/redis.yml
-      - ct install --config ct.yaml --namespace lago
+      - ct install --config ct.yaml --namespace default
