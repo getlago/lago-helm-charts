@@ -1,9 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ include "migrateJobName" . }}"
-  labels:
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  name: {{ .Release.Name }}-migrate-db
   annotations:
     helm.sh/hook: pre-install,pre-upgrade
     helm.sh/hook-weight: "-1"
@@ -11,11 +9,7 @@ metadata:
 spec:
   template:
     metadata:
-      name: "{{ include "migrateJobName" . }}"
       labels:
-        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
-        app.kubernetes.io/instance: {{ .Release.Name | quote }}
-        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         {{- range $key, $value := .Values.job.migrate.podLabels }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
@@ -74,8 +68,21 @@ spec:
                 secretKeyRef:
                   name: {{ include "encryption-secret-path" . }}
                   key: encryptionPrimaryKey
+            {{ if .Values.global.clickhouse.enabled }}
+            {{- include "kafkaEnvs" . | nindent 12 }}
+            {{- include "clickhouseEnvs" . | nindent 12 }}
+            - name: LAGO_CLICKHOUSE_MIGRATIONS_ENABLED
+              value: "true"
+            - name: LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP
+              value: clickhouse
+            {{ end }}
+            {{- with .Values.job.migrate.extraEnv }}
+            {{- range $key, $value := . }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}
           {{- with .Values.job.migrate.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      serviceAccountName: {{ .Values.global.serviceAccountName | default (printf "%s-serviceaccount" .Release.Name) }}

@@ -237,6 +237,10 @@ spec:
                   name: {{ .Release.Name }}-secrets
                   key: newRelicKey
             {{ end }}
+            {{ if .Values.global.clickhouse.enabled }}
+            {{- include "kafkaEnvs" . | nindent 12 }}
+            {{- include "clickhouseEnvs" . | nindent 12 }}
+            {{ end }}
           image: getlago/api:v{{ .Values.version }}
           name: {{ .Release.Name }}-api
           ports:

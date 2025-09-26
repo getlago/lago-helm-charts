@@ -38,3 +38,20 @@ tasks:
       - kubectl apply -f charts/lago/ci/postgres.yml
       - kubectl apply -f charts/lago/ci/redis.yml
       - ct install --config ct.yaml --namespace default
+
+  render:
+    cmd: >
+      helm template lago ./charts/lago
+      --set apiUrl=http://localhost:3000
+      --set frontUrl=http://localhost:3000
+      --set global.databaseUrl=postgres://postgres:postgres@localhost:5432/postgres
+      --set global.redisUrl=redis://localhost:6379
+      {{join " " .CLI_ARGS_LIST}}
+
+  render:clickhouse:
+    cmds:
+      - task: render
+        vars:
+          CLI_ARGS_LIST: >
+            --set global.clickhouse.enabled=true {{.CLI_ARGS}}
+            --set global.clickhouse.kafka.bootstrapServers[0]=kafka-server:9092
