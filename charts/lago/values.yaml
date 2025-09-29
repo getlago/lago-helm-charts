@@ -10,166 +10,345 @@ apiUrl: ""   # Example: https://api.mydomain.dev
 frontUrl: ""   # Example: https://app.mydomain.dev
 
 global:
-  # Define your Lago Premium License
-  # license:
+  # -- **[required]** Define your Lago Premium License
+  # @section -- Global
+  license:
 
-  # If you use a managed PG instance
-  # Should respect this format postgresql://USER:PASSWORD@HOST:PORT/DATABASE_NAME
-  # databaseUrl:
+  # -- PostgreSQL connection string,
+  # <br>should follow this format: postgresql://USER:PASSWORD@HOST:PORT/DB
+  # @section -- Global
+  databaseUrl:
 
-  # Should respect standard redis URL format redis://..., redis+sentinel://...
-  # redisUrl:
-  # redisCacheUrl:
+  # -- Redis connection string,
+  # <br>should follow this format: redis://..., or redis+sentinel://...
+  # @section -- Global
+  redisUrl:
 
-  # If you wish to provide an existing secret with credentials in, then you can do so here.
-  # The following fields are required:
-  #  - databaseUrl: <SEE FORMAT ABOVE>
-  #  - redisUrl:
-  #  - awsS3AccessKeyId:
-  #  - awsS3SecretAccessKey:
-  #  - smtpUsername:
-  #  - smtpPassword:
-  #  - googleAuthClientId:
-  #  - googleAuthClientSecret:
-  # existingSecret: "lago-credentials"
+  # -- Redis cache connection string,
+  # <br>should follow this format: redis://..., or redis+sentinel://...
+  # @section -- Global
+  redisCacheUrl:
 
-  # You can disable segment tracking for Lago's internal purpose
+  # -- If you wish to provide an existing secret with credentials in, then you can set its name here.
+  # <br> The following fields are required:
+  # `databaseUrl`,
+  # `redisUrl`,
+  # `awsS3AccessKeyId`,
+  # `awsS3SecretAccessKey`,
+  # `smtpUsername`,
+  # `smtpPassword`,
+  # `googleAuthClientId`,
+  # `googleAuthClientSecret`,
+  # @section -- Global
+  existingSecret: ""
+
   segment:
+    # -- You can disable segment (https://segment.com/) tracking for Lago's internal purpose
+    # @section -- Global
     enabled: true
+
+  # S3 configuration
+  # `accessKeyId` and `secretAccessKey` are not required here if using `existingSecret`
   s3:
+    # -- AWS S3 bucket enabled
+    # @section -- Global
     enabled: false
-    # accessKeyId and secretAccessKey are not required here if using existingSecret
-    # accessKeyId: "<your-aws-access-key>"
-    # secretAccessKey: "<your-aws-secret-key>"
-    # bucket: "<your-aws-bucket>"
-    # region: "<your-aws-region>"
-    # endpoint: "https://s3.<region>.amazonaws.com" # Leave empty for default AWS S3 endpoint
+    # -- Access key ID for the AWS S3 bucket (not required here if using `existingSecret`)
+    # @section -- Global
+    accessKeyId: ""
+    # -- Secret access key for the AWS S3 bucket (not required here if using `existingSecret`)
+    # @section -- Global
+    secretAccessKey: ""
+    # -- Name of the AWS S3 bucket
+    # @section -- Global
+    bucket: ""
+    # -- Region of the AWS S3 bucket
+    # @section -- Global
+    region: ""
+    # -- Alternate endpoint for the AWS S3 bucket
+    # <br>Leave empty for default AWS S3 endpoint
+    # Example: "https://s3.<region>.amazonaws.com"
+    # @section -- Global
+    endpoint: ""
 
+  # SMTP configuration
+  # `username` and `password` are not required here if using `existingSecret`
   smtp:
-    # username and password are not required here if using existingSecret
+    # -- SMTP enabled
+    # @section -- Global
     enabled: false
-    # address:
-    # username:
-    # password:
-    # port:
-    # fromEmail:
+    # -- SMTP server address
+    # @section -- Global
+    address:
+    # -- SMTP server username (not required here if using `existingSecret`)
+    # @section -- Global
+    username:
+    # -- SMTP server password (not required here if using `existingSecret`)
+    # @section -- Global
+    password:
+    # -- SMTP server port
+    # @section -- Global
+    port:
+    # -- SMTP from email
+    # @section -- Global
+    fromEmail:
+
+  # New Relic configuration
+  # `key` is not required here if using `existingSecret`
   newRelic:
+    # -- New Relic enabled
+    # @section -- Global
     enabled: false
-    # key:
+    # -- New Relic license key (not required here if using `existingSecret`)
+    # @section -- Global
+    key: ""
 
-  # You can disable Lago's signup
+  # Signup configuration
   signup:
+    # -- You can disable Lago's signup
+    # @section -- Global
     enabled: true
 
-  # You can disable Lago's pdf generation
+  # PDF generation configuration
   pdf:
+    # -- PDF generation enabled
+    # @section -- Global
     enabled: true
 
+  # Google authentication configuration
+  # `clientId` and `clientSecret` are not required here if using `existingSecret`
   googleAuth:
-    # clientId and clientSecret are not required here if using existingSecret
+    # -- Google authentication enabled
+    # @section -- Global
     enabled: false
-    # clientId:
-    # clientSecret:
+    # -- Google client ID (not required here if using `existingSecret`)
+    # @section -- Global
+    clientId: ""
+    # -- Google client secret (not required here if using `existingSecret`)
+    # @section -- Global
+    clientSecret: ""
 
+  # Ingress configuration
   ingress:
+    # -- Ingress enabled
+    # @section -- Global
     enabled: false
+    # -- Front hostname
+    # @section -- Global
     frontHostname:
+    # -- API hostname
+    # @section -- Global
     apiHostname:
+    # -- Ingress class name
+    # @section -- Global
     className: nginx
+    # -- Ingress annotations
+    # @section -- Global
     annotations: {}
 
+  # Network policy configuration
   networkPolicy:
+    # -- Network policy enabled
+    # @section -- Global
     enabled: false
+    # -- Network policy egress
+    # @section -- Global
     egress: []
+    # -- Network policy ingress
+    # @section -- Global
     ingress: []
 
   kubectl:
+    # -- Kubectl image registry
+    # @section -- Global
     imageRegistry: docker.io
+    # -- Kubectl image repository
+    # @section -- Global
     imageRepository: rancher/kubectl
+    # -- Kubectl image tag
+    # @section -- Global
     # If imageTag is not supplied it will be inferred using the version of the cluster that Lago is deployed on.
-    # imageTag: 1.29.0
+    imageTag:
 
+
+  # Clickhouse feature configuration
   clickhouse:
+    # -- Clickhouse enabled, this will enable the event based features
+    # @section -- Global
     enabled: false
+    # -- Clickhouse port
+    # @section -- Global
     port: 9000
+    # -- Clickhouse host
+    # @section -- Global
     host: clickhouse
+    # -- Clickhouse SSL enabled
+    # @section -- Global
     ssl: true
-    # username and password are not required here if using existingSecret
+    # -- Clickhouse username (not required here if using existingSecret)
+    # @section -- Global
     username: ""
+    # -- Clickhouse password (not required here if using existingSecret)
+    # @section -- Global
     password: ""
+
     kafka:
-      # username and password are not required here if using existingSecret
-      # username:
-      # password:
+      # -- Clickhouse Kafka username (not required here if using `existingSecret`)
+      # @section -- Global
+      username:
+      # -- Clickhouse Kafka password (not required here if using `existingSecret`)
+      # @section -- Global
+      password:
+      # -- Clickhouse Kafka TLS enabled
+      # @section -- Global
       tls: true
+      # -- Clickhouse Kafka SASL mechanisms (if TLS is enabled this is required)
+      # @section -- Global
       saslMechanisms: SCRAM-SHA-512
+      # -- Clickhouse Kafka security protocol (if TLS is enabled this is required)
+      # @section -- Global
       securityProtocol: SASL_SSL
+      # -- Clickhouse Kafka consumer group
+      # @section -- Global
       consumerGroup: events_consumer
-      # you must provide a list of Kafka servers if clickhouse is enabled
-      # bootstrapServers:
-      #   - "kafka-server:9092"
+      # -- Clickhouse Kafka bootstrap servers (**required** if clickhouse is enabled)
+      # @section -- Global
+      bootstrapServers: [
+        # - "kafka-server:9092"
+      ]
+      # -- List of Kafka topics, this is
+      # @default -- Do not set this as it is internally used by the helm chart
+      # @section -- Global
       topics:
+        # @ignored
         eventsChargedInAdvance: events_charged_in_advance
+        # @ignored
         eventsDeadLetter: events_dead_letter
+        # @ignored
         eventsEnriched: events_enriched
+        # @ignored
         eventsEnrichedExpanded: events_enriched_expanded
+        # @ignored
         eventsRaw: events_raw
+        # @ignored
         activityLogs: activity_logs
+        # @ignored
         apiLogs: api_logs
 
 
+# Encryption configuration
 encryption:
-  # The following fields are required:
-  #  - encryptionPrimaryKey:
-  #  - encryptionDeterministicKey:
-  #  - encryptionKeyDerivationSalt:
+  # -- To use your own encryption keys, you can specify an existing secret containing them.
+  # The following fields are required: encryptionPrimaryKey, encryptionDeterministicKey, encryptionKeyDerivationSalt
   existingSecret:
 
-  # serviceAccountName:
 
+# -- The name of the service account to use.
+# If not set a name is generated using the release name
+serviceAccountName:
+
+# Front service configuration
 front:
+  # -- Front deployment replicas
+  # @section -- Front
   replicas: 1
+  # Front service configuration
   service:
+    # -- Front service port
+    # @section -- Front
     port: 80
+  # -- Front deployment resources allocation
+  # @section -- Front
   resources:
     requests:
       memory: 512Mi
       cpu: "200m"
+  # -- This is for setting Kubernetes Annotations to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  # @section -- Front
   podAnnotations: {}
+  # -- This is for setting Kubernetes Labels to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  # @section -- Front
   podLabels: {}
+  # -- Front deployment extra environment variables
+  # @section -- Front
   extraEnv: {}
+  # -- Front deployment node tolerations
+  # @section -- Front
   tolerations: []
+  # -- Front deployment node selector
+  # @section -- Front
   nodeSelector: {}
+  # -- Front deployment node/pod affinity
+  # @section -- Front
   affinity: {}
 
+# API service configuration
 api:
+  # -- API deployment replicas
+  # @section -- API
   replicas: 1
+  # API service configuration
   service:
+    # -- API service port
+    # @section -- API
     port: 3000
+  # API service is a rails application, this is its specific configuration
   rails:
+    # -- API rails max threads
+    # @section -- API
     maxThreads: 10
+    # -- API rails web concurrency
+    # @section -- API
     webConcurrency: 4
+    # -- API rails environment
+    # @section -- API
     env: "production"
+    # -- API rails log stdout
+    # @section -- API
     logStdout: true
+    # -- API rails log level
+    # @section -- API
     logLevel: error
   sidekiqWeb:
+    # -- API sidekiq web enabled
+    # @section -- API
     enabled: true
+  # -- API deployment resources allocation
+  # @section -- API
   resources:
     requests:
       memory: 1Gi
       cpu: "1000m"
+  # API deployment autoscaling configuration
   autoscaling:
+    # -- API deployment autoscaling enabled
+    # @section -- API
     enabled: false
+    # -- API deployment autoscaling min replicas
+    # @section -- API
     minReplicas: 1
+    # -- API deployment autoscaling max replicas
+    # @section -- API
     maxReplicas: 3
+    # -- API deployment autoscaling target CPU utilization percentage
+    # @section -- API
     targetCPUUtilizationPercentage: 80
+  # API deployment volumes configuration
   volumes:
+    # -- API deployment volumes storage class name
+    # @section -- API
     storageClassName: ""
+    # -- API deployment volumes access modes
+    # @section -- API
     accessModes: ReadWriteOnce
+    # -- API deployment volumes storage
+    # @section -- API
     storage: "10Gi"
-  extraEnv: {}
-  podAnnotations: {}
-  podLabels: {}
+  # -- API deployment liveness probe configuration
+  # @section -- API
+  # @default -- Default configuration is matching what's defined above. If you want to use a different configuration, you can override it here.
   livenessProbe:
     enabled: true
     httpPath: /health
@@ -178,29 +357,69 @@ api:
     periodSeconds: 10
     timeoutSeconds: 1
     failureThreshold: 3
+  # -- This is for setting Kubernetes Annotations to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  # @section -- API
+  podAnnotations: {}
+  # -- This is for setting Kubernetes Labels to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  # @section -- API
+  podLabels: {}
+  # -- API deployment extra environment variables
+  # @section -- API
+  extraEnv: {}
+  # -- API deployment node tolerations
+  # @section -- API
   tolerations: []
+  # -- API deployment node selector
+  # @section -- API
   nodeSelector: {}
+  # -- API deployment node/pod affinity
+  # @section -- API
   affinity: {}
 
+# Worker service configuration
 worker:
+  # -- Worker deployment replicas
+  # @section -- Worker
   replicas: 1
+  # Worker service is a rails application, this is its specific configuration
   rails:
+    # -- Worker rails sidekiq concurrency
+    # @section -- Worker
     sidekiqConcurrency: 20
+    # -- Worker rails environment
+    # @section -- Worker
     env: "production"
+    # -- Worker rails log stdout
+    # @section -- Worker
     logStdout: true
+    # -- Worker rails log level
+    # @section -- Worker
     logLevel: error
+  # -- Worker deployment resources allocation
+  # @section -- Worker
   resources:
     requests:
       memory: 1Gi
       cpu: "1100m"
+  # Worker deployment autoscaling configuration
   autoscaling:
+    # -- Worker deployment autoscaling enabled
+    # @section -- Worker
     enabled: false
+    # -- Worker deployment autoscaling min replicas
+    # @section -- Worker
     minReplicas: 1
+    # -- Worker deployment autoscaling max replicas
+    # @section -- Worker
     maxReplicas: 3
+    # -- Worker deployment autoscaling target CPU utilization percentage
+    # @section -- Worker
     targetCPUUtilizationPercentage: 80
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
+  # -- Worker deployment liveness probe configuration
+  # @section -- Worker
+  # @default -- Default configuration is matching what's defined above. If you want to use a different configuration, you can override it here.
   livenessProbe:
     enabled: true
     httpPath: /
@@ -209,57 +428,145 @@ worker:
     periodSeconds: 10
     timeoutSeconds: 1
     failureThreshold: 3
+  # -- This is for setting Kubernetes Annotations to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  # @section -- Worker
+  podAnnotations: {}
+  # -- This is for setting Kubernetes Labels to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  # @section -- Worker
+  podLabels: {}
+  # -- Worker deployment extra environment variables
+  # @section -- Worker
+  extraEnv: {}
+  # -- Worker deployment node tolerations
+  # @section -- Worker
   tolerations: []
+  # -- Worker deployment node selector
+  # @section -- Worker
   nodeSelector: {}
+  # -- Worker deployment node/pod affinity
+  # @section -- Worker
   affinity: {}
 
 
+# Events consumer service configuration
 eventsConsumer:
+  # -- Events consumer database pool
+  # @section -- Events consumer
   databasePool: 10
+  # Events consumer is a rails application, this is its specific configuration
   rails:
+    # -- Events consumer rails environment
+    # @section -- Events consumer
     env: "production"
+    # -- Events consumer rails log stdout
+    # @section -- Events consumer
     logStdout: true
+    # -- Events consumer rails log level
+    # @section -- Events consumer
     logLevel: error
+  # -- Events consumer deployment resources allocation
+  # @section -- Events consumer
   resources:
     requests:
       memory: 1Gi
       cpu: "1100m"
+  # -- This is for setting Kubernetes Annotations to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  # @section -- Events consumer
   podAnnotations: {}
+  # -- This is for setting Kubernetes Labels to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  # @section -- Events consumer
   podLabels: {}
+  # -- Events consumer deployment extra environment variables
+  # @section -- Events consumer
   extraEnv: {}
+  # -- Events consumer deployment node tolerations
+  # @section -- Events consumer
   tolerations: []
+  # -- Events consumer deployment node selector
+  # @section -- Events consumer
   nodeSelector: {}
+  # -- Events consumer deployment node/pod affinity
+  # @section -- Events consumer
   affinity: {}
 
+# Events processor service configuration
 eventsProcessor:
+  # -- Events processor database pool
+  # @section -- Events processor
   databasePool: 10
-  env: "production"
+  # Events processor is a rails application, this is its specific configuration
+  rails:
+    # -- Events processor rails environment
+    # @section -- Events processor
+    env: "production"
+    # -- Events processor rails log stdout
+    # @section -- Events processor
+    logStdout: true
+    # -- Events processor rails log level
+    # @section -- Events processor
+    logLevel: error
+  # -- Events processor deployment resources allocation
+  # @section -- Events processor
   resources:
     requests:
       memory: 1Gi
       cpu: "1100m"
+  # -- This is for setting Kubernetes Annotations to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  # @section -- Events processor
   podAnnotations: {}
+  # -- This is for setting Kubernetes Labels to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  # @section -- Events processor
   podLabels: {}
+  # -- Events processor deployment extra environment variables
+  # @section -- Events processor
   extraEnv: {}
+  # -- Events processor deployment node tolerations
+  # @section -- Events processor
   tolerations: []
+  # -- Events processor deployment node selector
+  # @section -- Events processor
   nodeSelector: {}
+  # -- Events processor deployment node/pod affinity
+  # @section -- Events processor
   affinity: {}
 
+# Events worker service configuration
 eventsWorker:
+  # -- Events worker enabled
+  # @section -- Events worker
   enabled: true
+  # -- Events worker replicas
+  # @section -- Events worker
   replicas: 1
+  # Events worker is a rails application, this is its specific configuration
   rails:
+    # -- Events worker rails sidekiq concurrency
+    # @section -- Events worker
     sidekiqConcurrency: 20
+    # -- Events worker rails environment
+    # @section -- Events worker
     env: "production"
+    # -- Events worker rails log stdout
+    # @section -- Events worker
     logStdout: true
+    # -- Events worker rails log level
+    # @section -- Events worker
     logLevel: error
+  # -- Events worker deployment resources allocation
+  # @section -- Events worker
   resources:
     requests:
       memory: 1Gi
       cpu: "1100m"
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
+  # -- Events worker deployment liveness probe configuration
+  # @section -- Events worker
+  # @default -- Default configuration is matching what's defined above. If you want to use a different configuration, you can override it here.
   livenessProbe:
     enabled: true
     httpPath: /
@@ -268,30 +575,73 @@ eventsWorker:
     periodSeconds: 10
     timeoutSeconds: 1
     failureThreshold: 3
+  # -- This is for setting Kubernetes Annotations to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  # @section -- Events worker
+  podAnnotations: {}
+  # -- This is for setting Kubernetes Labels to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  # @section -- Events worker
+  podLabels: {}
+  # -- Events worker deployment extra environment variables
+  # @section -- Events worker
+  extraEnv: {}
+
+  # -- Events worker deployment node tolerations
+  # @section -- Events worker
   tolerations: []
+  # -- Events worker deployment node selector
+  # @section -- Events worker
   nodeSelector: {}
+  # -- Events worker deployment node/pod affinity
+  # @section -- Events worker
   affinity: {}
 
+# Clock worker service configuration
 clockWorker:
+  # -- Clock worker enabled
+  # @section -- Clock worker
   enabled: true
+  # -- Clock worker replicas
+  # @section -- Clock worker
   replicas: 1
+  # Clock worker is a rails application, this is its specific configuration
   rails:
+    # -- Clock worker rails sidekiq concurrency
+    # @section -- Clock worker
     sidekiqConcurrency: 20
+    # -- Clock worker rails environment
+    # @section -- Clock worker
     env: "production"
+    # -- Clock worker rails log stdout
+    # @section -- Clock worker
     logStdout: true
+    # -- Clock worker rails log level
+    # @section -- Clock worker
     logLevel: error
+  # -- Clock worker deployment resources allocation
+  # @section -- Clock worker
   resources:
     requests:
       memory: 1Gi
       cpu: "1100m"
+  # Clock worker deployment autoscaling configuration
   autoscaling:
+    # -- Clock worker deployment autoscaling enabled
+    # @section -- Clock worker
     enabled: false
+    # -- Clock worker deployment autoscaling min replicas
+    # @section -- Clock worker
     minReplicas: 1
+    # -- Clock worker deployment autoscaling max replicas
+    # @section -- Clock worker
     maxReplicas: 3
+    # -- Clock worker deployment autoscaling target CPU utilization percentage
+    # @section -- Clock worker
     targetCPUUtilizationPercentage: 80
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
+  # -- Clock worker deployment liveness probe configuration
+  # @section -- Clock worker
+  # @default -- Default configuration is matching what's defined above. If you want to use a different configuration, you can override it here.
   livenessProbe:
     enabled: true
     httpPath: /
@@ -300,67 +650,163 @@ clockWorker:
     periodSeconds: 10
     timeoutSeconds: 1
     failureThreshold: 3
+  # -- This is for setting Kubernetes Annotations to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  # @section -- Clock worker
+  podAnnotations: {}
+  # -- This is for setting Kubernetes Labels to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  # @section -- Clock worker
+  podLabels: {}
+  # -- Clock worker deployment extra environment variables
+  # @section -- Clock worker
+  extraEnv: {}
+  # -- Clock worker deployment node tolerations
+  # @section -- Clock worker
   tolerations: []
+  # -- Clock worker deployment node selector
+  # @section -- Clock worker
   nodeSelector: {}
+  # -- Clock worker deployment node/pod affinity
+  # @section -- Clock worker
   affinity: {}
 
+# Clock deployment configuration
 clock:
+  # -- Clock replicas
+  # @section -- Clock
   replicas: 1
+  # Clock is a rails application, this is its specific configuration
   rails:
+    # -- Clock rails environment
+    # @section -- Clock
     env: "production"
+    # -- Clock rails log stdout
+    # @section -- Clock
     logStdout: true
+    # -- Clock rails log level
+    # @section -- Clock
     logLevel: info
+  # -- Clock deployment resources allocation
+  # @section -- Clock
   resources:
     requests:
       memory: 256Mi
       cpu: "100m"
+  # -- This is for setting Kubernetes Annotations to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  # @section -- Clock
   podAnnotations: {}
+  # -- This is for setting Kubernetes Labels to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  # @section -- Clock
   podLabels: {}
+  # -- Clock deployment extra environment variables
+  # @section -- Clock
   extraEnv: {}
+  # -- Clock deployment node tolerations
+  # @section -- Clock
   tolerations: []
+  # -- Clock deployment node selector
+  # @section -- Clock
   nodeSelector: {}
+  # -- Clock deployment node/pod affinity
+  # @section -- Clock
   affinity: {}
 
+# PDF service configuration
 pdf:
+  # -- PDF replicas
+  # @section -- PDF
   replicas: 1
   service:
+    # -- PDF service port
+    # @section -- PDF
     port: 3001
+  # -- PDF deployment resources allocation
+  # @section -- PDF
   resources:
     requests:
       memory: 2Gi
       cpu: "1000m"
   autoscaling:
+    # -- PDF deployment autoscaling enabled
+    # @section -- PDF
     enabled: false
+    # -- PDF deployment autoscaling min replicas
+    # @section -- PDF
     minReplicas: 1
+    # -- PDF deployment autoscaling max replicas
+    # @section -- PDF
     maxReplicas: 3
+    # -- PDF deployment autoscaling target CPU utilization percentage
+    # @section -- PDF
     targetCPUUtilizationPercentage: 80
+  # -- This is for setting Kubernetes Annotations to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  # @section -- PDF
   podAnnotations: {}
+  # -- This is for setting Kubernetes Labels to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  # @section -- PDF
   podLabels: {}
+  # -- PDF deployment extra environment variables
+  # @section -- PDF
   extraEnv: {}
+  # -- PDF deployment node tolerations
+  # @section -- PDF
   tolerations: []
+  # -- PDF deployment node selector
+  # @section -- PDF
   nodeSelector: {}
+  # -- PDF deployment node/pod affinity
+  # @section -- PDF
   affinity: {}
 
+
+# Billing worker deployment configuration
 billingWorker:
+  # -- Billing worker enabled
+  # @section -- Billing worker
   enabled: true
+  # -- Billing worker replicas
+  # @section -- Billing worker
   replicas: 1
   rails:
+    # -- Billing worker rails sidekiq concurrency
+    # @section -- Billing worker
     sidekiqConcurrency: 10
+    # -- Billing worker rails environment
+    # @section -- Billing worker
     env: "production"
+    # -- Billing worker rails log stdout
+    # @section -- Billing worker
     logStdout: true
+    # -- Billing worker rails log level
+    # @section -- Billing worker
     logLevel: info
+  # -- Billing worker deployment resources allocation
+  # @section -- Billing worker
   resources:
     requests:
       memory: 1Gi
       cpu: "1100m"
   autoscaling:
+    # -- Billing worker deployment autoscaling enabled
+    # @section -- Billing worker
     enabled: false
+    # -- Billing worker deployment autoscaling min replicas
+    # @section -- Billing worker
     minReplicas: 1
+    # -- Billing worker deployment autoscaling max replicas
+    # @section -- Billing worker
     maxReplicas: 3
+    # -- Billing worker deployment autoscaling target CPU utilization percentage
+    # @section -- Billing worker
     targetCPUUtilizationPercentage: 100
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
+  # -- Billing worker deployment liveness probe configuration
+  # @section -- Billing worker
+  # @default -- Default configuration is matching what's defined above. If you want to use a different configuration, you can override it here.
   livenessProbe:
     enabled: true
     httpPath: /
@@ -369,30 +815,72 @@ billingWorker:
     periodSeconds: 10
     timeoutSeconds: 1
     failureThreshold: 3
+  # -- This is for setting Kubernetes Annotations to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  # @section -- Billing worker
+  podAnnotations: {}
+  # -- This is for setting Kubernetes Labels to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  # @section -- Billing worker
+  podLabels: {}
+  # -- Billing worker deployment extra environment variables
+  # @section -- Billing worker
+  extraEnv: {}
+
+  # -- Billing worker deployment node tolerations
+  # @section -- Billing worker
   tolerations: []
+  # -- Billing worker deployment node selector
+  # @section -- Billing worker
   nodeSelector: {}
+  # -- Billing worker deployment node/pod affinity
+  # @section -- Billing worker
   affinity: {}
 
+# PDF worker deployment configuration
 pdfWorker:
+  # -- PDF worker enabled
+  # @section -- PDF worker
   enabled: true
+  # -- PDF worker replicas
+  # @section -- PDF worker
   replicas: 1
+  # PDF worker is a rails application, this is its specific configuration
   rails:
+    # -- PDF worker rails sidekiq concurrency
+    # @section -- PDF worker
     sidekiqConcurrency: 10
+    # -- PDF worker rails environment
+    # @section -- PDF worker
     env: "production"
+    # -- PDF worker rails log stdout
+    # @section -- PDF worker
     logStdout: true
+    # -- PDF worker rails log level
+    # @section -- PDF worker
     logLevel: info
+  # -- PDF worker deployment resources allocation
+  # @section -- PDF worker
   resources:
     requests:
       memory: 1Gi
       cpu: "1100m"
   autoscaling:
+    # -- PDF worker deployment autoscaling enabled
+    # @section -- PDF worker
     enabled: false
+    # -- PDF worker deployment autoscaling min replicas
+    # @section -- PDF worker
     minReplicas: 1
+    # -- PDF worker deployment autoscaling max replicas
+    # @section -- PDF worker
     maxReplicas: 3
+    # -- PDF worker deployment autoscaling target CPU utilization percentage
+    # @section -- PDF worker
     targetCPUUtilizationPercentage: 80
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
+  # -- PDF worker deployment liveness probe configuration
+  # @section -- PDF worker
+  # @default -- Default configuration is matching what's defined above. If you want to use a different configuration, you can override it here.
   livenessProbe:
     enabled: true
     httpPath: /
@@ -401,30 +889,73 @@ pdfWorker:
     periodSeconds: 10
     timeoutSeconds: 1
     failureThreshold: 3
+  # -- This is for setting Kubernetes Annotations to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  # @section -- PDF worker
+  podAnnotations: {}
+  # -- This is for setting Kubernetes Labels to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  # @section -- PDF worker
+  podLabels: {}
+  # -- PDF worker deployment extra environment variables
+  # @section -- PDF worker
+  extraEnv: {}
+  # -- PDF worker deployment node tolerations
+  # @section -- PDF worker
   tolerations: []
+  # -- PDF worker deployment node selector
+  # @section -- PDF worker
   nodeSelector: {}
+  # -- PDF worker deployment node/pod affinity
+  # @section -- PDF worker
   affinity: {}
 
+
+# Webhook worker deployment configuration
 webhookWorker:
+  # -- Webhook worker enabled
+  # @section -- Webhook worker
   enabled: true
+  # -- Webhook worker replicas
+  # @section -- Webhook worker
   replicas: 1
+  # Webhook worker is a rails application, this is its specific configuration
   rails:
+    # -- Webhook worker rails sidekiq concurrency
+    # @section -- Webhook worker
     sidekiqConcurrency: 20
+    # -- Webhook worker rails environment
+    # @section -- Webhook worker
     env: "production"
+    # -- Webhook worker rails log stdout
+    # @section -- Webhook worker
     logStdout: true
+    # -- Webhook worker rails log level
+    # @section -- Webhook worker
     logLevel: info
+  # -- Webhook worker deployment resources allocation
+  # @section -- Webhook worker
   resources:
     requests:
       memory: 1Gi
       cpu: "1100m"
+  # Webhook worker deployment autoscaling configuration
   autoscaling:
+    # -- Webhook worker deployment autoscaling enabled
+    # @section -- Webhook worker
     enabled: false
+    # -- Webhook worker deployment autoscaling min replicas
+    # @section -- Webhook worker
     minReplicas: 1
+    # -- Webhook worker deployment autoscaling max replicas
+    # @section -- Webhook worker
     maxReplicas: 3
+    # -- Webhook worker deployment autoscaling target CPU utilization percentage
+    # @section -- Webhook worker
     targetCPUUtilizationPercentage: 80
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
+  # -- Webhook worker deployment liveness probe configuration
+  # @section -- Webhook worker
+  # @default -- Default configuration is matching what's defined above. If you want to use a different configuration, you can override it here.
   livenessProbe:
     enabled: true
     httpPath: /
@@ -433,30 +964,71 @@ webhookWorker:
     periodSeconds: 10
     timeoutSeconds: 1
     failureThreshold: 3
+  # -- This is for setting Kubernetes Annotations to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  # @section -- Webhook worker
+  podAnnotations: {}
+  # -- This is for setting Kubernetes Labels to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  # @section -- Webhook worker
+  podLabels: {}
+  # -- Webhook worker deployment extra environment variables
+  # @section -- Webhook worker
+  extraEnv: {}
+  # -- Webhook worker deployment node tolerations
+  # @section -- Webhook worker
   tolerations: []
+  # -- Webhook worker deployment node selector
+  # @section -- Webhook worker
   nodeSelector: {}
+  # -- Webhook worker deployment node/pod affinity
+  # @section -- Webhook worker
   affinity: {}
 
+# Payment worker deployment configuration
 paymentWorker:
+  # -- Payment worker enabled
+  # @section -- Payment worker
   enabled: true
+  # -- Payment worker replicas
+  # @section -- Payment worker
   replicas: 1
+  # Payment worker is a rails application, this is its specific configuration
   rails:
+    # -- Payment worker rails sidekiq concurrency
+    # @section -- Payment worker
     sidekiqConcurrency: 20
+    # -- Payment worker rails environment
+    # @section -- Payment worker
     env: "production"
+    # -- Payment worker rails log stdout
+    # @section -- Payment worker
     logStdout: true
+    # -- Payment worker rails log level
+    # @section -- Payment worker
     logLevel: info
+  # -- Payment worker deployment resources allocation
+  # @section -- Payment worker
   resources:
     requests:
       memory: 1Gi
       cpu: "1100m"
   autoscaling:
+    # -- Payment worker deployment autoscaling enabled
+    # @section -- Payment worker
     enabled: false
+    # -- Payment worker deployment autoscaling min replicas
+    # @section -- Payment worker
     minReplicas: 1
+    # -- Payment worker deployment autoscaling max replicas
+    # @section -- Payment worker
     maxReplicas: 3
+    # -- Payment worker deployment autoscaling target CPU utilization percentage
+    # @section -- Payment worker
     targetCPUUtilizationPercentage: 80
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
+  # -- Payment worker deployment liveness probe configuration
+  # @section -- Payment worker
+  # @default -- Default configuration is matching what's defined above. If you want to use a different configuration, you can override it here.
   livenessProbe:
     enabled: true
     httpPath: /
@@ -465,31 +1037,82 @@ paymentWorker:
     periodSeconds: 10
     timeoutSeconds: 1
     failureThreshold: 3
+  # -- This is for setting Kubernetes Annotations to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  # @section -- Payment worker
+  podAnnotations: {}
+  # -- This is for setting Kubernetes Labels to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  # @section -- Payment worker
+  podLabels: {}
+  # -- Payment worker deployment extra environment variables
+  # @section -- Payment worker
+  extraEnv: {}
+
+  # -- Payment worker deployment node tolerations
+  # @section -- Payment worker
   tolerations: []
+  # -- Payment worker deployment node selector
+  # @section -- Payment worker
   nodeSelector: {}
+  # -- Payment worker deployment node/pod affinity
+  # @section -- Payment worker
   affinity: {}
 
+# Jobs configuration, this is usually helm hooks triggered at installation or upgrade
 job:
   migrate:
+    # -- Jobs migrate name override
+    # @section -- Jobs
     nameOverride: null
+    # -- Jobs migrate pod annotations
+    # @section -- Jobs
     podAnnotations: {}
+    # -- Jobs migrate pod labels
+    # @section -- Jobs
     podLabels: {}
+    # -- Jobs migrate resources
+    # @section -- Jobs
     resources: {}
+    # -- Jobs migrate extra environment variables
+    # @section -- Jobs
     extraEnv: {}
+    # -- Jobs migrate load schema
+    # @section -- Jobs
     loadSchema: false
   topics:
+    # -- Jobs topics resources
+    # @section -- Jobs
     resources: {}
+    # -- Jobs topics extra environment variables
+    # @section -- Jobs
     extraEnv: {}
+    # -- Jobs topics pod annotations
+    # @section -- Jobs
     podAnnotations: {}
+    # -- Jobs topics pod labels
+    # @section -- Jobs
     podLabels: {}
 
-
+# Minio configuration
 minio:
+  # -- Minio enabled, this is usually deployed to serve as a S3 compatible storage for Lago
+  # @section -- Minio
   enabled: false
+  # -- Minio replicas
+  # @section -- Minio
   replicas: 1
+  # -- Minio fullname override
+  # @section -- Minio
   fullnameOverride: lago-minio
+  # -- Minio endpoint
+  # @section -- Minio
   endpoint: "http://minio.lago.dev"
+  # -- Minio name override
+  # @section -- Minio
   nameOverride: "minio"
+  # -- Minio resources
+  # @section -- Minio
   resources:
     requests:
       memory: "512Mi"
@@ -497,18 +1120,36 @@ minio:
     limits:
       memory: "1Gi"
       cpu: "1"
+  # -- Minio persistence
+  # @section -- Minio
   persistence:
     size: 10Gi
   ingress:
+    # -- Minio ingress enabled
+    # @section -- Minio
     enabled: false
+    # -- Minio ingress class name
+    # @section -- Minio
     ingressClassName: nginx
+    # -- Minio ingress labels
+    # @section -- Minio
     labels: {}
+    # -- Minio ingress annotations
+    # @section -- Minio
     annotations: {}
+    # -- Minio ingress path
+    # @section -- Minio
     path: /
+    # -- Minio ingress hosts
+    # @section -- Minio
     hosts:
       - minio.lago.dev
+    # -- Minio ingress tls
+    # @section -- Minio
     tls: []
   buckets:
+    # -- Minio lago bucket
+    # @section -- Minio
     - name: lago
       policy: none
       purge: false
