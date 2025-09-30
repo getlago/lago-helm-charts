@@ -3,19 +3,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.lago.service: {{ .Release.Name }}-payment-worker
+    {{ include "lago.payment-worker.labels" . | nindent 4 }}
   name: {{ .Release.Name }}-payment-worker
 spec:
   replicas: {{ .Values.paymentWorker.replicas }}
   selector:
     matchLabels:
-      io.lago.service: {{ .Release.Name }}-payment-worker
+      {{ include "lago.payment-worker.selectorLabels" . | nindent 6 }}
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        io.lago.service: {{ .Release.Name }}-payment-worker
+        {{ include "lago.payment-worker.labels" . | nindent 8 }}
         {{- range $key, $value := .Values.paymentWorker.podLabels }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}

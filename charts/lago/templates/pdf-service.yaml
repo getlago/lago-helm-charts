@@ -3,7 +3,7 @@ kind: Service
 metadata:
   annotations:
   labels:
-    io.lago.service: {{ .Release.Name }}-pdf
+    {{ include "lago.pdf.labels" . | nindent 4 }}
   name: {{ .Release.Name}}-pdf-svc
 spec:
   ports:
@@ -11,4 +11,4 @@ spec:
       port: {{ .Values.pdf.service.port }}
       targetPort: 3000
   selector:
-    io.lago.service: {{ .Release.Name }}-pdf
+    {{ include "lago.pdf.selectorLabels" . | nindent 4 }}

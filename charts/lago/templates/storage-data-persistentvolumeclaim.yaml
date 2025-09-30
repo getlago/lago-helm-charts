@@ -3,7 +3,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
-    io.lago.service: {{ .Release.Name }}-storage-data
+    {{ include "lago.storage.labels" . | nindent 4 }}
   name: {{ .Release.Name }}-storage-data
 spec:
   {{- if .Values.api.volumes.storageClassName }}

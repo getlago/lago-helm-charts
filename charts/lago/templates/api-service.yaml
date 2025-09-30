@@ -3,7 +3,7 @@ kind: Service
 metadata:
   annotations:
   labels:
-    io.lago.service: {{ .Release.Name }}-api
+    {{ include "lago.api.labels" . | nindent 4 }}
   name: {{.Release.Name}}-api-svc
 spec:
   ports:
@@ -11,4 +11,4 @@ spec:
       port: {{ .Values.api.service.port }}
       targetPort: 3000
   selector:
-    io.lago.service: {{ .Release.Name }}-api
+    {{ include "lago.api.selectorLabels" . | nindent 4 }}

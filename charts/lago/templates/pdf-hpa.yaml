@@ -5,7 +5,7 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: {{ .Release.Name }}-pdf
   labels:
-    io.lago.service: {{ .Release.Name }}-pdf
+    {{ include "lago.pdf.labels" . | nindent 4 }}
 
 spec:
   scaleTargetRef:

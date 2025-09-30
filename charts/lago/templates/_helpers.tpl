@@ -1,3 +1,19 @@
+{{/*
+Expand the name of the chart.
+*/}}
+{{- define "lago.name" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+create chart name and version as used by the chart label.
+*/}}
+{{- define "lago.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+
+
 {{- define "secret-path" }}
 {{- if .Values.global.existingSecret -}}
 {{ .Values.global.existingSecret }}

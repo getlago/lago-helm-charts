@@ -2,20 +2,20 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.lago.service: {{ .Release.Name }}-pdf
+    {{ include "lago.pdf.labels" . | nindent 4 }}
   name: {{ .Release.Name }}-pdf
 
 spec:
   replicas: {{ .Values.pdf.replicas }}
   selector:
     matchLabels:
-      io.lago.service: {{ .Release.Name }}-pdf
+      {{ include "lago.pdf.selectorLabels" . | nindent 6 }}
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        io.lago.service: {{ .Release.Name }}-pdf
+        {{ include "lago.pdf.labels" . | nindent 8 }}
         {{- range $key, $value := .Values.pdf.podLabels }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
