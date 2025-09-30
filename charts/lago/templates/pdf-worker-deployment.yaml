@@ -16,13 +16,13 @@ spec:
     metadata:
       labels:
         io.lago.service: {{ .Release.Name }}-pdf-worker
-        {{- range $key, $value := .Values.pdfWorker.podLabels }}
-        {{ $key }}: {{ $value | quote }}
+        {{- with .Values.pdfWorker.podLabels }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- with .Values.pdfWorker.podAnnotations }}
       annotations:
-        {{- range $key, $value := .Values.pdfWorker.podAnnotations }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       {{- with .Values.pdfWorker.tolerations }}
       tolerations:

@@ -16,13 +16,13 @@ spec:
     metadata:
       labels:
         io.lago.service: {{ .Release.Name }}-billing-worker
-        {{- range $key, $value := .Values.billingWorker.podLabels }}
-        {{ $key }}: {{ $value | quote }}
+        {{- with .Values.billingWorker.podLabels }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- with .Values.billingWorker.podAnnotations }}
       annotations:
-        {{- range $key, $value := .Values.billingWorker.podAnnotations }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       {{- with .Values.billingWorker.tolerations }}
       tolerations:
