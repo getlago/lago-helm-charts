@@ -8,12 +8,12 @@ spec:
   policyTypes:
   - Egress
   - Ingress
+  {{- with .Values.global.networkPolicy.egress }}
   egress:
-  {{- with .Values.global.networkPolicy }}
-  {{- toYaml .egress | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
+  {{- with .Values.global.networkPolicy.ingress }}
   ingress:
-  {{- with .Values.global.networkPolicy }}
-  {{- toYaml .ingress | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}

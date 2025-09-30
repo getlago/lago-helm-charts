@@ -15,13 +15,13 @@ spec:
     metadata:
       labels:
         io.lago.service: {{ .Release.Name }}-api
-        {{- range $key, $value := .Values.api.podLabels }}
-        {{ $key }}: {{ $value | quote }}
+        {{- with .Values.api.podLabels }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- with .Values.api.podAnnotations }}
       annotations:
-        {{- range $key, $value := .Values.api.podAnnotations }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       {{- with .Values.api.tolerations }}
       tolerations:

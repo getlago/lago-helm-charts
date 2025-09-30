@@ -12,13 +12,13 @@ spec:
         app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
         app.kubernetes.io/instance: {{ .Release.Name | quote }}
         helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-        {{- range $key, $value := .Values.job.migrate.podLabels }}
-        {{ $key }}: {{ $value | quote }}
+        {{- with .Values.job.migrate.podLabels }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- with .Values.job.migrate.podAnnotations }}
       annotations:
-        {{- range $key, $value := .Values.job.migrate.podAnnotations }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       restartPolicy: Never
       containers:
