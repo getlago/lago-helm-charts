@@ -5,7 +5,7 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: {{ .Release.Name }}-billing-worker
   labels:
-    io.lago.service: {{ .Release.Name }}-billing-worker
+    {{ include "lago.billing-worker.labels" . | nindent 4 }}
 
 spec:
   scaleTargetRef:

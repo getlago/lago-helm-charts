@@ -2,6 +2,8 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ .Release.Name }}-migrate-db
+  labels:
+    {{ include "lago.migrate.labels" . | nindent 4 }}
   annotations:
     helm.sh/hook: pre-install,pre-upgrade
     helm.sh/hook-weight: "-1"
@@ -10,6 +12,7 @@ spec:
   template:
     metadata:
       labels:
+        {{ include "lago.migrate.labels" . | nindent 8 }}
         {{- range $key, $value := .Values.job.migrate.podLabels }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}

@@ -3,6 +3,8 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   annotations:
+  labels:
+    {{ include "lago.labels" . | nindent 4 }}
   name: {{ .Release.Name }}
 spec:
   policyTypes:

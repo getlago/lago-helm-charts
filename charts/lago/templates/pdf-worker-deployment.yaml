@@ -3,19 +3,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.lago.service: {{ .Release.Name }}-pdf-worker
+    {{ include "lago.pdf-worker.labels" . | nindent 4 }}
   name: {{ .Release.Name }}-pdf-worker
 spec:
   replicas: {{ .Values.pdfWorker.replicas }}
   selector:
     matchLabels:
-      io.lago.service: {{ .Release.Name }}-pdf-worker
+      {{ include "lago.pdf-worker.selectorLabels" . | nindent 6 }}
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        io.lago.service: {{ .Release.Name }}-pdf-worker
+        {{ include "lago.pdf-worker.labels" . | nindent 8 }}
         {{- range $key, $value := .Values.pdfWorker.podLabels }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}

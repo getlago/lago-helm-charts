@@ -2,19 +2,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.lago.service: {{ .Release.Name }}-api
+    {{ include "lago.api.labels" . | nindent 4 }}
   name: {{ .Release.Name }}-api
 spec:
   replicas: {{ .Values.api.replicas }}
   selector:
     matchLabels:
-      io.lago.service: {{ .Release.Name }}-api
+      {{ include "lago.api.selectorLabels" . | nindent 6 }}
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        io.lago.service: {{ .Release.Name }}-api
+        {{ include "lago.api.labels" . | nindent 8 }}
         {{- range $key, $value := .Values.api.podLabels }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}

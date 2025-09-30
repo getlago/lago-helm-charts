@@ -5,7 +5,7 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: {{ .Release.Name }}-api
   labels:
-    io.lago.service: {{ .Release.Name }}-api
+    {{ include "lago.api.labels" . | nindent 4 }}
 
 spec:
   scaleTargetRef:
