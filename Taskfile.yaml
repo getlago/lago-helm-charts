@@ -1,5 +1,15 @@
 version: 3
 
+vars:
+  VERSION: v1.32.4
+  IMAGES:
+    map:
+      postgres: postgres:15-alpine
+      redis: redis:7-alpine
+      api: getlago/api:{{.VERSION}}
+      front: getlago/front:{{.VERSION}}
+      gotenberg: getlago/lago-gotenberg:8.15
+
 tasks:
   lint:
     desc: Lint the chart
@@ -8,12 +18,48 @@ tasks:
         msg: "❌ chart-testing not found (see: https://github.com/helm/chart-testing)"
     cmd: ct lint --config ct.yaml
 
+  # https://github.com/kubernetes-sigs/kind/issues/3795
+  kind:images:apple_silicon:*_*:
+    internal: true
+    cmds:
+      - cmd: docker save --platform linux/arm64 -o {{index .MATCH 0}}.tar {{index .MATCH 1}}
+      - defer: rm -f {{index .MATCH 0}}.tar
+        silent: true
+      - cmd: kind load --name lago image-archive {{index .MATCH 0}}.tar
+
+  kind:images:*_*:
+    vars:
+      NAME: "{{index .MATCH 0}}"
+      IMAGE: "{{index .MATCH 1}}"
+    internal: true
+    cmds:
+      - docker images -q {{.IMAGE}} | grep -qv "." || docker pull {{.IMAGE}}
+      - cmd: kind load --name lago docker-image {{.IMAGE}}
+        platforms: [linux, windows, darwin/amd64]
+      - task: kind:images:apple_silicon:{{.NAME}}_{{.IMAGE}}
+        platforms: [darwin/arm64]
+
+  kind:images:
+    desc: Pull the images for the kind cluster
+    cmds:
+      - for: {var : IMAGES }
+        task: kind:images:{{.KEY}}_{{.ITEM}}
+    status:
+      - test -n "{{ .NO_LOAD }}"
+
   kind:up:
     desc: Create a kind cluster
     preconditions:
       - sh: command -v kind
         msg: "❌ kind not found"
-    cmd: kind create cluster --name lago
+    cmds:
+      - kind create cluster --name lago
+      - task: kind:images
+        vars:
+          NO_LOAD: '{{ if not .LOAD }}true{{ end }}'
+    status:
+      - kind get clusters | grep -q "lago"
+
 
   kind:down:
     desc: Delete the kind cluster
