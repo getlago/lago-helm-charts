@@ -16,13 +16,13 @@ spec:
     metadata:
       labels:
         io.lago.service: {{ .Release.Name }}-webhook-worker
-        {{- range $key, $value := .Values.webhookWorker.podLabels }}
-        {{ $key }}: {{ $value | quote }}
+        {{- with .Values.webhookWorker.podLabels }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- with .Values.webhookWorker.podAnnotations }}
       annotations:
-        {{- range $key, $value := .Values.webhookWorker.podAnnotations }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       {{- with .Values.webhookWorker.tolerations }}
       tolerations:

@@ -16,13 +16,13 @@ spec:
     metadata:
       labels:
         io.lago.service: {{ .Release.Name }}-clock-worker
-        {{- range $key, $value := .Values.clockWorker.podLabels }}
-        {{ $key }}: {{ $value | quote }}
+        {{- with .Values.clockWorker.podLabels }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- with .Values.clockWorker.podAnnotations }}
       annotations:
-        {{- range $key, $value := .Values.clockWorker.podAnnotations }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       {{- with .Values.clockWorker.tolerations }}
       tolerations:

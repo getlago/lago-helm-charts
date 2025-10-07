@@ -10,13 +10,13 @@ spec:
   template:
     metadata:
       labels:
-        {{- range $key, $value := .Values.job.migrate.podLabels }}
-        {{ $key }}: {{ $value | quote }}
+        {{- with .Values.job.migrate.podLabels }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- with .Values.job.migrate.podAnnotations }}
       annotations:
-        {{- range $key, $value := .Values.job.migrate.podAnnotations }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       restartPolicy: Never
       containers:

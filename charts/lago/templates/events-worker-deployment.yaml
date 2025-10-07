@@ -15,13 +15,13 @@ spec:
     metadata:
       labels:
         io.lago.service: {{ .Release.Name }}-events-worker
-        {{- range $key, $value := .Values.eventsWorker.podLabels }}
-        {{ $key }}: {{ $value | quote }}
+        {{- with .Values.eventsWorker.podLabels }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- with .Values.eventsWorker.podAnnotations }}
       annotations:
-        {{- range $key, $value := .Values.eventsWorker.podAnnotations }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       {{- with .Values.eventsWorker.tolerations }}
       tolerations:

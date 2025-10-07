@@ -3,12 +3,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-ingress
-  annotations:
-{{ if .Values.global.ingress.annotations }}
   {{- with .Values.global.ingress.annotations }}
-    {{- toYaml . | trim | nindent 4 }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
   {{- end }}
-{{ end }}
 spec:
   ingressClassName: {{ .Values.global.ingress.className }}
   tls:
