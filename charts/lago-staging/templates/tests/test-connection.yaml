@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "lago-staging.fullname" . }}-test-connection"
+  labels:
+    {{- include "lago-staging.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "lago-staging.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never
