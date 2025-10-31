@@ -60,3 +60,46 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create the name of the config map to use
+*/}}
+{{- define "lago-data-api.configMapName" -}}
+{{- if .Values.config.cm.create }}
+{{- default (include "lago-data-api.fullname" .) .Values.config.cm.name }}
+{{- else }}
+{{- default "default" .Values.config.cm.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the name of the secret to use
+*/}}
+{{- define "lago-data-api.secretName" -}}
+{{- if .Values.config.secret.create }}
+{{- default (include "lago-data-api.fullname" .) .Values.config.secret.name }}
+{{- else }}
+{{- default "default" .Values.config.secret.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Generate configmap entries and enforce presence
+*/}}
+{{- define "lago-data-api.config.cm" -}}
+{{- $config := omit .Values.config.cm "create" "annotations" "labels" "name" -}}
+{{- range $key, $value := $config }}
+{{ $key }}: {{ required (printf "%s value is required" $key) $value | quote }}
+{{- end}}
+{{- end -}}
+
+
+{{/*
+Generate secret entries and enforce presence
+*/}}
+{{- define "lago-data-api.config.secret" -}}
+{{- $config := omit .Values.config.secret "create" "annotations" "labels" "name" -}}
+{{- range $key, $value := $config }}
+{{ $key }}: {{ required (printf "%s value is required" $key) $value | quote }}
+{{- end}}
+{{- end -}}

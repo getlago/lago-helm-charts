@@ -20,6 +20,50 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+# Name of the container will default to chart name
+name: ""
+
+config:
+  cm:
+    # -- Create the lago-data-api configmap for [declarative setup]
+    create: true
+
+    # The name of the config map to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+    # -- Labels to be added to lago-data-api configmap
+    labels: {}
+    # -- Annotations to be added to lago-data-api configmap
+    annotations: {}
+
+    db.analytical.host:
+    db.analytical.name:
+    db.analytical.port:
+    db.analytical.schema:
+    celery.broker:
+    celery.result_backend:
+    lago.api:
+
+  secret:
+    # -- Create the lago-data-api secret for [sensitive config]
+    create: true
+
+    # The name of the secret to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+    # -- Labels to be added to lago-data-api secret
+    labels: {}
+    # -- Annotations to be added to lago-data-api secret
+    annotations: {}
+
+    analytical.db.password: ""
+    analytical.db.username: ""
+    lago.api.token: ""
+    token: ""
+
+
 # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
   # Specifies whether a service account should be created
