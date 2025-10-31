@@ -11,6 +11,10 @@ vars:
       gotenberg: getlago/lago-gotenberg:8.15
 
 tasks:
+  lago-data-api:render:
+    desc: Render the data-api chart
+    cmd: >
+      helm template lago-data-api ./charts/lago-data-api {{join " " .CLI_ARGS_LIST}}
   lint:
     desc: Lint the chart
     preconditions:
