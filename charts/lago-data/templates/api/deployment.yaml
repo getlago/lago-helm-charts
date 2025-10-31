@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "lago-data-api.fullname" . }}
+  name: {{ include "lago-data.api.fullname" . }}
   labels:
-    {{- include "lago-data-api.labels" . | nindent 4 }}
+    {{- include "lago-data.labels" (dict "context" . "component" .Values.api.name "name" .Values.api.name) | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
+  {{- if not .Values.api.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "lago-data-api.selectorLabels" . | nindent 6 }}
+      {{- include "lago-data.selectorLabels" (dict "context" . "name" .Values.api.name) | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- with .Values.api.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "lago-data-api.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
+        {{- include "lago-data.labels" (dict "context" . "component" .Values.api.name "name" .Values.api.name) | nindent 8 }}
+        {{- with .Values.api.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
@@ -27,7 +27,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "lago-data-api.serviceAccountName" . }}
+      serviceAccountName: {{ include "lago-data.api.serviceAccountName" . }}
       {{- with .Values.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -38,67 +38,67 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.api.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .Values.api.service.port }}
               protocol: TCP
           env:
             - name: ANALYTICAL_DB_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "lago-data-api.configMapName" . }}
+                  name: {{ include "lago-data.configMapName" . }}
                   key: db.analytical.host
             - name: ANALYTICAL_DB_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "lago-data-api.configMapName" . }}
+                  name: {{ include "lago-data.configMapName" . }}
                   key: db.analytical.name
             - name: ANALYTICAL_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "lago-data-api.secretName" . }}
+                  name: {{ include "lago-data.secretName" . }}
                   key: analytical.db.password
             - name: ANALYTICAL_DB_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "lago-data-api.configMapName" . }}
+                  name: {{ include "lago-data.configMapName" . }}
                   key: db.analytical.port
             - name: ANALYTICAL_DB_SCHEMA
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "lago-data-api.configMapName" . }}
+                  name: {{ include "lago-data.configMapName" . }}
                   key: db.analytical.schema
             - name: ANALYTICAL_DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "lago-data-api.secretName" . }}
+                  name: {{ include "lago-data.secretName" . }}
                   key: analytical.db.username
             - name: BEARER_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "lago-data-api.secretName" . }}
+                  name: {{ include "lago-data.secretName" . }}
                   key: token
             - name: CELERY_BROKER_URL
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "lago-data-api.configMapName" . }}
+                  name: {{ include "lago-data.configMapName" . }}
                   key: celery.broker
             - name: CELERY_RESULT_BACKEND
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "lago-data-api.configMapName" . }}
+                  name: {{ include "lago-data.configMapName" . }}
                   key: celery.result_backend
             - name: LAGO_API_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "lago-data-api.secretName" . }}
+                  name: {{ include "lago-data.secretName" . }}
                   key: lago.api.token
             - name: LAGO_RAILS_API
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "lago-data-api.configMapName" . }}
+                  name: {{ include "lago-data.configMapName" . }}
                   key: lago.api
           {{- with .Values.livenessProbe }}
           livenessProbe:
