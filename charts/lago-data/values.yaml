@@ -1,4 +1,23 @@
 config:
+  databaseAnalytical:
+    host: ""
+    name: ""
+    user: ""
+    password: ""
+    port: 5432
+    schema: analytical
+
+  celery:
+    brokerUrl: ""
+    resultBackend: ""
+
+  api:
+    token:
+
+  configMap:
+    name: lago-data-config
+
+replica-config:
   database:
     url: ""
 
@@ -25,10 +44,26 @@ config:
   configMap:
     name: lago-config
 
-lago-api:
+  extraEnv:
+    - name: LAGO_DATA_API_BEARER_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: lago-data-config
+          key: api.token
+
+api:
   fullnameOverride: lago-api
   config:
     enabled: false
 
   existingConfigMap: lago-config
   existingSecret: lago-config
+
+data-api:
+  fullnameOverride: lago-data-api
+  config:
+    api:
+      url: lago-api # this is the value of the api.fullnameOverride
+
+  existingConfigMap: lago-data-config
+  existingSecret: lago-data-config

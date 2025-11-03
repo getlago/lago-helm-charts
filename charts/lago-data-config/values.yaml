@@ -1,0 +1,44 @@
+# Default values for lago-config.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+databaseAnalytical:
+  host: ""
+  name: ""
+  user: ""
+  password: ""
+  port: 5432
+  schema: analytical
+
+celery:
+  brokerUrl: ""
+  resultBackend: ""
+
+api:
+  token:
+
+configMap:
+  # -- Create the lago-config configmap for [declarative setup]
+  create: true
+
+  # The name of the config map to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+  # -- Labels to be added to lago-config configmap
+  labels: {}
+  # -- Annotations to be added to lago-config configmap
+  annotations: {}
+
+secret:
+  # -- Create the lago-config secret for [sensitive config]
+  create: false
+
+  # The name of the secret to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+  # -- Labels to be added to lago-config secret
+  labels: {}
+  # -- Annotations to be added to lago-config secret
+  annotations: {}

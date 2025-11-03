@@ -1,0 +1,31 @@
+{{- if .Values.configMap.create }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "lago-data-config.configMapName" . }}
+  labels:
+    {{- include "lago-data-config.labels" . | nindent 4 }}
+    {{- with .Values.configMap.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.configMap.annotations }}
+  annotations:
+    {{- range $key, $value := . }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}
+data:
+  databaseAnalytical.host: {{ .Values.databaseAnalytical.host }}
+  {{- with .Values.databaseAnalytical.name }}
+  databaseAnalytical.name: {{.}}
+  {{- end }}
+  databaseAnalytical.user: {{ .Values.databaseAnalytical.user }}
+  {{- with .Values.databaseAnalytical.port }}
+  databaseAnalytical.port: {{.}}
+  {{- end }}
+  {{- with .Values.databaseAnalytical.schema }}
+  databaseAnalytical.host: {{.}}
+  {{- end }}
+  celery.brokerUrl: {{ .Values.celery.brokerUrl }}
+  celery.resultBackend: {{ .Values.celery.resultBackend }}
+{{- end }}

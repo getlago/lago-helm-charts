@@ -1,5 +1,5 @@
 apiVersion: v2
-name: lago-data
+name: lago-data-config
 description: A Helm chart for Kubernetes
 
 # A chart can be either an 'application' or a 'library' chart.
@@ -16,21 +16,3 @@ type: application
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
 version: 0.1.0
-
-dependencies:
-  - name: lago-config
-    alias: replica-config
-    version: 0.1.0
-    repository: "file://../lago-config"
-  - name: lago-data-config
-    alias: config
-    version: 0.1.0
-    repository: "file://../lago-data-config"
-  - name: lago-api
-    alias: api
-    version: 0.1.0
-    repository: "file://../lago-rails"
-  - name: lago-data-api
-    alias: data-api
-    version: 0.1.0
-    repository: "file://../lago-data-api"
