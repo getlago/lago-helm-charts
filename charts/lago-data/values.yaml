@@ -67,3 +67,19 @@ data-api:
 
   existingConfigMap: lago-data-config
   existingSecret: lago-data-config
+
+celery-exporter:
+  env:
+    - name: CE_BROKER_URL
+      valueFrom:
+        configMapKeyRef:
+          name: lago-data-config
+          key: celery.brokerUrl
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  podAnnotations:
+    prometheus.io/scrape: "true"
