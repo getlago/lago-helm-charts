@@ -60,3 +60,20 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{- define "lago-data-api.secretName" -}}
+{{- if .Values.existingSecret }}
+{{- .Values.existingSecret }}
+{{- else }}
+{{- include "lago-data-config.secretName" (dict "Chart" .Subcharts.config.Chart "Values" .Values.config "Release" .Release) }}
+{{- end }}
+{{- end }}
+
+
+{{- define "lago-data-api.configMapName" -}}
+{{- if .Values.existingConfigMap }}
+{{- .Values.existingConfigMap }}
+{{- else }}
+{{- include "lago-data-config.configMapName" (dict "Chart" .Subcharts.config.Chart "Values" .Values.config "Release" .Release) }}
+{{- end }}
+{{- end }}

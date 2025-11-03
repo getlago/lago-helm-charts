@@ -33,17 +33,68 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: {{ .Chart.Name }}
-          {{- with .Values.securityContext }}
-          securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+        - name: {{ default .Chart.Name .Values.container.name }}
+          command: {{ toJson .Values.container.command }}
+          args: {{ toJson .Values.container.args }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: {{ .Values.container.ports.http }}
               protocol: TCP
+          env:
+            - name: ANALYTICAL_DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-data-api.configMapName" . }}
+                  key: databaseAnalytical.host
+            - name: ANALYTICAL_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-data-api.configMapName" . }}
+                  key: databaseAnalytical.name
+            - name: ANALYTICAL_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-data-api.secretName" . }}
+                  key: databaseAnalytical.password
+            - name: ANALYTICAL_DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-data-api.configMapName" . }}
+                  key: databaseAnalytical.port
+            - name: ANALYTICAL_DB_SCHEMA
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-data-api.configMapName" . }}
+                  key: databaseAnalytical.schema
+            - name: ANALYTICAL_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-data-api.secretName" . }}
+                  key: databaseAnalytical.username
+            - name: BEARER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-data-api.secretName" . }}
+                  key: api.token
+            - name: CELERY_BROKER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-data-api.configMapName" . }}
+                  key: celery.broker
+            - name: CELERY_RESULT_BACKEND
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-data-api.configMapName" . }}
+                  key: celery.result_backend
+            - name: LAGO_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-data-api.secretName" . }}
+                  key: api.token
+            - name: LAGO_RAILS_API_URL
+              value: {{ required "config.api.url must be provided " .Values.config.api.url }}
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
@@ -58,6 +109,10 @@ spec:
           {{- end }}
           {{- with .Values.volumeMounts }}
           volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.securityContext }}
+          securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
       {{- with .Values.volumes }}
