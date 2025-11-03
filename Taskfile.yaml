@@ -9,12 +9,28 @@ vars:
       api: getlago/api:{{.VERSION}}
       front: getlago/front:{{.VERSION}}
       gotenberg: getlago/lago-gotenberg:8.15
+  CHARTS:
+    - lago-config
+    - lago-data-config
+    - lago-rails
+    - lago-data-api
+    - lago-data
+    - lago
 
 tasks:
-  lago-data-api:render:
-    desc: Render the data-api chart
-    cmd: >
-      helm template lago-data-api ./charts/lago-data-api {{join " " .CLI_ARGS_LIST}}
+  dependencies:update:
+    cmd:
+      for:
+        var: CHARTS
+      cmd: helm dependency update charts/{{.ITEM}}
+
+  dependencies:build:
+    deps: [dependencies:update]
+    cmd:
+      for:
+        var: CHARTS
+      cmd: helm dependency build charts/{{.ITEM}}
+
   lint:
     desc: Lint the chart
     preconditions:
