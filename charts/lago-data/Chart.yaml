@@ -34,3 +34,6 @@ dependencies:
     alias: data-api
     version: 0.1.0
     repository: "file://../lago-data-api"
+  - name: celery-exporter
+    version: 0.9.0
+    repository: https://danihodovic.github.io/celery-exporter/
