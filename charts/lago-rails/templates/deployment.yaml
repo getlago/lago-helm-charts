@@ -1,0 +1,156 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "lago-api.fullname" . }}
+  labels:
+    {{- include "lago-api.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "lago-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "lago-api.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "lago-api.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ default .Chart.Name .Values.container.name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: {{ toJson .Values.container.command }}
+          args: {{ toJson .Values.container.args }}
+          envFrom:
+            {{- with .Values.extraEnvFrom }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+            - name: RAILS_ENV
+              value: {{ .Values.config.env }}
+            - name: LAGO_LOG_LEVEL
+              value: {{ .Values.config.log.level }}
+            - name: RAILS_LOG_TO_STDOUT
+              value: {{ .Values.config.log.stdout | quote }}
+            - name: DATABASE_POOL
+              value: {{ .Values.config.database.pool }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: database.url
+            - name: ENCRYPTION_PRIMARY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: encryption.key
+            - name: ENCRYPTION_KEY_DERIVATION_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: encryption.salt
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: signing.hmac
+            - name: LAGO_RSA_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: signing.rsa
+            - name: REDIS_URL
+              valueFrom:
+                configMapRef:
+                  name: {{ include "lago-api.configMapName" . }}
+                  key: redis.url
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: redis.password
+                  optional: true
+            - name: LAGO_REDIS_CACHE_URL
+              valueFrom:
+                configMapRef:
+                  name: {{ include "lago-api.configMapName" . }}
+                  key: redisCache.url
+                  optional: true
+            - name: LAGO_REDIS_CACHE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: redisCache.password
+                  optional: true
+            - name: LAGO_REDIS_STORE_URL
+              valueFrom:
+                configMapRef:
+                  name: {{ include "lago-api.configMapName" . }}
+                  key: redisStore.url
+                  optional: true
+            - name: LAGO_REDIS_STORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: redisStore.password
+                  optional: true
+            {{- with .Values.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end}}
+          ports:
+            - name: http
+              containerPort: {{ .Values.container.ports.http }}
+              protocol: TCP
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
