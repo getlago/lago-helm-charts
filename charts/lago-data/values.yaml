@@ -68,6 +68,15 @@ data-api:
   existingConfigMap: lago-data-config
   existingSecret: lago-data-config
 
+data-worker:
+  fullnameOverride: lago-data-worker
+  config:
+    api:
+      url: lago-api
+
+  existingConfigMap: lago-data-config
+  existingSecret: lago-data-config
+
 celery-exporter:
   env:
     - name: CE_BROKER_URL
