@@ -82,12 +82,12 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "lago-data-api.configMapName" . }}
-                  key: celery.broker
+                  key: celery.brokerUrl
             - name: CELERY_RESULT_BACKEND
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "lago-data-api.configMapName" . }}
-                  key: celery.result_backend
+                  key: celery.resultBackend
             - name: LAGO_API_TOKEN
               valueFrom:
                 secretKeyRef:
