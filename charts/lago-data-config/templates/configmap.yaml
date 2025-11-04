@@ -17,14 +17,14 @@ metadata:
 data:
   databaseAnalytical.host: {{ .Values.databaseAnalytical.host }}
   {{- with .Values.databaseAnalytical.name }}
-  databaseAnalytical.name: {{.}}
+  databaseAnalytical.name: {{ . }}
   {{- end }}
   databaseAnalytical.user: {{ .Values.databaseAnalytical.user }}
   {{- with .Values.databaseAnalytical.port }}
-  databaseAnalytical.port: {{.}}
+  databaseAnalytical.port: {{ quote . }}
   {{- end }}
   {{- with .Values.databaseAnalytical.schema }}
-  databaseAnalytical.host: {{.}}
+  databaseAnalytical.host: {{ . }}
   {{- end }}
   celery.brokerUrl: {{ .Values.celery.brokerUrl }}
   celery.resultBackend: {{ .Values.celery.resultBackend }}
