@@ -19,9 +19,9 @@ data:
   redis.url: {{.}}
   {{- end }}
   {{- with .Values.redisCache.url }}
-  redis.cache: {{.}}
+  redisCache.url: {{.}}
   {{- end }}
   {{- with .Values.redisStore.url }}
-  redis.cache: {{.}}
+  redisStore.url: {{.}}
   {{- end }}
 {{- end }}
