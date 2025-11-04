@@ -24,7 +24,7 @@ data:
   databaseAnalytical.port: {{ quote . }}
   {{- end }}
   {{- with .Values.databaseAnalytical.schema }}
-  databaseAnalytical.host: {{ . }}
+  databaseAnalytical.schema: {{ . }}
   {{- end }}
   celery.brokerUrl: {{ .Values.celery.brokerUrl }}
   celery.resultBackend: {{ .Values.celery.resultBackend }}
