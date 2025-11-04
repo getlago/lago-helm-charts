@@ -72,7 +72,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ include "lago-data-api.secretName" . }}
-                  key: databaseAnalytical.username
+                  key: databaseAnalytical.user
             - name: BEARER_TOKEN
               valueFrom:
                 secretKeyRef:
