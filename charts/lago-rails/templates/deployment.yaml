@@ -78,7 +78,7 @@ spec:
                   key: signing.rsa
             - name: REDIS_URL
               valueFrom:
-                configMapRef:
+                configMapKeyRef:
                   name: {{ include "lago-api.configMapName" . }}
                   key: redis.url
             - name: REDIS_PASSWORD
@@ -89,7 +89,7 @@ spec:
                   optional: true
             - name: LAGO_REDIS_CACHE_URL
               valueFrom:
-                configMapRef:
+                configMapKeyRef:
                   name: {{ include "lago-api.configMapName" . }}
                   key: redisCache.url
                   optional: true
@@ -101,7 +101,7 @@ spec:
                   optional: true
             - name: LAGO_REDIS_STORE_URL
               valueFrom:
-                configMapRef:
+                configMapKeyRef:
                   name: {{ include "lago-api.configMapName" . }}
                   key: redisStore.url
                   optional: true
