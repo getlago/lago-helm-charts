@@ -70,8 +70,8 @@ spec:
                   key: databaseAnalytical.schema
             - name: ANALYTICAL_DB_USER
               valueFrom:
-                secretKeyRef:
-                  name: {{ include "lago-data-api.secretName" . }}
+                configMapKeyRef:
+                  name: {{ include "lago-data-api.configMapName" . }}
                   key: databaseAnalytical.user
             - name: BEARER_TOKEN
               valueFrom:
