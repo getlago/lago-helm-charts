@@ -50,7 +50,7 @@ spec:
             - name: RAILS_LOG_TO_STDOUT
               value: {{ .Values.config.log.stdout | quote }}
             - name: DATABASE_POOL
-              value: {{ .Values.config.database.pool }}
+              value: {{ .Values.config.database.pool | quote }}
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
