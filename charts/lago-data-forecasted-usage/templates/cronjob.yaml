@@ -84,9 +84,9 @@ spec:
                       key: databaseAnalytical.schema
                 - name: ANALYTICAL_DB_USER
                   valueFrom:
-                    secretKeyRef:
-                      name: {{ include "lago-data-forecasted-usage.analyticalDatabaseSecretName" . }}
-                      key: databaseAnalytical.username
+                    configMapKeyRef:
+                      name: {{ include "lago-data-forecasted-usage.analyticalDatabaseConfigMapName" . }}
+                      key: databaseAnalytical.user
                 - name: AWS_ACCESS_KEY_ID
                   valueFrom:
                     secretKeyRef:
@@ -97,7 +97,7 @@ spec:
                     secretKeyRef:
                       name: {{ include "lago-data-forecasted-usage.s3SecretName" . }}
                       key: s3.secretAccessKey
-                - name: ML_CONFIG
+                - name: ML_CONFIG_YAML
                   valueFrom:
                     secretKeyRef:
                       name: {{ include "lago-data-forecasted-usage.mlSecretName" . }}

@@ -70,9 +70,9 @@ spec:
                   key: databaseAnalytical.schema
             - name: ANALYTICAL_DB_USER
               valueFrom:
-                secretKeyRef:
-                  name: {{ include "lago-data-worker.secretName" . }}
-                  key: databaseAnalytical.username
+                configMapKeyRef:
+                  name: {{ include "lago-data-worker.configMapName" . }}
+                  key: databaseAnalytical.user
             - name: BEARER_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -82,12 +82,12 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "lago-data-worker.configMapName" . }}
-                  key: celery.broker
+                  key: celery.brokerUrl
             - name: CELERY_RESULT_BACKEND
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "lago-data-worker.configMapName" . }}
-                  key: celery.result_backend
+                  key: celery.resultBackend
             - name: LAGO_API_TOKEN
               valueFrom:
                 secretKeyRef:
