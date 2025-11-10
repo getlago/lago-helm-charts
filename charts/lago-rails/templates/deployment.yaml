@@ -111,6 +111,12 @@ spec:
                   name: {{ include "lago-api.secretName" . }}
                   key: redisStore.password
                   optional: true
+            - name: LAGO_LICENSE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: lago.license
+                  optional: true
             {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end}}
