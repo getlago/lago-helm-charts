@@ -72,7 +72,7 @@ data-worker:
   fullnameOverride: lago-data-worker
   config:
     api:
-      url: lago-api
+      url: http://lago-api
 
   existingConfigMap: lago-data-config
   existingSecret: lago-data-config
