@@ -19,15 +19,15 @@ version: 0.1.0
 
 dependencies:
   - name: lago-config
-    alias: replica-config
+    alias: config
     version: 0.1.0
     repository: "file://../lago-config"
   - name: lago-data-config
-    alias: config
+    alias: data-config
     version: 0.1.0
     repository: "file://../lago-data-config"
   - name: lago-api
-    alias: replica
+    alias: api
     version: 0.1.0
     repository: "file://../lago-rails"
   - name: lago-data-api
