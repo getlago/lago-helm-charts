@@ -27,7 +27,7 @@ dependencies:
     version: 0.1.0
     repository: "file://../lago-data-config"
   - name: lago-api
-    alias: api
+    alias: replica
     version: 0.1.0
     repository: "file://../lago-rails"
   - name: lago-data-api

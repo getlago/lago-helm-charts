@@ -44,20 +44,20 @@ replica-config:
   configMap:
     name: lago-config
 
-  extraEnv:
-    - name: LAGO_DATA_API_BEARER_TOKEN
-      valueFrom:
-        secretKeyRef:
-          name: lago-data-config
-          key: api.token
-
-api:
+replica:
   fullnameOverride: lago-api
   config:
     enabled: false
 
   existingConfigMap: lago-config
   existingSecret: lago-config
+
+  extraEnv:
+    - name: LAGO_DATA_API_BEARER_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: lago-data-config
+          key: api.token
 
 data-api:
   fullnameOverride: lago-data-api
