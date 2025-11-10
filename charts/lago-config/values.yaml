@@ -25,6 +25,9 @@ redisStore:
   url: ""
   password: ""
 
+lago:
+  license: ""
+
 
 configMap:
   # -- Create the lago-config configmap for [declarative setup]
