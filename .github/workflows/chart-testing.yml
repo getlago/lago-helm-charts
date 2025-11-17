@@ -16,13 +16,8 @@ jobs:
         with:
           version: v3.18.4
 
-      - uses: actions/setup-python@v5.3.0
-        with:
-          python-version: '3.x'
-          check-latest: true
-
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.7.0
+        uses: helm/chart-testing-action@v2.8.0
 
       - name: Run chart-testing (list-changed)
         id: list-changed

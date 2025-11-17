@@ -1,0 +1,7 @@
+config:
+  mistral:
+    agentID: ag:00000000:00000000:lago-mcp-server-assistant:00000000
+    apiKey: someAPIKey
+
+  api:
+    url: api.lago.dev
