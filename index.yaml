@@ -686,4 +686,15 @@ entries:
     urls:
     - https://charts.getlago.com/artifacts/lago-1.0.0.tgz
     version: 1.0.0
-generated: "2025-10-07T07:42:57.904715361Z"
+  lago-mcp-server:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2025-11-19T08:51:14.226340746Z"
+    description: A Helm chart for Kubernetes
+    digest: 0cc20d4d68c610003d5b5c62dc54dbf60bbe6f01619f70fe4a89690045e8a0d5
+    name: lago-mcp-server
+    type: application
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/lago-mcp-server-0.1.0/lago-mcp-server-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-11-19T08:51:14.226418312Z"
