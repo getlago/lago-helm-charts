@@ -86,11 +86,13 @@ tasks:
     cmd: kind delete cluster --name lago
 
   test:unit:
-    desc: Run unit tests for the
+    desc: Run unit tests for the charts
     preconditions:
       - sh: helm unittest -h
         msg: "❌ helm unittest not found (see: https://github.com/helm-unittest/helm-unittest)"
-    cmd: helm unittest ./charts/lago
+    cmds:
+      - helm unittest ./charts/lago
+      - helm unittest ./charts/lago-app
 
   test:e2e:
     desc: Create a kind cluster and deploy the chart
