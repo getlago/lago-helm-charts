@@ -40,4 +40,7 @@ spec:
                   number: {{ $.Values.service.port }}
           {{- end }}
     {{- end }}
+    {{- with .Values.ingress.hostsRaw }}
+    {{- . | toYaml | nindent 4 }}
+    {{- end }}
 {{- end }}
