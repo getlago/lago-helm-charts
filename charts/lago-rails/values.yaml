@@ -132,8 +132,6 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
-
-
 # -- Environment variables to pass to the api container
 extraEnv: []
   # - name: "MY_VAR"
@@ -146,7 +144,6 @@ extraEnvFrom: []
   #     name: config-map-name
   # - secretRef:
   #     name: secret-name
-
 
 # This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
