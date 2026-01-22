@@ -53,7 +53,7 @@ spec:
               value: {{ .Values.config.env }}
             {{- with .Values.config.nangoKey }}
             - name: NANGO_PUBLIC_KEY
-              value: {{ .Values.config.nangoKey }}
+              value: {{ . }}
             {{- end }}
             {{- with .Values.config.signupEnabled }}
             - name: LAGO_DISABLE_SIGNUP
@@ -61,11 +61,11 @@ spec:
             {{- end}}
             {{- with .Values.config.proxyUrl }}
             - name: LAGO_OAUTH_PROXY_URL
-              value: {{ .Values.config.proxyUrl }}
+              value: {{ . }}
             {{- end}}
             {{- with .Values.config.sentryDsn }}
             - name: SENTRY_DSN
-              value: {{ .Values.config.sentryDsn }}
+              value: {{ . }}
             {{- end}}
             {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
