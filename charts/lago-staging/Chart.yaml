@@ -22,15 +22,19 @@ dependencies:
     alias: config
     version: 0.1.0
     repository: "file://../lago-config"
-  - name: lago-api
+  - name: lago-app
+    alias: app
+    version: 0.1.0
+    repository: "file://../lago-app"
+  - name: lago-rails
     alias: api
     version: 0.1.0
     repository: "file://../lago-rails"
-  # - name: lago-api
-  #   alias: worker
-  #   version: 0.1.0
-  #   repository: "file://../lago-rails"
-  # - name: lago-api
-  #   alias: clock
-  #   version: 0.1.0
-  #   repository: "file://../lago-rails"
+  - name: lago-rails
+    alias: clock
+    version: 0.1.0
+    repository: "file://../lago-rails"
+  - name: lago-rails
+    alias: worker
+    version: 0.1.0
+    repository: "file://../lago-rails"

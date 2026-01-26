@@ -63,18 +63,12 @@ Create the name of the service account to use
 
 
 {{- define "lago-api.secretName" -}}
-{{- if .Values.existingSecret }}
-{{- .Values.existingSecret }}
-{{- else }}
-{{- include "lago-config.secretName" (dict "Chart" .Subcharts.config.Chart "Values" .Values.config "Release" .Release) }}
-{{- end }}
+# {{- $foo := dict "Chart" .Subcharts.config.Chart "Values" .Values.config "Release" .Release -}}
+{{ fail (. | toYaml)}}
+{{- include "lago-config.secretName" $foo }}
 {{- end }}
 
 
 {{- define "lago-api.configMapName" -}}
-{{- if .Values.existingConfigMap }}
-{{- .Values.existingConfigMap }}
-{{- else }}
 {{- include "lago-config.configMapName" (dict "Chart" .Subcharts.config.Chart "Values" .Values.config "Release" .Release) }}
-{{- end }}
 {{- end }}

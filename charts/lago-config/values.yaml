@@ -28,6 +28,20 @@ redisStore:
 lago:
   license: ""
 
+s3:
+  enabled: false
+  # accessKeyId and secretAccessKey are not required here if using existingSecret
+  # accessKeyId: "<your-aws-access-key>"
+  accessKeyId: ""
+  # secretAccessKey: "<your-aws-secret-key>"
+  secretAccessKey: ""
+  # bucket: "<your-aws-bucket>"
+  bucket: ""
+  # region: "<your-aws-region>"
+  region: ""
+  # endpoint: "https://s3.<region>.amazonaws.com" # Leave empty for default AWS S3 endpoint
+  endpoint: ""
+
 
 configMap:
   # -- Create the lago-config configmap for [declarative setup]
