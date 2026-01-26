@@ -15,13 +15,20 @@ metadata:
     {{- end }}
   {{- end }}
 data:
-  {{- with .Values.redis.url }}
-  redis.url: {{.}}
+  {{- with .Values.global.redis.url }}
+  redis.url: {{ . }}
   {{- end }}
-  {{- with .Values.redisCache.url }}
-  redisCache.url: {{.}}
+  {{- with .Values.global.redisCache.url }}
+  redisCache.url: {{ . }}
   {{- end }}
-  {{- with .Values.redisStore.url }}
-  redisStore.url: {{.}}
+  {{- with .Values.global.redisStore.url }}
+  redisStore.url: {{ . }}
+  {{- end }}
+  {{- if .Values.global.s3.enabled }}
+  s3.bucket: {{ .Values.global.s3.bucket }}
+  s3.region: {{ .Values.global.s3.region }}
+  {{- with .Values.global.s3.endpoint }}
+  s3.endpoint: {{ . }}
+  {{- end }}
   {{- end }}
 {{- end }}
