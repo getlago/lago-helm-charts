@@ -22,7 +22,7 @@ dependencies:
     alias: config
     version: 0.1.0
     repository: "file://../lago-config"
-  - name: lago-api
+  - name: lago-rails
     alias: api
     version: 0.1.0
     repository: "file://../lago-rails"

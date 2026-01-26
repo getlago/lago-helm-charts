@@ -50,12 +50,16 @@ spec:
             - name: RAILS_LOG_TO_STDOUT
               value: {{ .Values.config.log.stdout | quote }}
             - name: DATABASE_POOL
-              value: {{ .Values.config.database.pool | quote }}
+              value: {{ default .Values.global.database.pool | quote }}
+            - name: LAGO_SIDEKIQ_PRO_REQUIRED
+              value: {{ default .Values.global.lago.sidekiqPro .Values.config.sidekiq.pro | quote }}
+            - name: LAGO_SIDEKIQ_WEB
+              value: {{ .Values.config.web.sidekiq | quote }}
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
                   name: {{ include "lago-api.secretName" . }}
-                  key: database.url
+                  key: database.uri
             - name: ENCRYPTION_PRIMARY_KEY
               valueFrom:
                 secretKeyRef:
@@ -117,6 +121,132 @@ spec:
                   name: {{ include "lago-api.secretName" . }}
                   key: lago.license
                   optional: true
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: sentryDsn
+                  optional: true
+            - name: SEGMENT_WRITE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: segmentWriteKey
+                  optional: true
+            - name: NANGO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: nangoSecretKey
+                  optional: true
+            - name: LAGO_API_URL
+              value: {{ required "global.urls.api value is required" .Values.global.urls.api | quote }}
+            - name: LAGO_FRONT_URL
+              value: {{ required "global.urls.front value is required" .Values.global.urls.front | quote }}
+            {{- if .Values.global.urls.pdf }}
+            - name: LAGO_PDF_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-api.configMapName" . }}
+                  key: urls.pdf
+            {{- else }}
+            - name: LAGO_DISABLE_PDF_GENERATION
+              value: {{ not .Values.global.lago.pdfGeneration | quote }}
+            {{- end }}
+            {{- if .Values.global.s3.enabled }}
+            - name: LAGO_USE_AWS_S3
+              value: "true"
+            - name: LAGO_AWS_S3_PATH_STYLE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-api.configMapName" . }}
+                  key: s3.pathStyle
+                  optional: true
+            - name: LAGO_AWS_S3_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-api.configMapName" . }}
+                  key: s3.endpoint
+                  optional: true
+            - name: LAGO_AWS_S3_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-api.configMapName" . }}
+                  key: s3.region
+            - name: LAGO_AWS_S3_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-api.configMapName" . }}
+                  key: s3.bucket
+            - name: LAGO_AWS_S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: s3.accessKeyId
+            - name: LAGO_AWS_S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: s3.secretAccessKey
+            {{- end }}
+            {{- if .Values.global.smtp.enabled }}
+            - name: LAGO_FROM_EMAIL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-api.configMapName" . }}
+                  key: smtp.from
+            - name: LAGO_SMTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-api.configMapName" . }}
+                  key: smtp.port
+            - name: LAGO_SMTP_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-api.configMapName" . }}
+                  key: smtp.address
+            - name: LAGO_SMTP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: smtp.username
+                  optional: true
+            - name: LAGO_SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: smtp.password
+                  optional: true
+            {{- end }}
+            {{- if .Values.global.google.enabled}}
+            - name: GOOGLE_AUTH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: google.clientId
+            - name: GOOGLE_AUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: google.clientSecret
+            {{- end }}
+            {{- if .Values.global.gocardless.enabled }}
+            - name: LAGO_OAUTH_PROXY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-api.configMapName" . }}
+                  key: gocardless.oauthProxy
+            - name: GOCARDLESS_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: gocardless.clientId
+            - name: GOCARDLESS_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-api.secretName" . }}
+                  key: gocardless.clientSecret
+            {{- end }}
             {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end}}
