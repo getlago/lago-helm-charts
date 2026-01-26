@@ -1,3 +1,22 @@
+data-config:
+  databaseAnalytical:
+    host: ""
+    name: ""
+    user: ""
+    password: ""
+    port: 5432
+    schema: analytical
+
+  celery:
+    brokerUrl: ""
+    resultBackend: ""
+
+  api:
+    token:
+
+  configMap:
+    name: lago-data-config
+
 config:
   database:
     url: ""
