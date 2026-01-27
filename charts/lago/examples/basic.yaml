@@ -1,0 +1,96 @@
+global:
+  urls:
+    api: "https://lago-api.example.com"
+    front: "https://lago.example.com"
+
+  database:
+    uri: "postgres://lago:some_password@lago-postgres.svc.cluster.local:5432/lago"
+
+  encryption:
+    # openssl rand -hex 16
+    key: 911219513a368a9f5cb38b326e739a70
+
+    # openssl rand -hex 16
+    salt: cabaabf712d9f7b2ce0ae1b12fc01eec
+
+  signing:
+    # openssl genrsa 512 | openssl base64 -A (use a higher rsa size)
+    rsa: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUJWZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQVVBd2dnRThBZ0VBQWtFQXpmMnl4bUFFTlhUNXcxKy8KRDI0ckEzcFZTa01NSlExOWpvRmNHQ1pnOFMwQWF3OXcrb2twcEM5NVZBZ0huWnh3bmpSNUVTeUpLK2VMeWJJcwpEZ3JuTVFJREFRQUJBa0VBdFFaeEo3aVZ1a3pVZWdnWXBmelJQRHN6M1JGVENQVDBGRnBHanNxYmd4WE4zTmVHClE2Y2ttZTV3NWhlUGN4Y3Y5NXJ0d1BsL3VOTXdqYWZXUUIwbWdRSWhBUHdEOS8wK1RjUjhHWVN4V1d5cWNjMVgKY3VsNzVvcWNyTFlNNEdiVmJoblpBaUVBMFQ5eUhVa1Z1bFdDRWVGdTV5UStrR1pZdFZhc3Rvenc2enE1WUkyWAp5UmtDSVFEMTZiRjlMZVNZekRmaVlXUlBRdXFWWXJYQTI2UVVzZGxlTTZaczhlcmowUUlnUVB5VmNtYjZhbzZZCkFQbWt1Z0RWdFg4ejJjMzdnZzZ2M0Q2MnlEZnhoakVDSVFEd1o4ZXVxQ1VuN01Ia3Q2YVdpSStidWRFQ05INTgKanNYTXBKWEdEdVMvU3c9PQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg==
+    # openssl rand -base64 16
+    hmac: SOswQPXojXToX/l7R/FXUw==
+
+  redis:
+    uri: "redis://lago-redis.svc.cluster.local:6379"
+
+  redisCache:
+    uri: "redis://lago-redis.svc.cluster.local:6379"
+
+  redisStore:
+    uri: "redis://lago-redis.svc.cluster.local:6379"
+
+extraObjects:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: lago-redis
+    spec:
+      selector:
+        app: redis
+      ports:
+        - port: 6379
+          targetPort: 6379
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: lago-redis
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: redis
+      template:
+        metadata:
+          labels:
+            app: redis
+        spec:
+          containers:
+            - name: redis
+              image: redis:7-alpine
+              ports:
+                - containerPort: 6379
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: lago-postgres
+    spec:
+      selector:
+        app: postgres
+      ports:
+        - port: 5432
+          targetPort: 5432
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: lago-postgres
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: postgres
+      template:
+        metadata:
+          labels:
+            app: postgres
+        spec:
+          containers:
+            - name: postgres
+              image: postgres:15-alpine
+              ports:
+                - containerPort: 5432
+              env:
+                - name: POSTGRES_USER
+                  value: "lago"
+                - name: POSTGRES_PASSWORD
+                  value: "some_password"
+                - name: POSTGRES_DB
+                  value: "lago"

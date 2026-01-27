@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "lago-api.fullname" . }}
+  name: {{ include "lago-rails.fullname" . }}
   labels:
-    {{- include "lago-api.labels" . | nindent 4 }}
+    {{- include "lago-rails.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -13,5 +13,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "lago-api.selectorLabels" . | nindent 4 }}
+    {{- include "lago-rails.selectorLabels" . | nindent 4 }}
 {{- end }}

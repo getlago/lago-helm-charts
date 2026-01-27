@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "lago-api.fullname" . }}
+  name: {{ include "lago-rails.fullname" . }}
   labels:
-    {{- include "lago-api.labels" . | nindent 4 }}
+    {{- include "lago-rails.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "lago-api.fullname" . }}
+    name: {{ include "lago-rails.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:

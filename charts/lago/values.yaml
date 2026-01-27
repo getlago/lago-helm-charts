@@ -1,16 +1,21 @@
 # Global values shared across all subcharts (api, worker, clock, config)
 global:
   lago:
-    cloud: true
-    sidekiqPro: true
+    env: "production"
+    license: ""
+    signup: false
+    cloud: false
+    sidekiqPro: false
+    pdfGeneration: false
 
   urls:
-    api: "max-test-api.staging.getlago.com"
-    front: "max-test-app.staging.getlago.com"
-    pdf: "http://pdf-web.default.svc.cluster.local"
+    api: ""
+    front: ""
+    pdf: ""
 
   database:
     uri: ""
+    pool: 20
 
   encryption:
     key: "" # ENCRYPTION_PRIMARY_KEY
@@ -21,24 +26,49 @@ global:
     rsa: ""  # LAGO_RSA_PRIVATE_KEY used by webhooks RS256
 
   redis:
-    url: "redis://max-test-redis.default.svc.cluster.local:6379"
+    url: ""
     password: ""
 
   redisCache:
-    url: "redis://max-test-redis.default.svc.cluster.local:6379"
+    url: ""
     password: ""
 
   redisStore:
-    url: "redis://max-test-redis.default.svc.cluster.local:6379"
+    url: ""
     password: ""
 
+  sentryDsn: ""
+  segmentWriteKey: ""
+
   s3:
-    enabled: true
+    enabled: false
     accessKeyId: ""
     secretAccessKey: ""
-    bucket: "lago-staging"
+    bucket: ""
+    region: ""
+    endpoint: ""
+    # s3.pathStyle -- (boolean)
+    pathStyle:
 
-# lago-config subchart settings
+  smtp:
+    enabled: false
+    username: ""
+    password: ""
+    from: ""
+    port: 25
+    address: ""
+
+  google:
+    enabled: false
+    clientId:
+    clientSecret:
+
+  gocardless:
+    enabled: false
+    clientId:
+    clientSecret:
+    proxy:
+
 config:
   configMap:
     name: lago-config
@@ -49,7 +79,6 @@ config:
 api:
   config:
     enabled: false
-    env: development
     web:
       sidekiq: true
     configMap:
@@ -58,6 +87,15 @@ api:
       name: lago-config
 
   nameOverride: lago-api
+
+front:
+  config:
+    enabled: false
+    configMap:
+      name: lago-config
+    secret:
+      name: lago-config
+  nameOverride: lago-front
 
 # worker:
 #   nameOverride: lago-worker
@@ -70,3 +108,34 @@ api:
 #     enabled: false
 #   container:
 #     command: ["./scripts/start.clock.sh"]
+
+# -- Array of extra K8s manifests to deploy
+## Note: Supports use of custom Helm templates
+extraObjects: []
+  # - apiVersion: secrets-store.csi.x-k8s.io/v1
+  #   kind: SecretProviderClass
+  #   metadata:
+  #     labels:
+  #       {{- include "lago.labels" . | nindent 4 }}
+  #     name: {{ include "lago.fullname" . }}
+  #   spec:
+  #     provider: aws
+  #     parameters:
+  #       objects: |
+  #         - objectName: "lago"
+  #           objectType: "secretsmanager"
+  #           jmesPath:
+  #               - path: "client_id"
+  #                 objectAlias: "client_id"
+  #               - path: "client_secret"
+  #                 objectAlias: "client_secret"
+  #     secretObjects:
+  #     - data:
+  #       - key: client_id
+  #         objectName: client_id
+  #       - key: client_secret
+  #         objectName: client_secret
+  #       secretName: {{ include "lago.fullname" . }}
+  #       type: Opaque
+  #       labels:
+  #         {{- include "lago.labels" . | nindent 4 }}
