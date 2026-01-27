@@ -30,14 +30,23 @@ spec:
         paths:
           {{- range .paths }}
           - path: {{ .path }}
-            {{- with .pathType }}
-            pathType: {{ . }}
-            {{- end }}
+            pathType: {{ default "ImplementationSpecific" .pathType }}
+            backend:
+              service:
+                name: {{ include "lago-rails.fullname" $ }}
+                port:
+                  number: {{ $.Values.service.port }}
+          {{- else }}
+          - path: /
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: {{ include "lago-rails.fullname" $ }}
                 port:
                   number: {{ $.Values.service.port }}
           {{- end }}
+    {{- end }}
+    {{- with .Values.ingress.hostsRaw }}
+    {{- . | toYaml | nindent 4 }}
     {{- end }}
 {{- end }}

@@ -29,13 +29,19 @@ spec:
       http:
         paths:
           {{- range .paths }}
-          - path: {{ .path }}
-            {{- with .pathType }}
-            pathType: {{ . }}
-            {{- end }}
+          - path: {{ default "/" .path }}
+            pathType: {{ default "ImplementationSpecific" .pathType }}
             backend:
               service:
                 name: {{ include "lago-app.fullname" $ }}
+                port:
+                  number: {{ $.Values.service.port }}
+          {{- else }}
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ include "lago-rails.fullname" $ }}
                 port:
                   number: {{ $.Values.service.port }}
           {{- end }}

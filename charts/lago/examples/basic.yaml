@@ -28,6 +28,26 @@ global:
   redisStore:
     uri: "redis://lago-redis.svc.cluster.local:6379"
 
+api:
+  ingress:
+    enabled: true
+    hosts:
+      - host: lago-api.example.com
+    tls:
+      - secretName: lago-api-example-tls
+        hosts:
+          - lago-api.example.com
+
+front:
+  ingress:
+    enabled: true
+    hosts:
+      - host: lago.example.com
+    tls:
+      - secretName: lago-example-tls
+        hosts:
+          - lago.example.com
+
 extraObjects:
   - apiVersion: v1
     kind: Service
