@@ -35,8 +35,10 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Create the name of the config map to use
 */}}
 {{- define "lago-config.configMapName" -}}
-{{- if .Values.configMap.name }}
+{{- if and .Values.configMap .Values.configMap.name }}
 {{- .Values.configMap.name }}
+{{- else if and .Values.config .Values.config.configMap .Values.config.configMap.name }}
+{{- .Values.config.configMap.name }}
 {{- else }}
 {{- include "lago-config.fullname" . }}
 {{- end }}
@@ -46,8 +48,10 @@ Create the name of the config map to use
 Create the name of the secret to use
 */}}
 {{- define "lago-config.secretName" -}}
-{{- if .Values.secret.name }}
+{{- if and .Values.secret .Values.secret.name }}
 {{- .Values.secret.name }}
+{{- else if and .Values.config .Values.config.secret .Values.config.secret.name }}
+{{- .Values.config.secret.name }}
 {{- else }}
 {{- include "lago-config.fullname" . }}
 {{- end }}

@@ -47,25 +47,30 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
-            - name: API_URL
-              value: {{ .Values.config.apiUrl | required "config.apiUrl must be provided" }}
+            - name: LAGO_API_URL
+              value: {{ required "global.urls.api value is required" .Values.global.urls.api | quote }}
             - name: APP_ENV
-              value: {{ .Values.config.env }}
-            {{- with .Values.config.nangoKey }}
+              value: {{ default .Values.global.lago.env .Values.config.env }}
             - name: NANGO_PUBLIC_KEY
-              value: {{ . }}
-            {{- end }}
-            {{- with .Values.config.signupEnabled }}
-            - name: LAGO_DISABLE_SIGNUP
-              value: {{ . | not | quote }}
-            {{- end}}
-            {{- with .Values.config.proxyUrl }}
-            - name: LAGO_OAUTH_PROXY_URL
-              value: {{ . }}
-            {{- end}}
-            {{- with .Values.config.sentryDsn }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-config.secretName" . }}
+                  key: nango.publicKey
+                  optional: true
             - name: SENTRY_DSN
-              value: {{ . }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-config.secretName" . }}
+                  key: sentryDsn
+                  optional: true
+            - name: LAGO_DISABLE_SIGNUP
+              value: {{ not .Values.global.lago.signup | quote }}
+            {{- if .Values.global.gocardless.enabled }}
+            - name: LAGO_OAUTH_PROXY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-config.configMapName" . }}
+                  key: gocardless.proxy
             {{- end}}
             {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}

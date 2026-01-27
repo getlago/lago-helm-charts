@@ -1,10 +1,11 @@
-# Default values for lago-api.
+# Default values for lago-rails.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 # Global values shared across all subcharts
 global:
   lago:
+    env: "production"
     license: ""
     cloud: false
     sidekiqPro: false
@@ -41,7 +42,10 @@ global:
 
   sentryDsn: ""
   segmentWriteKey: ""
-  nangoSecretKey: ""
+
+  nango:
+    secretKey: ""
+    publicKey: ""
 
   s3:
     enabled: false
@@ -70,7 +74,7 @@ global:
     enabled: false
     clientId:
     clientSecret:
-    callbackUrl:
+    proxy:
 
 # Local config specific to this chart instance
 config:
@@ -299,3 +303,38 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# -- Array of extra K8s manifests to deploy
+## Note: Supports use of custom Helm templates
+extraObjects: []
+  # - |-
+  #   apiVersion: networking.k8s.io/v1
+  #   kind: Ingress
+  #   metadata:
+  #     annotations:
+  #       nginx.ingress.kubernetes.io/backend-protocol: HTTP
+  #       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  #       nginx.ingress.kubernetes.io/proxy-body-size: 50m
+  #       nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+  #       nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+  #       nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+  #     labels:
+  #       {{- include "lago-rails.labels" . | nindent 4 }}
+  #     name: {{ include "lago-rails.fullname" . }}-webhooks-internal
+  #   spec:
+  #     ingressClassName: nginx
+  #     rules:
+  #     - host: webhooks.internal.getlago.com
+  #       http:
+  #         paths:
+  #         - backend:
+  #             service:
+  #               name: {{ include "lago-rails.fullname" . }}
+  #               port:
+  #                 number: 80
+  #           path: /webhooks
+  #           pathType: Prefix
+  #     tls:
+  #     - hosts:
+  #       - webhooks.internal.getlago.com
+  #       secretName: webhook-cert-tls

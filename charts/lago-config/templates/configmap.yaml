@@ -15,14 +15,14 @@ metadata:
     {{- end }}
   {{- end }}
 data:
-  {{- with .Values.global.redis.url }}
-  redis.url: {{ . }}
+  {{- with .Values.global.redis.uri }}
+  redis.uri: {{ . }}
   {{- end }}
-  {{- with .Values.global.redisCache.url }}
-  redisCache.url: {{ . }}
+  {{- with .Values.global.redisCache.uri }}
+  redisCache.uri: {{ . }}
   {{- end }}
-  {{- with .Values.global.redisStore.url }}
-  redisStore.url: {{ . }}
+  {{- with .Values.global.redisStore.uri }}
+  redisStore.uri: {{ . }}
   {{- end }}
   {{- if .Values.global.s3.enabled }}
   s3.bucket: {{ .Values.global.s3.bucket }}
@@ -30,5 +30,13 @@ data:
   {{- with .Values.global.s3.endpoint }}
   s3.endpoint: {{ . }}
   {{- end }}
+  {{- end }}
+  {{- if .Values.global.smtp.enabled }}
+  smtp.port: {{ .Values.global.smtp.port | quote }}
+  smtp.address: {{ .Values.global.smtp.address }}
+  smtp.from: {{ .Values.global.smtp.from }}
+  {{- end }}
+  {{- if .Values.global.gocardless.enabled }}
+  gocardless.proxy: {{ .Values.global.gocardless.proxy }}
   {{- end }}
 {{- end }}
