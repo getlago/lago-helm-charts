@@ -24,11 +24,17 @@ data:
   {{- with .Values.global.redisStore.uri }}
   redisStore.uri: {{ . }}
   {{- end }}
+  {{- with .Values.global.urls.pdf }}
+  urls.pdf: {{ . }}
+  {{- end }}
   {{- if .Values.global.s3.enabled }}
   s3.bucket: {{ .Values.global.s3.bucket }}
   s3.region: {{ .Values.global.s3.region }}
   {{- with .Values.global.s3.endpoint }}
   s3.endpoint: {{ . }}
+  {{- end }}
+  {{- with .Values.global.s3.pathStyle }}
+  s3.pathStyle: {{ . }}
   {{- end }}
   {{- end }}
   {{- if .Values.global.smtp.enabled }}
