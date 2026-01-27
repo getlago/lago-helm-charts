@@ -2,9 +2,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "lago-app.fullname" . }}
+  name: {{ include "lago-front.fullname" . }}
   labels:
-    {{- include "lago-app.labels" . | nindent 4 }}
+    {{- include "lago-front.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -33,7 +33,7 @@ spec:
             pathType: {{ default "ImplementationSpecific" .pathType }}
             backend:
               service:
-                name: {{ include "lago-app.fullname" $ }}
+                name: {{ include "lago-front.fullname" $ }}
                 port:
                   number: {{ $.Values.service.port }}
           {{- else }}
