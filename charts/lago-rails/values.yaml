@@ -79,7 +79,6 @@ global:
 # Local config specific to this chart instance
 config:
   enabled: true
-  env: production
   log:
     level: info
     stdout: true
