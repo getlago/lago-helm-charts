@@ -97,6 +97,61 @@ front:
       name: lago-config
   nameOverride: lago-front
 
+# Database migration job configuration
+migrate:
+  # -- Enable the database migration job
+  enabled: false
+  image:
+    repository: getlago/api
+    tag: ""
+    pullPolicy: IfNotPresent
+  # -- Command to run for migrations
+  command: []
+  # -- Arguments for the migration command
+  args: []
+  # -- Helm hook weight (lower runs first)
+  hookWeight: "-5"
+  # -- Hook delete policy: hook-succeeded, hook-failed, before-hook-creation
+  hookDeletePolicy: before-hook-creation
+  # -- Job backoff limit
+  backoffLimit: 3
+  # -- Restart policy for the job pod
+  restartPolicy: Never
+  # -- TTL for cleaning up finished jobs (seconds)
+  ttlSecondsAfterFinished: 300
+  # -- Active deadline for the job (seconds)
+  activeDeadlineSeconds: 600
+  # -- Additional annotations for the Job
+  annotations: {}
+  # -- Additional annotations for the pod
+  podAnnotations: {}
+  # -- Additional labels for the pod
+  podLabels: {}
+  # -- Service account name for the job
+  serviceAccountName: ""
+  # -- Image pull secrets
+  imagePullSecrets: []
+  # -- Pod security context
+  podSecurityContext: {}
+  # -- Container security context
+  securityContext: {}
+  # -- Resource limits and requests
+  resources: {}
+  # -- Additional environment variables
+  extraEnv: []
+  # -- Additional envFrom sources
+  extraEnvFrom: []
+  # -- Additional volumes
+  volumes: []
+  # -- Additional volume mounts
+  volumeMounts: []
+  # -- Node selector
+  nodeSelector: {}
+  # -- Tolerations
+  tolerations: []
+  # -- Affinity
+  affinity: {}
+
 # worker:
 #   nameOverride: lago-worker
 #   service:

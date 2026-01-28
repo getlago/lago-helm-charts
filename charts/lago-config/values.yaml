@@ -5,6 +5,7 @@
 # All config values are under global so they can be shared across subcharts
 global:
   lago:
+    version: ""
     env: "production"
     license: ""
     signup: false
