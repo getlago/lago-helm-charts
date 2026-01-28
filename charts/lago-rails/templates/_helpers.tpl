@@ -60,3 +60,8 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+
+{{- define "lago-rails.version" -}}
+{{ coalesce .Values.image.tag .Values.global.lago.version .Chart.AppVersion }}
+{{- end }}

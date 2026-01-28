@@ -60,3 +60,11 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Get the image version
+Checks migrate.image.tag, api.image.tag, global.version, then Chart.AppVersion
+*/}}
+{{- define "lago.version" -}}
+{{- coalesce .Values.migrate.image.tag .Values.api.image.tag .Values.global.lago.version .Chart.AppVersion }}
+{{- end }}

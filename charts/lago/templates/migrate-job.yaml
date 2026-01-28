@@ -1,0 +1,140 @@
+{{- if .Values.migrate.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "lago.fullname" . }}-migrate
+  labels:
+    {{- include "lago.labels" . | nindent 4 }}
+    app.kubernetes.io/component: migrate
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": {{ .Values.migrate.hookWeight | quote }}
+    "helm.sh/hook-delete-policy": {{ .Values.migrate.hookDeletePolicy }}
+    {{- with .Values.migrate.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- with .Values.migrate.ttlSecondsAfterFinished }}
+  ttlSecondsAfterFinished: {{ . }}
+  {{- end }}
+  {{- with .Values.migrate.activeDeadlineSeconds }}
+  activeDeadlineSeconds: {{ . }}
+  {{- end }}
+  backoffLimit: {{ .Values.migrate.backoffLimit }}
+  template:
+    metadata:
+      {{- with .Values.migrate.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "lago.labels" . | nindent 8 }}
+        app.kubernetes.io/component: migrate
+        {{- with .Values.migrate.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.migrate.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.migrate.serviceAccountName }}
+      serviceAccountName: {{ . }}
+      {{- end }}
+      {{- with .Values.migrate.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: {{ .Values.migrate.restartPolicy }}
+      containers:
+        - name: migrate
+          image: "{{ .Values.migrate.image.repository }}:{{ include "lago.version" . }}"
+          imagePullPolicy: {{ .Values.migrate.image.pullPolicy }}
+          {{- if .Values.migrate.command }}
+          command: {{ toJson .Values.migrate.command }}
+          args: {{ toJson .Values.migrate.args }}
+          {{- else if eq .Values.global.lago.env "staging" }}
+          command: ["./scripts/migrate.staging.sh"]
+          {{- else }}
+          command: ["./scripts/migrate.sh"]
+          {{- end }}
+          {{- with .Values.migrate.extraEnvFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: RAILS_ENV
+              value: {{ .Values.global.lago.env }}
+            - name: DATABASE_POOL
+              value: {{ .Values.global.database.pool | quote }}
+            - name: DATABASE_URL
+              {{- with .Values.global.database.uri }}
+              value: {{ . }}
+              {{- else }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.config.secret.name }}
+                  key: database.uri
+              {{- end }}
+            - name: LAGO_RSA_PRIVATE_KEY
+              {{- with .Values.global.signing.rsa }}
+              value: {{ . }}
+              {{- else }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-config.secretName" . }}
+                  key: signing.rsa
+              {{- end }}
+            - name: SECRET_KEY_BASE
+              {{- with .Values.global.signing.hmac }}
+              value: {{ . }}
+              {{- else }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-config.secretName" . }}
+                  key: signing.hmac
+              {{- end }}
+            - name: REDIS_URL
+              value: {{ .Values.global.redis.uri }}
+            - name: REDIS_PASSWORD
+              {{- with .Values.global.redis.password }}
+              value: {{ . }}
+              {{- else }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.config.secret.name }}
+                  key: redis.password
+                  optional: true
+              {{- end }}
+            {{- with .Values.migrate.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.migrate.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.migrate.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.migrate.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.migrate.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.migrate.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.migrate.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.migrate.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
