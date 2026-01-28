@@ -45,7 +45,6 @@ global:
 
   nango:
     secretKey: ""
-    publicKey: ""
 
   s3:
     enabled: false

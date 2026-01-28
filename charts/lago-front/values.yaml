@@ -12,7 +12,9 @@ global:
     api: ""
     pdf: ""
 
-  nangoSecretKey: ""
+  nango:
+    publicKey: ""
+
   sentryDsn: ""
 
   gocardless:
