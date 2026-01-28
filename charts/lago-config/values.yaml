@@ -44,6 +44,10 @@ global:
   sentryDsn: ""
   segmentWriteKey: ""
 
+  nango:
+    secretKey: ""
+    publicKey: ""
+
   s3:
     enabled: false
     accessKeyId: ""
