@@ -152,17 +152,40 @@ migrate:
   # -- Affinity
   affinity: {}
 
-# worker:
-#   nameOverride: lago-worker
-#   service:
-#     enabled: false
 
-# clock:
-#   nameOverride: lago-clock
-#   service:
-#     enabled: false
-#   container:
-#     command: ["./scripts/start.clock.sh"]
+worker:
+  nameOverride: lago-worker
+  config:
+    enabled: false
+    configMap:
+      name: lago-config
+    secret:
+      name: lago-config
+
+  service:
+    enabled: false
+
+  livenessProbe: null
+  readinessProbe: null
+
+  container:
+    command: ["./scripts/start.worker.sh"]
+
+
+clock:
+  nameOverride: lago-clock
+  config:
+    enabled: false
+    configMap:
+      name: lago-config
+    secret:
+      name: lago-config
+  livenessProbe: null
+  readinessProbe: null
+  service:
+    enabled: false
+  container:
+    command: ["./scripts/start.clock.sh"]
 
 # -- Array of extra K8s manifests to deploy
 ## Note: Supports use of custom Helm templates
