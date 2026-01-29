@@ -78,6 +78,17 @@ global:
     clientSecret:
     proxy:
 
+  mcp:
+    enabled: false
+    clientId:
+    clientSecret:
+    endpoint:
+
+  data:
+    enabled: false
+    token:
+    endpoint:
+
 configMap:
   # -- Create the lago-config configmap for [declarative setup]
   create: true

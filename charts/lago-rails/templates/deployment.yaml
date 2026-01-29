@@ -150,7 +150,7 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "lago-config.configMapName" . }}
-                  key: urls.pdf
+                  key: pdf.endpoint
             {{- else }}
             - name: LAGO_DISABLE_PDF_GENERATION
               value: {{ not .Values.global.lago.pdfGeneration | quote }}
@@ -248,6 +248,35 @@ spec:
                 secretKeyRef:
                   name: {{ include "lago-config.secretName" . }}
                   key: gocardless.clientSecret
+            {{- end }}
+            {{- if .Values.global.mcp.enabled }}
+            - name: LAGO_MCP_SERVER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-config.configMapName" . }}
+                  key: mcp.endpoint
+            - name: MISTRAL_AGENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-config.secretName" . }}
+                  key: mcp.clientId
+            - name: MISTRAL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-config.secretName" . }}
+                  key: mcp.clientSecret
+            {{- end }}
+            {{- if .Values.global.data.enabled }}
+            - name: LAGO_DATA_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-config.configMapName" . }}
+                  key: data.endpoint
+            - name: LAGO_DATA_API_BEARER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-config.secretName" . }}
+                  key: data.token
             {{- end }}
             {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
