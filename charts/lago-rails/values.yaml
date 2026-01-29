@@ -75,6 +75,17 @@ global:
     clientSecret:
     proxy:
 
+  mcp:
+    enabled: false
+    clientId:
+    clientSecret:
+    endpoint:
+
+  data:
+    enabled: false
+    token:
+    endpoint:
+
 # Local config specific to this chart instance
 config:
   enabled: true

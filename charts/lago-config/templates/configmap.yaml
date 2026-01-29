@@ -25,7 +25,7 @@ data:
   redisStore.uri: {{ . }}
   {{- end }}
   {{- with .Values.global.urls.pdf }}
-  urls.pdf: {{ . }}
+  pdf.endpoint: {{ . }}
   {{- end }}
   {{- if .Values.global.s3.enabled }}
   s3.bucket: {{ .Values.global.s3.bucket }}
@@ -44,5 +44,8 @@ data:
   {{- end }}
   {{- if .Values.global.gocardless.enabled }}
   gocardless.proxy: {{ .Values.global.gocardless.proxy }}
+  {{- end }}
+  {{- if .Values.global.mcp.enabled }}
+  mcp.endpoint: {{ .Values.global.mcp.endpoint }}
   {{- end }}
 {{- end }}
