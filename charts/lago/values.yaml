@@ -8,6 +8,10 @@ global:
     sidekiqPro: false
     pdfGeneration: false
 
+  config:
+    configmap:
+    secret:
+
   urls:
     api: ""
     front: ""
@@ -68,6 +72,53 @@ global:
     clientId:
     clientSecret:
     proxy:
+
+  mcp:
+    enabled: false
+    clientId:
+    clientSecret:
+    endpoint:
+
+  data:
+    enabled: false
+    token:
+    endpoint:
+
+  streaming_ingestion:
+    enabled: false
+    configmap: ""
+    secret: ""
+
+    clickhouse:
+      # username and password are not required here if using an external secret:
+      #  config.enabled: false, config.secret.name: "..."
+      username: ""
+      password: ""
+      port: 9000
+      address: clickhouse
+      tls: true
+
+    # kafka is required if clickhouse is set
+    kafka:
+      # username and password are not required here if if using an external secret:
+      #  config.enabled: false, config.secret.name: "..."
+      username: ""
+      password: ""
+      tls: true
+      saslMechanisms: SCRAM-SHA-512
+      securityProtocol: SASL_SSL
+      consumerGroup: events_consumer
+      # you must provide a list of Kafka servers if clickhouse is enabled
+      bootstrapServers: []
+      #   - "kafka-server:9092"
+      topics:
+        eventsChargedInAdvance: events_charged_in_advance
+        eventsDeadLetter: events_dead_letter
+        eventsEnriched: events_enriched
+        eventsEnrichedExpanded: events_enriched_expanded
+        eventsRaw: events_raw
+        activityLogs: activity_logs
+        apiLogs: api_logs
 
 config:
   configMap:

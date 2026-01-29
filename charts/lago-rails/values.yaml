@@ -11,6 +11,10 @@ global:
     sidekiqPro: false
     pdfGeneration: false
 
+  config:
+    secret: ""
+    configmap: ""
+
   urls:
     api: ""
     front: ""
