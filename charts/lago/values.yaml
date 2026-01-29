@@ -120,22 +120,12 @@ global:
         activityLogs: activity_logs
         apiLogs: api_logs
 
-config:
-  configMap:
-    name: lago-config
-  secret:
-    name: lago-config
-
 # lago-api subchart settings
 api:
   config:
     enabled: false
     web:
       sidekiq: true
-    configMap:
-      name: lago-config
-    secret:
-      name: lago-config
 
   nameOverride: lago-api
 
@@ -208,10 +198,6 @@ worker:
   nameOverride: lago-worker
   config:
     enabled: false
-    configMap:
-      name: lago-config
-    secret:
-      name: lago-config
 
   service:
     enabled: false
@@ -227,10 +213,6 @@ clock:
   nameOverride: lago-clock
   config:
     enabled: false
-    configMap:
-      name: lago-config
-    secret:
-      name: lago-config
   livenessProbe: null
   readinessProbe: null
   service:
