@@ -35,14 +35,29 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Create the name of the config map to use
 */}}
 {{- define "lago-config.configMapName" -}}
-{{- if and .Values.configMap .Values.configMap.name }}
-{{- .Values.configMap.name }}
-{{- else if and .Values.config .Values.config.configMap .Values.config.configMap.name }}
-{{- .Values.config.configMap.name }}
+{{- if and .Values.configmap .Values.configmap.name }}
+{{- .Values.configmap.name }}
+{{- else if and .Values.config .Values.config.configmap .Values.config.configmap.name }}
+{{- .Values.config.configmap.name }}
+{{- else if and .Values.global .Values.global.config .Values.global.config.configmap }}
+{{- .Values.global.config.configmap }}
 {{- else }}
 {{- include "lago-config.fullname" . }}
 {{- end }}
 {{- end }}
+
+{{- define "lago-config.streaming.configMapName" -}}
+{{- if and .Values.configmapStreaming .Values.configmapStreaming.name }}
+{{- .Values.configmapStreaming.name }}
+{{- else if and .Values.config .Values.config.configmapStreaming .Values.config.configmapStreaming.name }}
+{{- .Values.config.configmapStreaming.name }}
+{{- else if and .Values.global .Values.global.streaming_ingestion .Values.global.streaming_ingestion.configmap }}
+{{- .Values.global.streaming_ingestion.configmap }}
+{{- else }}
+{{- include "lago-config.fullname" . }}-streaming
+{{- end }}
+{{- end }}
+
 
 {{/*
 Create the name of the secret to use
@@ -52,7 +67,21 @@ Create the name of the secret to use
 {{- .Values.secret.name }}
 {{- else if and .Values.config .Values.config.secret .Values.config.secret.name }}
 {{- .Values.config.secret.name }}
+{{- else if and .Values.global .Values.global.config .Values.global.config.secret }}
+{{- .Values.global.config.secret }}
 {{- else }}
 {{- include "lago-config.fullname" . }}
+{{- end }}
+{{- end }}
+
+{{- define "lago-config.streaming.secretName" -}}
+{{- if and .Values.secretStreaming .Values.secretStreaming.name }}
+{{- .Values.secretStreaming.name }}
+{{- else if and .Values.config .Values.config.secretStreaming .Values.config.secretStreaming.name }}
+{{- .Values.config.secretStreaming.name }}
+{{- else if and .Values.global .Values.global.streaming_ingestion .Values.global.streaming_ingestion.secret }}
+{{- .Values.global.streaming_ingestion.secret }}
+{{- else }}
+{{- include "lago-config.fullname" . }}-streaming
 {{- end }}
 {{- end }}

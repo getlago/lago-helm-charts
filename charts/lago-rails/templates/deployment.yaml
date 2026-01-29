@@ -39,6 +39,12 @@ spec:
           command: {{ toJson .Values.container.command }}
           args: {{ toJson .Values.container.args }}
           envFrom:
+            {{- if .Values.global.streaming_ingestion }}
+            - configMapRef:
+                name: {{ include "lago-config.streaming.configMapName" . }}
+            - secretRef:
+                name: {{ include "lago-config.streaming.secretName" . }}
+            {{- end }}
             {{- with .Values.extraEnvFrom }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
