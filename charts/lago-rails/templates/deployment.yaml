@@ -287,10 +287,12 @@ spec:
             {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end}}
+          {{- with .Values.container.ports }}
           ports:
             - name: http
-              containerPort: {{ .Values.container.ports.http }}
+              containerPort: {{ .http }}
               protocol: TCP
+          {{- end }}
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
