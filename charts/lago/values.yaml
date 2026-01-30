@@ -96,7 +96,8 @@ global:
       password: ""
       port: 9000
       address: clickhouse
-      tls: true
+      tls: false
+      database: default
 
     # kafka is required if clickhouse is set
     kafka:
@@ -104,9 +105,9 @@ global:
       #  config.enabled: false, config.secret.name: "..."
       username: ""
       password: ""
-      tls: true
-      saslMechanisms: SCRAM-SHA-512
-      securityProtocol: SASL_SSL
+      tls: false
+      # SCRAM-SHA-512, SCRAM-SHA-256
+      saslMechanisms:
       consumerGroup: events_consumer
       # you must provide a list of Kafka servers if clickhouse is enabled
       bootstrapServers: []
