@@ -38,3 +38,8 @@ dependencies:
     alias: clock
     version: 0.1.0
     repository: "file://../lago-rails"
+  - name: lago-rails
+    alias: events-consumer-worker
+    version: 0.1.0
+    repository: "file://../lago-rails"
+    condition: global.streaming_ingestion.enabled, events-consumer-worker.enabled
