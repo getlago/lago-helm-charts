@@ -17,8 +17,10 @@ metadata:
     {{- end }}
   {{- end }}
 data:
-  LAGO_KAFKA_BOOTSTRAP_SERVERS: {{ required "If clickhouse is enabled, you must provide a list of Kafka servers"
-    $kafka.bootstrapServers | join "," }}
+  {{- if empty $kafka.bootstrapServers }}
+  {{- fail "If streaming_ingestion is enabled, you must provide a list of Kafka servers" }}
+  {{- end }}
+  LAGO_KAFKA_BOOTSTRAP_SERVERS: {{ $kafka.bootstrapServers | join "," }}
   LAGO_KAFKA_CONSUMER_GROUP: {{ $kafka.consumerGroup }}
   LAGO_KAFKA_ENRICHED_EVENTS_EXPANDED_TOPIC: {{ $kafka.topics.eventsEnrichedExpanded }}
   LAGO_KAFKA_ENRICHED_EVENTS_TOPIC: {{ $kafka.topics.eventsEnriched }}
@@ -29,9 +31,11 @@ data:
   LAGO_KAFKA_TLS: {{ $kafka.tls | quote }}
   LAGO_KAFKA_ACTIVITY_LOGS_TOPIC: {{ $kafka.topics.activityLogs }}
   LAGO_KAFKA_API_LOGS_TOPIC: {{ $kafka.topics.apiLogs }}
+  LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP: {{ $kafka.consumerGroup }}
   LAGO_CLICKHOUSE_PORT: {{ $clickhouse.port | quote }}
-  LAGO_CLICKHOUSE_HOST: {{ $clickhouse.host }}
-  LAGO_CLICKHOUSE_SSL: {{ $clickhouse.ssl | quote }}
+  LAGO_CLICKHOUSE_HOST: {{ $clickhouse.address }}
+  LAGO_CLICKHOUSE_SSL: {{ $clickhouse.tls | quote }}
   LAGO_CLICKHOUSE_ENABLED: "true"
-  LAGO_CLICKHOUSE_DATABASE: default
+  LAGO_CLICKHOUSE_DATABASE: {{$clickhouse.database}}
+  LAGO_CLICKHOUSE_MIGRATIONS_ENABLED: "true"
 {{- end }}

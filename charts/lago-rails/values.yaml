@@ -90,6 +90,43 @@ global:
     token:
     endpoint:
 
+  streaming_ingestion:
+    enabled: false
+    configmap: ""
+    secret: ""
+
+    clickhouse:
+      # username and password are not required here if using an external secret:
+      #  config.enabled: false, config.secret.name: "..."
+      username: ""
+      password: ""
+      port: 9000
+      address: clickhouse
+      tls: false
+      database: default
+
+    # kafka is required if clickhouse is set
+    kafka:
+      # username and password are not required here if if using an external secret:
+      #  config.enabled: false, config.secret.name: "..."
+      username: ""
+      password: ""
+      tls: false
+      # SCRAM-SHA-512, SCRAM-SHA-256
+      saslMechanisms:
+      consumerGroup: events_consumer
+      # you must provide a list of Kafka servers if clickhouse is enabled
+      bootstrapServers: []
+      #   - "kafka-server:9092"
+      topics:
+        eventsChargedInAdvance: events_charged_in_advance
+        eventsDeadLetter: events_dead_letter
+        eventsEnriched: events_enriched
+        eventsEnrichedExpanded: events_enriched_expanded
+        eventsRaw: events_raw
+        activityLogs: activity_logs
+        apiLogs: api_logs
+
 # Local config specific to this chart instance
 config:
   enabled: true
