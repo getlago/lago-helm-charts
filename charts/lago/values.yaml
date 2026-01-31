@@ -168,7 +168,6 @@ clock:
     ports:
 
 events-consumer-worker:
-  enabled: false
   config:
     enabled: false
   livenessProbe: null
@@ -178,6 +177,10 @@ events-consumer-worker:
   container:
     command: ["./scripts/start.events.consumer.sh"]
     ports:
+
+events-processor-worker:
+  config:
+    enabled: false
 
 # Database migration job configuration
 migrate:
