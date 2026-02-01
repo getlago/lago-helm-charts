@@ -2,25 +2,31 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-databaseAnalytical:
-  host: ""
-  name: ""
-  user: ""
-  password: ""
-  port: 5432
-  schema: analytical
+global:
+  databaseAnalytical:
+    host: ""
+    name: ""
+    user: ""
+    password: ""
+    port: 5432
+    schema: analytical
 
-celery:
-  brokerUrl: ""
-  resultBackend: ""
+  forecasted_usage:
+    enabled: false
+    # forecasted usage need to call lago-api, hence provide a valid token
+    api_token:
+    celery:
+      brokerUrl: ""
+      resultBackend: ""
 
-api:
-  token:
+  data:
+    configmap:
+    secret:
+    # token to validate calls from lago-api
+    token:
 
-configMap:
-  # -- Create the lago-config configmap for [declarative setup]
-  create: true
 
+configmap:
   # The name of the config map to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
@@ -32,7 +38,7 @@ configMap:
 
 secret:
   # -- Create the lago-config secret for [sensitive config]
-  create: false
+  create: true
 
   # The name of the secret to use.
   # If not set and create is true, a name is generated using the fullname template
