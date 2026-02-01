@@ -22,14 +22,16 @@ dependencies:
     alias: config
     version: 0.1.0
     repository: "file://../lago-config"
+    condition: global.forecasted_usage.enabled
   - name: lago-data-config
     alias: data-config
     version: 0.1.0
     repository: "file://../lago-data-config"
-  - name: lago-api
+  - name: lago-rails
     alias: api
     version: 0.1.0
     repository: "file://../lago-rails"
+    condition: global.forecasted_usage.enabled
   - name: lago-data-api
     alias: data-api
     version: 0.1.0
@@ -38,6 +40,8 @@ dependencies:
     alias: data-worker
     version: 0.1.0
     repository: "file://../lago-data-worker"
+    condition: global.forecasted_usage.enabled
   - name: celery-exporter
     version: 0.9.0
     repository: https://danihodovic.github.io/celery-exporter/
+    condition: celery-exporter.enabled,global.forecasted_usage.enabled

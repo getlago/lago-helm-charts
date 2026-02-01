@@ -133,10 +133,7 @@ api:
 front:
   config:
     enabled: false
-    configMap:
-      name: lago-config
-    secret:
-      name: lago-config
+
   nameOverride: lago-front
 
 worker:

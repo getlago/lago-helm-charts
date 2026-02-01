@@ -42,59 +42,68 @@ spec:
             - name: http
               containerPort: {{ .Values.container.ports.http }}
               protocol: TCP
+          envFrom:
+            {{- with .Values.extraEnvFrom }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           env:
             - name: ANALYTICAL_DB_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "lago-data-api.configMapName" . }}
+                  name: {{ include "lago-data-config.configMapName" . }}
                   key: databaseAnalytical.host
             - name: ANALYTICAL_DB_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "lago-data-api.configMapName" . }}
+                  name: {{ include "lago-data-config.configMapName" . }}
                   key: databaseAnalytical.name
             - name: ANALYTICAL_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "lago-data-api.secretName" . }}
+                  name: {{ include "lago-data-config.secretName" . }}
                   key: databaseAnalytical.password
             - name: ANALYTICAL_DB_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "lago-data-api.configMapName" . }}
+                  name: {{ include "lago-data-config.configMapName" . }}
                   key: databaseAnalytical.port
             - name: ANALYTICAL_DB_SCHEMA
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "lago-data-api.configMapName" . }}
+                  name: {{ include "lago-data-config.configMapName" . }}
                   key: databaseAnalytical.schema
             - name: ANALYTICAL_DB_USER
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "lago-data-api.configMapName" . }}
+                  name: {{ include "lago-data-config.configMapName" . }}
                   key: databaseAnalytical.user
             - name: BEARER_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "lago-data-api.secretName" . }}
+                  name: {{ include "lago-data-config.secretName" . }}
+                  key: bearer
+            {{- if .Values.global.forecasted_usage.enabled }}
+            - name: LAGO_RAILS_API_URL
+              value: {{ required "global.urls.api must be provided " .Values.global.urls.api }}
+            - name: LAGO_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-data-config.secretName" . }}
                   key: api.token
             - name: CELERY_BROKER_URL
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "lago-data-api.configMapName" . }}
+                  name: {{ include "lago-data-config.configMapName" . }}
                   key: celery.brokerUrl
             - name: CELERY_RESULT_BACKEND
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "lago-data-api.configMapName" . }}
+                  name: {{ include "lago-data-config.configMapName" . }}
                   key: celery.resultBackend
-            - name: LAGO_API_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "lago-data-api.secretName" . }}
-                  key: api.token
-            - name: LAGO_RAILS_API_URL
-              value: {{ required "config.api.url must be provided " .Values.config.api.url }}
+            {{- end }}
+            {{- with .Values.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end}}
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
