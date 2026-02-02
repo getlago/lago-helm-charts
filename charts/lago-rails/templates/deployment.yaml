@@ -39,7 +39,7 @@ spec:
           command: {{ toJson .Values.container.command }}
           args: {{ toJson .Values.container.args }}
           envFrom:
-            {{- if .Values.global.streaming_ingestion }}
+            {{- if .Values.global.streaming_ingestion.enabled }}
             - configMapRef:
                 name: {{ include "lago-config.streaming.configMapName" . }}
             - secretRef:

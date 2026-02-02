@@ -44,4 +44,4 @@ dependencies:
   - name: celery-exporter
     version: 0.9.0
     repository: https://danihodovic.github.io/celery-exporter/
-    condition: celery-exporter.enabled,global.forecasted_usage.enabled
+    condition: celery-exporter.enabled
