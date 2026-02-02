@@ -50,7 +50,7 @@ spec:
             - name: API_URL
               value: {{ required "global.urls.api value is required" .Values.global.urls.api | quote }}
             - name: APP_ENV
-              value: {{ default .Values.global.lago.env .Values.config.env }}
+              value: {{ .Values.global.lago.env }}
             - name: NANGO_PUBLIC_KEY
               valueFrom:
                 secretKeyRef:

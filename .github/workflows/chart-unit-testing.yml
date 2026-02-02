@@ -1,4 +1,8 @@
-on: pull_request
+on:
+  pull_request:
+  push:
+    branches:
+      - main
 
 name: Unit tests Charts
 
@@ -11,7 +15,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Helm and run tests
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.18.4
+
+      - name: Update chart dependencies
+        run: |
+          for chart in charts/*/; do
+            if [ -f "$chart/Chart.yaml" ] && grep -q "dependencies:" "$chart/Chart.yaml"; then
+              echo "Updating dependencies for $chart"
+              helm dependency update "$chart"
+            fi
+          done
+
+      - name: Run unit tests
         uses: d3adb5/helm-unittest-action@v2
         with:
           helm-version: v3.18.4

@@ -3,11 +3,14 @@ templates:
   - templates/deployment.yaml
   - templates/hpa.yaml
 
+values:
+  - ../values.yaml
+
 tests:
   - it: should set replicas when autoscaling is disabled
     template: templates/deployment.yaml
     set:
-      config.apiUrl: "http://api.lago.dev"
+      global.urls.api: "http://api.lago.dev"
       replicaCount: 3
       autoscaling.enabled: false
     asserts:
@@ -18,7 +21,7 @@ tests:
   - it: should not set replicas when autoscaling is enabled
     template: templates/deployment.yaml
     set:
-      config.apiUrl: "http://api.lago.dev"
+      global.urls.api: "http://api.lago.dev"
       replicaCount: 3
       autoscaling.enabled: true
     asserts:
@@ -28,7 +31,7 @@ tests:
   - it: should not set replicas when external autoscaling is enabled
     template: templates/deployment.yaml
     set:
-      config.apiUrl: "http://api.lago.dev"
+      global.urls.api: "http://api.lago.dev"
       replicaCount: 3
       autoscaling.enabled: true
       autoscaling.external: true
@@ -39,7 +42,7 @@ tests:
   - it: should deploy HPA when autoscaling is enabled and not external
     template: templates/hpa.yaml
     set:
-      config.apiUrl: "http://api.lago.dev"
+      global.urls.api: "http://api.lago.dev"
       autoscaling.enabled: true
       autoscaling.external: false
     asserts:
@@ -50,7 +53,7 @@ tests:
   - it: should not deploy HPA when autoscaling is disabled
     template: templates/hpa.yaml
     set:
-      config.apiUrl: "http://api.lago.dev"
+      global.urls.api: "http://api.lago.dev"
       autoscaling.enabled: false
     asserts:
       - hasDocuments:
@@ -59,7 +62,7 @@ tests:
   - it: should not deploy HPA when external autoscaling is enabled (KEDA)
     template: templates/hpa.yaml
     set:
-      config.apiUrl: "http://api.lago.dev"
+      global.urls.api: "http://api.lago.dev"
       autoscaling.enabled: true
       autoscaling.external: true
     asserts:
