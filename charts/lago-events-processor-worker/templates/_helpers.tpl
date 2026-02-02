@@ -65,3 +65,19 @@ Create the name of the service account to use
 {{- define "lago-events-processor-worker.version" -}}
 {{ coalesce .Values.image.tag .Values.global.lago.version .Chart.AppVersion }}
 {{- end }}
+
+{{- define "lago-events-processor-worker.configMapName" -}}
+{{- mustMergeOverwrite .Values .Values.config | set . "Values" | include "lago-config.configMapName" }}
+{{- end }}
+
+{{- define "lago-events-processor-worker.secretName" -}}
+{{- mustMergeOverwrite .Values .Values.config | set . "Values" | include "lago-config.secretName" }}
+{{- end }}
+
+{{- define "lago-events-processor-worker.streaming.configMapName" -}}
+{{- mustMergeOverwrite .Values .Values.config | set . "Values" | include "lago-config.streaming.configMapName" }}
+{{- end }}
+
+{{- define "lago-events-processor-worker.streaming.secretName" -}}
+{{- mustMergeOverwrite .Values .Values.config | set . "Values" | include "lago-config.streaming.secretName" }}
+{{- end }}

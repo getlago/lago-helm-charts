@@ -1,0 +1,118 @@
+global:
+  lago:
+    version: sha-1112223
+    env: staging
+    cloud: true
+
+  urls:
+    api: https://test-lago-api.example.com
+    front: https://test-lago.example.com
+    pdf: http://pdf.default.svc.cluster.local
+
+  database:
+    uri: "postgres://lago:some_password@lago-postgres.svc.cluster.local:5432/lago"
+
+  encryption:
+    # openssl rand -hex 16
+    key: 911219513a368a9f5cb38b326e739a70
+
+    # openssl rand -hex 16
+    salt: cabaabf712d9f7b2ce0ae1b12fc01eec
+
+  signing:
+    # openssl genrsa 512 | openssl base64 -A (use a higher rsa size)
+    rsa: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUJWZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQVVBd2dnRThBZ0VBQWtFQXpmMnl4bUFFTlhUNXcxKy8KRDI0ckEzcFZTa01NSlExOWpvRmNHQ1pnOFMwQWF3OXcrb2twcEM5NVZBZ0huWnh3bmpSNUVTeUpLK2VMeWJJcwpEZ3JuTVFJREFRQUJBa0VBdFFaeEo3aVZ1a3pVZWdnWXBmelJQRHN6M1JGVENQVDBGRnBHanNxYmd4WE4zTmVHClE2Y2ttZTV3NWhlUGN4Y3Y5NXJ0d1BsL3VOTXdqYWZXUUIwbWdRSWhBUHdEOS8wK1RjUjhHWVN4V1d5cWNjMVgKY3VsNzVvcWNyTFlNNEdiVmJoblpBaUVBMFQ5eUhVa1Z1bFdDRWVGdTV5UStrR1pZdFZhc3Rvenc2enE1WUkyWAp5UmtDSVFEMTZiRjlMZVNZekRmaVlXUlBRdXFWWXJYQTI2UVVzZGxlTTZaczhlcmowUUlnUVB5VmNtYjZhbzZZCkFQbWt1Z0RWdFg4ejJjMzdnZzZ2M0Q2MnlEZnhoakVDSVFEd1o4ZXVxQ1VuN01Ia3Q2YVdpSStidWRFQ05INTgKanNYTXBKWEdEdVMvU3c9PQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg==
+    # openssl rand -base64 16
+    hmac: SOswQPXojXToX/l7R/FXUw==
+
+  redis:
+    uri: "redis://lago-redis.svc.cluster.local:6379"
+
+  redisCache:
+    uri: "redis://lago-redis.svc.cluster.local:6379"
+
+  redisStore:
+    uri: "redis://lago-redis.svc.cluster.local:6379"
+  # config:
+  #   configmap: test-lago-config
+  #   secret: test-lago-config
+
+  data:
+    enabled: true
+    endpoint: http://data-api.default.svc.cluster.local
+    token: data_token
+
+  streaming_ingestion:
+    enabled: true
+    clickhouse:
+      database: lago
+      username: lago_clickhouse
+      password: clickhouse_password
+      port: 8123
+      address: clickhouse.default.svc.cluster.local
+
+    kafka:
+      bootstrapServers:
+        - redpanda.default.svc.cluster.local:9093
+      consumerGroup: consumer
+      topics:
+        activityLogs: activity_logs
+        apiLogs: api_logs
+        eventsChargedInAdvance: events-charged-in-advance
+        eventsDeadLetter: events-dead-letter
+        eventsEnriched: events-enriched
+        eventsEnrichedExpanded: events-enriched-expanded
+        eventsRaw: events-raw
+
+
+  s3:
+    enabled: true
+    region: us-east-1
+    bucket: lago-test
+    # examples credentials: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html
+    accessKeyId: AKIAIOSFODNN7EXAMPLE
+    secretAccessKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+  smtp:
+    enabled: true
+    from: noreply@example.com
+    port: 1025
+    address: mailhog-web.default.svc.cluster.local
+
+  google:
+    enabled: true
+
+  gocardless:
+    enabled: true
+    proxy: https://test-proxy.example.com
+    clientId: gocardless_client_id
+    clientSecret: gocardless_client_secret
+
+  mcp:
+    enabled: true
+    clientId: mcp_client_id
+    clientSecret: mcp_client_secret
+    endpoint: http://lago-mcp-server.default.svc.cluster.local/mcp
+
+api:
+  ingress:
+    enabled: true
+    hosts:
+      - host: test-lago-api.example.com
+    tls:
+      - secretName: test-lago-api-example-tls
+        hosts:
+          - test-lago-api.example.com
+
+front:
+  image:
+    tag: sha-4445556
+
+  ingress:
+    enabled: true
+    hosts:
+      - host: test-lago.example.com
+    tls:
+      - secretName: test-lago-example-tls
+        hosts:
+          - test-lago.example.com

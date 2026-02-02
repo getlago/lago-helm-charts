@@ -121,10 +121,14 @@ global:
         activityLogs: activity_logs
         apiLogs: api_logs
 
+config:
+  nameOverride: lago-config
+
 # lago-api subchart settings
 api:
   config:
     enabled: false
+    nameOverride: lago-config
     web:
       sidekiq: true
 
@@ -140,6 +144,7 @@ worker:
   nameOverride: lago-worker
   config:
     enabled: false
+    nameOverride: lago-config
 
   service:
     enabled: false
@@ -156,6 +161,7 @@ clock:
   nameOverride: lago-clock
   config:
     enabled: false
+    nameOverride: lago-config
   livenessProbe: null
   readinessProbe: null
   service:
@@ -165,8 +171,10 @@ clock:
     ports:
 
 events-consumer-worker:
+  nameOverride: lago-events-consumer-worker
   config:
     enabled: false
+    nameOverride: lago-config
   livenessProbe: null
   readinessProbe: null
   service:
@@ -176,8 +184,10 @@ events-consumer-worker:
     ports:
 
 events-processor-worker:
+  nameOverride: lago-events-processor-worker
   config:
     enabled: false
+    nameOverride: lago-config
 
 # Database migration job configuration
 migrate:
@@ -188,7 +198,7 @@ migrate:
     tag: ""
     pullPolicy: IfNotPresent
   # -- Command to run for migrations
-  command: []
+  command: ["./scripts/migrate.sh"]
   # -- Arguments for the migration command
   args: []
   # -- Helm hook weight (lower runs first)

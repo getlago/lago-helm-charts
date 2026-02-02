@@ -43,9 +43,9 @@ spec:
           args: {{ toJson .Values.container.args }}
           envFrom:
             - configMapRef:
-                name: {{ include "lago-config.streaming.configMapName" . }}
+                name: {{ include "lago-events-processor-worker.streaming.configMapName" . }}
             - secretRef:
-                name: {{ include "lago-config.streaming.secretName" . }}
+                name: {{ include "lago-events-processor-worker.streaming.secretName" . }}
             {{- with .Values.extraEnvFrom }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -57,36 +57,36 @@ spec:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "lago-config.secretName" . }}
+                  name: {{ include "lago-events-processor-worker.secretName" . }}
                   key: database.uri
             - name: LAGO_REDIS_CACHE_URL
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "lago-config.configMapName" . }}
+                  name: {{ include "lago-events-processor-worker.configMapName" . }}
                   key: redisCache.uri
                   optional: true
             - name: LAGO_REDIS_CACHE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "lago-config.secretName" . }}
+                  name: {{ include "lago-events-processor-worker.secretName" . }}
                   key: redisCache.password
                   optional: true
             - name: LAGO_REDIS_STORE_URL
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "lago-config.configMapName" . }}
+                  name: {{ include "lago-events-processor-worker.configMapName" . }}
                   key: redisStore.uri
                   optional: true
             - name: LAGO_REDIS_STORE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "lago-config.secretName" . }}
+                  name: {{ include "lago-events-processor-worker.secretName" . }}
                   key: redisStore.password
                   optional: true
             - name: SENTRY_DSN
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "lago-config.secretName" . }}
+                  name: {{ include "lago-events-processor-worker.secretName" . }}
                   key: sentryDsn
                   optional: true
             {{- with .Values.extraEnv }}

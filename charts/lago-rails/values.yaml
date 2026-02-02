@@ -130,6 +130,7 @@ global:
 # Local config specific to this chart instance
 config:
   enabled: true
+  nameOverride: lago-config
   log:
     level: info
     stdout: true

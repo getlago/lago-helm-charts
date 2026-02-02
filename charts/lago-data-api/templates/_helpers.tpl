@@ -60,3 +60,11 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{- define "lago-data-api.configMapName" -}}
+{{- mustMergeOverwrite .Values .Values.config | set . "Values" | include "lago-data-config.configMapName" }}
+{{- end }}
+
+{{- define "lago-data-api.secretName" -}}
+{{- mustMergeOverwrite .Values .Values.config | set . "Values" | include "lago-data-config.secretName" }}
+{{- end }}

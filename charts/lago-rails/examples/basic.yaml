@@ -22,21 +22,17 @@ global:
   redis:
     uri: "redis://lago-redis.svc.cluster.local:6379"
 
-  databaseAnalytical:
-    host: lago-postgres.svc.cluster.local
-    name: lago
-    user: lago
-    password: some_password
+  redisCache:
+    uri: "redis://lago-redis.svc.cluster.local:6379"
 
-  data:
-    token: some_token
+  redisStore:
+    uri: "redis://lago-redis.svc.cluster.local:6379"
 
-  forecasted_usage:
-    enabled: true
-    api_token: some_api_token
-    celery:
-      brokerUrl: "redis://redis:6379/0"
-      resultBackend: "redis://redis:6379/1"
-
-celery-exporter:
-  enabled: false
+ingress:
+  enabled: true
+  hosts:
+    - host: lago-api.example.com
+  tls:
+    - secretName: lago-api-example-tls
+      hosts:
+        - lago-api.example.com
