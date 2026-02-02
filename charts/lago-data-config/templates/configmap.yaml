@@ -26,6 +26,6 @@ data:
   databaseAnalytical.schema: {{ . }}
   {{- end }}
   {{- if .Values.global.forecasted_usage.enabled }}
-  celery.brokerUrl: {{ required "global.celery.brokerUrl is required" .Values.global.celery.brokerUrl }}
-  celery.resultBackend: {{ required "global.celery.resultBackend is required" .Values.global.celery.resultBackend }}
+  celery.brokerUrl: {{ required "global.forecasted_usage.celery.brokerUrl is required" .Values.global.forecasted_usage.celery.brokerUrl }}
+  celery.resultBackend: {{ required "global.forecasted_usage.celery.resultBackend is required" .Values.global.forecasted_usage.celery.resultBackend }}
   {{- end }}

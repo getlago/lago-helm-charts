@@ -2,10 +2,6 @@ global:
   ago:
     env: "production"
     license: ""
-    signup: false
-    cloud: false
-    sidekiqPro: false
-    pdfGeneration: false
 
   config:
     configmap:
@@ -64,10 +60,17 @@ global:
     # token to validate calls from lago-api
     token:
 
+config:
+  nameOverride: lago-config
+
+data-config:
+  nameOverride: lago-data-config
+
 api:
-  fullnameOverride: lago-api
+  nameOverride: lago-api
   config:
     enabled: false
+    nameOverride: lago-config
 
   extraEnv:
     - name: LAGO_DATA_API_BEARER_TOKEN
@@ -77,22 +80,25 @@ api:
           key: api.token
 
 data-api:
-  fullnameOverride: lago-data-api
+  nameOverride: lago-data-api
   config:
     enabled: false
+    nameOverride: lago-data-config
     api:
       url: lago-api # this is the value of the api.fullnameOverride
 
 
 data-worker:
-  fullnameOverride: lago-data-worker
+  nameOverride: lago-data-worker
   config:
     enabled: false
+    nameOverride: lago-data-config
     api:
       url: http://lago-api
 
 celery-exporter:
-  enabled: true
+  # Enable celery-exporter for Prometheus metrics (requires global.forecasted_usage.enabled: true)
+  enabled: false
   env:
     - name: CE_BROKER_URL
       valueFrom:

@@ -26,14 +26,7 @@ global:
     token:
 
 config:
-  enabled: false
-
-container:
-  name: ""
-  command: ["uv"]
-  args: ["run", "fastapi", "run", "app/main.py", "--port", "80"]
-  ports:
-    http: 80
+  enabled: true
 
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
@@ -52,6 +45,13 @@ imagePullSecrets: []
 # This is to override the chart name.
 nameOverride: ""
 fullnameOverride: ""
+
+container:
+  name: ""
+  command: ["uv"]
+  args: ["run", "fastapi", "run", "app/main.py", "--port", "80"]
+  ports:
+    http: 80
 
 # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
