@@ -41,7 +41,3 @@ dependencies:
     version: 0.1.0
     repository: "file://../lago-data-worker"
     condition: global.forecasted_usage.enabled
-  - name: celery-exporter
-    version: 0.9.0
-    repository: https://danihodovic.github.io/celery-exporter/
-    condition: celery-exporter.enabled

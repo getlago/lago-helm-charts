@@ -95,21 +95,3 @@ data-worker:
     nameOverride: lago-data-config
     api:
       url: http://lago-api
-
-celery-exporter:
-  # Enable celery-exporter for Prometheus metrics (requires global.forecasted_usage.enabled: true)
-  enabled: false
-  env:
-    - name: CE_BROKER_URL
-      valueFrom:
-        configMapKeyRef:
-          name: lago-data-config
-          key: celery.brokerUrl
-
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-
-  podAnnotations:
-    prometheus.io/scrape: "true"

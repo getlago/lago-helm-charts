@@ -27,7 +27,9 @@ data:
   LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC: {{ $kafka.topics.eventsChargedInAdvance }}
   LAGO_KAFKA_EVENTS_DEAD_LETTER_TOPIC: {{ $kafka.topics.eventsDeadLetter }}
   LAGO_KAFKA_RAW_EVENTS_TOPIC: {{ $kafka.topics.eventsRaw }}
+  {{- with $kafka.saslMechanisms }}
   LAGO_KAFKA_SCRAM_ALGORITHM: {{ $kafka.saslMechanisms }}
+  {{- end }}
   LAGO_KAFKA_TLS: {{ $kafka.tls | quote }}
   LAGO_KAFKA_ACTIVITY_LOGS_TOPIC: {{ $kafka.topics.activityLogs }}
   LAGO_KAFKA_API_LOGS_TOPIC: {{ $kafka.topics.apiLogs }}

@@ -50,14 +50,8 @@ spec:
         - name: migrate
           image: "{{ .Values.migrate.image.repository }}:{{ include "lago.version" . }}"
           imagePullPolicy: {{ .Values.migrate.image.pullPolicy }}
-          {{- if .Values.migrate.command }}
           command: {{ toJson .Values.migrate.command }}
           args: {{ toJson .Values.migrate.args }}
-          {{- else if eq .Values.global.lago.env "staging" }}
-          command: ["./scripts/migrate.staging.sh"]
-          {{- else }}
-          command: ["./scripts/migrate.sh"]
-          {{- end }}
           {{- with .Values.migrate.extraEnvFrom }}
           envFrom:
             {{- toYaml . | nindent 12 }}
