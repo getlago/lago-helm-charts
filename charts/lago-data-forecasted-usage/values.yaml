@@ -2,10 +2,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-config:
+global:
   databaseAnalytical:
-    existingSecret:
-    existingConfigMap:
     host: ""
     name: ""
     user: ""
@@ -13,13 +11,24 @@ config:
     port: 5432
     schema: analytical
 
+  data:
+    token: some_token # make data-config happy
+
+config:
+  enabled: true
+  nameOverride: lago-data-forecasted-usage
+
   s3:
-    existingSecret:
+    secret:
+      create: true
+      name:
     accessKeyId:
     secretAccessKey:
 
   ml:
-    existingSecret:
+    secret:
+      create: true
+      name:
     config: |
 
 
