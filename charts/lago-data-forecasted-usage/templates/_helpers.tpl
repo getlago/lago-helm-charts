@@ -62,33 +62,11 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Get the name of the analytical database secret
-*/}}
-{{- define "lago-data-forecasted-usage.analyticalDatabaseSecretName" -}}
-{{- if .Values.config.databaseAnalytical.existingSecret }}
-{{- .Values.config.databaseAnalytical.existingSecret }}
-{{- else }}
-{{- printf "%s-analytical-db" (include "lago-data-forecasted-usage.fullname" .) }}
-{{- end }}
-{{- end }}
-
-{{/*
-Get the name of the analytical database configmap
-*/}}
-{{- define "lago-data-forecasted-usage.analyticalDatabaseConfigMapName" -}}
-{{- if .Values.config.databaseAnalytical.existingConfigMap }}
-{{- .Values.config.databaseAnalytical.existingConfigMap }}
-{{- else }}
-{{- printf "%s-analytical-db" (include "lago-data-forecasted-usage.fullname" .) }}
-{{- end }}
-{{- end }}
-
-{{/*
 Get the name of the S3 secret
 */}}
-{{- define "lago-data-forecasted-usage.s3SecretName" -}}
-{{- if .Values.config.s3.existingSecret }}
-{{- .Values.config.s3.existingSecret }}
+{{- define "lago-data-forecasted-usage.s3.secretName" -}}
+{{- if .Values.config.s3.secret.name }}
+{{- .Values.config.s3.secret.name }}
 {{- else }}
 {{- printf "%s-s3" (include "lago-data-forecasted-usage.fullname" .) }}
 {{- end }}
@@ -97,10 +75,19 @@ Get the name of the S3 secret
 {{/*
 Get the name of the ML secret
 */}}
-{{- define "lago-data-forecasted-usage.mlSecretName" -}}
-{{- if .Values.config.ml.existingSecret }}
-{{- .Values.config.ml.existingSecret }}
+{{- define "lago-data-forecasted-usage.ml.secretName" -}}
+{{- if .Values.config.ml.secret.name }}
+{{- .Values.config.ml.secret.name }}
 {{- else }}
 {{- printf "%s-ml" (include "lago-data-forecasted-usage.fullname" .) }}
 {{- end }}
+{{- end }}
+
+
+{{- define "lago-data-forecasted-usage.configMapName" -}}
+{{- mustMergeOverwrite .Values .Values.config | set . "Values" | include "lago-data-config.configMapName" }}
+{{- end }}
+
+{{- define "lago-data-forecasted-usage.secretName" -}}
+{{- mustMergeOverwrite .Values .Values.config | set . "Values" | include "lago-data-config.secretName" }}
 {{- end }}

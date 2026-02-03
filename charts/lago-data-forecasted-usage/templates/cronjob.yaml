@@ -60,47 +60,47 @@ spec:
                 - name: ANALYTICAL_DB_HOST
                   valueFrom:
                     configMapKeyRef:
-                      name: {{ include "lago-data-forecasted-usage.analyticalDatabaseConfigMapName" . }}
+                      name: {{ include "lago-data-forecasted-usage.configMapName" . }}
                       key: databaseAnalytical.host
                 - name: ANALYTICAL_DB_NAME
                   valueFrom:
                     configMapKeyRef:
-                      name: {{ include "lago-data-forecasted-usage.analyticalDatabaseConfigMapName" . }}
+                      name: {{ include "lago-data-forecasted-usage.configMapName" . }}
                       key: databaseAnalytical.name
                 - name: ANALYTICAL_DB_PASSWORD
                   valueFrom:
                     secretKeyRef:
-                      name: {{ include "lago-data-forecasted-usage.analyticalDatabaseSecretName" . }}
+                      name: {{ include "lago-data-forecasted-usage.secretName" . }}
                       key: databaseAnalytical.password
                 - name: ANALYTICAL_DB_PORT
                   valueFrom:
                     configMapKeyRef:
-                      name: {{ include "lago-data-forecasted-usage.analyticalDatabaseConfigMapName" . }}
+                      name: {{ include "lago-data-forecasted-usage.configMapName" . }}
                       key: databaseAnalytical.port
                 - name: ANALYTICAL_DB_SCHEMA
                   valueFrom:
                     configMapKeyRef:
-                      name: {{ include "lago-data-forecasted-usage.analyticalDatabaseConfigMapName" . }}
+                      name: {{ include "lago-data-forecasted-usage.configMapName" . }}
                       key: databaseAnalytical.schema
                 - name: ANALYTICAL_DB_USER
                   valueFrom:
                     configMapKeyRef:
-                      name: {{ include "lago-data-forecasted-usage.analyticalDatabaseConfigMapName" . }}
+                      name: {{ include "lago-data-forecasted-usage.configMapName" . }}
                       key: databaseAnalytical.user
                 - name: AWS_ACCESS_KEY_ID
                   valueFrom:
                     secretKeyRef:
-                      name: {{ include "lago-data-forecasted-usage.s3SecretName" . }}
+                      name: {{ include "lago-data-forecasted-usage.s3.secretName" . }}
                       key: s3.accessKeyId
                 - name: AWS_SECRET_ACCESS_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: {{ include "lago-data-forecasted-usage.s3SecretName" . }}
+                      name: {{ include "lago-data-forecasted-usage.s3.secretName" . }}
                       key: s3.secretAccessKey
                 - name: ML_CONFIG_YAML
                   valueFrom:
                     secretKeyRef:
-                      name: {{ include "lago-data-forecasted-usage.mlSecretName" . }}
+                      name: {{ include "lago-data-forecasted-usage.ml.secretName" . }}
                       key: ml.config
               {{- with .Values.resources }}
               resources:

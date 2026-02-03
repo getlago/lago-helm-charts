@@ -15,16 +15,23 @@ vars:
     - lago-rails
     - lago-data-api
     - lago-data
+    - lago-data-forecasted-usage
+    - lago-staging
     - lago
 
 tasks:
   dependencies:update:
-    cmd:
-      for:
-        var: CHARTS
-      cmd: helm dependency update charts/{{.ITEM}}
+    desc: Update all chart dependencies (removes stale Chart.lock files first)
+    cmds:
+      - for:
+          var: CHARTS
+        cmd: rm -f charts/{{.ITEM}}/Chart.lock
+      - for:
+          var: CHARTS
+        cmd: helm dependency update charts/{{.ITEM}}
 
   dependencies:build:
+    desc: Build all chart dependencies
     deps: [dependencies:update]
     cmd:
       for:
