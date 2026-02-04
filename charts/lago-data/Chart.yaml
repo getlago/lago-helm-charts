@@ -22,7 +22,7 @@ dependencies:
     alias: config
     version: 0.1.0
     repository: "file://../lago-config"
-    condition: global.forecasted_usage.enabled
+    condition: global.forecastedUsage.enabled
   - name: lago-data-config
     alias: data-config
     version: 0.1.0
@@ -31,7 +31,7 @@ dependencies:
     alias: api
     version: 0.1.0
     repository: "file://../lago-rails"
-    condition: global.forecasted_usage.enabled
+    condition: global.forecastedUsage.enabled
   - name: lago-data-api
     alias: data-api
     version: 0.1.0
@@ -40,4 +40,4 @@ dependencies:
     alias: data-worker
     version: 0.1.0
     repository: "file://../lago-data-worker"
-    condition: global.forecasted_usage.enabled
+    condition: global.forecastedUsage.enabled

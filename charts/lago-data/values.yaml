@@ -46,7 +46,20 @@ global:
     port: 5432
     schema: analytical
 
-  forecasted_usage:
+  databaseReplica:
+    host: ""
+    name: ""
+    user: ""
+    password: ""
+    port: 5432
+
+  dbtPipeline:
+    enabled: false
+    sourceSchema: public
+    targetSchema: analytical
+    tables: []
+
+  forecastedUsage:
     enabled: false
     # forecasted usage need to call lago-api, hence provide a valid token
     api_token:
@@ -95,3 +108,52 @@ data-worker:
     nameOverride: lago-data-config
     api:
       url: http://lago-api
+
+# DBT Pipeline CronJob configuration
+dbtPipeline:
+  image:
+    repository: getlago/data-dbt-pipeline
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets: []
+
+  container:
+    command: []
+    args: []
+
+  # CronJob specific configuration
+  cronjob:
+    schedule: "0 5 * * *"
+    concurrencyPolicy: Forbid
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 1
+    startingDeadlineSeconds:
+    suspend: false
+    activeDeadlineSeconds:
+    backoffLimit: 0
+    restartPolicy: Never
+
+  # Trigger job on install via helm hook
+  trigger:
+    enabled: false
+    image:
+      repository: rancher/kubectl
+      tag: latest
+
+  serviceAccount:
+    create: true
+    automount: true
+    annotations: {}
+
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  securityContext: {}
+  resources: {}
+  volumes: []
+  volumeMounts: []
+  nodeSelector: {}
+  tolerations: []
+  affinity: []
+  extraEnv: []

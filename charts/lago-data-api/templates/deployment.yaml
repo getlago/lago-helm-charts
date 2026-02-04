@@ -82,7 +82,7 @@ spec:
                 secretKeyRef:
                   name: {{ include "lago-data-api.secretName" . }}
                   key: bearer
-            {{- if .Values.global.forecasted_usage.enabled }}
+            {{- if .Values.global.forecastedUsage.enabled }}
             - name: LAGO_RAILS_API_URL
               value: {{ required "global.urls.api must be provided " .Values.global.urls.api }}
             - name: LAGO_API_TOKEN

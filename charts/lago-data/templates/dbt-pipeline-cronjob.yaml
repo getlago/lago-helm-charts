@@ -1,0 +1,169 @@
+{{- if .Values.global.dbtPipeline.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "lago-data.fullname" . }}-dbt-pipeline
+  labels:
+    {{- include "lago-data.labels" . | nindent 4 }}
+    app.kubernetes.io/component: dbt-pipeline
+spec:
+  schedule: {{ .Values.dbtPipeline.cronjob.schedule | quote }}
+  concurrencyPolicy: {{ .Values.dbtPipeline.cronjob.concurrencyPolicy }}
+  failedJobsHistoryLimit: {{ .Values.dbtPipeline.cronjob.failedJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ .Values.dbtPipeline.cronjob.successfulJobsHistoryLimit }}
+  {{- with .Values.dbtPipeline.cronjob.startingDeadlineSeconds }}
+  startingDeadlineSeconds: {{ . }}
+  {{- end }}
+  suspend: {{ .Values.dbtPipeline.cronjob.suspend }}
+  jobTemplate:
+    metadata:
+      labels:
+        {{- include "lago-data.labels" . | nindent 8 }}
+        app.kubernetes.io/component: dbt-pipeline
+    spec:
+      {{- with .Values.dbtPipeline.cronjob.activeDeadlineSeconds }}
+      activeDeadlineSeconds: {{ . }}
+      {{- end }}
+      {{- with .Values.dbtPipeline.cronjob.backoffLimit }}
+      backoffLimit: {{ . }}
+      {{- end }}
+      template:
+        metadata:
+          {{- with .Values.dbtPipeline.podAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          labels:
+            {{- include "lago-data.labels" . | nindent 12 }}
+            app.kubernetes.io/component: dbt-pipeline
+            {{- with .Values.dbtPipeline.podLabels }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+        spec:
+          {{- with .Values.dbtPipeline.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          serviceAccountName: {{ include "lago-data.fullname" . }}-dbt-pipeline
+          {{- with .Values.dbtPipeline.podSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          restartPolicy: {{ .Values.dbtPipeline.cronjob.restartPolicy }}
+          containers:
+            - name: dbt-pipeline
+              {{- with .Values.dbtPipeline.securityContext }}
+              securityContext:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              image: "{{ .Values.dbtPipeline.image.repository }}:{{ .Values.dbtPipeline.image.tag }}"
+              imagePullPolicy: {{ .Values.dbtPipeline.image.pullPolicy }}
+              {{- if not (empty .Values.dbtPipeline.container.command) }}
+              command: {{ toJson .Values.dbtPipeline.container.command }}
+              {{- else if not (empty .Values.global.dbtPipeline.tables) }}
+              command: ["/bin/bash", "-c", "scripts/refresh_tables.sh && scripts/run_dbt.sh"]
+              {{- else }}
+              command: ["scripts/run_dbt.sh"]
+              {{- end }}
+              {{- if not (empty .Values.dbtPipeline.container.args) }}
+              args: {{ toJson .Values.dbtPipeline.container.args }}
+              {{- end }}
+              env:
+                - name: ANALYTICAL_DB_HOST
+                  valueFrom:
+                    configMapKeyRef:
+                      name: {{ include "lago-data.configMapName" . }}
+                      key: databaseAnalytical.host
+                - name: ANALYTICAL_DB_NAME
+                  valueFrom:
+                    configMapKeyRef:
+                      name: {{ include "lago-data.configMapName" . }}
+                      key: databaseAnalytical.name
+                - name: ANALYTICAL_DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "lago-data.secretName" . }}
+                      key: databaseAnalytical.password
+                - name: ANALYTICAL_DB_PORT
+                  valueFrom:
+                    configMapKeyRef:
+                      name: {{ include "lago-data.configMapName" . }}
+                      key: databaseAnalytical.port
+                - name: ANALYTICAL_DB_SCHEMA
+                  valueFrom:
+                    configMapKeyRef:
+                      name: {{ include "lago-data.configMapName" . }}
+                      key: databaseAnalytical.schema
+                - name: ANALYTICAL_DB_USER
+                  valueFrom:
+                    configMapKeyRef:
+                      name: {{ include "lago-data.configMapName" . }}
+                      key: databaseAnalytical.user
+                - name: ANALYTICAL_DB_SOURCE_SCHEMA
+                  valueFrom:
+                    configMapKeyRef:
+                      name: {{ include "lago-data.configMapName" . }}
+                      key: dbt.sourceSchema
+                - name: ANALYTICAL_DB_TARGET_SCHEMA
+                  valueFrom:
+                    configMapKeyRef:
+                      name: {{ include "lago-data.configMapName" . }}
+                      key: dbt.targetSchema
+                - name: REPLICA_DB_HOST
+                  valueFrom:
+                    configMapKeyRef:
+                      name: {{ include "lago-data.configMapName" . }}
+                      key: databaseReplica.host
+                - name: REPLICA_DB_NAME
+                  valueFrom:
+                    configMapKeyRef:
+                      name: {{ include "lago-data.configMapName" . }}
+                      key: databaseReplica.name
+                - name: REPLICA_DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "lago-data.secretName" . }}
+                      key: databaseReplica.password
+                - name: REPLICA_DB_PORT
+                  valueFrom:
+                    configMapKeyRef:
+                      name: {{ include "lago-data.configMapName" . }}
+                      key: databaseReplica.port
+                - name: REPLICA_DB_USER
+                  valueFrom:
+                    configMapKeyRef:
+                      name: {{ include "lago-data.configMapName" . }}
+                      key: databaseReplica.user
+                - name: REPLICA_DB_SOURCE_SCHEMA
+                  valueFrom:
+                    configMapKeyRef:
+                      name: {{ include "lago-data.configMapName" . }}
+                      key: dbt.sourceSchema
+                {{- with .Values.dbtPipeline.extraEnv }}
+                {{- toYaml . | nindent 16 }}
+                {{- end }}
+              {{- with .Values.dbtPipeline.resources }}
+              resources:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              {{- with .Values.dbtPipeline.volumeMounts }}
+              volumeMounts:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+          {{- with .Values.dbtPipeline.volumes }}
+          volumes:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.dbtPipeline.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.dbtPipeline.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.dbtPipeline.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}

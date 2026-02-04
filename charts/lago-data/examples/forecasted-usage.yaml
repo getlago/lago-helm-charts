@@ -31,7 +31,7 @@ global:
   data:
     token: some_token
 
-  forecasted_usage:
+  forecastedUsage:
     enabled: true
     api_token: some_api_token
     celery:
