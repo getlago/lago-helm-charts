@@ -1,0 +1,9 @@
+dependencies:
+- name: lago
+  repository: file://../lago
+  version: 0.1.0
+- name: lago-data
+  repository: file://../lago-data
+  version: 0.1.0
+digest: sha256:37669f5f5dfb981bd0bde63a3c04c94290cb6c59b106c8336f0a6f6a4f9d06b4
+generated: "2026-02-04T10:34:06.554984+01:00"
