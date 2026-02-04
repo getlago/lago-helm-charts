@@ -48,3 +48,6 @@ dependencies:
     version: 0.1.0
     repository: "file://../lago-events-processor-worker"
     condition: global.streaming_ingestion.enabled
+
+annotations:
+  org.opencontainers.image.source: "https://github.com/getlago/lago-helm-charts"

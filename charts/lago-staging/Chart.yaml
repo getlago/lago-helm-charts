@@ -25,3 +25,6 @@ dependencies:
     version: 0.1.0
     repository: "file://../lago-data"
     condition: global.data.enabled
+
+annotations:
+  org.opencontainers.image.source: "https://github.com/getlago/lago-helm-charts"
