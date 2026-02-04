@@ -41,3 +41,6 @@ dependencies:
     version: 0.1.0
     repository: "file://../lago-data-worker"
     condition: global.forecastedUsage.enabled
+
+annotations:
+  org.opencontainers.image.source: "https://github.com/getlago/lago-helm-charts"

@@ -1,0 +1,104 @@
+name: Publish charts to GHCR (OCI)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'charts/**/Chart.yaml'
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      charts: ${{ steps.changed-charts.outputs.charts }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changed charts
+        id: changed-charts
+        run: |
+          # Get list of changed Chart.yaml files
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD -- 'charts/**/Chart.yaml')
+
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No Chart.yaml files changed"
+            echo "charts=[]" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Extract chart names and check for version changes
+          CHARTS=()
+          for file in $CHANGED_FILES; do
+            CHART_DIR=$(dirname "$file")
+            CHART_NAME=$(basename "$CHART_DIR")
+
+            # Get old and new versions
+            OLD_VERSION=$(git show HEAD~1:"$file" 2>/dev/null | grep '^version:' | awk '{print $2}' || echo "")
+            NEW_VERSION=$(grep '^version:' "$file" | awk '{print $2}')
+
+            if [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
+              echo "Version bump detected for $CHART_NAME: $OLD_VERSION -> $NEW_VERSION"
+              CHARTS+=("$CHART_NAME")
+            else
+              echo "No version change for $CHART_NAME (version: $NEW_VERSION)"
+            fi
+          done
+
+          # Convert to JSON array
+          if [ ${#CHARTS[@]} -eq 0 ]; then
+            echo "charts=[]" >> $GITHUB_OUTPUT
+          else
+            JSON_ARRAY=$(printf '%s\n' "${CHARTS[@]}" | jq -R . | jq -s -c .)
+            echo "charts=$JSON_ARRAY" >> $GITHUB_OUTPUT
+          fi
+
+  publish:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.charts != '[]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        chart: ${{ fromJson(needs.detect-changes.outputs.charts) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.18.4
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Get chart version
+        id: chart-version
+        run: |
+          VERSION=$(grep '^version:' charts/${{ matrix.chart }}/Chart.yaml | awk '{print $2}')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Prepare chart for OCI publishing
+        run: |
+          mkdir -p .helm-packages .helm-build
+          cp -r charts/${{ matrix.chart }} .helm-build/
+          # Transform file:// dependencies to OCI registry
+          sed -i 's|repository:.*"file://\.\./[^"]*"|repository: "oci://ghcr.io/getlago/helm-charts"|g' .helm-build/${{ matrix.chart }}/Chart.yaml
+          rm -f .helm-build/${{ matrix.chart }}/Chart.lock
+
+      - name: Update dependencies
+        run: helm dependency update .helm-build/${{ matrix.chart }}
+
+      - name: Package chart
+        run: helm package .helm-build/${{ matrix.chart }} --destination .helm-packages
+
+      - name: Push to GHCR
+        run: |
+          helm push .helm-packages/${{ matrix.chart }}-${{ steps.chart-version.outputs.version }}.tgz oci://ghcr.io/getlago/helm-charts
+          echo "Published ${{ matrix.chart }}:${{ steps.chart-version.outputs.version }} to ghcr.io/getlago/lago-helm-charts"
