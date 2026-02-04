@@ -1,0 +1,26 @@
+global:
+  urls:
+    api: "https://lago-api.example.com"
+
+  databaseAnalytical:
+    host: lago-analytical-postgres.svc.cluster.local
+    name: lago
+    user: lago
+    password: some_password
+
+  databaseReplica:
+    host: lago-replica-postgres.svc.cluster.local
+    name: lago
+    user: lago
+    password: some_password
+
+  data:
+    token: some_token
+
+  dbtPipeline:
+    enabled: true
+
+
+dbtPipeline:
+  trigger:
+    enabled: true

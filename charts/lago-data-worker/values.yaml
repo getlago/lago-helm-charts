@@ -11,7 +11,7 @@ global:
     port: 5432
     schema: analytical
 
-  forecasted_usage:
+  forecastedUsage:
     enabled: true # if data worker is present, it means forecasted usage is active
     # forecasted usage need to call lago-api, hence provide a valid token
     api_token:
