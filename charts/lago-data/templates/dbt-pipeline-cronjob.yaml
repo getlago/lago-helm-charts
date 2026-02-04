@@ -109,6 +109,7 @@ spec:
                     configMapKeyRef:
                       name: {{ include "lago-data.configMapName" . }}
                       key: dbt.targetSchema
+                {{- if not (empty .Values.global.dbtPipeline.tables) }}
                 - name: REPLICA_DB_HOST
                   valueFrom:
                     configMapKeyRef:
@@ -139,6 +140,7 @@ spec:
                     configMapKeyRef:
                       name: {{ include "lago-data.configMapName" . }}
                       key: dbt.sourceSchema
+                {{- end }}
                 {{- with .Values.dbtPipeline.extraEnv }}
                 {{- toYaml . | nindent 16 }}
                 {{- end }}
