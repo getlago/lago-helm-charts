@@ -67,7 +67,7 @@ config:
 
 container:
   name: ""
-  command: ["./scripts/start.api.sh"]
+  command: ["./event_processors"]
   args: []
 
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
