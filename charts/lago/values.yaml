@@ -255,7 +255,7 @@ createTopics:
   # -- Helm hook weight (lower runs first)
   hookWeight: "-1"
   # -- Hook delete policy: hook-succeeded, hook-failed, before-hook-creation
-  hookDeletePolicy: before-hook-creation,hook-succeeded
+  hookDeletePolicy: before-hook-creation
   # -- Job backoff limit
   backoffLimit: 3
   # -- Restart policy for the job pod
@@ -289,7 +289,50 @@ createTopics:
   # -- Affinity
   affinity: {}
 
-
+# Kafka topic creation job configuration
+deleteTopics:
+  # -- Enable the Kafka topic creation job
+  enabled: false
+  image:
+    repository: alpine
+    tag: "3.20"
+    pullPolicy: IfNotPresent
+  # -- Helm hook weight (lower runs first)
+  hookWeight: "1"
+  # -- Hook delete policy: hook-succeeded, hook-failed, before-hook-creation
+  hookDeletePolicy: before-hook-creation
+  # -- Job backoff limit
+  backoffLimit: 3
+  # -- Restart policy for the job pod
+  restartPolicy: Never
+  # -- TTL for cleaning up finished jobs (seconds)
+  ttlSecondsAfterFinished: 300
+  # -- Active deadline for the job (seconds)
+  activeDeadlineSeconds: 300
+  # -- Additional annotations for the Job
+  annotations: {}
+  # -- Additional annotations for the pod
+  podAnnotations: {}
+  # -- Additional labels for the pod
+  podLabels: {}
+  # -- Service account name for the job
+  serviceAccountName: ""
+  # -- Image pull secrets
+  imagePullSecrets: []
+  # -- Pod security context
+  podSecurityContext: {}
+  # -- Container security context
+  securityContext: {}
+  # -- Resource limits and requests
+  resources: {}
+  # -- Additional environment variables
+  extraEnv: []
+  # -- Node selector
+  nodeSelector: {}
+  # -- Tolerations
+  tolerations: []
+  # -- Affinity
+  affinity: {}
 
 # -- Array of extra K8s manifests to deploy
 ## Note: Supports use of custom Helm templates
