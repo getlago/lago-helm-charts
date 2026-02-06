@@ -1,0 +1,8 @@
+# Required values for lago-data-forecasted-usage tests
+config:
+  enabled: true
+  ml:
+    config: "test-config"
+  s3:
+    accessKeyId: "test-access-key"
+    secretAccessKey: "test-secret-key"

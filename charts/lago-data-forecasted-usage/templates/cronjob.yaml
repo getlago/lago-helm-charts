@@ -56,6 +56,10 @@ spec:
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               command: {{ toJson .Values.container.command }}
               args: {{ toJson .Values.container.args }}
+              {{- with .Values.extraEnvFrom }}
+              envFrom:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
               env:
                 - name: ANALYTICAL_DB_HOST
                   valueFrom:
@@ -102,6 +106,9 @@ spec:
                     secretKeyRef:
                       name: {{ include "lago-data-forecasted-usage.ml.secretName" . }}
                       key: ml.config
+                {{- with .Values.extraEnv }}
+                {{- toYaml . | nindent 16 }}
+                {{- end }}
               {{- with .Values.resources }}
               resources:
                 {{- toYaml . | nindent 16 }}

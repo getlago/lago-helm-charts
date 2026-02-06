@@ -11,22 +11,23 @@ vars:
       front: getlago/front:{{.VERSION}}
       gotenberg: getlago/lago-gotenberg:8.15
   CHARTS:
-    # Base configs (no dependencies)
-    - lago-config
-    - lago-data-config
-    # Components depending on configs
-    - lago-rails
-    - lago-front
-    - lago-events-processor-worker
-    - lago-data-api
-    - lago-data-worker
-    - lago-data-forecasted-usage
-    - lago-mcp-server
-    # Umbrella charts (depend on components)
-    - lago-data
-    - lago
-    # Top-level (depends on umbrella charts)
-    - lago-staging
+    map:
+      # Base configs (no dependencies)
+      lago-config: ""
+      lago-data-config: ""
+      # Components depending on configs
+      lago-rails: deployment
+      lago-front: deployment
+      lago-events-processor-worker: deployment
+      lago-data-api: deployment
+      lago-data-worker: deployment
+      lago-data-forecasted-usage: cronjob
+      lago-mcp-server: deployment
+      # Umbrella charts (depend on components)
+      lago-data: ""
+      lago: ""
+      # Top-level (depends on umbrella charts)
+      lago-staging: ""
 
 tasks:
   dependencies:update:
@@ -34,10 +35,10 @@ tasks:
     cmds:
       - for:
           var: CHARTS
-        cmd: rm -f charts/{{.ITEM}}/Chart.lock
+        cmd: rm -f charts/{{.KEY}}/Chart.lock
       - for:
           var: CHARTS
-        cmd: helm dependency update charts/{{.ITEM}}
+        cmd: helm dependency update charts/{{.KEY}}
 
   dependencies:build:
     desc: Build all chart dependencies
@@ -45,7 +46,7 @@ tasks:
     cmd:
       for:
         var: CHARTS
-      cmd: helm dependency build charts/{{.ITEM}}
+      cmd: helm dependency build charts/{{.KEY}}
 
   lint:
     desc: Lint the chart
@@ -101,14 +102,39 @@ tasks:
     desc: Delete the kind cluster
     cmd: kind delete cluster --name lago
 
+  test:unit:*:
+    internal: true
+    vars:
+      CHART: '{{index .MATCH 0}}'
+      CHART_TYPE: '{{index .CHARTS .CHART}}'
+    deps:
+      - dependencies:build:{{.CHART}}
+    cmds:
+      - cmd: '{{if .CHART_TYPE}}cp tests-common/{{.CHART_TYPE}}/common_patterns_test.yaml charts/{{.CHART}}/tests/{{end}}'
+      - defer: rm -f charts/{{.CHART}}/tests/common_patterns_test.yaml
+      - helm unittest ./charts/{{.CHART}}
+
+  dependencies:build:*:
+    internal: true
+    vars:
+      CHART: '{{index .MATCH 0}}'
+    cmd: helm dependency build charts/{{.CHART}}
+
   test:unit:
     desc: Run unit tests for the charts
     preconditions:
       - sh: helm unittest -h
         msg: "❌ helm unittest not found (see: https://github.com/helm-unittest/helm-unittest)"
-    cmds:
-      - helm unittest ./charts/lago
-      - helm unittest ./charts/lago-app
+    deps:
+      - test:unit:lago-config
+      - test:unit:lago-rails
+      - test:unit:lago-front
+      - test:unit:lago-events-processor-worker
+      - test:unit:lago-data-api
+      - test:unit:lago-data-worker
+      - test:unit:lago-mcp-server
+      - test:unit:lago-data-forecasted-usage
+      - test:unit:lago
 
   test:e2e:
     desc: Create a kind cluster and deploy the chart
@@ -188,5 +214,5 @@ tasks:
       - mkdir -p .helm-packages .helm-build
       - for:
           var: CHARTS
-        task: oci:push:{{.ITEM}}
+        task: oci:push:{{.KEY}}
       - rm -rf .helm-packages .helm-build
