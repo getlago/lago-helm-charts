@@ -1,0 +1,5 @@
+# Required values for lago-data-worker tests
+config:
+  enabled: true
+  api:
+    url: "http://api.test.local"

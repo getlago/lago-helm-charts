@@ -1,0 +1,126 @@
+# Common tests for CronJob charts - validates extraEnv, extraEnvFrom, resources
+# This file is copied to each chart's tests/ directory by the Taskfile
+# Required: each chart must have tests/fixtures/required.yaml with chart-specific values
+suite: Test common cronjob patterns
+templates:
+  - templates/cronjob.yaml
+values:
+  - ../values.yaml
+
+tests:
+  # ============================================================================
+  # extraEnv Tests
+  # ============================================================================
+  - it: should include extraEnv variables in container env
+    values:
+      - ./fixtures/required.yaml
+    set:
+      extraEnv:
+        - name: TEST_EXTRA_ENV_VAR
+          value: "test-value-123"
+        - name: TEST_EXTRA_ENV_FROM_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: test-secret
+              key: test-key
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          content:
+            name: TEST_EXTRA_ENV_VAR
+            value: "test-value-123"
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          content:
+            name: TEST_EXTRA_ENV_FROM_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: test-secret
+                key: test-key
+
+  # ============================================================================
+  # extraEnvFrom Tests
+  # ============================================================================
+  - it: should include extraEnvFrom references in container envFrom
+    values:
+      - ./fixtures/required.yaml
+    set:
+      extraEnvFrom:
+        - configMapRef:
+            name: test-config-map
+        - secretRef:
+            name: test-secret-ref
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].envFrom
+          content:
+            configMapRef:
+              name: test-config-map
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].envFrom
+          content:
+            secretRef:
+              name: test-secret-ref
+
+  # ============================================================================
+  # Resources Tests
+  # ============================================================================
+  - it: should include resources when specified
+    values:
+      - ./fixtures/required.yaml
+    set:
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.cpu
+          value: 500m
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.memory
+          value: 512Mi
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.cpu
+          value: 100m
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.memory
+          value: 128Mi
+
+  - it: should not include resources when empty
+    values:
+      - ./fixtures/required.yaml
+    set:
+      resources: {}
+    asserts:
+      - notExists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources
+
+  # ============================================================================
+  # Combined Test
+  # ============================================================================
+  - it: should correctly render all common patterns together
+    values:
+      - ./fixtures/required.yaml
+    set:
+      extraEnv:
+        - name: TEST_COMBINED_VAR
+          value: "combined-test"
+      extraEnvFrom:
+        - configMapRef:
+            name: test-combined-configmap
+      resources:
+        limits:
+          cpu: 1
+          memory: 1Gi
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          content:
+            name: TEST_COMBINED_VAR
+            value: "combined-test"
+      - isNotNull:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources

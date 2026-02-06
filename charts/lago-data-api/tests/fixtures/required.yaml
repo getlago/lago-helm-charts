@@ -1,0 +1,6 @@
+# Required values for lago-data-api tests
+config:
+  enabled: true
+global:
+  urls:
+    api: "http://api.test.local"

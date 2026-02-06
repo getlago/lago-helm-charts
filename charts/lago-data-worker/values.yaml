@@ -94,6 +94,19 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+# -- Environment variables to pass to the container
+extraEnv: []
+  # - name: "MY_VAR"
+  #   value: "value"
+
+# -- envFrom to pass to the container
+# @default -- `[]` (See [values.yaml])
+extraEnvFrom: []
+  # - configMapRef:
+  #     name: config-map-name
+  # - secretRef:
+  #     name: secret-name
+
 # This is to setup the liveness probe more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 livenessProbe: {}
 
