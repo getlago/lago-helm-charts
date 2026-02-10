@@ -1,0 +1,45 @@
+suite: Test clickhouse environment variables
+templates:
+  - templates/api-deployment.yaml
+
+tests:
+  - it: should set LAGO_KAFKA_SECURITY_LOGS_TOPIC with default value
+    set:
+      apiUrl: "api.lago.dev"
+      frontUrl: "front.lago.dev"
+      global.clickhouse.enabled: true
+      global.clickhouse.kafka.bootstrapServers:
+        - "kafka-server:9092"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_KAFKA_SECURITY_LOGS_TOPIC
+            value: "security_logs"
+
+  - it: should set LAGO_KAFKA_SECURITY_LOGS_TOPIC with custom value
+    set:
+      apiUrl: "api.lago.dev"
+      frontUrl: "front.lago.dev"
+      global.clickhouse.enabled: true
+      global.clickhouse.kafka.bootstrapServers:
+        - "kafka-server:9092"
+      global.clickhouse.kafka.topics.securityLogs: "custom_security_logs"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_KAFKA_SECURITY_LOGS_TOPIC
+            value: "custom_security_logs"
+
+  - it: should not set LAGO_KAFKA_SECURITY_LOGS_TOPIC when clickhouse is disabled
+    set:
+      apiUrl: "api.lago.dev"
+      frontUrl: "front.lago.dev"
+      global.clickhouse.enabled: false
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_KAFKA_SECURITY_LOGS_TOPIC
+            value: "security_logs"

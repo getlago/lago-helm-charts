@@ -62,6 +62,8 @@
   value: {{ .Values.global.clickhouse.kafka.topics.activityLogs | quote }}
 - name: LAGO_KAFKA_API_LOGS_TOPIC
   value: {{ .Values.global.clickhouse.kafka.topics.apiLogs | quote }}
+- name: LAGO_KAFKA_SECURITY_LOGS_TOPIC
+  value: {{ .Values.global.clickhouse.kafka.topics.securityLogs | quote }}
 - name: LAGO_CLICKHOUSE_PORT
   value: "{{ .Values.global.clickhouse.port }}"
 - name: LAGO_CLICKHOUSE_HOST
