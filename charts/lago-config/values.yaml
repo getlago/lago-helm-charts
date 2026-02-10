@@ -129,6 +129,7 @@ global:
         eventsRaw: events_raw
         activityLogs: activity_logs
         apiLogs: api_logs
+        securityLogs: security_logs
 
 configmap:
   # The name of the config map to use.

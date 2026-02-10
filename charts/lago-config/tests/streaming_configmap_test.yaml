@@ -86,6 +86,28 @@ tests:
           path: metadata.name
           value: config-streaming-configmap
 
+  - it: should set LAGO_KAFKA_SECURITY_LOGS_TOPIC with default value
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers:
+        - "kafka:9092"
+      global.streaming_ingestion.kafka.topics.securityLogs: security_logs
+    asserts:
+      - equal:
+          path: data.LAGO_KAFKA_SECURITY_LOGS_TOPIC
+          value: "security_logs"
+
+  - it: should set LAGO_KAFKA_SECURITY_LOGS_TOPIC with custom value
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers:
+        - "kafka:9092"
+      global.streaming_ingestion.kafka.topics.securityLogs: custom_security_logs
+    asserts:
+      - equal:
+          path: data.LAGO_KAFKA_SECURITY_LOGS_TOPIC
+          value: "custom_security_logs"
+
   - it: should not create streaming configmap when streaming_ingestion is disabled
     set:
       global.streaming_ingestion.enabled: false

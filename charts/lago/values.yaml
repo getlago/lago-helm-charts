@@ -120,6 +120,7 @@ global:
         eventsRaw: events_raw
         activityLogs: activity_logs
         apiLogs: api_logs
+        securityLogs: security_logs
 
 config:
   nameOverride: lago-config
