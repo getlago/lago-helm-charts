@@ -63,6 +63,18 @@ spec:
               value: {{ .Values.config.web.sidekiq | quote }}
             - name: LAGO_DISABLE_SIGNUP
               value: {{ not .Values.global.lago.signup | quote }}
+            {{- with .Values.config.web.concurrency }}
+            - name: WEB_CONCURRENCY
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.config.web.maxThreads }}
+            - name: RAILS_MAX_THREADS
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.config.web.minThreads }}
+            - name: RAILS_MIN_THREADS
+              value: {{ . | quote }}
+            {{- end }}
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
