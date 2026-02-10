@@ -149,7 +149,7 @@ config:
   web:
     maxThreads:
     minThreads:
-    concurrency: 4
+    concurrency:
     sidekiq: false
 
   sidekiq:
