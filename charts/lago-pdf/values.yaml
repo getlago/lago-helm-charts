@@ -1,0 +1,233 @@
+# Default values for lago-pdf.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Global values shared across all subcharts
+global:
+  lago:
+    env: "production"
+    license: ""
+    cloud: false
+    sidekiqPro: false
+    pdfGeneration: false
+
+  config:
+    secret: ""
+    configmap: ""
+
+  urls:
+    api: ""
+    front: ""
+    pdf: ""
+
+  database:
+    uri: ""
+    pool: 20
+
+  encryption:
+    key: "" # ENCRYPTION_PRIMARY_KEY
+    salt: "" # ENCRYPTION_KEY_DERIVATION_SALT
+
+  signing:
+    hmac: "" # SECRET_KEY_BASE used by webhooks, message verifier HS256
+    rsa: ""  # LAGO_RSA_PRIVATE_KEY used by webhooks RS256
+
+  redis:
+    url: ""
+    password: ""
+
+  redisCache:
+    url: ""
+    password: ""
+
+  redisStore:
+    url: ""
+    password: ""
+
+  sentryDsn: ""
+  segmentWriteKey: ""
+
+  nango:
+    secretKey: ""
+
+  s3:
+    enabled: false
+    accessKeyId: ""
+    secretAccessKey: ""
+    bucket: ""
+    region: "us-east-1"
+    endpoint: ""
+    # s3.pathStyle -- (boolean)
+    pathStyle:
+
+  smtp:
+    enabled: false
+    username: ""
+    password: ""
+    from: ""
+    port: 25
+    address: ""
+
+  google:
+    enabled: false
+    clientId:
+    clientSecret:
+
+  gocardless:
+    enabled: false
+    clientId:
+    clientSecret:
+    proxy:
+
+  mcp:
+    enabled: false
+    clientId:
+    clientSecret:
+    endpoint:
+
+  data:
+    enabled: false
+    token:
+    endpoint:
+
+  streaming_ingestion:
+    enabled: false
+    configmap: ""
+    secret: ""
+
+    clickhouse:
+      # username and password are not required here if using an external secret:
+      #  config.enabled: false, config.secret.name: "..."
+      username: ""
+      password: ""
+      port: 9000
+      address: clickhouse
+      tls: false
+      database: default
+
+    # kafka is required if clickhouse is set
+    kafka:
+      # username and password are not required here if if using an external secret:
+      #  config.enabled: false, config.secret.name: "..."
+      username: ""
+      password: ""
+      tls: false
+      # SCRAM-SHA-512, SCRAM-SHA-256
+      saslMechanisms:
+      consumerGroup: events_consumer
+      # you must provide a list of Kafka servers if clickhouse is enabled
+      bootstrapServers: []
+      #   - "kafka-server:9092"
+      topics:
+        eventsChargedInAdvance: events_charged_in_advance
+        eventsDeadLetter: events_dead_letter
+        eventsEnriched: events_enriched
+        eventsEnrichedExpanded: events_enriched_expanded
+        eventsRaw: events_raw
+        activityLogs: activity_logs
+        apiLogs: api_logs
+
+# Local config specific to this chart instance
+config:
+  enabled: true
+  nameOverride: lago-config
+
+# Worker subchart (lago-rails configured as a background worker)
+worker:
+  enabled: true
+  nameOverride: lago-pdf-worker
+  config:
+    enabled: false
+    nameOverride: lago-config
+
+  service:
+    enabled: false
+
+  livenessProbe: null
+  readinessProbe: null
+
+  container:
+    command: ["./scripts/start.worker.sh"]
+    ports:
+
+# Gotenberg (HTML-to-PDF conversion service)
+gotenberg:
+  image:
+    repository: gotenberg/gotenberg
+    tag: "8"
+    pullPolicy: IfNotPresent
+
+  replicaCount: 1
+
+  container:
+    name: ""
+    command: []
+    args: []
+    ports:
+      http: 3000
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 80
+
+  serviceAccount:
+    create: true
+    automount: true
+    annotations: {}
+    name: ""
+
+  podAnnotations: {}
+  podLabels: {}
+
+  podSecurityContext: {}
+
+  securityContext: {}
+
+  extraEnv: []
+
+  extraEnvFrom: []
+
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 10
+    periodSeconds: 30
+
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 10
+    periodSeconds: 3
+
+  autoscaling:
+    enabled: false
+    external: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+
+  resources: {}
+
+  volumes: []
+
+  volumeMounts: []
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+# This is to override the chart name.
+nameOverride: ""
+fullnameOverride: ""
+
+# -- Array of extra K8s manifests to deploy
+extraObjects: []

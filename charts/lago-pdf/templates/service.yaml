@@ -1,0 +1,17 @@
+{{- if .Values.gotenberg.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "lago-pdf.gotenberg.fullname" . }}
+  labels:
+    {{- include "lago-pdf.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.gotenberg.service.type }}
+  ports:
+    - port: {{ .Values.gotenberg.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "lago-pdf.selectorLabels" . | nindent 4 }}
+{{- end }}
