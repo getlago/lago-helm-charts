@@ -1,24 +1,24 @@
 dependencies:
 - name: lago-config
   repository: file://../lago-config
-  version: 0.1.0
+  version: 0.2.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.1.0
+  version: 0.2.0
 - name: lago-front
   repository: file://../lago-front
-  version: 0.1.0
+  version: 0.2.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.1.0
+  version: 0.2.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.1.0
+  version: 0.2.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.1.0
+  version: 0.2.0
 - name: lago-events-processor-worker
   repository: file://../lago-events-processor-worker
-  version: 0.1.0
-digest: sha256:1f02bcb60c453942ab5472bc2d636fefb204ad879b3aca37cdb63e77509285c9
-generated: "2026-02-10T14:26:07.644724+01:00"
+  version: 0.2.0
+digest: sha256:16f19463c1bb5d18c9fd917c579a715d654d0b659ba34ba8816cc50734058b89
+generated: "2026-02-12T14:24:03.571275+01:00"

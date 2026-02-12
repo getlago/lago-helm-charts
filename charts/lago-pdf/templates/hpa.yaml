@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "lago-pdf.gotenberg.fullname" . }}
+  name: {{ include "lago-pdf.fullname" . }}
   labels:
     {{- include "lago-pdf.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "lago-pdf.gotenberg.fullname" . }}
+    name: {{ include "lago-pdf.fullname" . }}
   minReplicas: {{ .Values.gotenberg.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.gotenberg.autoscaling.maxReplicas }}
   metrics:

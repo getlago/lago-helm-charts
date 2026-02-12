@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "lago-pdf.gotenberg.fullname" . }}
+  name: {{ include "lago-pdf.fullname" . }}
   labels:
     {{- include "lago-pdf.labels" . | nindent 4 }}
 spec:

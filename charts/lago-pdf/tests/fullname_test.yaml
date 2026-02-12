@@ -6,7 +6,7 @@ values:
   - fixtures/required.yaml
 
 tests:
-  # --- lago-pdf.gotenberg.fullname (deployment + service) ---
+  # --- lago-pdf.fullname (deployment + service) ---
 
   - it: "should resolve to lago-pdf-gotenberg when release name equals chart name"
     release:
