@@ -130,7 +130,7 @@ global:
 # Local config specific to this chart instance
 config:
   enabled: true
-  nameOverride: lago-config
+  nameOverride: lago-pdf-config
 
 # Worker subchart (lago-rails configured as a background worker)
 worker:
@@ -138,7 +138,7 @@ worker:
   nameOverride: lago-pdf-worker
   config:
     enabled: false
-    nameOverride: lago-config
+    nameOverride: lago-pdf-config
 
   service:
     enabled: false

@@ -23,6 +23,7 @@ vars:
       lago-data-worker: deployment
       lago-data-forecasted-usage: cronjob
       lago-mcp-server: deployment
+      lago-pdf: ""
       # Umbrella charts (depend on components)
       lago-data: ""
       lago: ""
@@ -134,6 +135,7 @@ tasks:
       - test:unit:lago-data-worker
       - test:unit:lago-mcp-server
       - test:unit:lago-data-forecasted-usage
+      - test:unit:lago-pdf
       - test:unit:lago
 
   test:e2e:

@@ -17,6 +17,8 @@ If release name contains chart name it will be used as a full name.
 {{- $name := default .Chart.Name .Values.nameOverride }}
 {{- if contains $name .Release.Name }}
 {{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else if contains .Release.Name $name }}
+{{- $name | trunc 63 | trimSuffix "-" }}
 {{- else }}
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
 {{- end }}
@@ -25,17 +27,15 @@ If release name contains chart name it will be used as a full name.
 
 {{/*
 Create a fully qualified gotenberg name.
+Uses lago-pdf.fullname as the base so the chart identity is always preserved.
 */}}
 {{- define "lago-pdf.gotenberg.fullname" -}}
 {{- if .Values.gotenberg.fullnameOverride }}
 {{- .Values.gotenberg.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
-{{- $name := default "gotenberg" .Values.gotenberg.nameOverride }}
-{{- if contains $name .Release.Name }}
-{{- .Release.Name | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
-{{- end }}
+{{- $base := include "lago-pdf.fullname" . }}
+{{- $component := default "gotenberg" .Values.gotenberg.nameOverride }}
+{{- printf "%s-%s" $base $component | trunc 63 | trimSuffix "-" }}
 {{- end }}
 {{- end }}
 

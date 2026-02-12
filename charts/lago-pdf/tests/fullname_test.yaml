@@ -1,0 +1,79 @@
+suite: Test fullname helpers (reverse contains logic)
+templates:
+  - templates/deployment.yaml
+  - templates/service.yaml
+values:
+  - fixtures/required.yaml
+
+tests:
+  # --- lago-pdf.gotenberg.fullname (deployment + service) ---
+
+  - it: "should resolve to lago-pdf-gotenberg when release name equals chart name"
+    release:
+      name: lago-pdf
+    asserts:
+      - equal:
+          path: metadata.name
+          value: lago-pdf-gotenberg
+        template: templates/deployment.yaml
+      - equal:
+          path: metadata.name
+          value: lago-pdf-gotenberg
+        template: templates/service.yaml
+
+  - it: "should resolve to lago-pdf-gotenberg when release name is a prefix of chart name (reverse contains)"
+    release:
+      name: lago
+    asserts:
+      - equal:
+          path: metadata.name
+          value: lago-pdf-gotenberg
+        template: templates/deployment.yaml
+      - equal:
+          path: metadata.name
+          value: lago-pdf-gotenberg
+        template: templates/service.yaml
+
+  - it: "should prepend release name when it does not overlap with chart name"
+    release:
+      name: max-test
+    asserts:
+      - equal:
+          path: metadata.name
+          value: max-test-lago-pdf-gotenberg
+        template: templates/deployment.yaml
+      - equal:
+          path: metadata.name
+          value: max-test-lago-pdf-gotenberg
+        template: templates/service.yaml
+
+  - it: "should use gotenberg.fullnameOverride when set"
+    set:
+      gotenberg.fullnameOverride: my-custom-gotenberg
+    release:
+      name: lago-pdf
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-custom-gotenberg
+        template: templates/deployment.yaml
+
+  - it: "should use gotenberg.nameOverride when set"
+    set:
+      gotenberg.nameOverride: pdf-renderer
+    release:
+      name: lago-pdf
+    asserts:
+      - equal:
+          path: metadata.name
+          value: lago-pdf-pdf-renderer
+        template: templates/deployment.yaml
+
+  - it: "should truncate combined names to 63 characters"
+    release:
+      name: very-long-release-name-that-will-be-combined
+    asserts:
+      - matchRegex:
+          path: metadata.name
+          pattern: "^.{1,63}$"
+        template: templates/deployment.yaml
