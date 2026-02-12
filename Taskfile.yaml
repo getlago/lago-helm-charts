@@ -211,10 +211,25 @@ tasks:
       - rm -rf .helm-build/{{.CHART}}
 
   oci:push:all:
-    desc: Package and push all charts to GHCR
+    desc: Package and push all charts to GHCR (in dependency order)
+    vars:
+      # Ordered so dependencies are pushed before dependents
+      ORDERED: >-
+        lago-config
+        lago-data-config
+        lago-rails
+        lago-front
+        lago-events-processor-worker
+        lago-data-api
+        lago-data-worker
+        lago-data-forecasted-usage
+        lago-mcp-server
+        lago-pdf
+        lago-data
+        lago
+        lago-staging
     cmds:
       - mkdir -p .helm-packages .helm-build
-      - for:
-          var: CHARTS
-        task: oci:push:{{.KEY}}
+      - for: { var: ORDERED }
+        task: oci:push:{{.ITEM}}
       - rm -rf .helm-packages .helm-build
