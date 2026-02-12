@@ -101,4 +101,4 @@ jobs:
       - name: Push to GHCR
         run: |
           helm push .helm-packages/${{ matrix.chart }}-${{ steps.chart-version.outputs.version }}.tgz oci://ghcr.io/getlago/helm-charts
-          echo "Published ${{ matrix.chart }}:${{ steps.chart-version.outputs.version }} to ghcr.io/getlago/lago-helm-charts"
+          echo "Published ${{ matrix.chart }}:${{ steps.chart-version.outputs.version }} to ghcr.io/getlago/helm-charts"
