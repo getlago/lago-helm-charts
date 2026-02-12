@@ -153,7 +153,7 @@ worker:
 # Gotenberg (HTML-to-PDF conversion service)
 gotenberg:
   image:
-    repository: gotenberg/gotenberg
+    repository: getlago/lago-gotenberg
     tag: "8"
     pullPolicy: IfNotPresent
 
@@ -162,7 +162,7 @@ gotenberg:
   container:
     name: ""
     command: []
-    args: []
+    args: ["gotenberg", "--api-disable-health-check-logging"]
     ports:
       http: 3000
 

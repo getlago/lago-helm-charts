@@ -26,20 +26,6 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
-Create a fully qualified gotenberg name.
-Uses lago-pdf.fullname as the base so the chart identity is always preserved.
-*/}}
-{{- define "lago-pdf.gotenberg.fullname" -}}
-{{- if .Values.gotenberg.fullnameOverride }}
-{{- .Values.gotenberg.fullnameOverride | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- $base := include "lago-pdf.fullname" . }}
-{{- $component := default "gotenberg" .Values.gotenberg.nameOverride }}
-{{- printf "%s-%s" $base $component | trunc 63 | trimSuffix "-" }}
-{{- end }}
-{{- end }}
-
-{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "lago-pdf.chart" -}}
@@ -62,7 +48,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Selector labels
 */}}
 {{- define "lago-pdf.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "lago-pdf.gotenberg.fullname" . }}
+app.kubernetes.io/name: {{ include "lago-pdf.fullname" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
@@ -71,7 +57,7 @@ Create the name of the service account to use
 */}}
 {{- define "lago-pdf.serviceAccountName" -}}
 {{- if .Values.gotenberg.serviceAccount.create }}
-{{- default (include "lago-pdf.gotenberg.fullname" .) .Values.gotenberg.serviceAccount.name }}
+{{- default (include "lago-pdf.fullname" .) .Values.gotenberg.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.gotenberg.serviceAccount.name }}
 {{- end }}
