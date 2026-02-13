@@ -1,3 +1,4 @@
+{{- if .Values.configmap.create -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -50,3 +51,4 @@ data:
   {{- if .Values.global.data.enabled }}
   data.endpoint: {{ required "global.data.endpoint is required" .Values.global.data.endpoint }}
   {{- end }}
+{{- end }}

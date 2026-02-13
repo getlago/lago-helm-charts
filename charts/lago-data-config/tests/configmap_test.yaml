@@ -1,0 +1,133 @@
+suite: Test lago-data-config configmap
+templates:
+  - templates/configmap.yaml
+
+tests:
+  - it: should create configmap by default
+    set:
+      global.databaseAnalytical.host: "db.test"
+      global.databaseAnalytical.name: "analytical"
+      global.databaseAnalytical.user: "user"
+      global.databaseAnalytical.port: 5432
+      global.databaseAnalytical.schema: "analytical"
+      global.dbtPipeline.enabled: false
+    release:
+      name: my-release
+    chart:
+      name: lago-data-config
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: ConfigMap
+
+  - it: should not create configmap when configmap.create is false
+    set:
+      configmap.create: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should use default configmap name when no custom name is set
+    set:
+      global.databaseAnalytical.host: "db.test"
+      global.databaseAnalytical.name: "analytical"
+      global.databaseAnalytical.user: "user"
+      global.databaseAnalytical.port: 5432
+      global.databaseAnalytical.schema: "analytical"
+      global.dbtPipeline.enabled: false
+    release:
+      name: my-release
+    chart:
+      name: lago-data-config
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-release-lago-data-config
+
+  - it: should use configmap.name when provided
+    set:
+      configmap.name: "custom-configmap"
+      global.databaseAnalytical.host: "db.test"
+      global.databaseAnalytical.name: "analytical"
+      global.databaseAnalytical.user: "user"
+      global.databaseAnalytical.port: 5432
+      global.databaseAnalytical.schema: "analytical"
+      global.dbtPipeline.enabled: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: custom-configmap
+
+  - it: should use data.configmap.name when provided
+    set:
+      data.configmap.name: "data-configmap"
+      global.databaseAnalytical.host: "db.test"
+      global.databaseAnalytical.name: "analytical"
+      global.databaseAnalytical.user: "user"
+      global.databaseAnalytical.port: 5432
+      global.databaseAnalytical.schema: "analytical"
+      global.dbtPipeline.enabled: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: data-configmap
+
+  - it: should use global.data.configmap when provided
+    set:
+      global.data.configmap: "global-configmap"
+      global.databaseAnalytical.host: "db.test"
+      global.databaseAnalytical.name: "analytical"
+      global.databaseAnalytical.user: "user"
+      global.databaseAnalytical.port: 5432
+      global.databaseAnalytical.schema: "analytical"
+      global.dbtPipeline.enabled: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: global-configmap
+
+  - it: should prioritize configmap.name over data.configmap.name
+    set:
+      configmap.name: "direct-configmap"
+      data.configmap.name: "data-configmap"
+      global.databaseAnalytical.host: "db.test"
+      global.databaseAnalytical.name: "analytical"
+      global.databaseAnalytical.user: "user"
+      global.databaseAnalytical.port: 5432
+      global.databaseAnalytical.schema: "analytical"
+      global.dbtPipeline.enabled: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: direct-configmap
+
+  - it: should prioritize configmap.name over global.data.configmap
+    set:
+      configmap.name: "direct-configmap"
+      global.data.configmap: "global-configmap"
+      global.databaseAnalytical.host: "db.test"
+      global.databaseAnalytical.name: "analytical"
+      global.databaseAnalytical.user: "user"
+      global.databaseAnalytical.port: 5432
+      global.databaseAnalytical.schema: "analytical"
+      global.dbtPipeline.enabled: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: direct-configmap
+
+  - it: should prioritize data.configmap.name over global.data.configmap
+    set:
+      data.configmap.name: "data-configmap"
+      global.data.configmap: "global-configmap"
+      global.databaseAnalytical.host: "db.test"
+      global.databaseAnalytical.name: "analytical"
+      global.databaseAnalytical.user: "user"
+      global.databaseAnalytical.port: 5432
+      global.databaseAnalytical.schema: "analytical"
+      global.dbtPipeline.enabled: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: data-configmap
