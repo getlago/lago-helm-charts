@@ -27,8 +27,10 @@ global:
 
 
 configmap:
-  # The name of the config map to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # -- Toggle creation of the ConfigMap. Set to false when using an externally managed ConfigMap
+  # (provide its name via configmap.name, data.configmap.name, or global.data.configmap)
+  create: true
+  # -- Override the ConfigMap name. If not set and create is true, a name is generated using the fullname template
   name: ""
 
   # -- Labels to be added to lago-config configmap
