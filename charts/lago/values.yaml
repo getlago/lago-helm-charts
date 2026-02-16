@@ -1,6 +1,7 @@
 # Global values shared across all subcharts (api, worker, clock, config)
 global:
   lago:
+    version: ""
     env: "production"
     license: ""
     signup: false
@@ -53,12 +54,16 @@ global:
   sentryDsn: ""
   segmentWriteKey: ""
 
+  nango:
+    publicKey: ""
+    secretKey: ""
+
   s3:
     enabled: false
     accessKeyId: ""
     secretAccessKey: ""
     bucket: ""
-    region: ""
+    region: "us-east-1"
     endpoint: ""
     # s3.pathStyle -- (boolean)
     pathStyle:

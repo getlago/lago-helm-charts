@@ -16,11 +16,11 @@ global:
     uri: ""
 
   redisCache:
-    url: ""
+    uri: ""
     password: ""
 
   redisStore:
-    url: ""
+    uri: ""
     password: ""
 
   streaming_ingestion:

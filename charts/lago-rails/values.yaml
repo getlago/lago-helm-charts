@@ -43,15 +43,15 @@ global:
     rsa: ""  # LAGO_RSA_PRIVATE_KEY used by webhooks RS256
 
   redis:
-    url: ""
+    uri: ""
     password: ""
 
   redisCache:
-    url: ""
+    uri: ""
     password: ""
 
   redisStore:
-    url: ""
+    uri: ""
     password: ""
 
   sentryDsn: ""
