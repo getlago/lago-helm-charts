@@ -10,8 +10,17 @@ global:
     license: ""
     signup: false
     cloud: false
-    sidekiqPro: false
     pdfGeneration: false
+
+  sidekiq:
+    pro: false
+    queues:
+      analytics: false
+      billing: false
+      clock: false
+      events: false
+      webhook: false
+      pdf: false
 
   config:
     configmap:

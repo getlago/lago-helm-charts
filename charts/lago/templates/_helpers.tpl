@@ -68,3 +68,12 @@ Checks migrate.image.tag, api.image.tag, global.version, then Chart.AppVersion
 {{- define "lago.version" -}}
 {{- coalesce .Values.migrate.image.tag .Values.api.image.tag .Values.global.lago.version .Chart.AppVersion }}
 {{- end }}
+
+
+{{- define "lago.configMapName" -}}
+{{- mustMergeOverwrite .Values .Values.config | set . "Values" | include "lago-config.configMapName" }}
+{{- end }}
+
+{{- define "lago.secretName" -}}
+{{- mustMergeOverwrite .Values .Values.config | set . "Values" | include "lago-config.secretName" }}
+{{- end }}

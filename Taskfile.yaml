@@ -1,11 +1,11 @@
 version: 3
 
 vars:
-  VERSION: v1.32.4
+  VERSION: v1.41.0
   REGISTRY: oci://ghcr.io/getlago/helm-charts
   IMAGES:
     map:
-      postgres: postgres:15-alpine
+      postgres: getlago/postgres-partman:15.0-alpine
       redis: redis:7-alpine
       api: getlago/api:{{.VERSION}}
       front: getlago/front:{{.VERSION}}

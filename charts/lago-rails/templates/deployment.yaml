@@ -58,7 +58,7 @@ spec:
             - name: DATABASE_POOL
               value: {{ default .Values.global.database.pool .Values.config.database.pool | quote }}
             - name: LAGO_SIDEKIQ_PRO_REQUIRED
-              value: {{ .Values.global.lago.sidekiq.pro | quote }}
+              value: {{ .Values.global.sidekiq.pro | quote }}
             - name: LAGO_SIDEKIQ_WEB
               value: {{ .Values.config.web.sidekiq | quote }}
             - name: LAGO_DISABLE_SIGNUP
