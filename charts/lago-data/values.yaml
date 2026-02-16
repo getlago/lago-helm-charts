@@ -86,7 +86,7 @@ api:
     nameOverride: lago-config
 
   extraEnv:
-    - name: LAGO_DATA_API_BEARER_TOKEN
+    LAGO_DATA_API_BEARER_TOKEN:
       valueFrom:
         secretKeyRef:
           name: lago-data-config
@@ -156,4 +156,19 @@ dbtPipeline:
   nodeSelector: {}
   tolerations: []
   affinity: []
-  extraEnv: []
+  # -- Additional environment variables (map format, deep-mergeable)
+  extraEnv: {}
+    # Simple value:
+    #   MY_VAR: "value"
+    # From a Secret:
+    #   MY_SECRET:
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: secret-name
+    #         key: secret-key
+    # From a ConfigMap:
+    #   MY_CONFIG:
+    #     valueFrom:
+    #       configMapKeyRef:
+    #         name: configmap-name
+    #         key: config-key

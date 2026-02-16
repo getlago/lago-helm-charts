@@ -99,8 +99,14 @@ spec:
                   key: api.token
             - name: LAGO_RAILS_API_URL
               value: {{ required "config.api.url must be provided " .Values.config.api.url }}
-            {{- with .Values.extraEnv }}
-            {{- toYaml . | nindent 12 }}
+            {{- range $name, $val := .Values.extraEnv }}
+            {{- if kindIs "map" $val }}
+            - name: {{ $name }}
+              {{- toYaml $val | nindent 14 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $val | quote }}
+            {{- end }}
             {{- end }}
           {{- with .Values.livenessProbe }}
           livenessProbe:

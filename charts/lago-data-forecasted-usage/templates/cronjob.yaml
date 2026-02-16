@@ -106,8 +106,14 @@ spec:
                     secretKeyRef:
                       name: {{ include "lago-data-forecasted-usage.ml.secretName" . }}
                       key: ml.config
-                {{- with .Values.extraEnv }}
-                {{- toYaml . | nindent 16 }}
+                {{- range $name, $val := .Values.extraEnv }}
+                {{- if kindIs "map" $val }}
+                - name: {{ $name }}
+                  {{- toYaml $val | nindent 18 }}
+                {{- else }}
+                - name: {{ $name }}
+                  value: {{ $val | quote }}
+                {{- end }}
                 {{- end }}
               {{- with .Values.resources }}
               resources:

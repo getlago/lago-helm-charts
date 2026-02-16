@@ -141,8 +141,14 @@ spec:
                       name: {{ include "lago-data.configMapName" . }}
                       key: dbt.sourceSchema
                 {{- end }}
-                {{- with .Values.dbtPipeline.extraEnv }}
-                {{- toYaml . | nindent 16 }}
+                {{- range $name, $val := .Values.dbtPipeline.extraEnv }}
+                {{- if kindIs "map" $val }}
+                - name: {{ $name }}
+                  {{- toYaml $val | nindent 18 }}
+                {{- else }}
+                - name: {{ $name }}
+                  value: {{ $val | quote }}
+                {{- end }}
                 {{- end }}
               {{- with .Values.dbtPipeline.resources }}
               resources:

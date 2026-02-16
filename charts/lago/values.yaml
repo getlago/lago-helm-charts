@@ -5,8 +5,17 @@ global:
     license: ""
     signup: false
     cloud: false
-    sidekiqPro: false
     pdfGeneration: false
+
+  sidekiq:
+    pro: false
+    queues:
+      analytics: false
+      billing: false
+      clock: false
+      events: false
+      webhook: false
+      pdf: false
 
   config:
     configmap:
@@ -170,6 +179,82 @@ clock:
     command: ["./scripts/start.clock.sh"]
     ports:
 
+analytics-worker:
+  nameOverride: lago-analytics-worker
+  config:
+    enabled: false
+    nameOverride: lago-config
+  livenessProbe: null
+  readinessProbe: null
+  service:
+    enabled: false
+  container:
+    command: ["./scripts/start.analytics.worker.sh"]
+    ports:
+
+billing-worker:
+  nameOverride: lago-billing-worker
+  config:
+    enabled: false
+    nameOverride: lago-config
+  livenessProbe: null
+  readinessProbe: null
+  service:
+    enabled: false
+  container:
+    command: ["./scripts/start.billing.worker.sh"]
+    ports:
+
+clock-worker:
+  nameOverride: lago-clock-worker
+  config:
+    enabled: false
+    nameOverride: lago-config
+  livenessProbe: null
+  readinessProbe: null
+  service:
+    enabled: false
+  container:
+    command: ["./scripts/start.clock.worker.sh"]
+    ports:
+
+events-worker:
+  nameOverride: lago-events-worker
+  config:
+    enabled: false
+    nameOverride: lago-config
+  livenessProbe: null
+  readinessProbe: null
+  service:
+    enabled: false
+  container:
+    command: ["./scripts/start.events.worker.sh"]
+    ports:
+
+webhook-worker:
+  nameOverride: lago-webhook-worker
+  config:
+    enabled: false
+    nameOverride: lago-config
+  livenessProbe: null
+  readinessProbe: null
+  service:
+    enabled: false
+  container:
+    command: ["./scripts/start.webhook.worker.sh"]
+    ports:
+
+# Deploys the PDF stack with a worker and a gotenberg deployment
+pdf:
+  nameOverride: lago-pdf
+  config:
+    enabled: false
+    nameOverride: lago-config
+
+  worker:
+    config:
+      nameOverride: lago-config
+
 events-consumer-worker:
   nameOverride: lago-events-consumer-worker
   config:
@@ -229,8 +314,22 @@ migrate:
   securityContext: {}
   # -- Resource limits and requests
   resources: {}
-  # -- Additional environment variables
-  extraEnv: []
+  # -- Additional environment variables (map format, deep-mergeable)
+  extraEnv: {}
+    # Simple value:
+    #   MY_VAR: "value"
+    # From a Secret:
+    #   MY_SECRET:
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: secret-name
+    #         key: secret-key
+    # From a ConfigMap:
+    #   MY_CONFIG:
+    #     valueFrom:
+    #       configMapKeyRef:
+    #         name: configmap-name
+    #         key: config-key
   # -- Additional envFrom sources
   extraEnvFrom: []
   # -- Additional volumes
@@ -280,8 +379,22 @@ createTopics:
   securityContext: {}
   # -- Resource limits and requests
   resources: {}
-  # -- Additional environment variables
-  extraEnv: []
+  # -- Additional environment variables (map format, deep-mergeable)
+  extraEnv: {}
+    # Simple value:
+    #   MY_VAR: "value"
+    # From a Secret:
+    #   MY_SECRET:
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: secret-name
+    #         key: secret-key
+    # From a ConfigMap:
+    #   MY_CONFIG:
+    #     valueFrom:
+    #       configMapKeyRef:
+    #         name: configmap-name
+    #         key: config-key
   # -- Node selector
   nodeSelector: {}
   # -- Tolerations
@@ -325,8 +438,22 @@ deleteTopics:
   securityContext: {}
   # -- Resource limits and requests
   resources: {}
-  # -- Additional environment variables
-  extraEnv: []
+  # -- Additional environment variables (map format, deep-mergeable)
+  extraEnv: {}
+    # Simple value:
+    #   MY_VAR: "value"
+    # From a Secret:
+    #   MY_SECRET:
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: secret-name
+    #         key: secret-key
+    # From a ConfigMap:
+    #   MY_CONFIG:
+    #     valueFrom:
+    #       configMapKeyRef:
+    #         name: configmap-name
+    #         key: config-key
   # -- Node selector
   nodeSelector: {}
   # -- Tolerations
