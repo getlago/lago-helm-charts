@@ -67,7 +67,7 @@ spec:
               {{- else }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.config.secret.name }}
+                  name: {{ include "lago.secretName" . }}
                   key: database.uri
               {{- end }}
             - name: LAGO_RSA_PRIVATE_KEY
@@ -76,7 +76,7 @@ spec:
               {{- else }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "lago-config.secretName" . }}
+                  name: {{ include "lago.secretName" . }}
                   key: signing.rsa
               {{- end }}
             - name: SECRET_KEY_BASE
@@ -85,7 +85,7 @@ spec:
               {{- else }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "lago-config.secretName" . }}
+                  name: {{ include "lago.secretName" . }}
                   key: signing.hmac
               {{- end }}
             - name: REDIS_URL
@@ -96,7 +96,7 @@ spec:
               {{- else }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.config.secret.name }}
+                  name: {{ include "lago.secretName" . }}
                   key: redis.password
                   optional: true
               {{- end }}
