@@ -19,6 +19,19 @@ global:
       brokerUrl: ""
       resultBackend: ""
 
+  dbtPipeline:
+    enabled: false
+    sourceSchema: public
+    targetSchema: analytical
+    tables: []
+
+  databaseReplica:
+    host: ""
+    name: ""
+    user: ""
+    password: ""
+    port: 5432
+
   data:
     configmap:
     secret:
