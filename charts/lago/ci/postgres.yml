@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: lago-postgres
+spec:
+  selector:
+    app: lago-postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lago-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lago-postgres
+  template:
+    metadata:
+      labels:
+        app: lago-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: getlago/postgres-partman:15.0-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: "lago"
+            - name: POSTGRES_PASSWORD
+              value: "lago"
+            - name: POSTGRES_DB
+              value: "lago"
