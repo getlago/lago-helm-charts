@@ -6,10 +6,20 @@
 global:
   lago:
     env: "production"
+    version:
     license: ""
     cloud: false
-    sidekiqPro: false
     pdfGeneration: false
+
+  sidekiq:
+    pro: false
+    queues:
+      analytics: false
+      billing: false
+      clock: false
+      events: false
+      webhook: false
+      pdf: false
 
   config:
     secret: ""
@@ -154,7 +164,7 @@ worker:
 gotenberg:
   image:
     repository: getlago/lago-gotenberg
-    tag: "8"
+    tag:
     pullPolicy: IfNotPresent
 
   replicaCount: 1
@@ -184,8 +194,25 @@ gotenberg:
 
   securityContext: {}
 
-  extraEnv: []
+  # -- Environment variables to pass to the gotenberg container (map format, deep-mergeable)
+  extraEnv: {}
+    # Simple value:
+    #   MY_VAR: "value"
+    # From a Secret:
+    #   MY_SECRET:
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: secret-name
+    #         key: secret-key
+    # From a ConfigMap:
+    #   MY_CONFIG:
+    #     valueFrom:
+    #       configMapKeyRef:
+    #         name: configmap-name
+    #         key: config-key
 
+  # -- envFrom to pass to the gotenberg container
+  # @default -- `[]` (See [values.yaml])
   extraEnvFrom: []
 
   livenessProbe:

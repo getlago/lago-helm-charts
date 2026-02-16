@@ -58,7 +58,7 @@ spec:
             - name: DATABASE_POOL
               value: {{ default .Values.global.database.pool .Values.config.database.pool | quote }}
             - name: LAGO_SIDEKIQ_PRO_REQUIRED
-              value: {{ .Values.global.lago.sidekiqPro | quote }}
+              value: {{ .Values.global.lago.sidekiq.pro | quote }}
             - name: LAGO_SIDEKIQ_WEB
               value: {{ .Values.config.web.sidekiq | quote }}
             - name: LAGO_DISABLE_SIGNUP
@@ -163,6 +163,18 @@ spec:
               value: {{ required "global.urls.api value is required" .Values.global.urls.api | quote }}
             - name: LAGO_FRONT_URL
               value: {{ required "global.urls.front value is required" .Values.global.urls.front | quote }}
+            - name: SIDEKIQ_ANALYTICS
+              value: {{ .Values.global.sidekiq.queues.analytics | quote }}
+            - name: SIDEKIQ_BILLING
+              value: {{ .Values.global.sidekiq.queues.billing | quote }}
+            - name: SIDEKIQ_CLOCK
+              value: {{ .Values.global.sidekiq.queues.clock | quote }}
+            - name: SIDEKIQ_EVENTS
+              value: {{ .Values.global.sidekiq.queues.events | quote }}
+            - name: SIDEKIQ_WEBHOOK
+              value: {{ .Values.global.sidekiq.queues.webhook | quote }}
+            - name: SIDEKIQ_PDFS
+              value: {{ .Values.global.sidekiq.queues.pdf | quote }}
             {{- if .Values.global.urls.pdf }}
             - name: LAGO_PDF_URL
               valueFrom:
@@ -296,9 +308,15 @@ spec:
                   name: {{ include "lago-rails.secretName" . }}
                   key: data.token
             {{- end }}
-            {{- with .Values.extraEnv }}
-            {{- toYaml . | nindent 12 }}
-            {{- end}}
+            {{- range $name, $val := .Values.extraEnv }}
+            {{- if kindIs "map" $val }}
+            - name: {{ $name }}
+              {{- toYaml $val | nindent 14 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- end }}
           {{- with .Values.container.ports }}
           ports:
             - name: http

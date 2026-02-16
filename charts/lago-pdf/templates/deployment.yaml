@@ -50,9 +50,17 @@ spec:
           envFrom:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.gotenberg.extraEnv }}
+          {{- if .Values.gotenberg.extraEnv }}
           env:
-            {{- toYaml . | nindent 12 }}
+            {{- range $name, $val := .Values.gotenberg.extraEnv }}
+            {{- if kindIs "map" $val }}
+            - name: {{ $name }}
+              {{- toYaml $val | nindent 14 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- end }}
           {{- end }}
           ports:
             - name: http

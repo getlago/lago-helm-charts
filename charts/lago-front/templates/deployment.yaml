@@ -72,9 +72,15 @@ spec:
                   name: {{ include "lago-front.configMapName" . }}
                   key: gocardless.proxy
             {{- end}}
-            {{- with .Values.extraEnv }}
-            {{- toYaml . | nindent 12 }}
-            {{- end}}
+            {{- range $name, $val := .Values.extraEnv }}
+            {{- if kindIs "map" $val }}
+            - name: {{ $name }}
+              {{- toYaml $val | nindent 14 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.container.ports.http }}

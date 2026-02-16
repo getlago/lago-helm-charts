@@ -16,9 +16,8 @@ tests:
       - ./fixtures/required.yaml
     set:
       extraEnv:
-        - name: TEST_EXTRA_ENV_VAR
-          value: "test-value-123"
-        - name: TEST_EXTRA_ENV_FROM_SECRET
+        TEST_EXTRA_ENV_VAR: "test-value-123"
+        TEST_EXTRA_ENV_FROM_SECRET:
           valueFrom:
             secretKeyRef:
               name: test-secret
@@ -107,8 +106,7 @@ tests:
       - ./fixtures/required.yaml
     set:
       extraEnv:
-        - name: TEST_COMBINED_VAR
-          value: "combined-test"
+        TEST_COMBINED_VAR: "combined-test"
       extraEnvFrom:
         - configMapRef:
             name: test-combined-configmap

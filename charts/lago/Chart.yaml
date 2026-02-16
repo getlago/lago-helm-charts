@@ -39,6 +39,36 @@ dependencies:
     version: 0.2.0
     repository: "file://../lago-rails"
   - name: lago-rails
+    alias: analytics-worker
+    version: 0.2.0
+    repository: "file://../lago-rails"
+    condition: global.sidekiq.queues.analytics
+  - name: lago-rails
+    alias: billing-worker
+    version: 0.2.0
+    repository: "file://../lago-rails"
+    condition: global.sidekiq.queues.billing
+  - name: lago-rails
+    alias: clock-worker
+    version: 0.2.0
+    repository: "file://../lago-rails"
+    condition: global.sidekiq.queues.clock
+  - name: lago-rails
+    alias: events-worker
+    version: 0.2.0
+    repository: "file://../lago-rails"
+    condition: global.sidekiq.queues.events
+  - name: lago-rails
+    alias: webhook-worker
+    version: 0.2.0
+    repository: "file://../lago-rails"
+    condition: global.sidekiq.queues.webhook
+  - name: lago-pdf
+    alias: pdf
+    version: 0.2.0
+    repository: "file://../lago-pdf"
+    condition: global.sidekiq.queues.pdf
+  - name: lago-rails
     alias: events-consumer-worker
     version: 0.2.0
     repository: "file://../lago-rails"

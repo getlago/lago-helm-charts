@@ -100,8 +100,14 @@ spec:
                   key: redis.password
                   optional: true
               {{- end }}
-            {{- with .Values.migrate.extraEnv }}
-            {{- toYaml . | nindent 12 }}
+            {{- range $name, $val := .Values.migrate.extraEnv }}
+            {{- if kindIs "map" $val }}
+            - name: {{ $name }}
+              {{- toYaml $val | nindent 14 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $val | quote }}
+            {{- end }}
             {{- end }}
           {{- with .Values.migrate.resources }}
           resources:

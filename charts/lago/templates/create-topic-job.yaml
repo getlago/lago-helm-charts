@@ -60,8 +60,14 @@ spec:
           env:
             - name: RPK_BROKERS
               value: {{ .Values.global.streaming_ingestion.kafka.bootstrapServers | join "," }}
-            {{- with .Values.createTopics.extraEnv }}
-            {{- toYaml . | nindent 12 }}
+            {{- range $name, $val := .Values.createTopics.extraEnv }}
+            {{- if kindIs "map" $val }}
+            - name: {{ $name }}
+              {{- toYaml $val | nindent 14 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $val | quote }}
+            {{- end }}
             {{- end }}
           {{- with .Values.createTopics.resources }}
           resources:

@@ -83,10 +83,22 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
-# -- Environment variables to pass to the api container
-extraEnv: []
-  # - name: "MY_VAR"
-  #   value: "value"
+# -- Environment variables to pass to the api container (map format, deep-mergeable)
+extraEnv: {}
+  # Simple value:
+  #   MY_VAR: "value"
+  # From a Secret:
+  #   MY_SECRET:
+  #     valueFrom:
+  #       secretKeyRef:
+  #         name: secret-name
+  #         key: secret-key
+  # From a ConfigMap:
+  #   MY_CONFIG:
+  #     valueFrom:
+  #       configMapKeyRef:
+  #         name: configmap-name
+  #         key: config-key
 
 # -- envFrom to pass to the api container
 # @default -- `[]` (See [values.yaml])
