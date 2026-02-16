@@ -32,11 +32,11 @@ global:
     pool: 20
 
   encryption:
-    key: "" # ENCRYPTION_PRIMARY_KEY
-    salt: "" # ENCRYPTION_KEY_DERIVATION_SALT
+    key: ""  # ENCRYPTION_PRIMARY_KEY
+    salt: ""  # ENCRYPTION_KEY_DERIVATION_SALT
 
   signing:
-    hmac: "" # SECRET_KEY_BASE used by webhooks, message verifier HS256
+    hmac: ""  # SECRET_KEY_BASE used by webhooks, message verifier HS256
     rsa: ""  # LAGO_RSA_PRIVATE_KEY used by webhooks RS256
 
   redis:

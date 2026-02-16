@@ -5,3 +5,4 @@ chart-dirs:
 chart-repos:
   - minio=https://charts.min.io/
 validate-maintainers: false
+check-version-increment: false

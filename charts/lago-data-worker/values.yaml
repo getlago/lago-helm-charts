@@ -12,12 +12,25 @@ global:
     schema: analytical
 
   forecastedUsage:
-    enabled: true # if data worker is present, it means forecasted usage is active
+    enabled: true  # if data worker is present, it means forecasted usage is active
     # forecasted usage need to call lago-api, hence provide a valid token
     api_token:
     celery:
       brokerUrl: ""
       resultBackend: ""
+
+  dbtPipeline:
+    enabled: false
+    sourceSchema: public
+    targetSchema: analytical
+    tables: []
+
+  databaseReplica:
+    host: ""
+    name: ""
+    user: ""
+    password: ""
+    port: 5432
 
   data:
     configmap:
@@ -27,6 +40,8 @@ global:
 
 config:
   enabled: false
+  api:
+    url: ""
 
 
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
