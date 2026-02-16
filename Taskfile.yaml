@@ -149,7 +149,7 @@ tasks:
       - task: kind:up
       - kubectl apply -f charts/lago/ci/postgres.yml
       - kubectl apply -f charts/lago/ci/redis.yml
-      - ct install --config ct.yaml --namespace default
+      - ct install --config ct.yaml --namespace default --charts charts/lago
 
   render:
     cmd: >

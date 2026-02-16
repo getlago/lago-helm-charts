@@ -1,0 +1,24 @@
+global:
+  urls:
+    api: "http://lago-api.default.svc.cluster.local:3000"
+    front: "http://lago-front.default.svc.cluster.local:80"
+
+  database:
+    uri: "postgres://lago:lago@lago-postgres.default.svc.cluster.local:5432/lago"
+
+  encryption:
+    key: "911219513a368a9f5cb38b326e739a70"
+    salt: "cabaabf712d9f7b2ce0ae1b12fc01eec"
+
+  signing:
+    rsa: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUJWZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQVVBd2dnRThBZ0VBQWtFQXpmMnl4bUFFTlhUNXcxKy8KRDI0ckEzcFZTa01NSlExOWpvRmNHQ1pnOFMwQWF3OXcrb2twcEM5NVZBZ0huWnh3bmpSNUVTeUpLK2VMeWJJcwpEZ3JuTVFJREFRQUJBa0VBdFFaeEo3aVZ1a3pVZWdnWXBmelJQRHN6M1JGVENQVDBGRnBHanNxYmd4WE4zTmVHClE2Y2ttZTV3NWhlUGN4Y3Y5NXJ0d1BsL3VOTXdqYWZXUUIwbWdRSWhBUHdEOS8wK1RjUjhHWVN4V1d5cWNjMVgKY3VsNzVvcWNyTFlNNEdiVmJoblpBaUVBMFQ5eUhVa1Z1bFdDRWVGdTV5UStrR1pZdFZhc3Rvenc2enE1WUkyWAp5UmtDSVFEMTZiRjlMZVNZekRmaVlXUlBRdXFWWXJYQTI2UVVzZGxlTTZaczhlcmowUUlnUVB5VmNtYjZhbzZZCkFQbWt1Z0RWdFg4ejJjMzdnZzZ2M0Q2MnlEZnhoakVDSVFEd1o4ZXVxQ1VuN01Ia3Q2YVdpSStidWRFQ05INTgKanNYTXBKWEdEdVMvU3c9PQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg==
+    hmac: SOswQPXojXToX/l7R/FXUw==
+
+  redis:
+    uri: "redis://lago-redis.default.svc.cluster.local:6379"
+
+  redisCache:
+    uri: "redis://lago-redis.default.svc.cluster.local:6379"
+
+  redisStore:
+    uri: "redis://lago-redis.default.svc.cluster.local:6379"
