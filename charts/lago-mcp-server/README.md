@@ -6,6 +6,8 @@ A Helm chart for Kubernetes
 
 ## Values
 
+### Config
+
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | config.mistral.agentID | string | `nil` | Mistral AI agent ID |
@@ -13,26 +15,61 @@ A Helm chart for Kubernetes
 | config.logLevel | string | `nil` | Log level (`debug`, `info`, `warn`, `error`) |
 | config.api.url | string | `nil` | Lago API URL for the MCP server to connect to |
 | existingSecret | string | `nil` | Name of an existing Secret containing MCP server credentials |
+
+### Image
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | image.repository | string | `"ghcr.io/getlago/mcp-server"` | Container image repository |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.tag | string | `""` | Override the image tag (defaults to Chart appVersion) |
 | imagePullSecrets | list | `[]` | Image pull secrets for private registries |
+
+### Deployment
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | nameOverride | string | `""` | Override the chart name |
 | fullnameOverride | string | `""` | Override the full release name |
+
+### Container
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | container.name | string | `""` | Override the container name (defaults to chart fullname) |
 | container.command | list | `["./lago-mcp-server"]` | Container entrypoint command |
 | container.args | list | `["sse","--host","0.0.0.0"]` | Container command arguments |
 | container.ports.http | int | `3000` | HTTP container port |
+
+### Service Account
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | serviceAccount.create | bool | `true` | Create a ServiceAccount |
 | serviceAccount.automount | bool | `true` | Automount the ServiceAccount API credentials |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the ServiceAccount |
 | serviceAccount.name | string | `""` | ServiceAccount name (generated from fullname if not set) |
+
+### Service
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | service.type | string | `"ClusterIP"` | Service type (`ClusterIP`, `NodePort`, `LoadBalancer`) |
 | service.port | int | `80` | Service port |
+
+### Autoscaling
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | autoscaling.enabled | bool | `false` | Enable Horizontal Pod Autoscaler |
 | autoscaling.minReplicas | int | `1` | Minimum replicas |
 | autoscaling.maxReplicas | int | `100` | Maximum replicas |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` | Target CPU utilization percentage |
+
+### Pod
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | podAnnotations | object | `{}` | Additional pod annotations |
 | podLabels | object | `{}` | Additional pod labels |
 | podSecurityContext | object | `{}` | Pod-level security context |

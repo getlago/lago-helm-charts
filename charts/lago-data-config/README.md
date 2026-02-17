@@ -6,6 +6,8 @@ A Helm chart for Kubernetes
 
 ## Values
 
+### Analytical Database
+
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | global.databaseAnalytical.host | string | `""` | Analytical database host |
@@ -14,26 +16,56 @@ A Helm chart for Kubernetes
 | global.databaseAnalytical.password | string | `""` | Analytical database password |
 | global.databaseAnalytical.port | int | `5432` | Analytical database port |
 | global.databaseAnalytical.schema | string | `"analytical"` | Analytical database schema |
+
+### Forecasted Usage
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | global.forecastedUsage.enabled | bool | `false` | Enable forecasted usage feature |
 | global.forecastedUsage.api_token | string | `nil` | Lago API token for forecasted usage calls |
 | global.forecastedUsage.celery.brokerUrl | string | `""` | Celery broker URL |
 | global.forecastedUsage.celery.resultBackend | string | `""` | Celery result backend URL |
+
+### dbt Pipeline
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | global.dbtPipeline.enabled | bool | `false` | Enable dbt pipeline |
 | global.dbtPipeline.sourceSchema | string | `"public"` | Source schema for dbt pipeline |
 | global.dbtPipeline.targetSchema | string | `"analytical"` | Target schema for dbt pipeline |
 | global.dbtPipeline.tables | list | `[]` | Tables to replicate |
+
+### Replica Database
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | global.databaseReplica.host | string | `""` | Replica database host |
 | global.databaseReplica.name | string | `""` | Replica database name |
 | global.databaseReplica.user | string | `""` | Replica database user |
 | global.databaseReplica.password | string | `""` | Replica database password |
 | global.databaseReplica.port | int | `5432` | Replica database port |
+
+### Data
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | global.data.configmap | string | `nil` | Name of an existing ConfigMap for data configuration |
 | global.data.secret | string | `nil` | Name of an existing Secret for data configuration |
 | global.data.token | string | `nil` | API token to validate calls from lago-api |
+
+### ConfigMap
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | configmap.create | bool | `true` | Create the ConfigMap (set to false when using an externally managed ConfigMap) |
 | configmap.name | string | `""` | Override the ConfigMap name (generated from fullname if not set) |
 | configmap.labels | object | `{}` | Additional labels for the ConfigMap |
 | configmap.annotations | object | `{}` | Additional annotations for the ConfigMap |
+
+### Secret
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
 | secret.create | bool | `true` | Create the Secret for sensitive configuration |
 | secret.name | string | `""` | Override the Secret name (generated from fullname if not set) |
 | secret.labels | object | `{}` | Additional labels for the Secret |

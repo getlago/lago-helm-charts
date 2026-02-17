@@ -3,105 +3,142 @@
 config:
   mistral:
     # -- Mistral AI agent ID
+    # @section -- Config
     agentID:
     # -- Mistral AI API key
+    # @section -- Config
     apiKey:
 
   # -- Log level (`debug`, `info`, `warn`, `error`)
+  # @section -- Config
   logLevel:
 
   api:
     # -- Lago API URL for the MCP server to connect to
+    # @section -- Config
     url:
 
 # -- Name of an existing Secret containing MCP server credentials
+# @section -- Config
 existingSecret:
 
 image:
   # -- Container image repository
+  # @section -- Image
   repository: ghcr.io/getlago/mcp-server
   # -- Image pull policy
+  # @section -- Image
   pullPolicy: IfNotPresent
   # -- Override the image tag (defaults to Chart appVersion)
+  # @section -- Image
   tag: ""
 
 # -- Image pull secrets for private registries
 # @default -- `[]`
+# @section -- Image
 imagePullSecrets: []
 # -- Override the chart name
+# @section -- Deployment
 nameOverride: ""
 # -- Override the full release name
+# @section -- Deployment
 fullnameOverride: ""
 
 container:
   # -- Override the container name (defaults to chart fullname)
+  # @section -- Container
   name: ""
   # -- Container entrypoint command
+  # @section -- Container
   command: ["./lago-mcp-server"]
   # -- Container command arguments
+  # @section -- Container
   args: ["sse", "--host", "0.0.0.0"]
   ports:
     # -- HTTP container port
+    # @section -- Container
     http: 3000
 
 serviceAccount:
   # -- Create a ServiceAccount
+  # @section -- Service Account
   create: true
   # -- Automount the ServiceAccount API credentials
+  # @section -- Service Account
   automount: true
   # -- Annotations to add to the ServiceAccount
+  # @section -- Service Account
   annotations: {}
   # -- ServiceAccount name (generated from fullname if not set)
+  # @section -- Service Account
   name: ""
 
 service:
   # -- Service type (`ClusterIP`, `NodePort`, `LoadBalancer`)
+  # @section -- Service
   type: ClusterIP
   # -- Service port
+  # @section -- Service
   port: 80
 
 autoscaling:
   # -- Enable Horizontal Pod Autoscaler
+  # @section -- Autoscaling
   enabled: false
   # -- Minimum replicas
+  # @section -- Autoscaling
   minReplicas: 1
   # -- Maximum replicas
+  # @section -- Autoscaling
   maxReplicas: 100
   # -- Target CPU utilization percentage
+  # @section -- Autoscaling
   targetCPUUtilizationPercentage: 80
 
 # -- Additional pod annotations
+# @section -- Pod
 podAnnotations: {}
 # -- Additional pod labels
+# @section -- Pod
 podLabels: {}
 
 # -- Pod-level security context
+# @section -- Pod
 podSecurityContext: {}
 
 # -- Container-level security context
+# @section -- Pod
 securityContext: {}
 
 # -- Extra environment variables (map format, deep-mergeable)
+# @section -- Pod
 extraEnv: {}
 
 # -- Extra envFrom sources
 # @default -- `[]` (See [values.yaml])
+# @section -- Pod
 extraEnvFrom: []
 
 # -- Resource requests and limits
+# @section -- Pod
 resources: {}
 
 # -- Additional volumes
+# @section -- Pod
 volumes: []
 
 # -- Additional volume mounts
+# @section -- Pod
 volumeMounts: []
 
 # -- Node selector constraints
+# @section -- Pod
 nodeSelector: {}
 
 # -- Pod tolerations
+# @section -- Pod
 tolerations: []
 
 # -- Pod affinity rules
+# @section -- Pod
 affinity: {}
