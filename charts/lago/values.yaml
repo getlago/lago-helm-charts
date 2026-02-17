@@ -717,6 +717,9 @@ migrate:
   # -- Pod affinity rules
   # @section -- Database Migration
   affinity: {}
+  # -- Init containers to run before the migration (e.g. wait for database readiness)
+  # @section -- Database Migration
+  initContainers: []
 
 # -- Kafka topic creation job configuration
 # @default -- See child values

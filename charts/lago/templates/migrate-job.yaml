@@ -46,6 +46,10 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       restartPolicy: {{ .Values.migrate.restartPolicy }}
+      {{- with .Values.migrate.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: migrate
           image: "{{ .Values.migrate.image.repository }}:{{ include "lago.version" . }}"
