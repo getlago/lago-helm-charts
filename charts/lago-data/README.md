@@ -29,7 +29,7 @@ A Helm chart for Kubernetes
 |-----|------|---------|-------------|
 | global.config.configmap | string | `nil` | Name of an existing ConfigMap for shared configuration |
 | global.config.secret | string | `nil` | Name of an existing Secret for shared configuration |
-| config | object | `{"nameOverride":"lago-config"}` | lago-config subchart overrides |
+| config | object | See child values | lago-config subchart overrides |
 | config.nameOverride | string | `"lago-config"` | Override the config subchart release name |
 
 ### URLs
@@ -129,14 +129,14 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| data-config | object | `{"nameOverride":"lago-data-config"}` | lago-data-config subchart overrides |
+| data-config | object | See child values | lago-data-config subchart overrides |
 | data-config.nameOverride | string | `"lago-data-config"` | Override the data-config subchart release name |
 
 ### API
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| api | object | `{"config":{"enabled":false,"nameOverride":"lago-config"},"extraEnv":{"LAGO_DATA_API_BEARER_TOKEN":{"valueFrom":{"secretKeyRef":{"key":"api.token","name":"lago-data-config"}}}},"nameOverride":"lago-api"}` | lago-api subchart overrides (lago-rails) |
+| api | object | See child values | lago-api subchart overrides (lago-rails) |
 | api.nameOverride | string | `"lago-api"` | Override the API subchart release name |
 | api.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | api.config.nameOverride | string | `"lago-config"` | Config subchart name override |
@@ -146,7 +146,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| data-api | object | `{"config":{"api":{"url":"lago-api"},"enabled":false,"nameOverride":"lago-data-config"},"nameOverride":"lago-data-api"}` | lago-data-api subchart overrides |
+| data-api | object | See child values | lago-data-api subchart overrides |
 | data-api.nameOverride | string | `"lago-data-api"` | Override the data-api subchart release name |
 | data-api.config.enabled | bool | `false` | Disable nested config (uses parent data-config subchart) |
 | data-api.config.nameOverride | string | `"lago-data-config"` | Data-config subchart name override |
@@ -156,7 +156,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| data-worker | object | `{"config":{"api":{"url":"http://lago-api"},"enabled":false,"nameOverride":"lago-data-config"},"nameOverride":"lago-data-worker"}` | lago-data-worker subchart overrides |
+| data-worker | object | See child values | lago-data-worker subchart overrides |
 | data-worker.nameOverride | string | `"lago-data-worker"` | Override the data-worker subchart release name |
 | data-worker.config.enabled | bool | `false` | Disable nested config (uses parent data-config subchart) |
 | data-worker.config.nameOverride | string | `"lago-data-config"` | Data-config subchart name override |
@@ -166,7 +166,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| dbtPipeline | object | `{"affinity":[],"container":{"args":[],"command":[]},"cronjob":{"activeDeadlineSeconds":null,"backoffLimit":0,"concurrencyPolicy":"Forbid","failedJobsHistoryLimit":1,"restartPolicy":"Never","schedule":"0 5 * * *","startingDeadlineSeconds":null,"successfulJobsHistoryLimit":3,"suspend":false},"extraEnv":{},"image":{"pullPolicy":"IfNotPresent","repository":"getlago/data-dbt-pipeline","tag":"latest"},"imagePullSecrets":[],"nodeSelector":{},"podAnnotations":{},"podLabels":{},"podSecurityContext":{},"resources":{},"securityContext":{},"serviceAccount":{"annotations":{},"automount":true,"create":true},"tolerations":[],"trigger":{"enabled":false,"image":{"repository":"rancher/kubectl","tag":"latest"}},"volumeMounts":[],"volumes":[]}` | dbt pipeline CronJob configuration |
+| dbtPipeline | object | See child values | dbt pipeline CronJob configuration |
 | dbtPipeline.image.repository | string | `"getlago/data-dbt-pipeline"` | dbt pipeline image repository |
 | dbtPipeline.image.tag | string | `"latest"` | dbt pipeline image tag |
 | dbtPipeline.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |

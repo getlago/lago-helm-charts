@@ -296,6 +296,7 @@ global:
         apiLogs: api_logs
 
 # -- lago-config subchart overrides
+# @default -- See child values
 # @section -- lago-config
 config:
   # -- Override the config subchart release name
@@ -303,6 +304,7 @@ config:
   nameOverride: lago-config
 
 # -- lago-api subchart overrides (lago-rails)
+# @default -- See child values
 # @section -- API
 api:
   config:
@@ -322,6 +324,7 @@ api:
   nameOverride: lago-api
 
 # -- lago-front subchart overrides
+# @default -- See child values
 # @section -- Frontend
 front:
   config:
@@ -334,6 +337,7 @@ front:
   nameOverride: lago-front
 
 # -- Default Sidekiq worker subchart overrides (lago-rails)
+# @default -- See child values
 # @section -- Default Worker
 worker:
   # -- Override the worker subchart release name
@@ -368,6 +372,7 @@ worker:
     ports:
 
 # -- Clock scheduler subchart overrides (lago-rails)
+# @default -- See child values
 # @section -- Clock
 clock:
   # -- Override the clock subchart release name
@@ -399,6 +404,7 @@ clock:
     ports:
 
 # -- Analytics worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.analytics`)
+# @default -- See child values
 # @section -- Analytics Worker
 analytics-worker:
   # -- Override the analytics-worker subchart release name
@@ -430,6 +436,7 @@ analytics-worker:
     ports:
 
 # -- Billing worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.billing`)
+# @default -- See child values
 # @section -- Billing Worker
 billing-worker:
   # -- Override the billing-worker subchart release name
@@ -461,6 +468,7 @@ billing-worker:
     ports:
 
 # -- Clock worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.clock`)
+# @default -- See child values
 # @section -- Clock Worker
 clock-worker:
   # -- Override the clock-worker subchart release name
@@ -492,6 +500,7 @@ clock-worker:
     ports:
 
 # -- Events worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.events`)
+# @default -- See child values
 # @section -- Events Worker
 events-worker:
   # -- Override the events-worker subchart release name
@@ -523,6 +532,7 @@ events-worker:
     ports:
 
 # -- Webhook worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.webhook`)
+# @default -- See child values
 # @section -- Webhook Worker
 webhook-worker:
   # -- Override the webhook-worker subchart release name
@@ -554,6 +564,7 @@ webhook-worker:
     ports:
 
 # -- PDF stack subchart overrides (lago-pdf, conditional on `global.sidekiq.queues.pdf`)
+# @default -- See child values
 # @section -- PDF
 pdf:
   # -- Override the PDF subchart release name
@@ -574,6 +585,7 @@ pdf:
       nameOverride: lago-config
 
 # -- Events consumer worker subchart overrides (lago-rails, conditional on `global.streaming_ingestion.enabled`)
+# @default -- See child values
 # @section -- Events Consumer Worker
 events-consumer-worker:
   # -- Override the events-consumer-worker subchart release name
@@ -605,6 +617,7 @@ events-consumer-worker:
     ports:
 
 # -- Events processor worker subchart overrides (conditional on `global.streaming_ingestion.enabled`)
+# @default -- See child values
 # @section -- Events Processor Worker
 events-processor-worker:
   # -- Override the events-processor-worker subchart release name
@@ -619,6 +632,7 @@ events-processor-worker:
     nameOverride: lago-config
 
 # -- Database migration job configuration
+# @default -- See child values
 # @section -- Database Migration
 migrate:
   # -- Enable the database migration job
@@ -705,6 +719,7 @@ migrate:
   affinity: {}
 
 # -- Kafka topic creation job configuration
+# @default -- See child values
 # @section -- Create Topics Job
 createTopics:
   # -- Enable the Kafka topic creation job
@@ -776,6 +791,7 @@ createTopics:
   affinity: {}
 
 # -- Kafka topic deletion job configuration
+# @default -- See child values
 # @section -- Delete Topics Job
 deleteTopics:
   # -- Enable the Kafka topic deletion job

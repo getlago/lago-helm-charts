@@ -28,14 +28,14 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| config | object | `{"nameOverride":"lago-config"}` | lago-config subchart overrides |
+| config | object | See child values | lago-config subchart overrides |
 | config.nameOverride | string | `"lago-config"` | Override the config subchart release name |
 
 ### API
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| api | object | `{"config":{"enabled":false,"nameOverride":"lago-config","web":{"sidekiq":true}},"nameOverride":"lago-api"}` | lago-api subchart overrides (lago-rails) |
+| api | object | See child values | lago-api subchart overrides (lago-rails) |
 | api.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | api.config.nameOverride | string | `"lago-config"` | Config subchart name override |
 | api.config.web.sidekiq | bool | `true` | Enable Sidekiq embedded mode in the API process |
@@ -45,7 +45,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| front | object | `{"config":{"enabled":false},"nameOverride":"lago-front"}` | lago-front subchart overrides |
+| front | object | See child values | lago-front subchart overrides |
 | front.config.enabled | bool | `false` | Disable nested config |
 | front.nameOverride | string | `"lago-front"` | Override the front subchart release name |
 
@@ -53,7 +53,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| worker | object | `{"config":{"enabled":false,"nameOverride":"lago-config"},"container":{"command":["./scripts/start.worker.sh"],"ports":null},"livenessProbe":null,"nameOverride":"lago-worker","readinessProbe":null,"service":{"enabled":false}}` | Default Sidekiq worker subchart overrides (lago-rails) |
+| worker | object | See child values | Default Sidekiq worker subchart overrides (lago-rails) |
 | worker.nameOverride | string | `"lago-worker"` | Override the worker subchart release name |
 | worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
@@ -67,7 +67,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| clock | object | `{"config":{"enabled":false,"nameOverride":"lago-config"},"container":{"command":["./scripts/start.clock.sh"],"ports":null},"livenessProbe":null,"nameOverride":"lago-clock","readinessProbe":null,"service":{"enabled":false}}` | Clock scheduler subchart overrides (lago-rails) |
+| clock | object | See child values | Clock scheduler subchart overrides (lago-rails) |
 | clock.nameOverride | string | `"lago-clock"` | Override the clock subchart release name |
 | clock.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | clock.config.nameOverride | string | `"lago-config"` | Config subchart name override |
@@ -81,7 +81,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| analytics-worker | object | `{"config":{"enabled":false,"nameOverride":"lago-config"},"container":{"command":["./scripts/start.analytics.worker.sh"],"ports":null},"livenessProbe":null,"nameOverride":"lago-analytics-worker","readinessProbe":null,"service":{"enabled":false}}` | Analytics worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.analytics`) |
+| analytics-worker | object | See child values | Analytics worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.analytics`) |
 | analytics-worker.nameOverride | string | `"lago-analytics-worker"` | Override the analytics-worker subchart release name |
 | analytics-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | analytics-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
@@ -95,7 +95,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| billing-worker | object | `{"config":{"enabled":false,"nameOverride":"lago-config"},"container":{"command":["./scripts/start.billing.worker.sh"],"ports":null},"livenessProbe":null,"nameOverride":"lago-billing-worker","readinessProbe":null,"service":{"enabled":false}}` | Billing worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.billing`) |
+| billing-worker | object | See child values | Billing worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.billing`) |
 | billing-worker.nameOverride | string | `"lago-billing-worker"` | Override the billing-worker subchart release name |
 | billing-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | billing-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
@@ -109,7 +109,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| clock-worker | object | `{"config":{"enabled":false,"nameOverride":"lago-config"},"container":{"command":["./scripts/start.clock.worker.sh"],"ports":null},"livenessProbe":null,"nameOverride":"lago-clock-worker","readinessProbe":null,"service":{"enabled":false}}` | Clock worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.clock`) |
+| clock-worker | object | See child values | Clock worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.clock`) |
 | clock-worker.nameOverride | string | `"lago-clock-worker"` | Override the clock-worker subchart release name |
 | clock-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | clock-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
@@ -123,7 +123,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| events-worker | object | `{"config":{"enabled":false,"nameOverride":"lago-config"},"container":{"command":["./scripts/start.events.worker.sh"],"ports":null},"livenessProbe":null,"nameOverride":"lago-events-worker","readinessProbe":null,"service":{"enabled":false}}` | Events worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.events`) |
+| events-worker | object | See child values | Events worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.events`) |
 | events-worker.nameOverride | string | `"lago-events-worker"` | Override the events-worker subchart release name |
 | events-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | events-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
@@ -137,7 +137,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| webhook-worker | object | `{"config":{"enabled":false,"nameOverride":"lago-config"},"container":{"command":["./scripts/start.webhook.worker.sh"],"ports":null},"livenessProbe":null,"nameOverride":"lago-webhook-worker","readinessProbe":null,"service":{"enabled":false}}` | Webhook worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.webhook`) |
+| webhook-worker | object | See child values | Webhook worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.webhook`) |
 | webhook-worker.nameOverride | string | `"lago-webhook-worker"` | Override the webhook-worker subchart release name |
 | webhook-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | webhook-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
@@ -151,7 +151,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| pdf | object | `{"config":{"enabled":false,"nameOverride":"lago-config"},"nameOverride":"lago-pdf","worker":{"config":{"nameOverride":"lago-config"}}}` | PDF stack subchart overrides (lago-pdf, conditional on `global.sidekiq.queues.pdf`) |
+| pdf | object | See child values | PDF stack subchart overrides (lago-pdf, conditional on `global.sidekiq.queues.pdf`) |
 | pdf.nameOverride | string | `"lago-pdf"` | Override the PDF subchart release name |
 | pdf.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | pdf.config.nameOverride | string | `"lago-config"` | Config subchart name override |
@@ -161,7 +161,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| events-consumer-worker | object | `{"config":{"enabled":false,"nameOverride":"lago-config"},"container":{"command":["./scripts/start.events.consumer.sh"],"ports":null},"livenessProbe":null,"nameOverride":"lago-events-consumer-worker","readinessProbe":null,"service":{"enabled":false}}` | Events consumer worker subchart overrides (lago-rails, conditional on `global.streaming_ingestion.enabled`) |
+| events-consumer-worker | object | See child values | Events consumer worker subchart overrides (lago-rails, conditional on `global.streaming_ingestion.enabled`) |
 | events-consumer-worker.nameOverride | string | `"lago-events-consumer-worker"` | Override the events-consumer-worker subchart release name |
 | events-consumer-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | events-consumer-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
@@ -175,7 +175,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| events-processor-worker | object | `{"config":{"enabled":false,"nameOverride":"lago-config"},"nameOverride":"lago-events-processor-worker"}` | Events processor worker subchart overrides (conditional on `global.streaming_ingestion.enabled`) |
+| events-processor-worker | object | See child values | Events processor worker subchart overrides (conditional on `global.streaming_ingestion.enabled`) |
 | events-processor-worker.nameOverride | string | `"lago-events-processor-worker"` | Override the events-processor-worker subchart release name |
 | events-processor-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | events-processor-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
@@ -184,7 +184,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| migrate | object | `{"activeDeadlineSeconds":600,"affinity":{},"annotations":{},"args":[],"backoffLimit":3,"command":["./scripts/migrate.sh"],"enabled":false,"extraEnv":{},"extraEnvFrom":[],"hookDeletePolicy":"before-hook-creation","hookWeight":"-5","image":{"pullPolicy":"IfNotPresent","repository":"getlago/api","tag":""},"imagePullSecrets":[],"nodeSelector":{},"podAnnotations":{},"podLabels":{},"podSecurityContext":{},"resources":{},"restartPolicy":"Never","securityContext":{},"serviceAccountName":"","tolerations":[],"ttlSecondsAfterFinished":300,"volumeMounts":[],"volumes":[]}` | Database migration job configuration |
+| migrate | object | See child values | Database migration job configuration |
 | migrate.enabled | bool | `false` | Enable the database migration job |
 | migrate.image.repository | string | `"getlago/api"` | Migration job image repository |
 | migrate.image.tag | string | `""` | Override the migration job image tag |
@@ -217,7 +217,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| createTopics | object | `{"activeDeadlineSeconds":300,"affinity":{},"annotations":{},"backoffLimit":3,"enabled":false,"extraEnv":{},"hookDeletePolicy":"before-hook-creation","hookWeight":"-1","image":{"pullPolicy":"IfNotPresent","repository":"alpine","tag":"3.20"},"imagePullSecrets":[],"nodeSelector":{},"podAnnotations":{},"podLabels":{},"podSecurityContext":{},"resources":{},"restartPolicy":"Never","securityContext":{},"serviceAccountName":"","tolerations":[],"ttlSecondsAfterFinished":300}` | Kafka topic creation job configuration |
+| createTopics | object | See child values | Kafka topic creation job configuration |
 | createTopics.enabled | bool | `false` | Enable the Kafka topic creation job |
 | createTopics.image.repository | string | `"alpine"` | Topic job image repository |
 | createTopics.image.tag | string | `"3.20"` | Topic job image tag |
@@ -245,7 +245,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| deleteTopics | object | `{"activeDeadlineSeconds":300,"affinity":{},"annotations":{},"backoffLimit":3,"enabled":false,"extraEnv":{},"hookDeletePolicy":"before-hook-creation","hookWeight":"1","image":{"pullPolicy":"IfNotPresent","repository":"alpine","tag":"3.20"},"imagePullSecrets":[],"nodeSelector":{},"podAnnotations":{},"podLabels":{},"podSecurityContext":{},"resources":{},"restartPolicy":"Never","securityContext":{},"serviceAccountName":"","tolerations":[],"ttlSecondsAfterFinished":300}` | Kafka topic deletion job configuration |
+| deleteTopics | object | See child values | Kafka topic deletion job configuration |
 | deleteTopics.enabled | bool | `false` | Enable the Kafka topic deletion job |
 | deleteTopics.image.repository | string | `"alpine"` | Topic job image repository |
 | deleteTopics.image.tag | string | `"3.20"` | Topic job image tag |
