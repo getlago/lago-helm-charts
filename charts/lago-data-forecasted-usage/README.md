@@ -14,57 +14,56 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| global.databaseAnalytical.host | string | `""` |  |
-| global.databaseAnalytical.name | string | `""` |  |
-| global.databaseAnalytical.user | string | `""` |  |
-| global.databaseAnalytical.password | string | `""` |  |
-| global.databaseAnalytical.port | int | `5432` |  |
-| global.databaseAnalytical.schema | string | `"analytical"` |  |
-| global.data.token | string | `"some_token"` |  |
-| config.enabled | bool | `true` |  |
-| config.nameOverride | string | `"lago-data-forecasted-usage"` |  |
-| config.s3.secret.create | bool | `true` |  |
-| config.s3.secret.name | string | `nil` |  |
-| config.s3.accessKeyId | string | `nil` |  |
-| config.s3.secretAccessKey | string | `nil` |  |
-| config.ml.secret.create | bool | `true` |  |
-| config.ml.secret.name | string | `nil` |  |
-| config.ml.config | string | `""` |  |
-| cronjob.schedule | string | `"0 */6 * * *"` |  |
-| cronjob.concurrencyPolicy | string | `"Forbid"` |  |
-| cronjob.successfulJobsHistoryLimit | int | `3` |  |
-| cronjob.failedJobsHistoryLimit | int | `1` |  |
-| cronjob.startingDeadlineSeconds | string | `nil` |  |
-| cronjob.suspend | bool | `false` |  |
-| cronjob.activeDeadlineSeconds | string | `nil` |  |
-| cronjob.backoffLimit | int | `0` |  |
-| cronjob.restartPolicy | string | `"Never"` |  |
-| image.repository | string | `"getlago/lago-data-ml"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.tag | string | `""` |  |
-| imagePullSecrets | list | `[]` |  |
-| nameOverride | string | `""` |  |
-| fullnameOverride | string | `""` |  |
-| container.name | string | `""` |  |
-| container.command[0] | string | `"/bin/bash"` |  |
-| container.command[1] | string | `"-c"` |  |
-| container.args[0] | string | `"python run.py --mode train && python run.py --mode forecast"` |  |
-| serviceAccount.create | bool | `true` |  |
-| serviceAccount.automount | bool | `true` |  |
-| serviceAccount.annotations | object | `{}` |  |
-| serviceAccount.name | string | `""` |  |
-| podAnnotations | object | `{}` |  |
-| podLabels | object | `{}` |  |
-| podSecurityContext | object | `{}` |  |
-| securityContext | object | `{}` |  |
-| resources | object | `{}` |  |
-| extraEnv | object | `{}` | Environment variables to pass to the container (map format, deep-mergeable) |
-| extraEnvFrom | list | `[]` (See [values.yaml]) | envFrom to pass to the container |
-| volumes | list | `[]` |  |
-| volumeMounts | list | `[]` |  |
-| nodeSelector | object | `{}` |  |
-| tolerations | list | `[]` |  |
-| affinity | object | `{}` |  |
+| global.databaseAnalytical.host | string | `""` | Analytical database host |
+| global.databaseAnalytical.name | string | `""` | Analytical database name |
+| global.databaseAnalytical.user | string | `""` | Analytical database user |
+| global.databaseAnalytical.password | string | `""` | Analytical database password |
+| global.databaseAnalytical.port | int | `5432` | Analytical database port |
+| global.databaseAnalytical.schema | string | `"analytical"` | Analytical database schema |
+| global.data.token | string | `"some_token"` | API token (required by data-config subchart) |
+| config.enabled | bool | `true` | Deploy the config subchart |
+| config.nameOverride | string | `"lago-data-forecasted-usage"` | Override the config subchart release name |
+| config.s3.secret.create | bool | `true` | Create the S3 credentials secret |
+| config.s3.secret.name | string | `nil` | Use an existing S3 secret by name |
+| config.s3.accessKeyId | string | `nil` | S3 access key ID for model storage |
+| config.s3.secretAccessKey | string | `nil` | S3 secret access key for model storage |
+| config.ml.secret.create | bool | `true` | Create the ML config secret |
+| config.ml.secret.name | string | `nil` | Use an existing ML secret by name |
+| config.ml.config | string | `""` | ML model configuration (YAML or JSON string) |
+| cronjob.schedule | string | `"0 */6 * * *"` | Cron schedule expression |
+| cronjob.concurrencyPolicy | string | `"Forbid"` | How to treat concurrent job executions (`Allow`, `Forbid`, `Replace`) |
+| cronjob.successfulJobsHistoryLimit | int | `3` | Number of successful finished jobs to retain |
+| cronjob.failedJobsHistoryLimit | int | `1` | Number of failed finished jobs to retain |
+| cronjob.startingDeadlineSeconds | int | `nil` | Optional deadline in seconds for starting the job if it misses scheduled time |
+| cronjob.suspend | bool | `false` | Suspend subsequent executions |
+| cronjob.activeDeadlineSeconds | int | `nil` | Duration in seconds relative to startTime that the job may be active |
+| cronjob.backoffLimit | int | `0` | Number of retries before marking the job as failed |
+| cronjob.restartPolicy | string | `"Never"` | Restart policy (`OnFailure`, `Never`) |
+| image.repository | string | `"getlago/lago-data-ml"` | Container image repository |
+| image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| image.tag | string | `""` | Override the image tag (defaults to Chart appVersion) |
+| imagePullSecrets | list | `[]` | Image pull secrets for private registries |
+| nameOverride | string | `""` | Override the chart name |
+| fullnameOverride | string | `""` | Override the full release name |
+| container.name | string | `""` | Override the container name (defaults to chart fullname) |
+| container.command | list | `["/bin/bash","-c"]` | Container entrypoint command |
+| container.args | list | `["python run.py --mode train && python run.py --mode forecast"]` | Container command arguments |
+| serviceAccount.create | bool | `true` | Create a ServiceAccount |
+| serviceAccount.automount | bool | `true` | Automount the ServiceAccount API credentials |
+| serviceAccount.annotations | object | `{}` | Annotations to add to the ServiceAccount |
+| serviceAccount.name | string | `""` | ServiceAccount name (generated from fullname if not set) |
+| podAnnotations | object | `{}` | Additional pod annotations |
+| podLabels | object | `{}` | Additional pod labels |
+| podSecurityContext | object | `{}` | Pod-level security context |
+| securityContext | object | `{}` | Container-level security context |
+| resources | object | `{}` | Resource requests and limits |
+| extraEnv | object | `{}` | Extra environment variables (map format, deep-mergeable) |
+| extraEnvFrom | list | `[]` (See [values.yaml]) | Extra envFrom sources |
+| volumes | list | `[]` | Additional volumes |
+| volumeMounts | list | `[]` | Additional volume mounts |
+| nodeSelector | object | `{}` | Node selector constraints |
+| tolerations | list | `[]` | Pod tolerations |
+| affinity | object | `{}` | Pod affinity rules |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

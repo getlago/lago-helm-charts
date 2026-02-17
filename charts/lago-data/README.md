@@ -18,95 +18,100 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| global.ago.env | string | `"production"` |  |
-| global.ago.license | string | `""` |  |
-| global.config.configmap | string | `nil` |  |
-| global.config.secret | string | `nil` |  |
-| global.urls.api | string | `""` |  |
-| global.urls.front | string | `""` |  |
-| global.urls.pdf | string | `""` |  |
-| global.database.uri | string | `""` |  |
-| global.database.pool | int | `20` |  |
-| global.encryption.key | string | `""` |  |
-| global.encryption.salt | string | `""` |  |
-| global.signing.hmac | string | `""` |  |
-| global.signing.rsa | string | `""` |  |
-| global.redis.url | string | `""` |  |
-| global.redis.password | string | `""` |  |
-| global.redisCache.url | string | `""` |  |
-| global.redisCache.password | string | `""` |  |
-| global.redisStore.url | string | `""` |  |
-| global.redisStore.password | string | `""` |  |
-| global.sentryDsn | string | `""` |  |
-| global.databaseAnalytical.host | string | `""` |  |
-| global.databaseAnalytical.name | string | `""` |  |
-| global.databaseAnalytical.user | string | `""` |  |
-| global.databaseAnalytical.password | string | `""` |  |
-| global.databaseAnalytical.port | int | `5432` |  |
-| global.databaseAnalytical.schema | string | `"analytical"` |  |
-| global.databaseReplica.host | string | `""` |  |
-| global.databaseReplica.name | string | `""` |  |
-| global.databaseReplica.user | string | `""` |  |
-| global.databaseReplica.password | string | `""` |  |
-| global.databaseReplica.port | int | `5432` |  |
-| global.dbtPipeline.enabled | bool | `false` |  |
-| global.dbtPipeline.sourceSchema | string | `"public"` |  |
-| global.dbtPipeline.targetSchema | string | `"analytical"` |  |
-| global.dbtPipeline.tables | list | `[]` |  |
-| global.forecastedUsage.enabled | bool | `false` |  |
-| global.forecastedUsage.api_token | string | `nil` |  |
-| global.forecastedUsage.celery.brokerUrl | string | `""` |  |
-| global.forecastedUsage.celery.resultBackend | string | `""` |  |
-| global.data.configmap | string | `nil` |  |
-| global.data.secret | string | `nil` |  |
-| global.data.token | string | `nil` |  |
-| config.nameOverride | string | `"lago-config"` |  |
-| data-config.nameOverride | string | `"lago-data-config"` |  |
-| api.nameOverride | string | `"lago-api"` |  |
-| api.config.enabled | bool | `false` |  |
-| api.config.nameOverride | string | `"lago-config"` |  |
-| api.extraEnv.LAGO_DATA_API_BEARER_TOKEN.valueFrom.secretKeyRef.name | string | `"lago-data-config"` |  |
-| api.extraEnv.LAGO_DATA_API_BEARER_TOKEN.valueFrom.secretKeyRef.key | string | `"api.token"` |  |
-| data-api.nameOverride | string | `"lago-data-api"` |  |
-| data-api.config.enabled | bool | `false` |  |
-| data-api.config.nameOverride | string | `"lago-data-config"` |  |
-| data-api.config.api.url | string | `"lago-api"` |  |
-| data-worker.nameOverride | string | `"lago-data-worker"` |  |
-| data-worker.config.enabled | bool | `false` |  |
-| data-worker.config.nameOverride | string | `"lago-data-config"` |  |
-| data-worker.config.api.url | string | `"http://lago-api"` |  |
-| dbtPipeline.image.repository | string | `"getlago/data-dbt-pipeline"` |  |
-| dbtPipeline.image.tag | string | `"latest"` |  |
-| dbtPipeline.image.pullPolicy | string | `"IfNotPresent"` |  |
-| dbtPipeline.imagePullSecrets | list | `[]` |  |
-| dbtPipeline.container.command | list | `[]` |  |
-| dbtPipeline.container.args | list | `[]` |  |
-| dbtPipeline.cronjob.schedule | string | `"0 5 * * *"` |  |
-| dbtPipeline.cronjob.concurrencyPolicy | string | `"Forbid"` |  |
-| dbtPipeline.cronjob.successfulJobsHistoryLimit | int | `3` |  |
-| dbtPipeline.cronjob.failedJobsHistoryLimit | int | `1` |  |
-| dbtPipeline.cronjob.startingDeadlineSeconds | string | `nil` |  |
-| dbtPipeline.cronjob.suspend | bool | `false` |  |
-| dbtPipeline.cronjob.activeDeadlineSeconds | string | `nil` |  |
-| dbtPipeline.cronjob.backoffLimit | int | `0` |  |
-| dbtPipeline.cronjob.restartPolicy | string | `"Never"` |  |
-| dbtPipeline.trigger.enabled | bool | `false` |  |
-| dbtPipeline.trigger.image.repository | string | `"rancher/kubectl"` |  |
-| dbtPipeline.trigger.image.tag | string | `"latest"` |  |
-| dbtPipeline.serviceAccount.create | bool | `true` |  |
-| dbtPipeline.serviceAccount.automount | bool | `true` |  |
-| dbtPipeline.serviceAccount.annotations | object | `{}` |  |
-| dbtPipeline.podAnnotations | object | `{}` |  |
-| dbtPipeline.podLabels | object | `{}` |  |
-| dbtPipeline.podSecurityContext | object | `{}` |  |
-| dbtPipeline.securityContext | object | `{}` |  |
-| dbtPipeline.resources | object | `{}` |  |
-| dbtPipeline.volumes | list | `[]` |  |
-| dbtPipeline.volumeMounts | list | `[]` |  |
-| dbtPipeline.nodeSelector | object | `{}` |  |
-| dbtPipeline.tolerations | list | `[]` |  |
-| dbtPipeline.affinity | list | `[]` |  |
-| dbtPipeline.extraEnv | object | `{}` | Additional environment variables (map format, deep-mergeable) |
+| global.ago.env | string | `"production"` | Rails environment (`production`, `staging`, `development`) |
+| global.ago.license | string | `""` | Lago Premium license key |
+| global.config.configmap | string | `nil` | Name of an existing ConfigMap for shared configuration |
+| global.config.secret | string | `nil` | Name of an existing Secret for shared configuration |
+| global.urls.api | string | `""` | Public URL of the Lago API |
+| global.urls.front | string | `""` | Public URL of the Lago frontend |
+| global.urls.pdf | string | `""` | Internal URL of the PDF service (Gotenberg) |
+| global.database.uri | string | `""` | PostgreSQL connection URI |
+| global.database.pool | int | `20` | Database connection pool size |
+| global.encryption.key | string | `""` | Primary encryption key (`openssl rand -hex 16`) |
+| global.encryption.salt | string | `""` | Key derivation salt (`openssl rand -hex 16`) |
+| global.signing.hmac | string | `""` | HMAC signing key (HS256) |
+| global.signing.rsa | string | `""` | RSA private key (RS256), base64-encoded |
+| global.redis.url | string | `""` | Redis URI for Sidekiq job queue |
+| global.redis.password | string | `""` | Redis password |
+| global.redisCache.url | string | `""` | Redis URI for Rails cache |
+| global.redisCache.password | string | `""` | Redis cache password |
+| global.redisStore.url | string | `""` | Redis URI for ActionCable / general store |
+| global.redisStore.password | string | `""` | Redis store password |
+| global.sentryDsn | string | `""` | Sentry DSN for error tracking |
+| global.databaseAnalytical.host | string | `""` | Analytical database host |
+| global.databaseAnalytical.name | string | `""` | Analytical database name |
+| global.databaseAnalytical.user | string | `""` | Analytical database user |
+| global.databaseAnalytical.password | string | `""` | Analytical database password |
+| global.databaseAnalytical.port | int | `5432` | Analytical database port |
+| global.databaseAnalytical.schema | string | `"analytical"` | Analytical database schema |
+| global.databaseReplica.host | string | `""` | Replica database host |
+| global.databaseReplica.name | string | `""` | Replica database name |
+| global.databaseReplica.user | string | `""` | Replica database user |
+| global.databaseReplica.password | string | `""` | Replica database password |
+| global.databaseReplica.port | int | `5432` | Replica database port |
+| global.dbtPipeline.enabled | bool | `false` | Enable dbt pipeline |
+| global.dbtPipeline.sourceSchema | string | `"public"` | Source schema for dbt pipeline |
+| global.dbtPipeline.targetSchema | string | `"analytical"` | Target schema for dbt pipeline |
+| global.dbtPipeline.tables | list | `[]` | Tables to replicate |
+| global.forecastedUsage.enabled | bool | `false` | Enable forecasted usage feature |
+| global.forecastedUsage.api_token | string | `nil` | Lago API token for forecasted usage calls |
+| global.forecastedUsage.celery.brokerUrl | string | `""` | Celery broker URL |
+| global.forecastedUsage.celery.resultBackend | string | `""` | Celery result backend URL |
+| global.data.configmap | string | `nil` | Name of an existing ConfigMap for data configuration |
+| global.data.secret | string | `nil` | Name of an existing Secret for data configuration |
+| global.data.token | string | `nil` | API token to validate calls from lago-api |
+| config | object | `{"nameOverride":"lago-config"}` | lago-config subchart overrides |
+| config.nameOverride | string | `"lago-config"` | Override the config subchart release name |
+| data-config | object | `{"nameOverride":"lago-data-config"}` | lago-data-config subchart overrides |
+| data-config.nameOverride | string | `"lago-data-config"` | Override the data-config subchart release name |
+| api | object | `{"config":{"enabled":false,"nameOverride":"lago-config"},"extraEnv":{"LAGO_DATA_API_BEARER_TOKEN":{"valueFrom":{"secretKeyRef":{"key":"api.token","name":"lago-data-config"}}}},"nameOverride":"lago-api"}` | lago-api subchart overrides (lago-rails) |
+| api.nameOverride | string | `"lago-api"` | Override the API subchart release name |
+| api.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
+| api.config.nameOverride | string | `"lago-config"` | Config subchart name override |
+| api.extraEnv.LAGO_DATA_API_BEARER_TOKEN | object | `{"valueFrom":{"secretKeyRef":{"key":"api.token","name":"lago-data-config"}}}` | Inject the Data API bearer token from the data-config secret |
+| data-api | object | `{"config":{"api":{"url":"lago-api"},"enabled":false,"nameOverride":"lago-data-config"},"nameOverride":"lago-data-api"}` | lago-data-api subchart overrides |
+| data-api.nameOverride | string | `"lago-data-api"` | Override the data-api subchart release name |
+| data-api.config.enabled | bool | `false` | Disable nested config (uses parent data-config subchart) |
+| data-api.config.nameOverride | string | `"lago-data-config"` | Data-config subchart name override |
+| data-api.config.api.url | string | `"lago-api"` | Internal Lago API service URL |
+| data-worker | object | `{"config":{"api":{"url":"http://lago-api"},"enabled":false,"nameOverride":"lago-data-config"},"nameOverride":"lago-data-worker"}` | lago-data-worker subchart overrides |
+| data-worker.nameOverride | string | `"lago-data-worker"` | Override the data-worker subchart release name |
+| data-worker.config.enabled | bool | `false` | Disable nested config (uses parent data-config subchart) |
+| data-worker.config.nameOverride | string | `"lago-data-config"` | Data-config subchart name override |
+| data-worker.config.api.url | string | `"http://lago-api"` | Internal Lago API URL for data worker |
+| dbtPipeline | object | `{"affinity":[],"container":{"args":[],"command":[]},"cronjob":{"activeDeadlineSeconds":null,"backoffLimit":0,"concurrencyPolicy":"Forbid","failedJobsHistoryLimit":1,"restartPolicy":"Never","schedule":"0 5 * * *","startingDeadlineSeconds":null,"successfulJobsHistoryLimit":3,"suspend":false},"extraEnv":{},"image":{"pullPolicy":"IfNotPresent","repository":"getlago/data-dbt-pipeline","tag":"latest"},"imagePullSecrets":[],"nodeSelector":{},"podAnnotations":{},"podLabels":{},"podSecurityContext":{},"resources":{},"securityContext":{},"serviceAccount":{"annotations":{},"automount":true,"create":true},"tolerations":[],"trigger":{"enabled":false,"image":{"repository":"rancher/kubectl","tag":"latest"}},"volumeMounts":[],"volumes":[]}` | dbt pipeline CronJob configuration |
+| dbtPipeline.image.repository | string | `"getlago/data-dbt-pipeline"` | dbt pipeline image repository |
+| dbtPipeline.image.tag | string | `"latest"` | dbt pipeline image tag |
+| dbtPipeline.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| dbtPipeline.imagePullSecrets | list | `[]` | Image pull secrets for private registries |
+| dbtPipeline.container.command | list | `[]` | Container entrypoint command |
+| dbtPipeline.container.args | list | `[]` | Container command arguments |
+| dbtPipeline.cronjob.schedule | string | `"0 5 * * *"` | Cron schedule expression |
+| dbtPipeline.cronjob.concurrencyPolicy | string | `"Forbid"` | How to treat concurrent job executions (`Allow`, `Forbid`, `Replace`) |
+| dbtPipeline.cronjob.successfulJobsHistoryLimit | int | `3` | Number of successful finished jobs to retain |
+| dbtPipeline.cronjob.failedJobsHistoryLimit | int | `1` | Number of failed finished jobs to retain |
+| dbtPipeline.cronjob.startingDeadlineSeconds | int | `nil` | Optional deadline in seconds for starting the job |
+| dbtPipeline.cronjob.suspend | bool | `false` | Suspend subsequent executions |
+| dbtPipeline.cronjob.activeDeadlineSeconds | int | `nil` | Duration in seconds the job may be active |
+| dbtPipeline.cronjob.backoffLimit | int | `0` | Number of retries before marking the job as failed |
+| dbtPipeline.cronjob.restartPolicy | string | `"Never"` | Restart policy (`OnFailure`, `Never`) |
+| dbtPipeline.trigger.enabled | bool | `false` | Enable a trigger job on install via Helm hook |
+| dbtPipeline.trigger.image.repository | string | `"rancher/kubectl"` | Trigger job image repository |
+| dbtPipeline.trigger.image.tag | string | `"latest"` | Trigger job image tag |
+| dbtPipeline.serviceAccount.create | bool | `true` | Create a ServiceAccount |
+| dbtPipeline.serviceAccount.automount | bool | `true` | Automount the ServiceAccount API credentials |
+| dbtPipeline.serviceAccount.annotations | object | `{}` | Annotations to add to the ServiceAccount |
+| dbtPipeline.podAnnotations | object | `{}` | Additional pod annotations |
+| dbtPipeline.podLabels | object | `{}` | Additional pod labels |
+| dbtPipeline.podSecurityContext | object | `{}` | Pod-level security context |
+| dbtPipeline.securityContext | object | `{}` | Container-level security context |
+| dbtPipeline.resources | object | `{}` | Resource requests and limits |
+| dbtPipeline.volumes | list | `[]` | Additional volumes |
+| dbtPipeline.volumeMounts | list | `[]` | Additional volume mounts |
+| dbtPipeline.nodeSelector | object | `{}` | Node selector constraints |
+| dbtPipeline.tolerations | list | `[]` | Pod tolerations |
+| dbtPipeline.affinity | list | `[]` | Pod affinity rules |
+| dbtPipeline.extraEnv | object | `{}` | Extra environment variables (map format, deep-mergeable) |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

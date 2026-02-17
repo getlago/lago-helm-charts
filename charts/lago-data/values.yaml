@@ -1,174 +1,249 @@
+# Default values for the lago-data umbrella chart.
+
 global:
   ago:
+    # -- Rails environment (`production`, `staging`, `development`)
     env: "production"
+    # -- Lago Premium license key
     license: ""
 
   config:
+    # -- Name of an existing ConfigMap for shared configuration
     configmap:
+    # -- Name of an existing Secret for shared configuration
     secret:
 
   urls:
+    # -- Public URL of the Lago API
     api: ""
+    # -- Public URL of the Lago frontend
     front: ""
+    # -- Internal URL of the PDF service (Gotenberg)
     pdf: ""
 
   database:
+    # -- PostgreSQL connection URI
     uri: ""
+    # -- Database connection pool size
     pool: 20
 
   encryption:
-    key: ""  # ENCRYPTION_PRIMARY_KEY
-    salt: ""  # ENCRYPTION_KEY_DERIVATION_SALT
+    # -- Primary encryption key (`openssl rand -hex 16`)
+    key: ""
+    # -- Key derivation salt (`openssl rand -hex 16`)
+    salt: ""
 
   signing:
-    hmac: ""  # SECRET_KEY_BASE used by webhooks, message verifier HS256
-    rsa: ""  # LAGO_RSA_PRIVATE_KEY used by webhooks RS256
+    # -- HMAC signing key (HS256)
+    hmac: ""
+    # -- RSA private key (RS256), base64-encoded
+    rsa: ""
 
   redis:
+    # -- Redis URI for Sidekiq job queue
     url: ""
+    # -- Redis password
     password: ""
 
   redisCache:
+    # -- Redis URI for Rails cache
     url: ""
+    # -- Redis cache password
     password: ""
 
   redisStore:
+    # -- Redis URI for ActionCable / general store
     url: ""
+    # -- Redis store password
     password: ""
 
+  # -- Sentry DSN for error tracking
   sentryDsn: ""
 
   databaseAnalytical:
+    # -- Analytical database host
     host: ""
+    # -- Analytical database name
     name: ""
+    # -- Analytical database user
     user: ""
+    # -- Analytical database password
     password: ""
+    # -- Analytical database port
     port: 5432
+    # -- Analytical database schema
     schema: analytical
 
   databaseReplica:
+    # -- Replica database host
     host: ""
+    # -- Replica database name
     name: ""
+    # -- Replica database user
     user: ""
+    # -- Replica database password
     password: ""
+    # -- Replica database port
     port: 5432
 
   dbtPipeline:
+    # -- Enable dbt pipeline
     enabled: false
+    # -- Source schema for dbt pipeline
     sourceSchema: public
+    # -- Target schema for dbt pipeline
     targetSchema: analytical
+    # -- Tables to replicate
     tables: []
 
   forecastedUsage:
+    # -- Enable forecasted usage feature
     enabled: false
-    # forecasted usage need to call lago-api, hence provide a valid token
+    # -- Lago API token for forecasted usage calls
     api_token:
     celery:
+      # -- Celery broker URL
       brokerUrl: ""
+      # -- Celery result backend URL
       resultBackend: ""
 
   data:
+    # -- Name of an existing ConfigMap for data configuration
     configmap:
+    # -- Name of an existing Secret for data configuration
     secret:
-    # token to validate calls from lago-api
+    # -- API token to validate calls from lago-api
     token:
 
+# -- lago-config subchart overrides
 config:
+  # -- Override the config subchart release name
   nameOverride: lago-config
 
+# -- lago-data-config subchart overrides
 data-config:
+  # -- Override the data-config subchart release name
   nameOverride: lago-data-config
 
+# -- lago-api subchart overrides (lago-rails)
 api:
+  # -- Override the API subchart release name
   nameOverride: lago-api
   config:
+    # -- Disable nested config (uses parent config subchart)
     enabled: false
+    # -- Config subchart name override
     nameOverride: lago-config
 
   extraEnv:
+    # -- Inject the Data API bearer token from the data-config secret
     LAGO_DATA_API_BEARER_TOKEN:
       valueFrom:
         secretKeyRef:
           name: lago-data-config
           key: api.token
 
+# -- lago-data-api subchart overrides
 data-api:
+  # -- Override the data-api subchart release name
   nameOverride: lago-data-api
   config:
+    # -- Disable nested config (uses parent data-config subchart)
     enabled: false
+    # -- Data-config subchart name override
     nameOverride: lago-data-config
     api:
-      url: lago-api  # this is the value of the api.fullnameOverride
+      # -- Internal Lago API service URL
+      url: lago-api
 
-
+# -- lago-data-worker subchart overrides
 data-worker:
+  # -- Override the data-worker subchart release name
   nameOverride: lago-data-worker
   config:
+    # -- Disable nested config (uses parent data-config subchart)
     enabled: false
+    # -- Data-config subchart name override
     nameOverride: lago-data-config
     api:
+      # -- Internal Lago API URL for data worker
       url: http://lago-api
 
-# DBT Pipeline CronJob configuration
+# -- dbt pipeline CronJob configuration
 dbtPipeline:
   image:
+    # -- dbt pipeline image repository
     repository: getlago/data-dbt-pipeline
+    # -- dbt pipeline image tag
     tag: latest
+    # -- Image pull policy
     pullPolicy: IfNotPresent
 
+  # -- Image pull secrets for private registries
   imagePullSecrets: []
 
   container:
+    # -- Container entrypoint command
     command: []
+    # -- Container command arguments
     args: []
 
-  # CronJob specific configuration
   cronjob:
+    # -- Cron schedule expression
     schedule: "0 5 * * *"
+    # -- How to treat concurrent job executions (`Allow`, `Forbid`, `Replace`)
     concurrencyPolicy: Forbid
+    # -- Number of successful finished jobs to retain
     successfulJobsHistoryLimit: 3
+    # -- Number of failed finished jobs to retain
     failedJobsHistoryLimit: 1
+    # -- (int) Optional deadline in seconds for starting the job
     startingDeadlineSeconds:
+    # -- Suspend subsequent executions
     suspend: false
+    # -- (int) Duration in seconds the job may be active
     activeDeadlineSeconds:
+    # -- Number of retries before marking the job as failed
     backoffLimit: 0
+    # -- Restart policy (`OnFailure`, `Never`)
     restartPolicy: Never
 
-  # Trigger job on install via helm hook
   trigger:
+    # -- Enable a trigger job on install via Helm hook
     enabled: false
     image:
+      # -- Trigger job image repository
       repository: rancher/kubectl
+      # -- Trigger job image tag
       tag: latest
 
   serviceAccount:
+    # -- Create a ServiceAccount
     create: true
+    # -- Automount the ServiceAccount API credentials
     automount: true
+    # -- Annotations to add to the ServiceAccount
     annotations: {}
 
+  # -- Additional pod annotations
   podAnnotations: {}
+  # -- Additional pod labels
   podLabels: {}
+  # -- Pod-level security context
   podSecurityContext: {}
+  # -- Container-level security context
   securityContext: {}
+  # -- Resource requests and limits
   resources: {}
+  # -- Additional volumes
   volumes: []
+  # -- Additional volume mounts
   volumeMounts: []
+  # -- Node selector constraints
   nodeSelector: {}
+  # -- Pod tolerations
   tolerations: []
+  # -- Pod affinity rules
   affinity: []
-  # -- Additional environment variables (map format, deep-mergeable)
+  # -- Extra environment variables (map format, deep-mergeable)
   extraEnv: {}
-    # Simple value:
-    #   MY_VAR: "value"
-    # From a Secret:
-    #   MY_SECRET:
-    #     valueFrom:
-    #       secretKeyRef:
-    #         name: secret-name
-    #         key: secret-key
-    # From a ConfigMap:
-    #   MY_CONFIG:
-    #     valueFrom:
-    #       configMapKeyRef:
-    #         name: configmap-name
-    #         key: config-key

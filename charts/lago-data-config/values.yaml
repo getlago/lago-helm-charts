@@ -1,65 +1,77 @@
-# Default values for lago-config.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+# Default values for lago-data-config.
 
 global:
   databaseAnalytical:
+    # -- Analytical database host
     host: ""
+    # -- Analytical database name
     name: ""
+    # -- Analytical database user
     user: ""
+    # -- Analytical database password
     password: ""
+    # -- Analytical database port
     port: 5432
+    # -- Analytical database schema
     schema: analytical
 
   forecastedUsage:
+    # -- Enable forecasted usage feature
     enabled: false
-    # forecasted usage need to call lago-api, hence provide a valid token
+    # -- Lago API token for forecasted usage calls
     api_token:
     celery:
+      # -- Celery broker URL
       brokerUrl: ""
+      # -- Celery result backend URL
       resultBackend: ""
 
   dbtPipeline:
+    # -- Enable dbt pipeline
     enabled: false
+    # -- Source schema for dbt pipeline
     sourceSchema: public
+    # -- Target schema for dbt pipeline
     targetSchema: analytical
+    # -- Tables to replicate
     tables: []
 
   databaseReplica:
+    # -- Replica database host
     host: ""
+    # -- Replica database name
     name: ""
+    # -- Replica database user
     user: ""
+    # -- Replica database password
     password: ""
+    # -- Replica database port
     port: 5432
 
   data:
+    # -- Name of an existing ConfigMap for data configuration
     configmap:
+    # -- Name of an existing Secret for data configuration
     secret:
-    # token to validate calls from lago-api
+    # -- API token to validate calls from lago-api
     token:
 
-
 configmap:
-  # -- Toggle creation of the ConfigMap. Set to false when using an externally managed ConfigMap
-  # (provide its name via configmap.name, data.configmap.name, or global.data.configmap)
+  # -- Create the ConfigMap (set to false when using an externally managed ConfigMap)
   create: true
-  # -- Override the ConfigMap name. If not set and create is true, a name is generated using the fullname template
+  # -- Override the ConfigMap name (generated from fullname if not set)
   name: ""
-
-  # -- Labels to be added to lago-config configmap
+  # -- Additional labels for the ConfigMap
   labels: {}
-  # -- Annotations to be added to lago-config configmap
+  # -- Additional annotations for the ConfigMap
   annotations: {}
 
 secret:
-  # -- Create the lago-config secret for [sensitive config]
+  # -- Create the Secret for sensitive configuration
   create: true
-
-  # The name of the secret to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # -- Override the Secret name (generated from fullname if not set)
   name: ""
-
-  # -- Labels to be added to lago-config secret
+  # -- Additional labels for the Secret
   labels: {}
-  # -- Annotations to be added to lago-config secret
+  # -- Additional annotations for the Secret
   annotations: {}
