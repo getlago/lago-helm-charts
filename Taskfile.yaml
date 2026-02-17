@@ -6,6 +6,7 @@ vars:
   IMAGES:
     map:
       postgres: getlago/postgres-partman:15.0-alpine
+      busybox: busybox:1.37
       redis: redis:7-alpine
       api: getlago/api:{{.VERSION}}
       front: getlago/front:{{.VERSION}}

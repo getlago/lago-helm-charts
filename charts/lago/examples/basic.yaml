@@ -48,6 +48,16 @@ front:
         hosts:
           - lago.example.com
 
+migrate:
+  enabled: true
+  initContainers:
+    - name: wait-for-db
+      image: busybox:1.37
+      command: ["sh", "-c", "until nc -z lago-postgres 5432; do echo 'waiting for postgres...'; sleep 2; done"]
+    - name: wait-for-redis
+      image: busybox:1.37
+      command: ["sh", "-c", "until nc -z lago-redis 6379; do echo 'waiting for redis...'; sleep 2; done"]
+
 extraObjects:
   - apiVersion: v1
     kind: Service
