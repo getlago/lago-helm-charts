@@ -138,7 +138,7 @@ tasks:
     cmds:
       - cmd: '{{if .CHART_TYPE}}cp tests-common/{{.CHART_TYPE}}/common_patterns_test.yaml charts/{{.CHART}}/tests/{{end}}'
       - defer: rm -f charts/{{.CHART}}/tests/common_patterns_test.yaml
-      - helm unittest ./charts/{{.CHART}}
+      - untt ./charts/{{.CHART}}
 
   dependencies:build:*:
     internal: true
@@ -149,8 +149,8 @@ tasks:
   test:unit:
     desc: Run unit tests for the charts
     preconditions:
-      - sh: helm unittest -h
-        msg: "❌ helm unittest not found (see: https://github.com/helm-unittest/helm-unittest)"
+      - sh: command -v untt
+        msg: "❌ untt not found (see: https://github.com/helm-unittest/helm-unittest)"
     deps:
       - test:unit:lago-config
       - test:unit:lago-rails
