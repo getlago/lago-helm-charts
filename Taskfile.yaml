@@ -63,6 +63,24 @@ tasks:
         msg: "❌ chart-testing not found (see: https://github.com/helm/chart-testing)"
     cmd: ct lint --all --config tools/ct.yaml
 
+  docs:*:
+    desc: Generate README for a specific chart (e.g. task docs:lago)
+    vars:
+      CHART: '{{index .MATCH 0}}'
+    preconditions:
+      - sh: command -v helm-docs
+        msg: "❌ helm-docs not found (see: https://github.com/norwoodj/helm-docs)"
+      - sh: '[ -d "charts/{{.CHART}}" ]'
+        msg: "❌ Chart directory charts/{{.CHART}} does not exist"
+    cmd: helm-docs -c charts -g charts/{{.CHART}} -s file
+
+  docs:
+    desc: Generate README for all charts
+    preconditions:
+      - sh: command -v helm-docs
+        msg: "❌ helm-docs not found (see: https://github.com/norwoodj/helm-docs)"
+    cmd: helm-docs -c charts -s file
+
   # https://github.com/kubernetes-sigs/kind/issues/3795
   kind:images:apple_silicon:*_*:
     internal: true
