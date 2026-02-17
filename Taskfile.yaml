@@ -50,11 +50,18 @@ tasks:
       cmd: helm dependency build charts/{{.KEY}}
 
   lint:
-    desc: Lint the chart
+    desc: Lint changed charts (compared to target branch)
     preconditions:
       - sh: command -v ct
         msg: "❌ chart-testing not found (see: https://github.com/helm/chart-testing)"
-    cmd: ct lint --config ct.yaml
+    cmd: ct lint --config tools/ct.yaml
+
+  lint:all:
+    desc: Lint all charts
+    preconditions:
+      - sh: command -v ct
+        msg: "❌ chart-testing not found (see: https://github.com/helm/chart-testing)"
+    cmd: ct lint --all --config tools/ct.yaml
 
   # https://github.com/kubernetes-sigs/kind/issues/3795
   kind:images:apple_silicon:*_*:
@@ -149,7 +156,7 @@ tasks:
       - task: kind:up
       - kubectl apply -f charts/lago/ci/postgres.yml
       - kubectl apply -f charts/lago/ci/redis.yml
-      - ct install --config ct.yaml --namespace default --charts charts/lago
+      - ct install --config tools/ct.yaml --namespace default --charts charts/lago
 
   render:
     cmd: >

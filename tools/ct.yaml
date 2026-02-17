@@ -4,5 +4,7 @@ chart-dirs:
   - charts
 chart-repos:
   - minio=https://charts.min.io/
+chart-yaml-schema: tools/chart_schema.yaml
+lint-conf: tools/lintconf.yaml
 validate-maintainers: false
 check-version-increment: false
