@@ -1,0 +1,39 @@
+# Production replica scaling overrides.
+#
+# Layer on top of basic_workers.yaml + basic_workers_resources.yaml:
+#   helm install lago ./charts/lago \
+#     -f charts/lago/examples/basic_workers.yaml \
+#     -f charts/lago/examples/basic_workers_resources.yaml \
+#     -f charts/lago/examples/basic_workers_scaled.yaml
+#
+# Raises minReplicas to recommended production levels.
+# Components not listed here keep minReplicas: 1 from the resources overlay.
+
+api:
+  autoscaling:
+    minReplicas: 10
+
+front:
+  autoscaling:
+    minReplicas: 2
+
+worker:
+  autoscaling:
+    minReplicas: 3
+
+billing-worker:
+  autoscaling:
+    minReplicas: 3
+
+events-worker:
+  autoscaling:
+    minReplicas: 2
+
+webhook-worker:
+  autoscaling:
+    minReplicas: 3
+
+pdf:
+  gotenberg:
+    autoscaling:
+      minReplicas: 2
