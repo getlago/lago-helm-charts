@@ -1,169 +1,136 @@
 # Default values for lago-data-forecasted-usage.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 
 global:
   databaseAnalytical:
+    # -- Analytical database host
     host: ""
+    # -- Analytical database name
     name: ""
+    # -- Analytical database user
     user: ""
+    # -- Analytical database password
     password: ""
+    # -- Analytical database port
     port: 5432
+    # -- Analytical database schema
     schema: analytical
 
   data:
-    token: some_token  # make data-config happy
+    # -- API token (required by data-config subchart)
+    token: some_token
 
 config:
+  # -- Deploy the config subchart
   enabled: true
+  # -- Override the config subchart release name
   nameOverride: lago-data-forecasted-usage
 
   s3:
     secret:
+      # -- Create the S3 credentials secret
       create: true
+      # -- Use an existing S3 secret by name
       name:
+    # -- S3 access key ID for model storage
     accessKeyId:
+    # -- S3 secret access key for model storage
     secretAccessKey:
 
   ml:
     secret:
+      # -- Create the ML config secret
       create: true
+      # -- Use an existing ML secret by name
       name:
+    # -- ML model configuration (YAML or JSON string)
     config: |
 
-
-# CronJob specific configuration
 cronjob:
-  # Schedule in Cron format, see https://en.wikipedia.org/wiki/Cron
+  # -- Cron schedule expression
   schedule: "0 */6 * * *"
-
-  # Specifies how to treat concurrent executions of a Job
-  # Options: Allow, Forbid, Replace
+  # -- How to treat concurrent job executions (`Allow`, `Forbid`, `Replace`)
   concurrencyPolicy: Forbid
-
-  # The number of successful finished jobs to retain
+  # -- Number of successful finished jobs to retain
   successfulJobsHistoryLimit: 3
-
-  # The number of failed finished jobs to retain
+  # -- Number of failed finished jobs to retain
   failedJobsHistoryLimit: 1
-
-  # Optional deadline in seconds for starting the job if it misses scheduled time
+  # -- (int) Optional deadline in seconds for starting the job if it misses scheduled time
   startingDeadlineSeconds:
-
-  # This flag tells the controller to suspend subsequent executions
+  # -- Suspend subsequent executions
   suspend: false
-
-  # Specifies the duration in seconds relative to the startTime that the job may be active
+  # -- (int) Duration in seconds relative to startTime that the job may be active
   activeDeadlineSeconds:
-
-  # Specifies the number of retries before marking this job failed
+  # -- Number of retries before marking the job as failed
   backoffLimit: 0
-
-  # Restart policy for the pod. Options: OnFailure, Never
+  # -- Restart policy (`OnFailure`, `Never`)
   restartPolicy: Never
 
-# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
+  # -- Container image repository
   repository: getlago/lago-data-ml
-
-  # This sets the pull policy for images.
+  # -- Image pull policy
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
+  # -- Override the image tag (defaults to Chart appVersion)
   tag: ""
 
-# This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+# -- Image pull secrets for private registries
+# @default -- `[]`
 imagePullSecrets: []
-# This is to override the chart name.
+# -- Override the chart name
 nameOverride: ""
+# -- Override the full release name
 fullnameOverride: ""
 
 container:
+  # -- Override the container name (defaults to chart fullname)
   name: ""
+  # -- Container entrypoint command
   command: ["/bin/bash", "-c"]
+  # -- Container command arguments
   args: ["python run.py --mode train && python run.py --mode forecast"]
 
-# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Create a ServiceAccount
   create: true
-  # Automatically mount a ServiceAccount's API credentials?
+  # -- Automount the ServiceAccount API credentials
   automount: true
-  # Annotations to add to the service account
+  # -- Annotations to add to the ServiceAccount
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # -- ServiceAccount name (generated from fullname if not set)
   name: ""
 
-# This is for setting Kubernetes Annotations to a Pod.
-# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+# -- Additional pod annotations
 podAnnotations: {}
-# This is for setting Kubernetes Labels to a Pod.
-# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+# -- Additional pod labels
 podLabels: {}
 
+# -- Pod-level security context
 podSecurityContext: {}
-  # fsGroup: 2000
 
+# -- Container-level security context
 securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
 
+# -- Resource requests and limits
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
 
-# -- Environment variables to pass to the container (map format, deep-mergeable)
+# -- Extra environment variables (map format, deep-mergeable)
 extraEnv: {}
-  # Simple value:
-  #   MY_VAR: "value"
-  # From a Secret:
-  #   MY_SECRET:
-  #     valueFrom:
-  #       secretKeyRef:
-  #         name: secret-name
-  #         key: secret-key
-  # From a ConfigMap:
-  #   MY_CONFIG:
-  #     valueFrom:
-  #       configMapKeyRef:
-  #         name: configmap-name
-  #         key: config-key
 
-# -- envFrom to pass to the container
+# -- Extra envFrom sources
 # @default -- `[]` (See [values.yaml])
 extraEnvFrom: []
-  # - configMapRef:
-  #     name: config-map-name
-  # - secretRef:
-  #     name: secret-name
 
-# Additional volumes on the output CronJob definition.
+# -- Additional volumes
 volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
 
-# Additional volumeMounts on the output CronJob definition.
+# -- Additional volume mounts
 volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
 
+# -- Node selector constraints
 nodeSelector: {}
 
+# -- Pod tolerations
 tolerations: []
 
+# -- Pod affinity rules
 affinity: {}

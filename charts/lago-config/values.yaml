@@ -1,185 +1,251 @@
 # Default values for lago-config.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 
-# All config values are under global so they can be shared across subcharts
+# -- Global values shared across all subcharts
 global:
   lago:
+    # -- Override the application Docker image tag (defaults to Chart appVersion)
     version: ""
+    # -- Rails environment (`production`, `staging`, `development`)
     env: "production"
+    # -- Lago Premium license key
     license: ""
+    # -- Enable self-service signup
     signup: false
+    # -- Enable Lago Cloud mode
     cloud: false
+    # -- Enable PDF generation support
     pdfGeneration: false
 
   sidekiq:
+    # -- Enable Sidekiq Pro (requires valid license)
     pro: false
     queues:
+      # -- Enable the analytics background queue
       analytics: false
+      # -- Enable the billing background queue
       billing: false
+      # -- Enable the clock background queue
       clock: false
+      # -- Enable the events background queue
       events: false
+      # -- Enable the webhook background queue
       webhook: false
+      # -- Enable the PDF background queue
       pdf: false
 
   config:
+    # -- Name of an existing ConfigMap for shared configuration (bypasses auto-generated configmap)
     configmap:
+    # -- Name of an existing Secret for shared configuration (bypasses auto-generated secret)
     secret:
 
   urls:
+    # -- Public URL of the Lago API
     api: ""
+    # -- Public URL of the Lago frontend
     front: ""
+    # -- Internal URL of the PDF service (Gotenberg)
     pdf: ""
 
   database:
+    # -- PostgreSQL connection URI
     uri: ""
+    # -- Database connection pool size
     pool: 20
 
   encryption:
-    key: ""  # ENCRYPTION_PRIMARY_KEY
-    salt: ""  # ENCRYPTION_KEY_DERIVATION_SALT
+    # -- Primary encryption key (`openssl rand -hex 16`)
+    key: ""
+    # -- Key derivation salt (`openssl rand -hex 16`)
+    salt: ""
 
   signing:
-    hmac: ""  # SECRET_KEY_BASE used by webhooks, message verifier HS256
-    rsa: ""  # LAGO_RSA_PRIVATE_KEY used by webhooks RS256
+    # -- HMAC signing key used by webhooks and message verifier (HS256)
+    hmac: ""
+    # -- RSA private key for webhook signatures (RS256), base64-encoded
+    rsa: ""
 
   redis:
+    # -- Redis URI for Sidekiq job queue
     uri: ""
+    # -- Redis password (appended to URI if set)
     password: ""
 
   redisCache:
+    # -- Redis URI for Rails cache
     uri: ""
+    # -- Redis cache password
     password: ""
 
   redisStore:
+    # -- Redis URI for ActionCable / general store
     uri: ""
+    # -- Redis store password
     password: ""
 
+  # -- Sentry DSN for error tracking
   sentryDsn: ""
+  # -- Segment write key for analytics
   segmentWriteKey: ""
 
   nango:
+    # -- Nango secret key for OAuth integrations
     secretKey: ""
+    # -- Nango public key for frontend OAuth flows
     publicKey: ""
 
   s3:
+    # -- Enable S3-compatible object storage
     enabled: false
+    # -- S3 access key ID
     accessKeyId: ""
+    # -- S3 secret access key
     secretAccessKey: ""
+    # -- S3 bucket name
     bucket: ""
+    # -- S3 region
     region: ""
+    # -- S3 custom endpoint (for MinIO, etc.)
     endpoint: ""
-    # s3.pathStyle -- (boolean)
+    # -- (bool) Use path-style addressing instead of virtual-hosted-style
     pathStyle:
 
   smtp:
+    # -- Enable SMTP for outbound email
     enabled: false
+    # -- SMTP username
     username: ""
+    # -- SMTP password
     password: ""
+    # -- Sender email address
     from: ""
+    # -- SMTP port
     port: 25
+    # -- SMTP server address
     address: ""
 
   google:
+    # -- Enable Google OAuth
     enabled: false
+    # -- Google OAuth client ID
     clientId:
+    # -- Google OAuth client secret
     clientSecret:
 
   gocardless:
+    # -- Enable GoCardless integration
     enabled: false
+    # -- GoCardless client ID
     clientId:
+    # -- GoCardless client secret
     clientSecret:
+    # -- GoCardless API proxy URL
     proxy:
 
   mcp:
+    # -- Enable MCP (Model Context Protocol) integration
     enabled: false
+    # -- MCP client ID
     clientId:
+    # -- MCP client secret
     clientSecret:
+    # -- MCP endpoint URL
     endpoint:
 
   data:
+    # -- Enable Lago Data analytics
     enabled: false
+    # -- Lago Data API token
     token:
+    # -- Lago Data API endpoint
     endpoint:
 
   streaming_ingestion:
+    # -- Enable streaming ingestion (ClickHouse + Kafka)
     enabled: false
+    # -- Name of an existing ConfigMap for streaming config
     configmap: ""
+    # -- Name of an existing Secret for streaming credentials
     secret: ""
 
     clickhouse:
-      # username and password are not required here if using an external secret:
-      #  config.enabled: false, config.secret.name: "..."
+      # -- ClickHouse username (not required when using an external secret)
       username: ""
+      # -- ClickHouse password (not required when using an external secret)
       password: ""
+      # -- ClickHouse native protocol port
       port: 9000
+      # -- ClickHouse server address
       address: clickhouse
+      # -- Enable TLS for ClickHouse connections
       tls: false
+      # -- ClickHouse database name
       database: default
 
-    # kafka is required if clickhouse is set
     kafka:
-      # username and password are not required here if if using an external secret:
-      #  config.enabled: false, config.secret.name: "..."
+      # -- Kafka username (not required when using an external secret)
       username: ""
+      # -- Kafka password (not required when using an external secret)
       password: ""
+      # -- Enable TLS for Kafka connections
       tls: false
-      # SCRAM-SHA-512, SCRAM-SHA-256
+      # -- Kafka SASL mechanism (`SCRAM-SHA-512`, `SCRAM-SHA-256`)
       saslMechanisms:
+      # -- Kafka consumer group name
       consumerGroup: events_consumer
-      # you must provide a list of Kafka servers if clickhouse is enabled
+      # -- List of Kafka bootstrap servers
+      # @default -- `[]`
       bootstrapServers: []
-      #   - "kafka-server:9092"
       topics:
+        # -- Kafka topic for charged-in-advance events
         eventsChargedInAdvance: events_charged_in_advance
+        # -- Kafka topic for dead-letter events
         eventsDeadLetter: events_dead_letter
+        # -- Kafka topic for enriched events
         eventsEnriched: events_enriched
+        # -- Kafka topic for expanded enriched events
         eventsEnrichedExpanded: events_enriched_expanded
+        # -- Kafka topic for raw events
         eventsRaw: events_raw
+        # -- Kafka topic for activity logs
         activityLogs: activity_logs
+        # -- Kafka topic for API logs
         apiLogs: api_logs
 
 configmap:
-  # -- Toggle creation of the ConfigMap. Set to false when using an externally managed ConfigMap
-  # (provide its name via configmap.name, config.configmap.name, or global.config.configmap)
+  # -- Create the ConfigMap (set to false when using an externally managed ConfigMap)
   create: true
-  # -- Override the ConfigMap name. If not set and create is true, a name is generated using the fullname template
+  # -- Override the ConfigMap name (generated from fullname if not set)
   name: ""
-
-  # -- Labels to be added to lago-config configmap
+  # -- Additional labels for the ConfigMap
   labels: {}
-  # -- Annotations to be added to lago-config configmap
+  # -- Additional annotations for the ConfigMap
   annotations: {}
 
 secret:
-  # -- Create the lago-config secret for [sensitive config]
+  # -- Create the Secret for sensitive configuration
   create: true
-
-  # The name of the secret to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # -- Override the Secret name (generated from fullname if not set)
   name: ""
-
-  # -- Labels to be added to lago-config secret
+  # -- Additional labels for the Secret
   labels: {}
-  # -- Annotations to be added to lago-config secret
+  # -- Additional annotations for the Secret
   annotations: {}
 
 configmapStreaming:
+  # -- Override the streaming ConfigMap name (generated from fullname if not set)
   name: ""
-
+  # -- Additional labels for the streaming ConfigMap
   labels: {}
-
+  # -- Additional annotations for the streaming ConfigMap
   annotations: {}
 
 secretStreaming:
-  # -- Create the lago-config secret for [sensitive config]
+  # -- Create the streaming Secret for sensitive streaming credentials
   create: true
-
-  # The name of the secret to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # -- Override the streaming Secret name (generated from fullname if not set)
   name: ""
-
-  # -- Labels to be added to lago-config secret
+  # -- Additional labels for the streaming Secret
   labels: {}
-  # -- Annotations to be added to lago-config secret
+  # -- Additional annotations for the streaming Secret
   annotations: {}

@@ -1,234 +1,318 @@
 # Default values for lago-rails.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 
-# Global values shared across all subcharts
+# -- Global values shared across all subcharts
 global:
   lago:
+    # -- Override the application Docker image tag (defaults to Chart appVersion)
     version:
+    # -- Rails environment (`production`, `staging`, `development`)
     env: "production"
+    # -- Lago Premium license key
     license: ""
+    # -- Enable Lago Cloud mode
     cloud: false
+    # -- Enable PDF generation support
     pdfGeneration: false
 
   sidekiq:
+    # -- Enable Sidekiq Pro (requires valid license)
     pro: false
     queues:
+      # -- Enable the analytics background queue
       analytics: false
+      # -- Enable the billing background queue
       billing: false
+      # -- Enable the clock background queue
       clock: false
+      # -- Enable the events background queue
       events: false
+      # -- Enable the webhook background queue
       webhook: false
+      # -- Enable the PDF background queue
       pdf: false
 
   config:
+    # -- Name of an existing Secret for shared configuration (bypasses auto-generated secret)
     secret: ""
+    # -- Name of an existing ConfigMap for shared configuration (bypasses auto-generated configmap)
     configmap: ""
 
   urls:
+    # -- Public URL of the Lago API
     api: ""
+    # -- Public URL of the Lago frontend
     front: ""
+    # -- Internal URL of the PDF service (Gotenberg)
     pdf: ""
 
   database:
+    # -- PostgreSQL connection URI
     uri: ""
+    # -- Database connection pool size
     pool: 20
 
   encryption:
-    key: ""  # ENCRYPTION_PRIMARY_KEY
-    salt: ""  # ENCRYPTION_KEY_DERIVATION_SALT
+    # -- Primary encryption key (`openssl rand -hex 16`)
+    key: ""
+    # -- Key derivation salt (`openssl rand -hex 16`)
+    salt: ""
 
   signing:
-    hmac: ""  # SECRET_KEY_BASE used by webhooks, message verifier HS256
-    rsa: ""  # LAGO_RSA_PRIVATE_KEY used by webhooks RS256
+    # -- HMAC signing key used by webhooks and message verifier (HS256)
+    hmac: ""
+    # -- RSA private key for webhook signatures (RS256), base64-encoded
+    rsa: ""
 
   redis:
+    # -- Redis URI for Sidekiq job queue
     uri: ""
+    # -- Redis password (appended to URI if set)
     password: ""
 
   redisCache:
+    # -- Redis URI for Rails cache
     uri: ""
+    # -- Redis cache password
     password: ""
 
   redisStore:
+    # -- Redis URI for ActionCable / general store
     uri: ""
+    # -- Redis store password
     password: ""
 
+  # -- Sentry DSN for error tracking
   sentryDsn: ""
+  # -- Segment write key for analytics
   segmentWriteKey: ""
 
   nango:
+    # -- Nango secret key for OAuth integrations
     secretKey: ""
 
   s3:
+    # -- Enable S3-compatible object storage
     enabled: false
+    # -- S3 access key ID
     accessKeyId: ""
+    # -- S3 secret access key
     secretAccessKey: ""
+    # -- S3 bucket name
     bucket: ""
+    # -- S3 region
     region: "us-east-1"
+    # -- S3 custom endpoint (for MinIO, etc.)
     endpoint: ""
-    # s3.pathStyle -- (boolean)
+    # -- (bool) Use path-style addressing instead of virtual-hosted-style
     pathStyle:
 
   smtp:
+    # -- Enable SMTP for outbound email
     enabled: false
+    # -- SMTP username
     username: ""
+    # -- SMTP password
     password: ""
+    # -- Sender email address
     from: ""
+    # -- SMTP port
     port: 25
+    # -- SMTP server address
     address: ""
 
   google:
+    # -- Enable Google OAuth
     enabled: false
+    # -- Google OAuth client ID
     clientId:
+    # -- Google OAuth client secret
     clientSecret:
 
   gocardless:
+    # -- Enable GoCardless integration
     enabled: false
+    # -- GoCardless client ID
     clientId:
+    # -- GoCardless client secret
     clientSecret:
+    # -- GoCardless API proxy URL
     proxy:
 
   mcp:
+    # -- Enable MCP (Model Context Protocol) integration
     enabled: false
+    # -- MCP client ID
     clientId:
+    # -- MCP client secret
     clientSecret:
+    # -- MCP endpoint URL
     endpoint:
 
   data:
+    # -- Enable Lago Data analytics
     enabled: false
+    # -- Lago Data API token
     token:
+    # -- Lago Data API endpoint
     endpoint:
 
   streaming_ingestion:
+    # -- Enable streaming ingestion (ClickHouse + Kafka)
     enabled: false
+    # -- Name of an existing ConfigMap for streaming config
     configmap: ""
+    # -- Name of an existing Secret for streaming credentials
     secret: ""
 
     clickhouse:
-      # username and password are not required here if using an external secret:
-      #  config.enabled: false, config.secret.name: "..."
+      # -- ClickHouse username (not required when using an external secret)
       username: ""
+      # -- ClickHouse password (not required when using an external secret)
       password: ""
+      # -- ClickHouse native protocol port
       port: 9000
+      # -- ClickHouse server address
       address: clickhouse
+      # -- Enable TLS for ClickHouse connections
       tls: false
+      # -- ClickHouse database name
       database: default
 
-    # kafka is required if clickhouse is set
     kafka:
-      # username and password are not required here if if using an external secret:
-      #  config.enabled: false, config.secret.name: "..."
+      # -- Kafka username (not required when using an external secret)
       username: ""
+      # -- Kafka password (not required when using an external secret)
       password: ""
+      # -- Enable TLS for Kafka connections
       tls: false
-      # SCRAM-SHA-512, SCRAM-SHA-256
+      # -- Kafka SASL mechanism (`SCRAM-SHA-512`, `SCRAM-SHA-256`)
       saslMechanisms:
+      # -- Kafka consumer group name
       consumerGroup: events_consumer
-      # you must provide a list of Kafka servers if clickhouse is enabled
+      # -- List of Kafka bootstrap servers
+      # @default -- `[]`
       bootstrapServers: []
-      #   - "kafka-server:9092"
       topics:
+        # -- Kafka topic for charged-in-advance events
         eventsChargedInAdvance: events_charged_in_advance
+        # -- Kafka topic for dead-letter events
         eventsDeadLetter: events_dead_letter
+        # -- Kafka topic for enriched events
         eventsEnriched: events_enriched
+        # -- Kafka topic for expanded enriched events
         eventsEnrichedExpanded: events_enriched_expanded
+        # -- Kafka topic for raw events
         eventsRaw: events_raw
+        # -- Kafka topic for activity logs
         activityLogs: activity_logs
+        # -- Kafka topic for API logs
         apiLogs: api_logs
 
-# Local config specific to this chart instance
+# -- Local lago-config subchart settings
 config:
+  # -- Deploy the lago-config subchart
   enabled: true
+  # -- Override the config subchart release name
   nameOverride: lago-config
   log:
+    # -- Log level (`debug`, `info`, `warn`, `error`)
     level: info
+    # -- Log to stdout
     stdout: true
 
   database:
-    # database.pool -- (int)
+    # -- (int) Override the global database pool size for this instance
     pool:
 
   otel:
+    # -- Enable OpenTelemetry tracing
     enabled: false
+    # -- OpenTelemetry collector endpoint
     endpoint:
+    # -- OpenTelemetry service name
     serviceName:
+    # -- Traces sampler argument (e.g. sampling ratio)
     tracesSamplerArg:
+    # -- Traces sampler type (e.g. `parentbased_traceidratio`)
     tracesSampler:
 
   web:
+    # -- (int) Puma maximum threads
     maxThreads:
+    # -- (int) Puma minimum threads
     minThreads:
+    # -- (int) Puma worker count (processes)
     concurrency:
+    # -- Set to true when this instance runs Sidekiq instead of Puma
     sidekiq: false
 
   sidekiq:
+    # -- Enable Sidekiq Pro for this instance
     pro: false
+    # -- Maximum dead jobs to retain
     maxDeadJobs: 1000000
+    # -- Sidekiq concurrency (threads per process)
     concurrency: 5
 
-  # lago-config subchart settings (passed down to nested lago-config)
   configMap:
+    # -- Use an existing ConfigMap by name (bypasses generated configmap)
     name: ""
   secret:
+    # -- Use an existing Secret by name (bypasses generated secret)
     name: ""
 
 container:
+  # -- Override the container name (defaults to chart fullname)
   name: ""
+  # -- Container entrypoint command
   command: ["./scripts/start.api.sh"]
+  # -- Container command arguments
   args: []
   ports:
     # -- HTTP container port
     http: 3000
 
-# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+# -- Number of replicas (ignored when autoscaling is enabled)
 replicaCount: 1
 
-# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
+  # -- Container image repository
   repository: getlago/api
-  # This sets the pull policy for images.
+  # -- Image pull policy
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
+  # -- Override the image tag (defaults to Chart appVersion)
   tag:
 
-# This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+# -- Image pull secrets for private registries
+# @default -- `[]`
 imagePullSecrets: []
-# This is to override the chart name.
+# -- Override the chart name
 nameOverride: ""
+# -- Override the full release name
 fullnameOverride: ""
 
-# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Create a ServiceAccount
   create: true
-  # Automatically mount a ServiceAccount's API credentials?
+  # -- Automount the ServiceAccount API credentials
   automount: true
-  # Annotations to add to the service account
+  # -- Annotations to add to the ServiceAccount
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # -- ServiceAccount name (generated from fullname if not set)
   name: ""
 
-# This is for setting Kubernetes Annotations to a Pod.
-# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+# -- Additional pod annotations
 podAnnotations: {}
-# This is for setting Kubernetes Labels to a Pod.
-# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+# -- Additional pod labels
 podLabels: {}
 
+# -- Pod-level security context
 podSecurityContext: {}
-  # fsGroup: 2000
 
+# -- Container-level security context
 securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
 
-# -- Environment variables to pass to the api container (map format, deep-mergeable)
+# -- Extra environment variables (map format, deep-mergeable)
 extraEnv: {}
   # Simple value:
   #   MY_VAR: "value"
@@ -245,7 +329,7 @@ extraEnv: {}
   #         name: configmap-name
   #         key: config-key
 
-# -- envFrom to pass to the api container
+# -- Extra envFrom sources
 # @default -- `[]` (See [values.yaml])
 extraEnvFrom: []
   # - configMapRef:
@@ -253,82 +337,54 @@ extraEnvFrom: []
   # - secretRef:
   #     name: secret-name
 
-# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
+  # -- Create a Service
   enabled: true
-  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  # -- Service type (`ClusterIP`, `NodePort`, `LoadBalancer`)
   type: ClusterIP
-  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  # -- Service port
   port: 80
 
-# This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
+  # -- Enable Ingress
   enabled: false
+  # -- Ingress class name
   className: ""
+  # -- Ingress annotations
   annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  # -- Ingress host rules
   hosts:
     - host: chart-example.local
       paths:
         - path: /
           pathType: ImplementationSpecific
+  # -- Ingress TLS configuration
   tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
 
-# -- Expose the service via gateway-api HTTPRoute
-# Requires Gateway API resources and suitable controller installed within the cluster
-# (see: https://gateway-api.sigs.k8s.io/guides/)
+# -- Expose the service via Gateway API HTTPRoute
 httpRoute:
-  # HTTPRoute enabled.
+  # -- Enable HTTPRoute
   enabled: false
-  # HTTPRoute annotations.
+  # -- HTTPRoute annotations
   annotations: {}
-  # Which Gateways this Route is attached to.
+  # -- Parent gateway references
   parentRefs:
   - name: gateway
     sectionName: http
-    # namespace: default
-  # Hostnames matching HTTP header.
+  # -- Hostnames to match
   hostnames:
   - chart-example.local
-  # List of rules and filters applied.
+  # -- Routing rules and filters
   rules:
   - matches:
     - path:
         type: PathPrefix
         value: /headers
-  #   filters:
-  #   - type: RequestHeaderModifier
-  #     requestHeaderModifier:
-  #       set:
-  #       - name: My-Overwrite-Header
-  #         value: this-is-the-only-value
-  #       remove:
-  #       - User-Agent
-  # - matches:
-  #   - path:
-  #       type: PathPrefix
-  #       value: /echo
-  #     headers:
-  #     - name: version
-  #       value: v2
 
+# -- Resource requests and limits
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
 
-# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+# -- Liveness probe configuration
 livenessProbe:
   failureThreshold: 5
   httpGet:
@@ -339,6 +395,7 @@ livenessProbe:
   periodSeconds: 30
   successThreshold: 1
   timeoutSeconds: 1
+# -- Readiness probe configuration
 readinessProbe:
   failureThreshold: 3
   httpGet:
@@ -350,65 +407,33 @@ readinessProbe:
   successThreshold: 1
   timeoutSeconds: 1
 
-# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:
+  # -- Enable Horizontal Pod Autoscaler
   enabled: false
-  external: false  # Set to true when using external autoscaler (e.g., KEDA)
+  # -- Set to true when using an external autoscaler (e.g. KEDA) to skip built-in HPA
+  external: false
+  # -- Minimum replicas
   minReplicas: 1
+  # -- Maximum replicas
   maxReplicas: 100
+  # -- Target CPU utilization percentage
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
-# Additional volumes on the output Deployment definition.
+# -- Additional volumes
 volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
 
-# Additional volumeMounts on the output Deployment definition.
+# -- Additional volume mounts
 volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
 
+# -- Node selector constraints
 nodeSelector: {}
 
+# -- Pod tolerations
 tolerations: []
 
+# -- Pod affinity rules
 affinity: {}
 
 # -- Array of extra K8s manifests to deploy
-## Note: Supports use of custom Helm templates
 extraObjects: []
-  # - |-
-  #   apiVersion: networking.k8s.io/v1
-  #   kind: Ingress
-  #   metadata:
-  #     annotations:
-  #       nginx.ingress.kubernetes.io/backend-protocol: HTTP
-  #       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-  #       nginx.ingress.kubernetes.io/proxy-body-size: 50m
-  #       nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
-  #       nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
-  #       nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
-  #     labels:
-  #       {{- include "lago-rails.labels" . | nindent 4 }}
-  #     name: {{ include "lago-rails.fullname" . }}-webhooks-internal
-  #   spec:
-  #     ingressClassName: nginx
-  #     rules:
-  #     - host: webhooks.internal.getlago.com
-  #       http:
-  #         paths:
-  #         - backend:
-  #             service:
-  #               name: {{ include "lago-rails.fullname" . }}
-  #               port:
-  #                 number: 80
-  #           path: /webhooks
-  #           pathType: Prefix
-  #     tls:
-  #     - hosts:
-  #       - webhooks.internal.getlago.com
-  #       secretName: webhook-cert-tls

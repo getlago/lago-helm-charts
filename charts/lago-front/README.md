@@ -14,65 +14,66 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| config | object | `{}` |  |
-| global.lago.env | string | `"production"` |  |
-| global.lago.signup | bool | `false` |  |
-| global.lago.pdfGeneration | bool | `false` |  |
-| global.urls.api | string | `""` |  |
-| global.urls.pdf | string | `""` |  |
-| global.nango.publicKey | string | `""` |  |
-| global.sentryDsn | string | `""` |  |
-| global.gocardless.enabled | bool | `false` |  |
-| global.gocardless.proxy | string | `""` |  |
-| container.name | string | `""` |  |
-| container.command | string | `nil` |  |
-| container.args | string | `nil` |  |
-| container.ports.http | int | `80` |  |
-| replicaCount | int | `1` |  |
-| image.repository | string | `"getlago/front"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.tag | string | `nil` |  |
-| imagePullSecrets | list | `[]` |  |
-| nameOverride | string | `""` |  |
-| fullnameOverride | string | `""` |  |
-| serviceAccount.create | bool | `true` |  |
-| serviceAccount.automount | bool | `true` |  |
-| serviceAccount.annotations | object | `{}` |  |
-| serviceAccount.name | string | `""` |  |
-| podAnnotations | object | `{}` |  |
-| podLabels | object | `{}` |  |
-| podSecurityContext | object | `{}` |  |
-| securityContext | object | `{}` |  |
-| extraEnv | object | `{}` | Environment variables to pass to the app container (map format, deep-mergeable) |
-| extraEnvFrom | list | `[]` (See [values.yaml]) | envFrom to pass to the app container |
-| service.enabled | bool | `true` |  |
-| service.type | string | `"ClusterIP"` |  |
-| service.port | int | `80` |  |
-| ingress.enabled | bool | `false` |  |
-| ingress.className | string | `""` |  |
-| ingress.annotations | object | `{}` |  |
-| ingress.hostsRaw | list | `[]` |  |
-| ingress.hosts[0].host | string | `"chart-example.local"` |  |
-| ingress.hosts[0].paths[0].path | string | `"/"` |  |
-| ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
-| ingress.tls | list | `[]` |  |
-| httpRoute | object | `{"annotations":{},"enabled":false,"hostnames":["chart-example.local"],"parentRefs":[{"name":"gateway","sectionName":"http"}],"rules":[{"matches":[{"path":{"type":"PathPrefix","value":"/headers"}}]}]}` | Expose the service via gateway-api HTTPRoute Requires Gateway API resources and suitable controller installed within the cluster (see: https://gateway-api.sigs.k8s.io/guides/) |
-| resources | object | `{}` |  |
-| livenessProbe.httpGet.path | string | `"/"` |  |
-| livenessProbe.httpGet.port | string | `"http"` |  |
-| readinessProbe.httpGet.path | string | `"/"` |  |
-| readinessProbe.httpGet.port | string | `"http"` |  |
-| autoscaling.enabled | bool | `false` |  |
-| autoscaling.external | bool | `false` |  |
-| autoscaling.minReplicas | int | `1` |  |
-| autoscaling.maxReplicas | int | `100` |  |
-| autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
-| volumes | list | `[]` |  |
-| volumeMounts | list | `[]` |  |
-| nodeSelector | object | `{}` |  |
-| tolerations | list | `[]` |  |
-| affinity | object | `{}` |  |
-| extraObjects | list | `[]` | Array of extra K8s manifests to deploy # Note: Supports use of custom Helm templates |
+| config | object | `{}` | Config section used for merging with lago-config helpers |
+| global.lago.env | string | `"production"` | Rails environment (`production`, `staging`, `development`) |
+| global.lago.signup | bool | `false` | Enable self-service signup |
+| global.lago.pdfGeneration | bool | `false` | Enable PDF generation support |
+| global.urls.api | string | `""` | Public URL of the Lago API |
+| global.urls.pdf | string | `""` | Internal URL of the PDF service (Gotenberg) |
+| global.nango.publicKey | string | `""` | Nango public key for frontend OAuth flows |
+| global.sentryDsn | string | `""` | Sentry DSN for error tracking |
+| global.gocardless.enabled | bool | `false` | Enable GoCardless integration |
+| global.gocardless.proxy | string | `""` | GoCardless API proxy URL |
+| container.name | string | `""` | Override the container name (defaults to chart fullname) |
+| container.command | string | `nil` | Container entrypoint command |
+| container.args | string | `nil` | Container command arguments |
+| container.ports.http | int | `80` | HTTP container port |
+| replicaCount | int | `1` | Number of replicas (ignored when autoscaling is enabled) |
+| image.repository | string | `"getlago/front"` | Container image repository |
+| image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| image.tag | string | `nil` | Override the image tag (defaults to Chart appVersion) |
+| imagePullSecrets | list | `[]` | Image pull secrets for private registries |
+| nameOverride | string | `""` | Override the chart name |
+| fullnameOverride | string | `""` | Override the full release name |
+| serviceAccount.create | bool | `true` | Create a ServiceAccount |
+| serviceAccount.automount | bool | `true` | Automount the ServiceAccount API credentials |
+| serviceAccount.annotations | object | `{}` | Annotations to add to the ServiceAccount |
+| serviceAccount.name | string | `""` | ServiceAccount name (generated from fullname if not set) |
+| podAnnotations | object | `{}` | Additional pod annotations |
+| podLabels | object | `{}` | Additional pod labels |
+| podSecurityContext | object | `{}` | Pod-level security context |
+| securityContext | object | `{}` | Container-level security context |
+| extraEnv | object | `{}` | Extra environment variables (map format, deep-mergeable) |
+| extraEnvFrom | list | `[]` (See [values.yaml]) | Extra envFrom sources |
+| service.enabled | bool | `true` | Create a Service |
+| service.type | string | `"ClusterIP"` | Service type (`ClusterIP`, `NodePort`, `LoadBalancer`) |
+| service.port | int | `80` | Service port |
+| ingress.enabled | bool | `false` | Enable Ingress |
+| ingress.className | string | `""` | Ingress class name |
+| ingress.annotations | object | `{}` | Ingress annotations |
+| ingress.hostsRaw | list | `[]` | Raw ingress host entries (unstructured, for advanced use) |
+| ingress.hosts | list | `[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific"}]}]` | Ingress host rules |
+| ingress.tls | list | `[]` | Ingress TLS configuration |
+| httpRoute | object | `{"annotations":{},"enabled":false,"hostnames":["chart-example.local"],"parentRefs":[{"name":"gateway","sectionName":"http"}],"rules":[{"matches":[{"path":{"type":"PathPrefix","value":"/headers"}}]}]}` | Expose the service via Gateway API HTTPRoute |
+| httpRoute.enabled | bool | `false` | Enable HTTPRoute |
+| httpRoute.annotations | object | `{}` | HTTPRoute annotations |
+| httpRoute.parentRefs | list | `[{"name":"gateway","sectionName":"http"}]` | Parent gateway references |
+| httpRoute.hostnames | list | `["chart-example.local"]` | Hostnames to match |
+| httpRoute.rules | list | `[{"matches":[{"path":{"type":"PathPrefix","value":"/headers"}}]}]` | Routing rules and filters |
+| resources | object | `{}` | Resource requests and limits |
+| livenessProbe | object | `{"httpGet":{"path":"/","port":"http"}}` | Liveness probe configuration |
+| readinessProbe | object | `{"httpGet":{"path":"/","port":"http"}}` | Readiness probe configuration |
+| autoscaling.enabled | bool | `false` | Enable Horizontal Pod Autoscaler |
+| autoscaling.external | bool | `false` | Set to true when using an external autoscaler (e.g. KEDA) to skip built-in HPA |
+| autoscaling.minReplicas | int | `1` | Minimum replicas |
+| autoscaling.maxReplicas | int | `100` | Maximum replicas |
+| autoscaling.targetCPUUtilizationPercentage | int | `80` | Target CPU utilization percentage |
+| volumes | list | `[]` | Additional volumes |
+| volumeMounts | list | `[]` | Additional volume mounts |
+| nodeSelector | object | `{}` | Node selector constraints |
+| tolerations | list | `[]` | Pod tolerations |
+| affinity | object | `{}` | Pod affinity rules |
+| extraObjects | list | `[]` | Array of extra K8s manifests to deploy |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

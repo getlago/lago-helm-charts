@@ -1,221 +1,184 @@
 # Default values for lago-events-processor-worker.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 
-# Global values shared across all subcharts
+# -- Global values shared across all subcharts
 global:
   lago:
+    # -- Rails environment (`production`, `staging`, `development`)
     env: "production"
+    # -- Override the application Docker image tag (defaults to Chart appVersion)
     version:
 
   config:
+    # -- Name of an existing Secret for shared configuration (bypasses auto-generated secret)
     secret: ""
+    # -- Name of an existing ConfigMap for shared configuration (bypasses auto-generated configmap)
     configmap: ""
 
   database:
+    # -- PostgreSQL connection URI
     uri: ""
 
   redisCache:
+    # -- Redis URI for Rails cache
     uri: ""
+    # -- Redis cache password
     password: ""
 
   redisStore:
+    # -- Redis URI for ActionCable / general store
     uri: ""
+    # -- Redis store password
     password: ""
 
   streaming_ingestion:
+    # -- Enable streaming ingestion (ClickHouse + Kafka)
     enabled: true
+    # -- Name of an existing ConfigMap for streaming config
     configmap: ""
+    # -- Name of an existing Secret for streaming credentials
     secret: ""
 
-    # kafka is required if clickhouse is set
     kafka:
-      # username and password are not required here if if using an external secret:
-      #  config.enabled: false, config.secret.name: "..."
+      # -- Kafka username (not required when using an external secret)
       username: ""
+      # -- Kafka password (not required when using an external secret)
       password: ""
+      # -- Enable TLS for Kafka connections
       tls: false
-      # SCRAM-SHA-512, SCRAM-SHA-256
+      # -- Kafka SASL mechanism (`SCRAM-SHA-512`, `SCRAM-SHA-256`)
       saslMechanisms:
+      # -- Kafka consumer group name
       consumerGroup: events_consumer
-      # you must provide a list of Kafka servers if clickhouse is enabled
+      # -- List of Kafka bootstrap servers
+      # @default -- `[]`
       bootstrapServers: []
-      #   - "kafka-server:9092"
       topics:
+        # -- Kafka topic for charged-in-advance events
         eventsChargedInAdvance: events_charged_in_advance
+        # -- Kafka topic for dead-letter events
         eventsDeadLetter: events_dead_letter
+        # -- Kafka topic for enriched events
         eventsEnriched: events_enriched
+        # -- Kafka topic for expanded enriched events
         eventsEnrichedExpanded: events_enriched_expanded
+        # -- Kafka topic for raw events
         eventsRaw: events_raw
+        # -- Kafka topic for activity logs
         activityLogs: activity_logs
+        # -- Kafka topic for API logs
         apiLogs: api_logs
 
-# Local config specific to this chart instance
+# -- Local config settings
 config:
+  # -- Deploy the config subchart
   enabled: true
   log:
+    # -- Log level (`debug`, `info`, `warn`, `error`)
     level: info
 
   database:
+    # -- Database connection pool size
     pool: 10
 
   otel:
+    # -- Enable OpenTelemetry tracing
     enabled: false
+    # -- OpenTelemetry collector endpoint
     endpoint:
+    # -- OpenTelemetry service name
     serviceName:
+    # -- Traces sampler argument (e.g. sampling ratio)
     tracesSamplerArg:
+    # -- Traces sampler type (e.g. `parentbased_traceidratio`)
     tracesSampler:
 
 container:
+  # -- Override the container name (defaults to chart fullname)
   name: ""
+  # -- Container entrypoint command
   command: ["./event_processors"]
+  # -- Container command arguments
   args: []
 
-# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+# -- Number of replicas (ignored when autoscaling is enabled)
 replicaCount: 1
 
-# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
+  # -- Container image repository
   repository: getlago/lago-events-processor
-  # This sets the pull policy for images.
+  # -- Image pull policy
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
+  # -- Override the image tag (defaults to Chart appVersion)
   tag:
 
-# This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+# -- Image pull secrets for private registries
+# @default -- `[]`
 imagePullSecrets: []
-# This is to override the chart name.
+# -- Override the chart name
 nameOverride: ""
+# -- Override the full release name
 fullnameOverride: ""
 
-# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Create a ServiceAccount
   create: true
-  # Automatically mount a ServiceAccount's API credentials?
+  # -- Automount the ServiceAccount API credentials
   automount: true
-  # Annotations to add to the service account
+  # -- Annotations to add to the ServiceAccount
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # -- ServiceAccount name (generated from fullname if not set)
   name: ""
 
-# This is for setting Kubernetes Annotations to a Pod.
-# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+# -- Additional pod annotations
 podAnnotations: {}
-# This is for setting Kubernetes Labels to a Pod.
-# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+# -- Additional pod labels
 podLabels: {}
 
+# -- Pod-level security context
 podSecurityContext: {}
-  # fsGroup: 2000
 
+# -- Container-level security context
 securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
 
-# -- Environment variables to pass to the container (map format, deep-mergeable)
+# -- Extra environment variables (map format, deep-mergeable)
 extraEnv: {}
-  # Simple value:
-  #   MY_VAR: "value"
-  # From a Secret:
-  #   MY_SECRET:
-  #     valueFrom:
-  #       secretKeyRef:
-  #         name: secret-name
-  #         key: secret-key
-  # From a ConfigMap:
-  #   MY_CONFIG:
-  #     valueFrom:
-  #       configMapKeyRef:
-  #         name: configmap-name
-  #         key: config-key
 
-# -- envFrom to pass to the api container
+# -- Extra envFrom sources
 # @default -- `[]` (See [values.yaml])
 extraEnvFrom: []
-  # - configMapRef:
-  #     name: config-map-name
-  # - secretRef:
-  #     name: secret-name
 
+# -- Resource requests and limits
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
 
+# -- Liveness probe configuration
 livenessProbe:
 
-# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:
+  # -- Enable Horizontal Pod Autoscaler
   enabled: false
-  external: false  # Set to true when using external autoscaler (e.g., KEDA)
+  # -- Set to true when using an external autoscaler (e.g. KEDA) to skip built-in HPA
+  external: false
+  # -- Minimum replicas
   minReplicas: 1
+  # -- Maximum replicas
   maxReplicas: 100
+  # -- Target CPU utilization percentage
   targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
 
-# Additional volumes on the output Deployment definition.
+# -- Additional volumes
 volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
 
-# Additional volumeMounts on the output Deployment definition.
+# -- Additional volume mounts
 volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
 
+# -- Node selector constraints
 nodeSelector: {}
 
+# -- Pod tolerations
 tolerations: []
 
+# -- Pod affinity rules
 affinity: {}
 
 # -- Array of extra K8s manifests to deploy
-## Note: Supports use of custom Helm templates
 extraObjects: []
-  # - |-
-  #   apiVersion: networking.k8s.io/v1
-  #   kind: Ingress
-  #   metadata:
-  #     annotations:
-  #       nginx.ingress.kubernetes.io/backend-protocol: HTTP
-  #       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-  #       nginx.ingress.kubernetes.io/proxy-body-size: 50m
-  #       nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
-  #       nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
-  #       nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
-  #     labels:
-  #       {{- include "lago-events-processor-worker.labels" . | nindent 4 }}
-  #     name: {{ include "lago-events-processor-worker.fullname" . }}-webhooks-internal
-  #   spec:
-  #     ingressClassName: nginx
-  #     rules:
-  #     - host: webhooks.internal.getlago.com
-  #       http:
-  #         paths:
-  #         - backend:
-  #             service:
-  #               name: {{ include "lago-events-processor-worker.fullname" . }}
-  #               port:
-  #                 number: 80
-  #           path: /webhooks
-  #           pathType: Prefix
-  #     tls:
-  #     - hosts:
-  #       - webhooks.internal.getlago.com
-  #       secretName: webhook-cert-tls

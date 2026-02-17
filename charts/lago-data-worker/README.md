@@ -14,64 +14,62 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| global.databaseAnalytical.host | string | `""` |  |
-| global.databaseAnalytical.name | string | `""` |  |
-| global.databaseAnalytical.user | string | `""` |  |
-| global.databaseAnalytical.password | string | `""` |  |
-| global.databaseAnalytical.port | int | `5432` |  |
-| global.databaseAnalytical.schema | string | `"analytical"` |  |
-| global.forecastedUsage.enabled | bool | `true` |  |
-| global.forecastedUsage.api_token | string | `nil` |  |
-| global.forecastedUsage.celery.brokerUrl | string | `""` |  |
-| global.forecastedUsage.celery.resultBackend | string | `""` |  |
-| global.dbtPipeline.enabled | bool | `false` |  |
-| global.dbtPipeline.sourceSchema | string | `"public"` |  |
-| global.dbtPipeline.targetSchema | string | `"analytical"` |  |
-| global.dbtPipeline.tables | list | `[]` |  |
-| global.databaseReplica.host | string | `""` |  |
-| global.databaseReplica.name | string | `""` |  |
-| global.databaseReplica.user | string | `""` |  |
-| global.databaseReplica.password | string | `""` |  |
-| global.databaseReplica.port | int | `5432` |  |
-| global.data.configmap | string | `nil` |  |
-| global.data.secret | string | `nil` |  |
-| global.data.token | string | `nil` |  |
-| config.enabled | bool | `false` |  |
-| config.api.url | string | `""` |  |
-| replicaCount | int | `1` |  |
-| image.repository | string | `"getlago/data-worker"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.tag | string | `""` |  |
-| imagePullSecrets | list | `[]` |  |
-| nameOverride | string | `""` |  |
-| fullnameOverride | string | `""` |  |
-| container.name | string | `""` |  |
-| container.command[0] | string | `"uv"` |  |
-| container.args[0] | string | `"run"` |  |
-| container.args[1] | string | `"python"` |  |
-| container.args[2] | string | `"worker/start_worker.py"` |  |
-| serviceAccount.create | bool | `true` |  |
-| serviceAccount.automount | bool | `true` |  |
-| serviceAccount.annotations | object | `{}` |  |
-| serviceAccount.name | string | `""` |  |
-| podAnnotations | object | `{}` |  |
-| podLabels | object | `{}` |  |
-| podSecurityContext | object | `{}` |  |
-| securityContext | object | `{}` |  |
-| resources | object | `{}` |  |
-| extraEnv | object | `{}` | Environment variables to pass to the container (map format, deep-mergeable) |
-| extraEnvFrom | list | `[]` (See [values.yaml]) | envFrom to pass to the container |
-| livenessProbe | object | `{}` |  |
-| autoscaling.enabled | bool | `false` |  |
-| autoscaling.external | bool | `false` |  |
-| autoscaling.minReplicas | int | `1` |  |
-| autoscaling.maxReplicas | int | `100` |  |
-| autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
-| volumes | list | `[]` |  |
-| volumeMounts | list | `[]` |  |
-| nodeSelector | object | `{}` |  |
-| tolerations | list | `[]` |  |
-| affinity | object | `{}` |  |
+| global.databaseAnalytical.host | string | `""` | Analytical database host |
+| global.databaseAnalytical.name | string | `""` | Analytical database name |
+| global.databaseAnalytical.user | string | `""` | Analytical database user |
+| global.databaseAnalytical.password | string | `""` | Analytical database password |
+| global.databaseAnalytical.port | int | `5432` | Analytical database port |
+| global.databaseAnalytical.schema | string | `"analytical"` | Analytical database schema |
+| global.forecastedUsage.enabled | bool | `true` | Enable forecasted usage feature (defaults to true when data-worker is deployed) |
+| global.forecastedUsage.api_token | string | `nil` | Lago API token for forecasted usage calls |
+| global.forecastedUsage.celery.brokerUrl | string | `""` | Celery broker URL |
+| global.forecastedUsage.celery.resultBackend | string | `""` | Celery result backend URL |
+| global.dbtPipeline.enabled | bool | `false` | Enable dbt pipeline |
+| global.dbtPipeline.sourceSchema | string | `"public"` | Source schema for dbt pipeline |
+| global.dbtPipeline.targetSchema | string | `"analytical"` | Target schema for dbt pipeline |
+| global.dbtPipeline.tables | list | `[]` | Tables to replicate |
+| global.databaseReplica.host | string | `""` | Replica database host |
+| global.databaseReplica.name | string | `""` | Replica database name |
+| global.databaseReplica.user | string | `""` | Replica database user |
+| global.databaseReplica.password | string | `""` | Replica database password |
+| global.databaseReplica.port | int | `5432` | Replica database port |
+| global.data.configmap | string | `nil` | Name of an existing ConfigMap for data configuration |
+| global.data.secret | string | `nil` | Name of an existing Secret for data configuration |
+| global.data.token | string | `nil` | API token to validate calls from lago-api |
+| config.enabled | bool | `false` | Deploy the data-config subchart |
+| config.api.url | string | `""` | Lago API URL for the data worker |
+| replicaCount | int | `1` | Number of replicas (ignored when autoscaling is enabled) |
+| image.repository | string | `"getlago/data-worker"` | Container image repository |
+| image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| image.tag | string | `""` | Override the image tag (defaults to Chart appVersion) |
+| imagePullSecrets | list | `[]` | Image pull secrets for private registries |
+| nameOverride | string | `""` | Override the chart name |
+| fullnameOverride | string | `""` | Override the full release name |
+| container.name | string | `""` | Override the container name (defaults to chart fullname) |
+| container.command | list | `["uv"]` | Container entrypoint command |
+| container.args | list | `["run","python","worker/start_worker.py"]` | Container command arguments |
+| serviceAccount.create | bool | `true` | Create a ServiceAccount |
+| serviceAccount.automount | bool | `true` | Automount the ServiceAccount API credentials |
+| serviceAccount.annotations | object | `{}` | Annotations to add to the ServiceAccount |
+| serviceAccount.name | string | `""` | ServiceAccount name (generated from fullname if not set) |
+| podAnnotations | object | `{}` | Additional pod annotations |
+| podLabels | object | `{}` | Additional pod labels |
+| podSecurityContext | object | `{}` | Pod-level security context |
+| securityContext | object | `{}` | Container-level security context |
+| resources | object | `{}` | Resource requests and limits |
+| extraEnv | object | `{}` | Extra environment variables (map format, deep-mergeable) |
+| extraEnvFrom | list | `[]` (See [values.yaml]) | Extra envFrom sources |
+| livenessProbe | object | `{}` | Liveness probe configuration |
+| autoscaling.enabled | bool | `false` | Enable Horizontal Pod Autoscaler |
+| autoscaling.external | bool | `false` | Set to true when using an external autoscaler (e.g. KEDA) to skip built-in HPA |
+| autoscaling.minReplicas | int | `1` | Minimum replicas |
+| autoscaling.maxReplicas | int | `100` | Maximum replicas |
+| autoscaling.targetCPUUtilizationPercentage | int | `80` | Target CPU utilization percentage |
+| volumes | list | `[]` | Additional volumes |
+| volumeMounts | list | `[]` | Additional volume mounts |
+| nodeSelector | object | `{}` | Node selector constraints |
+| tolerations | list | `[]` | Pod tolerations |
+| affinity | object | `{}` | Pod affinity rules |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
