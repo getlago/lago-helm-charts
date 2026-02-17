@@ -1,184 +1,251 @@
 # Default values for lago-events-processor-worker.
 
-# -- Global values shared across all subcharts
+# -- @ignore
 global:
   lago:
     # -- Rails environment (`production`, `staging`, `development`)
+    # @section -- Lago
     env: "production"
     # -- Override the application Docker image tag (defaults to Chart appVersion)
+    # @section -- Lago
     version:
 
   config:
     # -- Name of an existing Secret for shared configuration (bypasses auto-generated secret)
+    # @section -- Config
     secret: ""
     # -- Name of an existing ConfigMap for shared configuration (bypasses auto-generated configmap)
+    # @section -- Config
     configmap: ""
 
   database:
     # -- PostgreSQL connection URI
+    # @section -- Database
     uri: ""
 
   redisCache:
     # -- Redis URI for Rails cache
+    # @section -- Redis
     uri: ""
     # -- Redis cache password
+    # @section -- Redis
     password: ""
 
   redisStore:
     # -- Redis URI for ActionCable / general store
+    # @section -- Redis
     uri: ""
     # -- Redis store password
+    # @section -- Redis
     password: ""
 
   streaming_ingestion:
     # -- Enable streaming ingestion (ClickHouse + Kafka)
+    # @section -- Streaming Ingestion
     enabled: true
     # -- Name of an existing ConfigMap for streaming config
+    # @section -- Streaming Ingestion
     configmap: ""
     # -- Name of an existing Secret for streaming credentials
+    # @section -- Streaming Ingestion
     secret: ""
 
     kafka:
       # -- Kafka username (not required when using an external secret)
+      # @section -- Streaming Ingestion / Kafka
       username: ""
       # -- Kafka password (not required when using an external secret)
+      # @section -- Streaming Ingestion / Kafka
       password: ""
       # -- Enable TLS for Kafka connections
+      # @section -- Streaming Ingestion / Kafka
       tls: false
       # -- Kafka SASL mechanism (`SCRAM-SHA-512`, `SCRAM-SHA-256`)
+      # @section -- Streaming Ingestion / Kafka
       saslMechanisms:
       # -- Kafka consumer group name
+      # @section -- Streaming Ingestion / Kafka
       consumerGroup: events_consumer
       # -- List of Kafka bootstrap servers
       # @default -- `[]`
+      # @section -- Streaming Ingestion / Kafka
       bootstrapServers: []
       topics:
         # -- Kafka topic for charged-in-advance events
+        # @section -- Streaming Ingestion / Kafka
         eventsChargedInAdvance: events_charged_in_advance
         # -- Kafka topic for dead-letter events
+        # @section -- Streaming Ingestion / Kafka
         eventsDeadLetter: events_dead_letter
         # -- Kafka topic for enriched events
+        # @section -- Streaming Ingestion / Kafka
         eventsEnriched: events_enriched
         # -- Kafka topic for expanded enriched events
+        # @section -- Streaming Ingestion / Kafka
         eventsEnrichedExpanded: events_enriched_expanded
         # -- Kafka topic for raw events
+        # @section -- Streaming Ingestion / Kafka
         eventsRaw: events_raw
         # -- Kafka topic for activity logs
+        # @section -- Streaming Ingestion / Kafka
         activityLogs: activity_logs
         # -- Kafka topic for API logs
+        # @section -- Streaming Ingestion / Kafka
         apiLogs: api_logs
 
 # -- Local config settings
+# @section -- Config
 config:
   # -- Deploy the config subchart
+  # @section -- Config
   enabled: true
   log:
     # -- Log level (`debug`, `info`, `warn`, `error`)
+    # @section -- Config
     level: info
 
   database:
     # -- Database connection pool size
+    # @section -- Config
     pool: 10
 
   otel:
     # -- Enable OpenTelemetry tracing
+    # @section -- Config
     enabled: false
     # -- OpenTelemetry collector endpoint
+    # @section -- Config
     endpoint:
     # -- OpenTelemetry service name
+    # @section -- Config
     serviceName:
     # -- Traces sampler argument (e.g. sampling ratio)
+    # @section -- Config
     tracesSamplerArg:
     # -- Traces sampler type (e.g. `parentbased_traceidratio`)
+    # @section -- Config
     tracesSampler:
 
 container:
   # -- Override the container name (defaults to chart fullname)
+  # @section -- Container
   name: ""
   # -- Container entrypoint command
+  # @section -- Container
   command: ["./event_processors"]
   # -- Container command arguments
+  # @section -- Container
   args: []
 
 # -- Number of replicas (ignored when autoscaling is enabled)
+# @section -- Deployment
 replicaCount: 1
 
 image:
   # -- Container image repository
+  # @section -- Image
   repository: getlago/lago-events-processor
   # -- Image pull policy
+  # @section -- Image
   pullPolicy: IfNotPresent
   # -- Override the image tag (defaults to Chart appVersion)
+  # @section -- Image
   tag:
 
 # -- Image pull secrets for private registries
 # @default -- `[]`
+# @section -- Image
 imagePullSecrets: []
 # -- Override the chart name
+# @section -- Deployment
 nameOverride: ""
 # -- Override the full release name
+# @section -- Deployment
 fullnameOverride: ""
 
 serviceAccount:
   # -- Create a ServiceAccount
+  # @section -- Service Account
   create: true
   # -- Automount the ServiceAccount API credentials
+  # @section -- Service Account
   automount: true
   # -- Annotations to add to the ServiceAccount
+  # @section -- Service Account
   annotations: {}
   # -- ServiceAccount name (generated from fullname if not set)
+  # @section -- Service Account
   name: ""
 
 # -- Additional pod annotations
+# @section -- Pod
 podAnnotations: {}
 # -- Additional pod labels
+# @section -- Pod
 podLabels: {}
 
 # -- Pod-level security context
+# @section -- Pod
 podSecurityContext: {}
 
 # -- Container-level security context
+# @section -- Pod
 securityContext: {}
 
 # -- Extra environment variables (map format, deep-mergeable)
+# @section -- Pod
 extraEnv: {}
 
 # -- Extra envFrom sources
 # @default -- `[]` (See [values.yaml])
+# @section -- Pod
 extraEnvFrom: []
 
 # -- Resource requests and limits
+# @section -- Pod
 resources: {}
 
 # -- Liveness probe configuration
+# @section -- Pod
 livenessProbe:
 
 autoscaling:
   # -- Enable Horizontal Pod Autoscaler
+  # @section -- Autoscaling
   enabled: false
   # -- Set to true when using an external autoscaler (e.g. KEDA) to skip built-in HPA
+  # @section -- Autoscaling
   external: false
   # -- Minimum replicas
+  # @section -- Autoscaling
   minReplicas: 1
   # -- Maximum replicas
+  # @section -- Autoscaling
   maxReplicas: 100
   # -- Target CPU utilization percentage
+  # @section -- Autoscaling
   targetCPUUtilizationPercentage: 80
 
 # -- Additional volumes
+# @section -- Pod
 volumes: []
 
 # -- Additional volume mounts
+# @section -- Pod
 volumeMounts: []
 
 # -- Node selector constraints
+# @section -- Pod
 nodeSelector: {}
 
 # -- Pod tolerations
+# @section -- Pod
 tolerations: []
 
 # -- Pod affinity rules
+# @section -- Pod
 affinity: {}
 
 # -- Array of extra K8s manifests to deploy
+# @section -- Extra Objects
 extraObjects: []

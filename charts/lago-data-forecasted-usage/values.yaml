@@ -3,134 +3,184 @@
 global:
   databaseAnalytical:
     # -- Analytical database host
+    # @section -- Analytical Database
     host: ""
     # -- Analytical database name
+    # @section -- Analytical Database
     name: ""
     # -- Analytical database user
+    # @section -- Analytical Database
     user: ""
     # -- Analytical database password
+    # @section -- Analytical Database
     password: ""
     # -- Analytical database port
+    # @section -- Analytical Database
     port: 5432
     # -- Analytical database schema
+    # @section -- Analytical Database
     schema: analytical
 
   data:
     # -- API token (required by data-config subchart)
+    # @section -- Data
     token: some_token
 
 config:
   # -- Deploy the config subchart
+  # @section -- Config
   enabled: true
   # -- Override the config subchart release name
+  # @section -- Config
   nameOverride: lago-data-forecasted-usage
 
   s3:
     secret:
       # -- Create the S3 credentials secret
+      # @section -- Config
       create: true
       # -- Use an existing S3 secret by name
+      # @section -- Config
       name:
     # -- S3 access key ID for model storage
+    # @section -- Config
     accessKeyId:
     # -- S3 secret access key for model storage
+    # @section -- Config
     secretAccessKey:
 
   ml:
     secret:
       # -- Create the ML config secret
+      # @section -- Config
       create: true
       # -- Use an existing ML secret by name
+      # @section -- Config
       name:
     # -- ML model configuration (YAML or JSON string)
+    # @section -- Config
     config: |
 
 cronjob:
   # -- Cron schedule expression
+  # @section -- CronJob
   schedule: "0 */6 * * *"
   # -- How to treat concurrent job executions (`Allow`, `Forbid`, `Replace`)
+  # @section -- CronJob
   concurrencyPolicy: Forbid
   # -- Number of successful finished jobs to retain
+  # @section -- CronJob
   successfulJobsHistoryLimit: 3
   # -- Number of failed finished jobs to retain
+  # @section -- CronJob
   failedJobsHistoryLimit: 1
   # -- (int) Optional deadline in seconds for starting the job if it misses scheduled time
+  # @section -- CronJob
   startingDeadlineSeconds:
   # -- Suspend subsequent executions
+  # @section -- CronJob
   suspend: false
   # -- (int) Duration in seconds relative to startTime that the job may be active
+  # @section -- CronJob
   activeDeadlineSeconds:
   # -- Number of retries before marking the job as failed
+  # @section -- CronJob
   backoffLimit: 0
   # -- Restart policy (`OnFailure`, `Never`)
+  # @section -- CronJob
   restartPolicy: Never
 
 image:
   # -- Container image repository
+  # @section -- Image
   repository: getlago/lago-data-ml
   # -- Image pull policy
+  # @section -- Image
   pullPolicy: IfNotPresent
   # -- Override the image tag (defaults to Chart appVersion)
+  # @section -- Image
   tag: ""
 
 # -- Image pull secrets for private registries
 # @default -- `[]`
+# @section -- Image
 imagePullSecrets: []
 # -- Override the chart name
+# @section -- Deployment
 nameOverride: ""
 # -- Override the full release name
+# @section -- Deployment
 fullnameOverride: ""
 
 container:
   # -- Override the container name (defaults to chart fullname)
+  # @section -- Container
   name: ""
   # -- Container entrypoint command
+  # @section -- Container
   command: ["/bin/bash", "-c"]
   # -- Container command arguments
+  # @section -- Container
   args: ["python run.py --mode train && python run.py --mode forecast"]
 
 serviceAccount:
   # -- Create a ServiceAccount
+  # @section -- Service Account
   create: true
   # -- Automount the ServiceAccount API credentials
+  # @section -- Service Account
   automount: true
   # -- Annotations to add to the ServiceAccount
+  # @section -- Service Account
   annotations: {}
   # -- ServiceAccount name (generated from fullname if not set)
+  # @section -- Service Account
   name: ""
 
 # -- Additional pod annotations
+# @section -- Pod
 podAnnotations: {}
 # -- Additional pod labels
+# @section -- Pod
 podLabels: {}
 
 # -- Pod-level security context
+# @section -- Pod
 podSecurityContext: {}
 
 # -- Container-level security context
+# @section -- Pod
 securityContext: {}
 
 # -- Resource requests and limits
+# @section -- Pod
 resources: {}
 
 # -- Extra environment variables (map format, deep-mergeable)
+# @section -- Pod
 extraEnv: {}
 
 # -- Extra envFrom sources
 # @default -- `[]` (See [values.yaml])
+# @section -- Pod
 extraEnvFrom: []
 
 # -- Additional volumes
+# @section -- Pod
 volumes: []
 
 # -- Additional volume mounts
+# @section -- Pod
 volumeMounts: []
 
 # -- Node selector constraints
+# @section -- Pod
 nodeSelector: {}
 
 # -- Pod tolerations
+# @section -- Pod
 tolerations: []
 
 # -- Pod affinity rules
+# @section -- Pod
 affinity: {}
