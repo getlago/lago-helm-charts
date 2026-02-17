@@ -81,7 +81,7 @@ global:
 config:
   # -- Deploy the data-config subchart
   # @section -- Config
-  enabled: false
+  enabled: true
   api:
     # -- Lago API URL for the data worker
     # @section -- Config
