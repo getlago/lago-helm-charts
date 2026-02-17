@@ -172,8 +172,6 @@ tasks:
         msg: "❌ chart-testing not found (see: https://github.com/helm/chart-testing)"
     cmds:
       - task: kind:up
-      - kubectl apply -f charts/lago/ci/postgres.yml
-      - kubectl apply -f charts/lago/ci/redis.yml
       - ct install --config tools/ct.yaml --namespace default --charts charts/lago
 
   render:
@@ -258,3 +256,15 @@ tasks:
       - for: { var: ORDERED }
         task: oci:push:{{.ITEM}}
       - rm -rf .helm-packages .helm-build
+
+  oci:install:
+    desc: Install the lago chart from GHCR with basic_workers example values
+    vars:
+      CHART_VERSION:
+        sh: grep '^version:' charts/lago/Chart.yaml | awk '{print $2}'
+    cmds:
+      - >
+        helm install lago {{.REGISTRY}}/lago
+        --version {{.CHART_VERSION}}
+        -f charts/lago/examples/basic_workers.yaml
+        {{join " " .CLI_ARGS_LIST}}
