@@ -1,6 +1,6 @@
 # lago
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.41.0](https://img.shields.io/badge/AppVersion-v1.41.0-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.41.0](https://img.shields.io/badge/AppVersion-v1.41.0-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -8,19 +8,19 @@ A Helm chart for Kubernetes
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../lago-config | config(lago-config) | 0.2.0 |
-| file://../lago-events-processor-worker | events-processor-worker(lago-events-processor-worker) | 0.2.0 |
-| file://../lago-front | front(lago-front) | 0.2.0 |
-| file://../lago-pdf | pdf(lago-pdf) | 0.2.0 |
-| file://../lago-rails | billing-worker(lago-rails) | 0.2.0 |
-| file://../lago-rails | analytics-worker(lago-rails) | 0.2.0 |
-| file://../lago-rails | clock(lago-rails) | 0.2.0 |
-| file://../lago-rails | clock-worker(lago-rails) | 0.2.0 |
-| file://../lago-rails | events-worker(lago-rails) | 0.2.0 |
-| file://../lago-rails | webhook-worker(lago-rails) | 0.2.0 |
-| file://../lago-rails | worker(lago-rails) | 0.2.0 |
-| file://../lago-rails | events-consumer-worker(lago-rails) | 0.2.0 |
-| file://../lago-rails | api(lago-rails) | 0.2.0 |
+| file://../lago-config | config(lago-config) | 0.3.0 |
+| file://../lago-events-processor-worker | events-processor-worker(lago-events-processor-worker) | 0.3.0 |
+| file://../lago-front | front(lago-front) | 0.3.0 |
+| file://../lago-pdf | pdf(lago-pdf) | 0.3.0 |
+| file://../lago-rails | billing-worker(lago-rails) | 0.3.0 |
+| file://../lago-rails | analytics-worker(lago-rails) | 0.3.0 |
+| file://../lago-rails | clock(lago-rails) | 0.3.0 |
+| file://../lago-rails | clock-worker(lago-rails) | 0.3.0 |
+| file://../lago-rails | events-worker(lago-rails) | 0.3.0 |
+| file://../lago-rails | webhook-worker(lago-rails) | 0.3.0 |
+| file://../lago-rails | worker(lago-rails) | 0.3.0 |
+| file://../lago-rails | events-consumer-worker(lago-rails) | 0.3.0 |
+| file://../lago-rails | api(lago-rails) | 0.3.0 |
 
 ## Values
 
