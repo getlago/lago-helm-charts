@@ -135,6 +135,20 @@ task docs:lago     # Regenerate a single chart README
 task --list        # List all available tasks
 ```
 
+## Creating a First Account
+
+Once the stack is running, exec into the API pod and seed the initial organization:
+
+```bash
+kubectl exec -ti <lago-api-pod> -- bash
+bundle exec rake roles:seed_predefined
+bundle exec rails signup:seed_organization \
+  LAGO_CREATE_ORG=true \
+  LAGO_ORG_NAME=Hooli \
+  LAGO_ORG_USER_EMAIL="admin@hooli.com" \
+  LAGO_ORG_USER_PASSWORD=pass1234
+```
+
 ## Uninstall
 
 ```bash
