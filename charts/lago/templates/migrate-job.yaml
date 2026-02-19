@@ -62,9 +62,13 @@ spec:
           {{- end }}
           env:
             - name: RAILS_ENV
-              value: {{ .Values.global.lago.env }}
+              value: {{ default .Values.global.lago.env .Values.migrate.config.env }}
             - name: DATABASE_POOL
-              value: {{ .Values.global.database.pool | quote }}
+              value: {{ default .Values.global.database.pool .Values.migrate.config.database.pool | quote }}
+            - name: LAGO_LOG_LEVEL
+              value: {{ .Values.migrate.config.log.level }}
+            - name: RAILS_LOG_TO_STDOUT
+              value: {{ .Values.migrate.config.log.stdout | quote }}
             - name: DATABASE_URL
               {{- with .Values.global.database.uri }}
               value: {{ . }}

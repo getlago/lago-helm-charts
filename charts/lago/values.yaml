@@ -638,6 +638,23 @@ migrate:
   # -- Enable the database migration job
   # @section -- Database Migration
   enabled: false
+  # -- Local rails config
+  # @default -- See [values.yaml](./values.yaml#L644)
+  # @section -- Database Migration / Config
+  config:
+    nameOverride: lago-config
+    log:
+      # -- Log level (`debug`, `info`, `warn`, `error`)
+      # @section -- Database Migration / Config
+      level: info
+      # -- Log to stdout
+      # @section -- Database Migration / Config
+      stdout: true
+
+    database:
+      # -- (int) Override the global database pool size for this instance
+      # @section -- Database Migration / Config
+      pool:
   image:
     # -- Migration job image repository
     # @section -- Database Migration
@@ -668,7 +685,7 @@ migrate:
   restartPolicy: Never
   # -- TTL for cleaning up finished jobs (seconds)
   # @section -- Database Migration
-  ttlSecondsAfterFinished: 300
+  ttlSecondsAfterFinished: 0
   # -- Active deadline for the job (seconds)
   # @section -- Database Migration
   activeDeadlineSeconds: 600

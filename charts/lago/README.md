@@ -1,6 +1,6 @@
 # lago
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.41.0](https://img.shields.io/badge/AppVersion-v1.41.0-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.41.2](https://img.shields.io/badge/AppVersion-v1.41.2-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -195,7 +195,7 @@ A Helm chart for Kubernetes
 | migrate.hookDeletePolicy | string | `"before-hook-creation"` | Hook delete policy (`hook-succeeded`, `hook-failed`, `before-hook-creation`) |
 | migrate.backoffLimit | int | `3` | Job backoff limit |
 | migrate.restartPolicy | string | `"Never"` | Restart policy for the job pod |
-| migrate.ttlSecondsAfterFinished | int | `300` | TTL for cleaning up finished jobs (seconds) |
+| migrate.ttlSecondsAfterFinished | int | `0` | TTL for cleaning up finished jobs (seconds) |
 | migrate.activeDeadlineSeconds | int | `600` | Active deadline for the job (seconds) |
 | migrate.annotations | object | `{}` | Additional annotations for the Job |
 | migrate.podAnnotations | object | `{}` | Additional annotations for the pod |
@@ -212,6 +212,16 @@ A Helm chart for Kubernetes
 | migrate.nodeSelector | object | `{}` | Node selector constraints |
 | migrate.tolerations | list | `[]` | Pod tolerations |
 | migrate.affinity | object | `{}` | Pod affinity rules |
+| migrate.initContainers | list | `[]` | Init containers to run before the migration (e.g. wait for database readiness) |
+
+### Database Migration / Config
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| migrate.config | object | See [values.yaml](./values.yaml#L644) | Local rails config |
+| migrate.config.log.level | string | `"info"` | Log level (`debug`, `info`, `warn`, `error`) |
+| migrate.config.log.stdout | bool | `true` | Log to stdout |
+| migrate.config.database.pool | int | `nil` | Override the global database pool size for this instance |
 
 ### Create Topics Job
 
