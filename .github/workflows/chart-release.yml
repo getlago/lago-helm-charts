@@ -144,20 +144,25 @@ jobs:
           )
           VERSION="${{ inputs.version }}"
 
-          BODY="## OCI Packages\n\n"
-          BODY+="\`\`\`bash\n"
-          BODY+="helm pull oci://ghcr.io/getlago/helm-charts/lago --version $VERSION\n"
-          BODY+="\`\`\`\n\n"
-          BODY+="| Chart | OCI | GHCR |\n"
-          BODY+="|-------|-----|------|\n"
+          gh release view "v$VERSION" --json body -q .body > /tmp/release-notes.md
+
+          cat >> /tmp/release-notes.md <<EOF
+
+## OCI Packages
+
+\`\`\`bash
+helm pull oci://ghcr.io/getlago/helm-charts/lago --version $VERSION
+\`\`\`
+
+| Chart | OCI | GHCR |
+|-------|-----|------|
+EOF
+
           for chart in "${CHARTS[@]}"; do
-            BODY+="| $chart | \`oci://ghcr.io/getlago/helm-charts/$chart:$VERSION\` | [Package](${GHCR_URL}${chart}) |\n"
+            echo "| $chart | \`oci://ghcr.io/getlago/helm-charts/$chart:$VERSION\` | [Package](${GHCR_URL}${chart}) |" >> /tmp/release-notes.md
           done
 
-          EXISTING=$(gh release view "v$VERSION" --json body -q .body)
-          gh release edit "v$VERSION" --notes "${EXISTING}
-
-          ${BODY}"
+          gh release edit "v$VERSION" --notes-file /tmp/release-notes.md
 
       - name: Package charts for GitHub release
         run: |
