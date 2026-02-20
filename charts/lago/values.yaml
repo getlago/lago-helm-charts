@@ -294,6 +294,9 @@ global:
         # -- Kafka topic for API logs
         # @section -- Streaming Ingestion / Kafka
         apiLogs: api_logs
+        # -- Kafka topic for security logs
+        # @section -- Streaming Ingestion / Kafka
+        securityLogs: security_logs
 
 # -- lago-config subchart overrides
 # @default -- See child values

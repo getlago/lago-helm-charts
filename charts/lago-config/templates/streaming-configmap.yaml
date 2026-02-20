@@ -33,6 +33,7 @@ data:
   LAGO_KAFKA_TLS: {{ $kafka.tls | quote }}
   LAGO_KAFKA_ACTIVITY_LOGS_TOPIC: {{ $kafka.topics.activityLogs }}
   LAGO_KAFKA_API_LOGS_TOPIC: {{ $kafka.topics.apiLogs }}
+  LAGO_KAFKA_SECURITY_LOGS_TOPIC: {{ $kafka.topics.securityLogs }}
   LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP: {{ $kafka.consumerGroup }}
   LAGO_CLICKHOUSE_PORT: {{ $clickhouse.port | quote }}
   LAGO_CLICKHOUSE_HOST: {{ $clickhouse.address }}
