@@ -131,10 +131,65 @@ jobs:
 
           rm -rf .helm-packages .helm-build
 
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.7.0
-        with:
-          config: tools/cr.yaml
-          charts_dir: charts/
+      - name: Add OCI links to GitHub release
         env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_URL: https://github.com/orgs/getlago/packages/container/helm-charts%2F
+        run: |
+          CHARTS=(
+            lago-config lago-data-config lago-rails lago-front
+            lago-events-processor-worker lago-data-api lago-data-worker
+            lago-data-forecasted-usage lago-mcp-server lago-pdf
+            lago-data lago lago-staging
+          )
+          VERSION="${{ inputs.version }}"
+
+          BODY="## OCI Packages\n\n"
+          BODY+="\`\`\`bash\n"
+          BODY+="helm pull oci://ghcr.io/getlago/helm-charts/lago --version $VERSION\n"
+          BODY+="\`\`\`\n\n"
+          BODY+="| Chart | OCI | GHCR |\n"
+          BODY+="|-------|-----|------|\n"
+          for chart in "${CHARTS[@]}"; do
+            BODY+="| $chart | \`oci://ghcr.io/getlago/helm-charts/$chart:$VERSION\` | [Package](${GHCR_URL}${chart}) |\n"
+          done
+
+          EXISTING=$(gh release view "v$VERSION" --json body -q .body)
+          gh release edit "v$VERSION" --notes "${EXISTING}
+
+          ${BODY}"
+
+      - name: Package charts for GitHub release
+        run: |
+          mkdir -p .cr-release-packages
+          for chart in charts/*/; do
+            chart_name=$(basename "$chart")
+            echo "::group::Packaging $chart_name"
+            helm package "$chart" --destination .cr-release-packages
+            echo "::endgroup::"
+          done
+          ls -lh .cr-release-packages/
+
+      - name: Upload chart tarballs to GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "v${{ inputs.version }}" .cr-release-packages/*.tgz --clobber
+
+      - name: Update Helm repo index on gh-pages
+        run: |
+          git fetch origin gh-pages
+          git worktree add /tmp/gh-pages gh-pages
+
+          helm repo index .cr-release-packages \
+            --url "https://github.com/getlago/lago-helm-charts/releases/download/v${{ inputs.version }}" \
+            --merge /tmp/gh-pages/index.yaml
+
+          mv .cr-release-packages/index.yaml /tmp/gh-pages/index.yaml
+          rm -rf .cr-release-packages
+
+          cd /tmp/gh-pages
+          git add index.yaml
+          git commit -m "Update Helm repo index for v${{ inputs.version }}"
+          git push origin gh-pages
+          cd -
+          git worktree remove /tmp/gh-pages
