@@ -63,7 +63,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| config.enabled | bool | `false` | Deploy the data-config subchart |
+| config.enabled | bool | `true` | Deploy the data-config subchart |
 | config.api.url | string | `""` | Lago API URL for the data worker |
 
 ### Deployment

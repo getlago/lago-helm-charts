@@ -2,3 +2,4 @@ charts/*/charts
 /*-values*.y*ml
 .helm-packages/
 .helm-build/
+.task
