@@ -205,7 +205,7 @@ tasks:
       - sh: '[ -d "charts/{{.CHART}}" ]'
         msg: "Chart directory charts/{{.CHART}} does not exist"
     deps:
-      - dependencies:update:{{.CHART}}
+      - dependencies:update
     cmds:
       - mkdir -p .helm-packages
       - helm package charts/{{.CHART}} --destination .helm-packages
