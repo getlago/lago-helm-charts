@@ -223,10 +223,6 @@ tasks:
     cmds:
       - task: oci:build:lago
 
-  hooks:install:
-    desc: Configure git to use the repository hooks directory
-    cmd: git config core.hooksPath .githooks
-
   install:
     desc: Install the lago chart from local directory with basic_workers example values
     deps: [dependencies:update]
