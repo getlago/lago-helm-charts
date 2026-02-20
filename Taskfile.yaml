@@ -2,7 +2,6 @@ version: 3
 
 vars:
   VERSION: v1.41.2
-  REGISTRY: oci://ghcr.io/getlago/helm-charts
   IMAGES:
     map:
       postgres: getlago/postgres-partman:15.0-alpine
@@ -190,94 +189,26 @@ tasks:
             --set global.clickhouse.enabled=true {{.CLI_ARGS}}
             --set global.clickhouse.kafka.bootstrapServers[0]=kafka-server:9092
 
-  # OCI Registry Tasks
-  oci:login:
-    desc: Login to GHCR using gh cli
-    preconditions:
-      - sh: command -v gh
-        msg: "❌ gh cli not found (see: https://cli.github.com/)"
-      - sh: gh auth status
-        msg: "❌ gh cli not authenticated (run: gh auth login)"
-    cmds:
-      - gh auth refresh --hostname github.com --scopes write:packages
-      - gh auth token | helm registry login ghcr.io -u $ --password-stdin
-
-  oci:package:*:
+  # OCI Local Build
+  oci:build:
+    desc: Package the lago chart locally for testing
     vars:
-      CHART: '{{index .MATCH 0}}'
-    preconditions:
-      - sh: '[ -d "charts/{{.CHART}}" ]'
-        msg: "❌ Chart directory charts/{{.CHART}} does not exist"
-    cmds:
-      - mkdir -p .helm-packages .helm-build
-      - rm -rf .helm-build/{{.CHART}}
-      - cp -r charts/{{.CHART}} .helm-build/
-      # Transform file:// dependencies to OCI registry
-      - 'sed -i.bak ''s|repository:.*"file://\.\.\/[^"]*"|repository: "{{.REGISTRY}}"|g'' .helm-build/{{.CHART}}/Chart.yaml'
-      - rm -f .helm-build/{{.CHART}}/Chart.yaml.bak .helm-build/{{.CHART}}/Chart.lock
-      - helm dependency update .helm-build/{{.CHART}}
-      - helm package .helm-build/{{.CHART}} --destination .helm-packages
-
-  oci:push:*:
-    vars:
-      CHART: '{{index .MATCH 0}}'
+      SHA:
+        sh: git rev-parse --short HEAD
       CHART_VERSION:
-        sh: grep '^version:' charts/{{index .MATCH 0}}/Chart.yaml | awk '{print $2}'
-    preconditions:
-      - sh: '[ -d "charts/{{.CHART}}" ]'
-        msg: "❌ Chart directory charts/{{.CHART}} does not exist"
-    cmds:
-      - task: oci:package:{{.CHART}}
-      - helm push .helm-packages/{{.CHART}}-{{.CHART_VERSION}}.tgz {{.REGISTRY}}
-      - rm -f .helm-packages/{{.CHART}}-{{.CHART_VERSION}}.tgz
-      - rm -rf .helm-build/{{.CHART}}
-
-  oci:push:all:
-    desc: Package and push all charts to GHCR (in dependency order)
-    vars:
-      # Ordered so dependencies are pushed before dependents
-      ORDERED: >-
-        lago-config
-        lago-data-config
-        lago-rails
-        lago-front
-        lago-events-processor-worker
-        lago-data-api
-        lago-data-worker
-        lago-data-forecasted-usage
-        lago-mcp-server
-        lago-pdf
-        lago-data
-        lago
-        lago-staging
-    cmds:
-      - mkdir -p .helm-packages .helm-build
-      - for: { var: ORDERED }
-        task: oci:push:{{.ITEM}}
-      - rm -rf .helm-packages .helm-build
-
-  tag:
-    desc: Validate chart versions, create and push a git tag (e.g. task tag)
-    vars:
-      TAG_VERSION:
         sh: grep '^version:' charts/lago/Chart.yaml | awk '{print $2}'
+    deps: [dependencies:update]
     cmds:
+      - rm -rf .helm-packages
+      - mkdir -p .helm-packages
+      - helm package charts/lago --destination .helm-packages
       - cmd: |
-          MISMATCH=0
-          for chart in charts/*/Chart.yaml; do
-            CHART_NAME=$(basename "$(dirname "$chart")")
-            VERSION=$(grep '^version:' "$chart" | awk '{print $2}')
-            if [ "$VERSION" != "{{.TAG_VERSION}}" ]; then
-              echo "❌ $CHART_NAME version ($VERSION) does not match expected ({{.TAG_VERSION}})"
-              MISMATCH=1
-            fi
-          done
-          if [ "$MISMATCH" -eq 1 ]; then
-            exit 1
-          fi
-          echo "✅ All chart versions match {{.TAG_VERSION}}"
-      - git tag -a "v{{.TAG_VERSION}}" -m "v{{.TAG_VERSION}}"
-      - git push origin "v{{.TAG_VERSION}}"
+          echo ""
+          echo "Built lago-{{.CHART_VERSION}}.tgz ({{.SHA}})"
+          echo ""
+          echo "  helm install lago .helm-packages/lago-{{.CHART_VERSION}}.tgz -f <values>"
+          echo "  helm template lago .helm-packages/lago-{{.CHART_VERSION}}.tgz -f <values>"
+        silent: true
 
   hooks:install:
     desc: Configure git to use the repository hooks directory
@@ -289,17 +220,5 @@ tasks:
     cmds:
       - >
         helm install lago ./charts/lago
-        -f charts/lago/examples/basic_workers.yaml
-        {{join " " .CLI_ARGS_LIST}}
-
-  oci:install:
-    desc: Install the lago chart from GHCR with basic_workers example values
-    vars:
-      CHART_VERSION:
-        sh: grep '^version:' charts/lago/Chart.yaml | awk '{print $2}'
-    cmds:
-      - >
-        helm install lago {{.REGISTRY}}/lago
-        --version {{.CHART_VERSION}}
         -f charts/lago/examples/basic_workers.yaml
         {{join " " .CLI_ARGS_LIST}}
