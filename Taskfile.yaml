@@ -256,6 +256,33 @@ tasks:
         task: oci:push:{{.ITEM}}
       - rm -rf .helm-packages .helm-build
 
+  tag:
+    desc: Validate chart versions, create and push a git tag (e.g. task tag)
+    vars:
+      TAG_VERSION:
+        sh: grep '^version:' charts/lago/Chart.yaml | awk '{print $2}'
+    cmds:
+      - cmd: |
+          MISMATCH=0
+          for chart in charts/*/Chart.yaml; do
+            CHART_NAME=$(basename "$(dirname "$chart")")
+            VERSION=$(grep '^version:' "$chart" | awk '{print $2}')
+            if [ "$VERSION" != "{{.TAG_VERSION}}" ]; then
+              echo "❌ $CHART_NAME version ($VERSION) does not match expected ({{.TAG_VERSION}})"
+              MISMATCH=1
+            fi
+          done
+          if [ "$MISMATCH" -eq 1 ]; then
+            exit 1
+          fi
+          echo "✅ All chart versions match {{.TAG_VERSION}}"
+      - git tag -a "v{{.TAG_VERSION}}" -m "v{{.TAG_VERSION}}"
+      - git push origin "v{{.TAG_VERSION}}"
+
+  hooks:install:
+    desc: Configure git to use the repository hooks directory
+    cmd: git config core.hooksPath .githooks
+
   install:
     desc: Install the lago chart from local directory with basic_workers example values
     deps: [dependencies:update]

@@ -23,6 +23,24 @@ jobs:
         with:
           version: v3.18.4
 
+      - name: Validate tag matches chart versions
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          echo "Tag version: $TAG"
+          MISMATCH=0
+          for chart in charts/*/Chart.yaml; do
+            CHART_NAME=$(basename "$(dirname "$chart")")
+            VERSION=$(grep '^version:' "$chart" | awk '{print $2}')
+            if [ "$VERSION" != "$TAG" ]; then
+              echo "::error::$CHART_NAME version ($VERSION) does not match tag (v$TAG)"
+              MISMATCH=1
+            fi
+          done
+          if [ "$MISMATCH" -eq 1 ]; then
+            exit 1
+          fi
+          echo "All chart versions match tag v$TAG"
+
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
 
