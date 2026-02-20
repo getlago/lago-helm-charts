@@ -183,6 +183,7 @@ A Helm chart for Kubernetes
 | global.streaming_ingestion.kafka.topics.eventsRaw | string | `"events_raw"` | Kafka topic for raw events |
 | global.streaming_ingestion.kafka.topics.activityLogs | string | `"activity_logs"` | Kafka topic for activity logs |
 | global.streaming_ingestion.kafka.topics.apiLogs | string | `"api_logs"` | Kafka topic for API logs |
+| global.streaming_ingestion.kafka.topics.securityLogs | string | `"securityLogs"` | Kafka topic for security logs |
 
 ### ConfigMap
 
