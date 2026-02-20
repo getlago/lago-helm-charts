@@ -48,14 +48,6 @@ tasks:
           var: CHARTS
         cmd: helm dependency update charts/{{.KEY}}
 
-  dependencies:build:
-    desc: Build all chart dependencies
-    deps: [dependencies:update]
-    cmd:
-      for:
-        var: CHARTS
-      cmd: helm dependency build charts/{{.KEY}}
-
   lint:
     desc: Lint changed charts (compared to target branch)
     preconditions:
@@ -141,17 +133,17 @@ tasks:
       CHART: '{{index .MATCH 0}}'
       CHART_TYPE: '{{index .CHARTS .CHART}}'
     deps:
-      - dependencies:build:{{.CHART}}
+      - dependencies:update:{{.CHART}}
     cmds:
       - cmd: '{{if .CHART_TYPE}}cp tests-common/{{.CHART_TYPE}}/common_patterns_test.yaml charts/{{.CHART}}/tests/{{end}}'
       - defer: rm -f charts/{{.CHART}}/tests/common_patterns_test.yaml
       - untt ./charts/{{.CHART}}
 
-  dependencies:build:*:
+  dependencies:update:*:
     internal: true
     vars:
       CHART: '{{index .MATCH 0}}'
-    cmd: helm dependency build charts/{{.CHART}}
+    cmd: helm dependency update charts/{{.CHART}}
 
   test:unit:
     desc: Run unit tests for the charts
