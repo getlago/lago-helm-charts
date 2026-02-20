@@ -191,10 +191,13 @@ tasks:
 
   # OCI Local Build
   oci:build:
-    desc: Package the lago chart locally for testing
+    desc: Package the lago chart locally for testing (uses git short SHA as version)
     vars:
       SHA:
         sh: git rev-parse --short HEAD
+      DIRTY:
+        sh: git diff --quiet && git diff --staged --quiet || echo "-dirty"
+      BUILD_VERSION: '{{.SHA}}{{.DIRTY}}'
       CHART_VERSION:
         sh: grep '^version:' charts/lago/Chart.yaml | awk '{print $2}'
     deps: [dependencies:update]
@@ -202,12 +205,13 @@ tasks:
       - rm -rf .helm-packages
       - mkdir -p .helm-packages
       - helm package charts/lago --destination .helm-packages
+      - mv .helm-packages/lago-{{.CHART_VERSION}}.tgz .helm-packages/lago-{{.BUILD_VERSION}}.tgz
       - cmd: |
           echo ""
-          echo "Built lago-{{.CHART_VERSION}}.tgz ({{.SHA}})"
+          echo "Built lago-{{.BUILD_VERSION}}.tgz"
           echo ""
-          echo "  helm install lago .helm-packages/lago-{{.CHART_VERSION}}.tgz -f <values>"
-          echo "  helm template lago .helm-packages/lago-{{.CHART_VERSION}}.tgz -f <values>"
+          echo "  helm install lago .helm-packages/lago-{{.BUILD_VERSION}}.tgz -f <values>"
+          echo "  helm template lago .helm-packages/lago-{{.BUILD_VERSION}}.tgz -f <values>"
         silent: true
 
   hooks:install:
