@@ -190,29 +190,38 @@ tasks:
             --set global.clickhouse.kafka.bootstrapServers[0]=kafka-server:9092
 
   # OCI Local Build
-  oci:build:
-    desc: Package the lago chart locally for testing (uses git short SHA as version)
+  oci:build:*:
+    desc: Package a specific chart locally for testing (e.g. task oci:build:lago)
     vars:
+      CHART: '{{index .MATCH 0}}'
       SHA:
         sh: git rev-parse --short HEAD
       DIRTY:
         sh: git diff --quiet && git diff --staged --quiet || echo "-dirty"
       BUILD_VERSION: '{{.SHA}}{{.DIRTY}}'
       CHART_VERSION:
-        sh: grep '^version:' charts/lago/Chart.yaml | awk '{print $2}'
-    deps: [dependencies:update]
+        sh: grep '^version:' charts/{{index .MATCH 0}}/Chart.yaml | awk '{print $2}'
+    preconditions:
+      - sh: '[ -d "charts/{{.CHART}}" ]'
+        msg: "Chart directory charts/{{.CHART}} does not exist"
+    deps:
+      - dependencies:update:{{.CHART}}
     cmds:
-      - rm -rf .helm-packages
       - mkdir -p .helm-packages
-      - helm package charts/lago --destination .helm-packages
-      - mv .helm-packages/lago-{{.CHART_VERSION}}.tgz .helm-packages/lago-{{.BUILD_VERSION}}.tgz
+      - helm package charts/{{.CHART}} --destination .helm-packages
+      - mv .helm-packages/{{.CHART}}-{{.CHART_VERSION}}.tgz .helm-packages/{{.CHART}}-{{.BUILD_VERSION}}.tgz
       - cmd: |
           echo ""
-          echo "Built lago-{{.BUILD_VERSION}}.tgz"
+          echo "Built {{.CHART}}-{{.BUILD_VERSION}}.tgz"
           echo ""
-          echo "  helm install lago .helm-packages/lago-{{.BUILD_VERSION}}.tgz -f <values>"
-          echo "  helm template lago .helm-packages/lago-{{.BUILD_VERSION}}.tgz -f <values>"
+          echo "  helm install {{.CHART}} .helm-packages/{{.CHART}}-{{.BUILD_VERSION}}.tgz -f <values>"
+          echo "  helm template {{.CHART}} .helm-packages/{{.CHART}}-{{.BUILD_VERSION}}.tgz -f <values>"
         silent: true
+
+  oci:build:
+    desc: Package the lago umbrella chart locally for testing
+    cmds:
+      - task: oci:build:lago
 
   hooks:install:
     desc: Configure git to use the repository hooks directory
