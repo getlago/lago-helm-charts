@@ -58,6 +58,7 @@ global:
       topics:
         activityLogs: activity_logs
         apiLogs: api_logs
+        securityLogs: security_logs
         eventsChargedInAdvance: events-charged-in-advance
         eventsDeadLetter: events-dead-letter
         eventsEnriched: events-enriched

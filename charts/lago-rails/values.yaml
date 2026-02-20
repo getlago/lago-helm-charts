@@ -288,6 +288,9 @@ global:
         # -- Kafka topic for API logs
         # @section -- Streaming Ingestion / Kafka
         apiLogs: api_logs
+        # -- Kafka topic for security logs
+        # @section -- Streaming Ingestion / Kafka
+        securityLogs: securityLogs
 
 # -- Local lago-config subchart settings
 # @default -- See [values.yaml](./values.yaml#L295)

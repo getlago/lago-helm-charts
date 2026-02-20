@@ -92,6 +92,9 @@ global:
         # -- Kafka topic for API logs
         # @section -- Streaming Ingestion / Kafka
         apiLogs: api_logs
+        # -- Kafka topic for security logs
+        # @section -- Streaming Ingestion / Kafka
+        securityLogs: securityLogs
 
 # -- Local config settings
 # @section -- Config
