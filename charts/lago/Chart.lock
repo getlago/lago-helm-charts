@@ -39,4 +39,4 @@ dependencies:
   repository: file://../lago-events-processor-worker
   version: 0.4.0
 digest: sha256:5598c58750dc292829d4aba9addc642b78ac376a99a92826c58fc35913c687f0
-generated: "2026-02-20T13:49:45.969097667Z"
+generated: "2026-02-20T14:05:40.036933358Z"
