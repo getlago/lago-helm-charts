@@ -1,5 +1,6 @@
 name: Release charts
 
+# yaml-anchor: force workflow re-index
 on:
   push:
     branches:
