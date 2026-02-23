@@ -63,6 +63,8 @@ spec:
               value: {{ .Values.config.web.sidekiq | quote }}
             - name: LAGO_DISABLE_SIGNUP
               value: {{ not .Values.global.lago.signup | quote }}
+            - name: SIDEKIQ_CONCURRENCY
+              value: {{ .Values.config.sidekiq.concurrency | quote }}
             {{- with .Values.config.web.concurrency }}
             - name: WEB_CONCURRENCY
               value: {{ . | quote }}
