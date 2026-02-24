@@ -189,6 +189,20 @@ tasks:
             --set global.clickhouse.enabled=true {{.CLI_ARGS}}
             --set global.clickhouse.kafka.bootstrapServers[0]=kafka-server:9092
 
+  render:oci:
+    desc: Render the lago chart from the OCI registry with basic_workers example values
+    vars:
+      REGISTRY: '{{.REGISTRY | default "oci://ghcr.io/getlago/helm-charts"}}'
+      CHART_VERSION:
+        sh: grep '^version:' charts/lago/Chart.yaml | awk '{print $2}'
+      OCI_VERSION: '{{.OCI_VERSION | default .CHART_VERSION}}'
+    cmds:
+      - >
+        helm template lago {{.REGISTRY}}/lago
+        --version {{.OCI_VERSION}}
+        -f charts/lago/examples/basic_workers.yaml
+        {{join " " .CLI_ARGS_LIST}}
+
   # OCI Local Build
   oci:build:*:
     desc: Package a specific chart locally for testing (e.g. task oci:build:lago)
