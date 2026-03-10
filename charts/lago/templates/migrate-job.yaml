@@ -21,7 +21,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: lago-migrate
-          image: getlago/api:v{{ .Values.version }}
+          image: {{ printf "%s%sgetlago/api:v%s"  (.Values.global.image.registry | default "") (.Values.global.image.registry | ternary "/" "" ) .Values.version }}
           {{ if .Values.job.migrate.loadSchema }}
           command: ["bin/rails"]
           args:

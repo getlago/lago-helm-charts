@@ -37,7 +37,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - image: getlago/lago-gotenberg:8.15
+        - image: {{ printf "%s%sgetlago/lago-gotenberg:8.15"  (.Values.global.image.registry | default "") (.Values.global.image.registry | ternary "/" "" ) }}
           name: {{ .Release.Name }}-pdf
           ports:
             - containerPort: 3000

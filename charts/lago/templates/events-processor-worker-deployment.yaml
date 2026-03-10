@@ -38,7 +38,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Release.Name }}-events-processor-worker
-          image: getlago/lago-events-processor:v{{ .Values.version }}
+          image: {{ printf "%s%sgetlago/lago-events-processor:v%s"  (.Values.global.image.registry | default "") (.Values.global.image.registry | ternary "/" "" ) .Values.version }}
           command: ["./event_processors"]
         {{- with .Values.eventsProcessor.resources }}
           resources:
