@@ -33,6 +33,10 @@ global:
   #  - googleAuthClientSecret:
   # existingSecret: "lago-credentials"
 
+  # Enable customization of docker registry for all getLago images
+  image:
+    registry: ""
+
   # You can disable segment tracking for Lago's internal purpose
   segment:
     enabled: true

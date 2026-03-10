@@ -207,7 +207,7 @@ spec:
                   name: {{ .Release.Name }}-secrets
                   key: newRelicKey
             {{ end }}
-          image: getlago/api:v{{ .Values.version }}
+          image: {{ printf "%s%sgetlago/api:v%s"  (.Values.global.image.registry | default "") (.Values.global.image.registry | ternary "/" "" ) .Values.version }}
           name: {{ .Release.Name }}-worker
           {{- if .Values.worker.livenessProbe.enabled }}
           livenessProbe:

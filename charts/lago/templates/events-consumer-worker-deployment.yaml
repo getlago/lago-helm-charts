@@ -38,7 +38,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Release.Name }}-events-consumer-worker
-          image: getlago/api:v{{ .Values.version }}
+          image: {{ printf "%s%sgetlago/api:v%s"  (.Values.global.image.registry | default "") (.Values.global.image.registry | ternary "/" "" ) .Values.version }}
           command: ["./scripts/start.events.consumer.sh"]
         {{- with .Values.eventsConsumer.resources }}
           resources:
