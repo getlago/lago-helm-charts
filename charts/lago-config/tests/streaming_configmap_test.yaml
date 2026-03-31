@@ -1,0 +1,96 @@
+suite: Test lago-config.streaming.configMapName helper
+templates:
+  - templates/streaming-configmap.yaml
+
+tests:
+  - it: should use default streaming configmap name when no custom name is set
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers:
+        - "kafka:9092"
+    release:
+      name: my-release
+    chart:
+      name: lago-config
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-release-lago-config-streaming
+
+  - it: should use configmapStreaming.name when provided
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers:
+        - "kafka:9092"
+      configmapStreaming.name: "custom-streaming-configmap"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: custom-streaming-configmap
+
+  - it: should use config.configmapStreaming.name when provided
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers:
+        - "kafka:9092"
+      config.configmapStreaming.name: "config-streaming-configmap"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: config-streaming-configmap
+
+  - it: should use global.streaming_ingestion.configmap when provided
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers:
+        - "kafka:9092"
+      global.streaming_ingestion.configmap: "global-streaming-configmap"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: global-streaming-configmap
+
+  - it: should prioritize configmapStreaming.name over config.configmapStreaming.name
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers:
+        - "kafka:9092"
+      configmapStreaming.name: "direct-streaming-configmap"
+      config.configmapStreaming.name: "config-streaming-configmap"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: direct-streaming-configmap
+
+  - it: should prioritize configmapStreaming.name over global.streaming_ingestion.configmap
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers:
+        - "kafka:9092"
+      configmapStreaming.name: "direct-streaming-configmap"
+      global.streaming_ingestion.configmap: "global-streaming-configmap"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: direct-streaming-configmap
+
+  - it: should prioritize config.configmapStreaming.name over global.streaming_ingestion.configmap
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers:
+        - "kafka:9092"
+      config.configmapStreaming.name: "config-streaming-configmap"
+      global.streaming_ingestion.configmap: "global-streaming-configmap"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: config-streaming-configmap
+
+  - it: should not create streaming configmap when streaming_ingestion is disabled
+    set:
+      global.streaming_ingestion.enabled: false
+      global.streaming_ingestion.kafka.bootstrapServers:
+        - "kafka:9092"
+    asserts:
+      - hasDocuments:
+          count: 0
