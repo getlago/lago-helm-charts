@@ -1,516 +1,890 @@
-version: 1.33.4
+# Default values for the lago umbrella chart.
 
-# EXAMPLE CONFIGURATION - Lago Events Processing Components
-# This is a standalone example demonstrating Lago's events processing capabilities
-# For production deployments, refer to the official Lago documentation
-
-# Required: Set the URLs for your API and Frontend services
-# Replace these placeholders with the actual domain names.
-apiUrl: ""   # Example: https://api.mydomain.dev
-frontUrl: ""   # Example: https://app.mydomain.dev
-
+# -- @ignore
 global:
-  # Define your Lago Premium License
-  # license:
+  lago:
+    # -- Override the application Docker image tag (defaults to Chart appVersion)
+    # @section -- Lago
+    version: ""
+    # -- Rails environment (`production`, `staging`, `development`)
+    # @section -- Lago
+    env: "production"
+    # -- Lago Premium license key
+    # @section -- Lago
+    license: ""
+    # -- Enable self-service signup
+    # @section -- Lago
+    signup: false
+    # -- Enable Lago Cloud mode
+    # @section -- Lago
+    cloud: false
+    # -- Enable PDF generation support
+    # @section -- Lago
+    pdfGeneration: false
 
-  # If you use a managed PG instance
-  # Should respect this format postgresql://USER:PASSWORD@HOST:PORT/DATABASE_NAME
-  # databaseUrl:
+  sidekiq:
+    # -- Enable Sidekiq Pro (requires valid license)
+    # @section -- Sidekiq
+    pro: false
+    queues:
+      # -- Enable the analytics background queue
+      # @section -- Sidekiq
+      analytics: false
+      # -- Enable the billing background queue
+      # @section -- Sidekiq
+      billing: false
+      # -- Enable the clock background queue
+      # @section -- Sidekiq
+      clock: false
+      # -- Enable the events background queue
+      # @section -- Sidekiq
+      events: false
+      # -- Enable the webhook background queue
+      # @section -- Sidekiq
+      webhook: false
+      # -- Enable the PDF background queue
+      # @section -- Sidekiq
+      pdf: false
 
-  # Should respect standard redis URL format redis://..., redis+sentinel://...
-  # redisUrl:
-  # redisCacheUrl:
+  config:
+    # -- Name of an existing ConfigMap for shared configuration (bypasses auto-generated configmap)
+    # @section -- Config
+    configmap:
+    # -- Name of an existing Secret for shared configuration (bypasses auto-generated secret)
+    # @section -- Config
+    secret:
 
-  # If you wish to provide an existing secret with credentials in, then you can do so here.
-  # The following fields are required:
-  #  - databaseUrl: <SEE FORMAT ABOVE>
-  #  - redisUrl:
-  #  - awsS3AccessKeyId:
-  #  - awsS3SecretAccessKey:
-  #  - smtpUsername:
-  #  - smtpPassword:
-  #  - googleAuthClientId:
-  #  - googleAuthClientSecret:
-  # existingSecret: "lago-credentials"
+  urls:
+    # -- Public URL of the Lago API
+    # @section -- URLs
+    api: ""
+    # -- Public URL of the Lago frontend
+    # @section -- URLs
+    front: ""
+    # -- Internal URL of the PDF service (Gotenberg)
+    # @section -- URLs
+    pdf: ""
 
-  # You can disable segment tracking for Lago's internal purpose
-  segment:
-    enabled: true
+  database:
+    # -- PostgreSQL connection URI
+    # @section -- Database
+    uri: ""
+    # -- Database connection pool size
+    # @section -- Database
+    pool: 20
+
+  encryption:
+    # -- Primary encryption key (`openssl rand -hex 16`)
+    # @section -- Encryption
+    key: ""
+    # -- Key derivation salt (`openssl rand -hex 16`)
+    # @section -- Encryption
+    salt: ""
+
+  signing:
+    # -- HMAC signing key used by webhooks and message verifier (HS256)
+    # @section -- Signing
+    hmac: ""
+    # -- RSA private key for webhook signatures (RS256), base64-encoded
+    # @section -- Signing
+    rsa: ""
+
+  redis:
+    # -- Redis URI for Sidekiq job queue
+    # @section -- Redis
+    uri: ""
+    # -- Redis password (appended to URI if set)
+    # @section -- Redis
+    password: ""
+
+  redisCache:
+    # -- Redis URI for Rails cache
+    # @section -- Redis
+    uri: ""
+    # -- Redis cache password
+    # @section -- Redis
+    password: ""
+
+  redisStore:
+    # -- Redis URI for ActionCable / general store
+    # @section -- Redis
+    uri: ""
+    # -- Redis store password
+    # @section -- Redis
+    password: ""
+
+  # -- Sentry DSN for error tracking
+  # @section -- Observability
+  sentryDsn: ""
+  # -- Segment write key for analytics
+  # @section -- Observability
+  segmentWriteKey: ""
+
+  nango:
+    # -- Nango public key for frontend OAuth flows
+    # @section -- Nango
+    publicKey: ""
+    # -- Nango secret key for OAuth integrations
+    # @section -- Nango
+    secretKey: ""
+
   s3:
+    # -- Enable S3-compatible object storage
+    # @section -- S3
     enabled: false
-    # accessKeyId and secretAccessKey are not required here if using existingSecret
-    # accessKeyId: "<your-aws-access-key>"
-    # secretAccessKey: "<your-aws-secret-key>"
-    # bucket: "<your-aws-bucket>"
-    # region: "<your-aws-region>"
-    # endpoint: "https://s3.<region>.amazonaws.com" # Leave empty for default AWS S3 endpoint
+    # -- S3 access key ID
+    # @section -- S3
+    accessKeyId: ""
+    # -- S3 secret access key
+    # @section -- S3
+    secretAccessKey: ""
+    # -- S3 bucket name
+    # @section -- S3
+    bucket: ""
+    # -- S3 region
+    # @section -- S3
+    region: "us-east-1"
+    # -- S3 custom endpoint (for MinIO, etc.)
+    # @section -- S3
+    endpoint: ""
+    # -- (bool) Use path-style addressing instead of virtual-hosted-style
+    # @section -- S3
+    pathStyle:
 
   smtp:
-    # username and password are not required here if using existingSecret
+    # -- Enable SMTP for outbound email
+    # @section -- SMTP
     enabled: false
-    # address:
-    # username:
-    # password:
-    # port:
-    # fromEmail:
-  newRelic:
-    enabled: false
-    # key:
-
-  # You can disable Lago's signup
-  signup:
-    enabled: true
-
-  # You can disable Lago's pdf generation
-  pdf:
-    enabled: true
-
-  googleAuth:
-    # clientId and clientSecret are not required here if using existingSecret
-    enabled: false
-    # clientId:
-    # clientSecret:
-
-  ingress:
-    enabled: false
-    frontHostname:
-    apiHostname:
-    className: nginx
-    annotations: {}
-
-  networkPolicy:
-    enabled: false
-    egress: []
-    ingress: []
-
-  kubectl:
-    imageRegistry: docker.io
-    imageRepository: rancher/kubectl
-    # If imageTag is not supplied it will be inferred using the version of the cluster that Lago is deployed on.
-    # imageTag: 1.29.0
-
-  clickhouse:
-    enabled: false
-    port: 9000
-    host: clickhouse
-    ssl: true
-    # username and password are not required here if using existingSecret
+    # -- SMTP username
+    # @section -- SMTP
     username: ""
+    # -- SMTP password
+    # @section -- SMTP
     password: ""
+    # -- Sender email address
+    # @section -- SMTP
+    from: ""
+    # -- SMTP port
+    # @section -- SMTP
+    port: 25
+    # -- SMTP server address
+    # @section -- SMTP
+    address: ""
+
+  google:
+    # -- Enable Google OAuth
+    # @section -- Google
+    enabled: false
+    # -- Google OAuth client ID
+    # @section -- Google
+    clientId:
+    # -- Google OAuth client secret
+    # @section -- Google
+    clientSecret:
+
+  gocardless:
+    # -- Enable GoCardless integration
+    # @section -- GoCardless
+    enabled: false
+    # -- GoCardless client ID
+    # @section -- GoCardless
+    clientId:
+    # -- GoCardless client secret
+    # @section -- GoCardless
+    clientSecret:
+    # -- GoCardless API proxy URL
+    # @section -- GoCardless
+    proxy:
+
+  mcp:
+    # -- Enable MCP (Model Context Protocol) integration
+    # @section -- MCP
+    enabled: false
+    # -- MCP client ID
+    # @section -- MCP
+    clientId:
+    # -- MCP client secret
+    # @section -- MCP
+    clientSecret:
+    # -- MCP endpoint URL
+    # @section -- MCP
+    endpoint:
+
+  data:
+    # -- Enable Lago Data analytics
+    # @section -- Data
+    enabled: false
+    # -- Lago Data API token
+    # @section -- Data
+    token:
+    # -- Lago Data API endpoint
+    # @section -- Data
+    endpoint:
+
+  streaming_ingestion:
+    # -- Enable streaming ingestion (ClickHouse + Kafka)
+    # @section -- Streaming Ingestion
+    enabled: false
+    # -- Name of an existing ConfigMap for streaming config
+    # @section -- Streaming Ingestion
+    configmap: ""
+    # -- Name of an existing Secret for streaming credentials
+    # @section -- Streaming Ingestion
+    secret: ""
+
+    clickhouse:
+      # -- ClickHouse username (not required when using an external secret)
+      # @section -- Streaming Ingestion / ClickHouse
+      username: ""
+      # -- ClickHouse password (not required when using an external secret)
+      # @section -- Streaming Ingestion / ClickHouse
+      password: ""
+      # -- ClickHouse native protocol port
+      # @section -- Streaming Ingestion / ClickHouse
+      port: 9000
+      # -- ClickHouse server address
+      # @section -- Streaming Ingestion / ClickHouse
+      address: clickhouse
+      # -- Enable TLS for ClickHouse connections
+      # @section -- Streaming Ingestion / ClickHouse
+      tls: false
+      # -- ClickHouse database name
+      # @section -- Streaming Ingestion / ClickHouse
+      database: default
+
     kafka:
-      # username and password are not required here if using existingSecret
-      # username:
-      # password:
-      tls: true
-      saslMechanisms: SCRAM-SHA-512
-      securityProtocol: SASL_SSL
+      # -- Kafka username (not required when using an external secret)
+      # @section -- Streaming Ingestion / Kafka
+      username: ""
+      # -- Kafka password (not required when using an external secret)
+      # @section -- Streaming Ingestion / Kafka
+      password: ""
+      # -- Enable TLS for Kafka connections
+      # @section -- Streaming Ingestion / Kafka
+      tls: false
+      # -- Kafka SASL mechanism (`SCRAM-SHA-512`, `SCRAM-SHA-256`)
+      # @section -- Streaming Ingestion / Kafka
+      saslMechanisms:
+      # -- Kafka consumer group name
+      # @section -- Streaming Ingestion / Kafka
       consumerGroup: events_consumer
-      # you must provide a list of Kafka servers if clickhouse is enabled
-      # bootstrapServers:
-      #   - "kafka-server:9092"
+      # -- List of Kafka bootstrap servers
+      # @default -- `[]`
+      # @section -- Streaming Ingestion / Kafka
+      bootstrapServers: []
       topics:
+        # -- Kafka topic for charged-in-advance events
+        # @section -- Streaming Ingestion / Kafka
         eventsChargedInAdvance: events_charged_in_advance
+        # -- Kafka topic for dead-letter events
+        # @section -- Streaming Ingestion / Kafka
         eventsDeadLetter: events_dead_letter
+        # -- Kafka topic for enriched events
+        # @section -- Streaming Ingestion / Kafka
         eventsEnriched: events_enriched
+        # -- Kafka topic for expanded enriched events
+        # @section -- Streaming Ingestion / Kafka
         eventsEnrichedExpanded: events_enriched_expanded
+        # -- Kafka topic for raw events
+        # @section -- Streaming Ingestion / Kafka
         eventsRaw: events_raw
+        # -- Kafka topic for activity logs
+        # @section -- Streaming Ingestion / Kafka
         activityLogs: activity_logs
+        # -- Kafka topic for API logs
+        # @section -- Streaming Ingestion / Kafka
         apiLogs: api_logs
+        # -- Kafka topic for security logs
+        # @section -- Streaming Ingestion / Kafka
+        securityLogs: security_logs
 
+# -- lago-config subchart overrides
+# @default -- See child values
+# @section -- lago-config
+config:
+  # -- Override the config subchart release name
+  # @section -- lago-config
+  nameOverride: lago-config
 
-encryption:
-  # The following fields are required:
-  #  - encryptionPrimaryKey:
-  #  - encryptionDeterministicKey:
-  #  - encryptionKeyDerivationSalt:
-  existingSecret:
-
-  # serviceAccountName:
-
-front:
-  replicas: 1
-  service:
-    port: 80
-  resources:
-    requests:
-      memory: 512Mi
-      cpu: "200m"
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
-  tolerations: []
-  nodeSelector: {}
-  affinity: {}
-
+# -- lago-api subchart overrides (lago-rails)
+# @default -- See child values
+# @section -- API
 api:
-  replicas: 1
-  service:
-    port: 3000
-  rails:
-    maxThreads: 10
-    webConcurrency: 4
-    env: "production"
-    logStdout: true
-    logLevel: error
-  sidekiqWeb:
-    enabled: true
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: "1000m"
-  autoscaling:
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- API
     enabled: false
-    minReplicas: 1
-    maxReplicas: 3
-    targetCPUUtilizationPercentage: 80
-  volumes:
-    storageClassName: ""
-    accessModes: ReadWriteOnce
-    storage: "10Gi"
-  extraEnv: {}
-  podAnnotations: {}
-  podLabels: {}
-  livenessProbe:
-    enabled: true
-    httpPath: /health
-    httpPort: 3000
-    initialDelaySeconds: 0
-    periodSeconds: 10
-    timeoutSeconds: 1
-    failureThreshold: 3
-  tolerations: []
-  nodeSelector: {}
-  affinity: {}
+    # -- Config subchart name override
+    # @section -- API
+    nameOverride: lago-config
+    web:
+      # -- Enable Sidekiq embedded mode in the API process
+      # @section -- API
+      sidekiq: true
 
+  # -- Override the API subchart release name
+  # @section -- API
+  nameOverride: lago-api
+
+# -- lago-front subchart overrides
+# @default -- See child values
+# @section -- Frontend
+front:
+  config:
+    # -- Disable nested config
+    # @section -- Frontend
+    enabled: false
+
+  # -- Override the front subchart release name
+  # @section -- Frontend
+  nameOverride: lago-front
+
+# -- Default Sidekiq worker subchart overrides (lago-rails)
+# @default -- See child values
+# @section -- Default Worker
 worker:
-  replicas: 1
-  rails:
-    sidekiqConcurrency: 20
-    env: "production"
-    logStdout: true
-    logLevel: error
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: "1100m"
-  autoscaling:
+  # -- Override the worker subchart release name
+  # @section -- Default Worker
+  nameOverride: lago-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Default Worker
     enabled: false
-    minReplicas: 1
-    maxReplicas: 3
-    targetCPUUtilizationPercentage: 80
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
-  livenessProbe:
-    enabled: true
-    httpPath: /
-    httpPort: 8080
-    initialDelaySeconds: 0
-    periodSeconds: 10
-    timeoutSeconds: 1
-    failureThreshold: 3
-  tolerations: []
-  nodeSelector: {}
-  affinity: {}
+    # -- Config subchart name override
+    # @section -- Default Worker
+    nameOverride: lago-config
 
-
-eventsConsumer:
-  databasePool: 10
-  rails:
-    env: "production"
-    logStdout: true
-    logLevel: error
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: "1100m"
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
-  tolerations: []
-  nodeSelector: {}
-  affinity: {}
-
-eventsProcessor:
-  databasePool: 10
-  env: "production"
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: "1100m"
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
-  tolerations: []
-  nodeSelector: {}
-  affinity: {}
-
-eventsWorker:
-  enabled: true
-  replicas: 1
-  rails:
-    sidekiqConcurrency: 20
-    env: "production"
-    logStdout: true
-    logLevel: error
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: "1100m"
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
-  livenessProbe:
-    enabled: true
-    httpPath: /
-    httpPort: 8080
-    initialDelaySeconds: 0
-    periodSeconds: 10
-    timeoutSeconds: 1
-    failureThreshold: 3
-  tolerations: []
-  nodeSelector: {}
-  affinity: {}
-
-clockWorker:
-  enabled: true
-  replicas: 1
-  rails:
-    sidekiqConcurrency: 20
-    env: "production"
-    logStdout: true
-    logLevel: error
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: "1100m"
-  autoscaling:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 3
-    targetCPUUtilizationPercentage: 80
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
-  livenessProbe:
-    enabled: true
-    httpPath: /
-    httpPort: 8080
-    initialDelaySeconds: 0
-    periodSeconds: 10
-    timeoutSeconds: 1
-    failureThreshold: 3
-  tolerations: []
-  nodeSelector: {}
-  affinity: {}
-
-clock:
-  replicas: 1
-  rails:
-    env: "production"
-    logStdout: true
-    logLevel: info
-  resources:
-    requests:
-      memory: 256Mi
-      cpu: "100m"
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
-  tolerations: []
-  nodeSelector: {}
-  affinity: {}
-
-pdf:
-  replicas: 1
   service:
-    port: 3001
-  resources:
-    requests:
-      memory: 2Gi
-      cpu: "1000m"
-  autoscaling:
+    # -- Disable service for the worker (no inbound traffic)
+    # @section -- Default Worker
     enabled: false
-    minReplicas: 1
-    maxReplicas: 3
-    targetCPUUtilizationPercentage: 80
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
-  tolerations: []
-  nodeSelector: {}
-  affinity: {}
 
-billingWorker:
-  enabled: true
-  replicas: 1
-  rails:
-    sidekiqConcurrency: 10
-    env: "production"
-    logStdout: true
-    logLevel: info
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: "1100m"
-  autoscaling:
+  # -- Liveness probe (disabled for workers)
+  # @section -- Default Worker
+  livenessProbe: null
+  # -- Readiness probe (disabled for workers)
+  # @section -- Default Worker
+  readinessProbe: null
+
+  container:
+    # -- Worker entrypoint command
+    # @section -- Default Worker
+    command: ["./scripts/start.worker.sh"]
+    # -- Worker container ports (none needed)
+    # @section -- Default Worker
+    ports:
+
+# -- Clock scheduler subchart overrides (lago-rails)
+# @default -- See child values
+# @section -- Clock
+clock:
+  # -- Override the clock subchart release name
+  # @section -- Clock
+  nameOverride: lago-clock
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Clock
     enabled: false
-    minReplicas: 1
-    maxReplicas: 3
-    targetCPUUtilizationPercentage: 100
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
-  livenessProbe:
-    enabled: true
-    httpPath: /
-    httpPort: 8080
-    initialDelaySeconds: 0
-    periodSeconds: 10
-    timeoutSeconds: 1
-    failureThreshold: 3
-  tolerations: []
-  nodeSelector: {}
-  affinity: {}
-
-pdfWorker:
-  enabled: true
-  replicas: 1
-  rails:
-    sidekiqConcurrency: 10
-    env: "production"
-    logStdout: true
-    logLevel: info
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: "1100m"
-  autoscaling:
+    # -- Config subchart name override
+    # @section -- Clock
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for clock)
+  # @section -- Clock
+  livenessProbe: null
+  # -- Readiness probe (disabled for clock)
+  # @section -- Clock
+  readinessProbe: null
+  service:
+    # -- Disable service for the clock (no inbound traffic)
+    # @section -- Clock
     enabled: false
-    minReplicas: 1
-    maxReplicas: 3
-    targetCPUUtilizationPercentage: 80
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
-  livenessProbe:
-    enabled: true
-    httpPath: /
-    httpPort: 8080
-    initialDelaySeconds: 0
-    periodSeconds: 10
-    timeoutSeconds: 1
-    failureThreshold: 3
-  tolerations: []
-  nodeSelector: {}
-  affinity: {}
+  container:
+    # -- Clock entrypoint command
+    # @section -- Clock
+    command: ["./scripts/start.clock.sh"]
+    # -- Clock container ports (none needed)
+    # @section -- Clock
+    ports:
 
-webhookWorker:
-  enabled: true
-  replicas: 1
-  rails:
-    sidekiqConcurrency: 20
-    env: "production"
-    logStdout: true
-    logLevel: info
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: "1100m"
-  autoscaling:
+# -- Analytics worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.analytics`)
+# @default -- See child values
+# @section -- Analytics Worker
+analytics-worker:
+  # -- Override the analytics-worker subchart release name
+  # @section -- Analytics Worker
+  nameOverride: lago-analytics-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Analytics Worker
     enabled: false
-    minReplicas: 1
-    maxReplicas: 3
-    targetCPUUtilizationPercentage: 80
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
-  livenessProbe:
-    enabled: true
-    httpPath: /
-    httpPort: 8080
-    initialDelaySeconds: 0
-    periodSeconds: 10
-    timeoutSeconds: 1
-    failureThreshold: 3
-  tolerations: []
-  nodeSelector: {}
-  affinity: {}
-
-paymentWorker:
-  enabled: true
-  replicas: 1
-  rails:
-    sidekiqConcurrency: 20
-    env: "production"
-    logStdout: true
-    logLevel: info
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: "1100m"
-  autoscaling:
+    # -- Config subchart name override
+    # @section -- Analytics Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- Analytics Worker
+  livenessProbe: null
+  # -- Readiness probe (disabled for workers)
+  # @section -- Analytics Worker
+  readinessProbe: null
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- Analytics Worker
     enabled: false
-    minReplicas: 1
-    maxReplicas: 3
-    targetCPUUtilizationPercentage: 80
-  podAnnotations: {}
-  podLabels: {}
-  extraEnv: {}
-  livenessProbe:
-    enabled: true
-    httpPath: /
-    httpPort: 8080
-    initialDelaySeconds: 0
-    periodSeconds: 10
-    timeoutSeconds: 1
-    failureThreshold: 3
-  tolerations: []
-  nodeSelector: {}
-  affinity: {}
+  container:
+    # -- Analytics worker entrypoint command
+    # @section -- Analytics Worker
+    command: ["./scripts/start.analytics.worker.sh"]
+    # -- Container ports (none needed)
+    # @section -- Analytics Worker
+    ports:
 
-job:
-  migrate:
-    nameOverride: null
-    podAnnotations: {}
-    podLabels: {}
-    resources: {}
-    extraEnv: {}
-    loadSchema: false
-  topics:
-    resources: {}
-    extraEnv: {}
-    podAnnotations: {}
-    podLabels: {}
+# -- Billing worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.billing`)
+# @default -- See child values
+# @section -- Billing Worker
+billing-worker:
+  # -- Override the billing-worker subchart release name
+  # @section -- Billing Worker
+  nameOverride: lago-billing-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Billing Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- Billing Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- Billing Worker
+  livenessProbe: null
+  # -- Readiness probe (disabled for workers)
+  # @section -- Billing Worker
+  readinessProbe: null
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- Billing Worker
+    enabled: false
+  container:
+    # -- Billing worker entrypoint command
+    # @section -- Billing Worker
+    command: ["./scripts/start.billing.worker.sh"]
+    # -- Container ports (none needed)
+    # @section -- Billing Worker
+    ports:
 
+# -- Clock worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.clock`)
+# @default -- See child values
+# @section -- Clock Worker
+clock-worker:
+  # -- Override the clock-worker subchart release name
+  # @section -- Clock Worker
+  nameOverride: lago-clock-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Clock Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- Clock Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- Clock Worker
+  livenessProbe: null
+  # -- Readiness probe (disabled for workers)
+  # @section -- Clock Worker
+  readinessProbe: null
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- Clock Worker
+    enabled: false
+  container:
+    # -- Clock worker entrypoint command
+    # @section -- Clock Worker
+    command: ["./scripts/start.clock.worker.sh"]
+    # -- Container ports (none needed)
+    # @section -- Clock Worker
+    ports:
 
-minio:
+# -- Events worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.events`)
+# @default -- See child values
+# @section -- Events Worker
+events-worker:
+  # -- Override the events-worker subchart release name
+  # @section -- Events Worker
+  nameOverride: lago-events-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Events Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- Events Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- Events Worker
+  livenessProbe: null
+  # -- Readiness probe (disabled for workers)
+  # @section -- Events Worker
+  readinessProbe: null
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- Events Worker
+    enabled: false
+  container:
+    # -- Events worker entrypoint command
+    # @section -- Events Worker
+    command: ["./scripts/start.events.worker.sh"]
+    # -- Container ports (none needed)
+    # @section -- Events Worker
+    ports:
+
+# -- Webhook worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.webhook`)
+# @default -- See child values
+# @section -- Webhook Worker
+webhook-worker:
+  # -- Override the webhook-worker subchart release name
+  # @section -- Webhook Worker
+  nameOverride: lago-webhook-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Webhook Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- Webhook Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- Webhook Worker
+  livenessProbe: null
+  # -- Readiness probe (disabled for workers)
+  # @section -- Webhook Worker
+  readinessProbe: null
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- Webhook Worker
+    enabled: false
+  container:
+    # -- Webhook worker entrypoint command
+    # @section -- Webhook Worker
+    command: ["./scripts/start.webhook.worker.sh"]
+    # -- Container ports (none needed)
+    # @section -- Webhook Worker
+    ports:
+
+# -- PDF stack subchart overrides (lago-pdf, conditional on `global.sidekiq.queues.pdf`)
+# @default -- See child values
+# @section -- PDF
+pdf:
+  # -- Override the PDF subchart release name
+  # @section -- PDF
+  nameOverride: lago-pdf
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- PDF
+    enabled: false
+    # -- Config subchart name override
+    # @section -- PDF
+    nameOverride: lago-config
+
+  worker:
+    config:
+      # -- Config subchart name override for PDF worker
+      # @section -- PDF
+      nameOverride: lago-config
+
+# -- Events consumer worker subchart overrides (lago-rails, conditional on `global.streaming_ingestion.enabled`)
+# @default -- See child values
+# @section -- Events Consumer Worker
+events-consumer-worker:
+  # -- Override the events-consumer-worker subchart release name
+  # @section -- Events Consumer Worker
+  nameOverride: lago-events-consumer-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Events Consumer Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- Events Consumer Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- Events Consumer Worker
+  livenessProbe: null
+  # -- Readiness probe (disabled for workers)
+  # @section -- Events Consumer Worker
+  readinessProbe: null
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- Events Consumer Worker
+    enabled: false
+  container:
+    # -- Events consumer entrypoint command
+    # @section -- Events Consumer Worker
+    command: ["./scripts/start.events.consumer.sh"]
+    # -- Container ports (none needed)
+    # @section -- Events Consumer Worker
+    ports:
+
+# -- Events processor worker subchart overrides (conditional on `global.streaming_ingestion.enabled`)
+# @default -- See child values
+# @section -- Events Processor Worker
+events-processor-worker:
+  # -- Override the events-processor-worker subchart release name
+  # @section -- Events Processor Worker
+  nameOverride: lago-events-processor-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Events Processor Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- Events Processor Worker
+    nameOverride: lago-config
+
+# -- Database migration job configuration
+# @default -- See child values
+# @section -- Database Migration
+migrate:
+  # -- Enable the database migration job
+  # @section -- Database Migration
   enabled: false
-  replicas: 1
-  fullnameOverride: lago-minio
-  endpoint: "http://minio.lago.dev"
-  nameOverride: "minio"
-  resources:
-    requests:
-      memory: "512Mi"
-      cpu: "500m"
-    limits:
-      memory: "1Gi"
-      cpu: "1"
-  persistence:
-    size: 10Gi
-  ingress:
-    enabled: false
-    ingressClassName: nginx
-    labels: {}
-    annotations: {}
-    path: /
-    hosts:
-      - minio.lago.dev
-    tls: []
-  buckets:
-    - name: lago
-      policy: none
-      purge: false
-      versioning: false
-      objectlocking: false
+  # -- Local rails config
+  # @default -- See [values.yaml](./values.yaml#L644)
+  # @section -- Database Migration / Config
+  config:
+    nameOverride: lago-config
+    log:
+      # -- Log level (`debug`, `info`, `warn`, `error`)
+      # @section -- Database Migration / Config
+      level: info
+      # -- Log to stdout
+      # @section -- Database Migration / Config
+      stdout: true
+
+    database:
+      # -- (int) Override the global database pool size for this instance
+      # @section -- Database Migration / Config
+      pool:
+  image:
+    # -- Migration job image repository
+    # @section -- Database Migration
+    repository: getlago/api
+    # -- Override the migration job image tag
+    # @section -- Database Migration
+    tag: ""
+    # -- Image pull policy
+    # @section -- Database Migration
+    pullPolicy: IfNotPresent
+  # -- Command to run for migrations
+  # @section -- Database Migration
+  command: ["./scripts/migrate.sh"]
+  # -- Arguments for the migration command
+  # @section -- Database Migration
+  args: []
+  # -- Helm hook weight (lower runs first)
+  # @section -- Database Migration
+  hookWeight: "-5"
+  # -- Hook delete policy (`hook-succeeded`, `hook-failed`, `before-hook-creation`)
+  # @section -- Database Migration
+  hookDeletePolicy: before-hook-creation
+  # -- Job backoff limit
+  # @section -- Database Migration
+  backoffLimit: 3
+  # -- Restart policy for the job pod
+  # @section -- Database Migration
+  restartPolicy: Never
+  # -- TTL for cleaning up finished jobs (seconds)
+  # @section -- Database Migration
+  ttlSecondsAfterFinished: 0
+  # -- Active deadline for the job (seconds)
+  # @section -- Database Migration
+  activeDeadlineSeconds: 600
+  # -- Additional annotations for the Job
+  # @section -- Database Migration
+  annotations: {}
+  # -- Additional annotations for the pod
+  # @section -- Database Migration
+  podAnnotations: {}
+  # -- Additional labels for the pod
+  # @section -- Database Migration
+  podLabels: {}
+  # -- Service account name for the job
+  # @section -- Database Migration
+  serviceAccountName: ""
+  # -- Image pull secrets
+  # @section -- Database Migration
+  imagePullSecrets: []
+  # -- Pod security context
+  # @section -- Database Migration
+  podSecurityContext: {}
+  # -- Container security context
+  # @section -- Database Migration
+  securityContext: {}
+  # -- Resource requests and limits
+  # @section -- Database Migration
+  resources: {}
+  # -- Extra environment variables (map format, deep-mergeable)
+  # @section -- Database Migration
+  extraEnv: {}
+  # -- Extra envFrom sources
+  # @section -- Database Migration
+  extraEnvFrom: []
+  # -- Additional volumes
+  # @section -- Database Migration
+  volumes: []
+  # -- Additional volume mounts
+  # @section -- Database Migration
+  volumeMounts: []
+  # -- Node selector constraints
+  # @section -- Database Migration
+  nodeSelector: {}
+  # -- Pod tolerations
+  # @section -- Database Migration
+  tolerations: []
+  # -- Pod affinity rules
+  # @section -- Database Migration
+  affinity: {}
+  # -- Init containers to run before the migration (e.g. wait for database readiness)
+  # @section -- Database Migration
+  initContainers: []
+
+# -- Kafka topic creation job configuration
+# @default -- See child values
+# @section -- Create Topics Job
+createTopics:
+  # -- Enable the Kafka topic creation job
+  # @section -- Create Topics Job
+  enabled: false
+  image:
+    # -- Topic job image repository
+    # @section -- Create Topics Job
+    repository: alpine
+    # -- Topic job image tag
+    # @section -- Create Topics Job
+    tag: "3.20"
+    # -- Image pull policy
+    # @section -- Create Topics Job
+    pullPolicy: IfNotPresent
+  # -- Helm hook weight (lower runs first)
+  # @section -- Create Topics Job
+  hookWeight: "-1"
+  # -- Hook delete policy (`hook-succeeded`, `hook-failed`, `before-hook-creation`)
+  # @section -- Create Topics Job
+  hookDeletePolicy: before-hook-creation
+  # -- Job backoff limit
+  # @section -- Create Topics Job
+  backoffLimit: 3
+  # -- Restart policy for the job pod
+  # @section -- Create Topics Job
+  restartPolicy: Never
+  # -- TTL for cleaning up finished jobs (seconds)
+  # @section -- Create Topics Job
+  ttlSecondsAfterFinished: 300
+  # -- Active deadline for the job (seconds)
+  # @section -- Create Topics Job
+  activeDeadlineSeconds: 300
+  # -- Additional annotations for the Job
+  # @section -- Create Topics Job
+  annotations: {}
+  # -- Additional annotations for the pod
+  # @section -- Create Topics Job
+  podAnnotations: {}
+  # -- Additional labels for the pod
+  # @section -- Create Topics Job
+  podLabels: {}
+  # -- Service account name for the job
+  # @section -- Create Topics Job
+  serviceAccountName: ""
+  # -- Image pull secrets
+  # @section -- Create Topics Job
+  imagePullSecrets: []
+  # -- Pod security context
+  # @section -- Create Topics Job
+  podSecurityContext: {}
+  # -- Container security context
+  # @section -- Create Topics Job
+  securityContext: {}
+  # -- Resource requests and limits
+  # @section -- Create Topics Job
+  resources: {}
+  # -- Extra environment variables (map format, deep-mergeable)
+  # @section -- Create Topics Job
+  extraEnv: {}
+  # -- Node selector constraints
+  # @section -- Create Topics Job
+  nodeSelector: {}
+  # -- Pod tolerations
+  # @section -- Create Topics Job
+  tolerations: []
+  # -- Pod affinity rules
+  # @section -- Create Topics Job
+  affinity: {}
+
+# -- Kafka topic deletion job configuration
+# @default -- See child values
+# @section -- Delete Topics Job
+deleteTopics:
+  # -- Enable the Kafka topic deletion job
+  # @section -- Delete Topics Job
+  enabled: false
+  image:
+    # -- Topic job image repository
+    # @section -- Delete Topics Job
+    repository: alpine
+    # -- Topic job image tag
+    # @section -- Delete Topics Job
+    tag: "3.20"
+    # -- Image pull policy
+    # @section -- Delete Topics Job
+    pullPolicy: IfNotPresent
+  # -- Helm hook weight (lower runs first)
+  # @section -- Delete Topics Job
+  hookWeight: "1"
+  # -- Hook delete policy (`hook-succeeded`, `hook-failed`, `before-hook-creation`)
+  # @section -- Delete Topics Job
+  hookDeletePolicy: before-hook-creation
+  # -- Job backoff limit
+  # @section -- Delete Topics Job
+  backoffLimit: 3
+  # -- Restart policy for the job pod
+  # @section -- Delete Topics Job
+  restartPolicy: Never
+  # -- TTL for cleaning up finished jobs (seconds)
+  # @section -- Delete Topics Job
+  ttlSecondsAfterFinished: 300
+  # -- Active deadline for the job (seconds)
+  # @section -- Delete Topics Job
+  activeDeadlineSeconds: 300
+  # -- Additional annotations for the Job
+  # @section -- Delete Topics Job
+  annotations: {}
+  # -- Additional annotations for the pod
+  # @section -- Delete Topics Job
+  podAnnotations: {}
+  # -- Additional labels for the pod
+  # @section -- Delete Topics Job
+  podLabels: {}
+  # -- Service account name for the job
+  # @section -- Delete Topics Job
+  serviceAccountName: ""
+  # -- Image pull secrets
+  # @section -- Delete Topics Job
+  imagePullSecrets: []
+  # -- Pod security context
+  # @section -- Delete Topics Job
+  podSecurityContext: {}
+  # -- Container security context
+  # @section -- Delete Topics Job
+  securityContext: {}
+  # -- Resource requests and limits
+  # @section -- Delete Topics Job
+  resources: {}
+  # -- Extra environment variables (map format, deep-mergeable)
+  # @section -- Delete Topics Job
+  extraEnv: {}
+  # -- Node selector constraints
+  # @section -- Delete Topics Job
+  nodeSelector: {}
+  # -- Pod tolerations
+  # @section -- Delete Topics Job
+  tolerations: []
+  # -- Pod affinity rules
+  # @section -- Delete Topics Job
+  affinity: {}
+
+# -- Array of extra K8s manifests to deploy
+# @section -- Extra Objects
+extraObjects: []
