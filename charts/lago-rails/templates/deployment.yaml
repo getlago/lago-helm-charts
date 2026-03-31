@@ -1,0 +1,363 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "lago-rails.fullname" . }}
+  labels:
+    {{- include "lago-rails.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "lago-rails.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "lago-rails.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "lago-rails.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ default .Chart.Name .Values.container.name }}
+          image: "{{ .Values.image.repository }}:{{ include "lago-rails.version" .}}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: {{ toJson .Values.container.command }}
+          args: {{ toJson .Values.container.args }}
+          envFrom:
+            {{- if .Values.global.streaming_ingestion.enabled }}
+            - configMapRef:
+                name: {{ include "lago-rails.streaming.configMapName" . }}
+            - secretRef:
+                name: {{ include "lago-rails.streaming.secretName" . }}
+            {{- end }}
+            {{- with .Values.extraEnvFrom }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+            - name: RAILS_ENV
+              value: {{ default .Values.global.lago.env .Values.config.env }}
+            - name: LAGO_LOG_LEVEL
+              value: {{ .Values.config.log.level }}
+            - name: RAILS_LOG_TO_STDOUT
+              value: {{ .Values.config.log.stdout | quote }}
+            - name: DATABASE_POOL
+              value: {{ default .Values.global.database.pool .Values.config.database.pool | quote }}
+            - name: LAGO_SIDEKIQ_PRO_REQUIRED
+              value: {{ .Values.global.sidekiq.pro | quote }}
+            - name: LAGO_SIDEKIQ_WEB
+              value: {{ .Values.config.web.sidekiq | quote }}
+            - name: LAGO_DISABLE_SIGNUP
+              value: {{ not .Values.global.lago.signup | quote }}
+            - name: SIDEKIQ_CONCURRENCY
+              value: {{ .Values.config.sidekiq.concurrency | quote }}
+            {{- with .Values.config.web.concurrency }}
+            - name: WEB_CONCURRENCY
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.config.web.maxThreads }}
+            - name: RAILS_MAX_THREADS
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.config.web.minThreads }}
+            - name: RAILS_MIN_THREADS
+              value: {{ . | quote }}
+            {{- end }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: database.uri
+            - name: ENCRYPTION_PRIMARY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: encryption.key
+            - name: ENCRYPTION_KEY_DERIVATION_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: encryption.salt
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: signing.hmac
+            - name: LAGO_RSA_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: signing.rsa
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: redis.uri
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: redis.password
+                  optional: true
+            - name: LAGO_REDIS_CACHE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: redisCache.uri
+                  optional: true
+            - name: LAGO_REDIS_CACHE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: redisCache.password
+                  optional: true
+            - name: LAGO_REDIS_STORE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: redisStore.uri
+                  optional: true
+            - name: LAGO_REDIS_STORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: redisStore.password
+                  optional: true
+            - name: LAGO_LICENSE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: lago.license
+                  optional: true
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: sentryDsn
+                  optional: true
+            - name: SEGMENT_WRITE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: segmentWriteKey
+                  optional: true
+            - name: NANGO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: nango.secretKey
+                  optional: true
+            - name: LAGO_API_URL
+              value: {{ required "global.urls.api value is required" .Values.global.urls.api | quote }}
+            - name: LAGO_FRONT_URL
+              value: {{ required "global.urls.front value is required" .Values.global.urls.front | quote }}
+            - name: SIDEKIQ_ANALYTICS
+              value: {{ .Values.global.sidekiq.queues.analytics | quote }}
+            - name: SIDEKIQ_BILLING
+              value: {{ .Values.global.sidekiq.queues.billing | quote }}
+            - name: SIDEKIQ_CLOCK
+              value: {{ .Values.global.sidekiq.queues.clock | quote }}
+            - name: SIDEKIQ_EVENTS
+              value: {{ .Values.global.sidekiq.queues.events | quote }}
+            - name: SIDEKIQ_WEBHOOK
+              value: {{ .Values.global.sidekiq.queues.webhook | quote }}
+            - name: SIDEKIQ_PDFS
+              value: {{ .Values.global.sidekiq.queues.pdf | quote }}
+            {{- if .Values.global.urls.pdf }}
+            - name: LAGO_PDF_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: pdf.endpoint
+            {{- else }}
+            - name: LAGO_DISABLE_PDF_GENERATION
+              value: {{ not .Values.global.lago.pdfGeneration | quote }}
+            {{- end }}
+            {{- if .Values.global.s3.enabled }}
+            - name: LAGO_USE_AWS_S3
+              value: "true"
+            - name: LAGO_AWS_S3_PATH_STYLE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: s3.pathStyle
+                  optional: true
+            - name: LAGO_AWS_S3_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: s3.endpoint
+                  optional: true
+            - name: LAGO_AWS_S3_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: s3.region
+            - name: LAGO_AWS_S3_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: s3.bucket
+            - name: LAGO_AWS_S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: s3.accessKeyId
+            - name: LAGO_AWS_S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: s3.secretAccessKey
+            {{- end }}
+            {{- if .Values.global.smtp.enabled }}
+            - name: LAGO_FROM_EMAIL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: smtp.from
+            - name: LAGO_SMTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: smtp.port
+            - name: LAGO_SMTP_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: smtp.address
+            - name: LAGO_SMTP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: smtp.username
+                  optional: true
+            - name: LAGO_SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: smtp.password
+                  optional: true
+            {{- end }}
+            {{- if .Values.global.google.enabled}}
+            - name: GOOGLE_AUTH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: google.clientId
+            - name: GOOGLE_AUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: google.clientSecret
+            {{- end }}
+            {{- if .Values.global.gocardless.enabled }}
+            - name: LAGO_OAUTH_PROXY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: gocardless.proxy
+            - name: GOCARDLESS_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: gocardless.clientId
+            - name: GOCARDLESS_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: gocardless.clientSecret
+            {{- end }}
+            {{- if .Values.global.mcp.enabled }}
+            - name: LAGO_MCP_SERVER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: mcp.endpoint
+            - name: MISTRAL_AGENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: mcp.clientId
+            - name: MISTRAL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: mcp.clientSecret
+            {{- end }}
+            {{- if .Values.global.data.enabled }}
+            - name: LAGO_DATA_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: data.endpoint
+            - name: LAGO_DATA_API_BEARER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: data.token
+            {{- end }}
+            {{- range $name, $val := .Values.extraEnv }}
+            {{- if kindIs "map" $val }}
+            - name: {{ $name }}
+              {{- toYaml $val | nindent 14 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- end }}
+          {{- with .Values.container.ports }}
+          ports:
+            - name: http
+              containerPort: {{ .http }}
+              protocol: TCP
+          {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

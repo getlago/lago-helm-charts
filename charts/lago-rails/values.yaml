@@ -1,0 +1,599 @@
+# Default values for lago-rails.
+
+# -- @ignore
+global:
+  lago:
+    # -- Override the application Docker image tag (defaults to Chart appVersion)
+    # @section -- Lago
+    version:
+    # -- Rails environment (`production`, `staging`, `development`)
+    # @section -- Lago
+    env: "production"
+    # -- Lago Premium license key
+    # @section -- Lago
+    license: ""
+    # -- Enable Lago Cloud mode
+    # @section -- Lago
+    cloud: false
+    # -- Enable PDF generation support
+    # @section -- Lago
+    pdfGeneration: false
+
+  sidekiq:
+    # -- Enable Sidekiq Pro (requires valid license)
+    # @section -- Sidekiq
+    pro: false
+    queues:
+      # -- Enable the analytics background queue
+      # @section -- Sidekiq
+      analytics: false
+      # -- Enable the billing background queue
+      # @section -- Sidekiq
+      billing: false
+      # -- Enable the clock background queue
+      # @section -- Sidekiq
+      clock: false
+      # -- Enable the events background queue
+      # @section -- Sidekiq
+      events: false
+      # -- Enable the webhook background queue
+      # @section -- Sidekiq
+      webhook: false
+      # -- Enable the PDF background queue
+      # @section -- Sidekiq
+      pdf: false
+
+  config:
+    # -- Name of an existing Secret for shared configuration (bypasses auto-generated secret)
+    # @section -- Config
+    secret: ""
+    # -- Name of an existing ConfigMap for shared configuration (bypasses auto-generated configmap)
+    # @section -- Config
+    configmap: ""
+
+  urls:
+    # -- Public URL of the Lago API
+    # @section -- URLs
+    api: ""
+    # -- Public URL of the Lago frontend
+    # @section -- URLs
+    front: ""
+    # -- Internal URL of the PDF service (Gotenberg)
+    # @section -- URLs
+    pdf: ""
+
+  database:
+    # -- PostgreSQL connection URI
+    # @section -- Database
+    uri: ""
+    # -- Database connection pool size
+    # @section -- Database
+    pool: 20
+
+  encryption:
+    # -- Primary encryption key (`openssl rand -hex 16`)
+    # @section -- Encryption
+    key: ""
+    # -- Key derivation salt (`openssl rand -hex 16`)
+    # @section -- Encryption
+    salt: ""
+
+  signing:
+    # -- HMAC signing key used by webhooks and message verifier (HS256)
+    # @section -- Signing
+    hmac: ""
+    # -- RSA private key for webhook signatures (RS256), base64-encoded
+    # @section -- Signing
+    rsa: ""
+
+  redis:
+    # -- Redis URI for Sidekiq job queue
+    # @section -- Redis
+    uri: ""
+    # -- Redis password (appended to URI if set)
+    # @section -- Redis
+    password: ""
+
+  redisCache:
+    # -- Redis URI for Rails cache
+    # @section -- Redis
+    uri: ""
+    # -- Redis cache password
+    # @section -- Redis
+    password: ""
+
+  redisStore:
+    # -- Redis URI for ActionCable / general store
+    # @section -- Redis
+    uri: ""
+    # -- Redis store password
+    # @section -- Redis
+    password: ""
+
+  # -- Sentry DSN for error tracking
+  # @section -- Observability
+  sentryDsn: ""
+  # -- Segment write key for analytics
+  # @section -- Observability
+  segmentWriteKey: ""
+
+  nango:
+    # -- Nango secret key for OAuth integrations
+    # @section -- Nango
+    secretKey: ""
+
+  s3:
+    # -- Enable S3-compatible object storage
+    # @section -- S3
+    enabled: false
+    # -- S3 access key ID
+    # @section -- S3
+    accessKeyId: ""
+    # -- S3 secret access key
+    # @section -- S3
+    secretAccessKey: ""
+    # -- S3 bucket name
+    # @section -- S3
+    bucket: ""
+    # -- S3 region
+    # @section -- S3
+    region: "us-east-1"
+    # -- S3 custom endpoint (for MinIO, etc.)
+    # @section -- S3
+    endpoint: ""
+    # -- (bool) Use path-style addressing instead of virtual-hosted-style
+    # @section -- S3
+    pathStyle:
+
+  smtp:
+    # -- Enable SMTP for outbound email
+    # @section -- SMTP
+    enabled: false
+    # -- SMTP username
+    # @section -- SMTP
+    username: ""
+    # -- SMTP password
+    # @section -- SMTP
+    password: ""
+    # -- Sender email address
+    # @section -- SMTP
+    from: ""
+    # -- SMTP port
+    # @section -- SMTP
+    port: 25
+    # -- SMTP server address
+    # @section -- SMTP
+    address: ""
+
+  google:
+    # -- Enable Google OAuth
+    # @section -- Google
+    enabled: false
+    # -- Google OAuth client ID
+    # @section -- Google
+    clientId:
+    # -- Google OAuth client secret
+    # @section -- Google
+    clientSecret:
+
+  gocardless:
+    # -- Enable GoCardless integration
+    # @section -- GoCardless
+    enabled: false
+    # -- GoCardless client ID
+    # @section -- GoCardless
+    clientId:
+    # -- GoCardless client secret
+    # @section -- GoCardless
+    clientSecret:
+    # -- GoCardless API proxy URL
+    # @section -- GoCardless
+    proxy:
+
+  mcp:
+    # -- Enable MCP (Model Context Protocol) integration
+    # @section -- MCP
+    enabled: false
+    # -- MCP client ID
+    # @section -- MCP
+    clientId:
+    # -- MCP client secret
+    # @section -- MCP
+    clientSecret:
+    # -- MCP endpoint URL
+    # @section -- MCP
+    endpoint:
+
+  data:
+    # -- Enable Lago Data analytics
+    # @section -- Data
+    enabled: false
+    # -- Lago Data API token
+    # @section -- Data
+    token:
+    # -- Lago Data API endpoint
+    # @section -- Data
+    endpoint:
+
+  streaming_ingestion:
+    # -- Enable streaming ingestion (ClickHouse + Kafka)
+    # @section -- Streaming Ingestion
+    enabled: false
+    # -- Name of an existing ConfigMap for streaming config
+    # @section -- Streaming Ingestion
+    configmap: ""
+    # -- Name of an existing Secret for streaming credentials
+    # @section -- Streaming Ingestion
+    secret: ""
+
+    clickhouse:
+      # -- ClickHouse username (not required when using an external secret)
+      # @section -- Streaming Ingestion / ClickHouse
+      username: ""
+      # -- ClickHouse password (not required when using an external secret)
+      # @section -- Streaming Ingestion / ClickHouse
+      password: ""
+      # -- ClickHouse native protocol port
+      # @section -- Streaming Ingestion / ClickHouse
+      port: 9000
+      # -- ClickHouse server address
+      # @section -- Streaming Ingestion / ClickHouse
+      address: clickhouse
+      # -- Enable TLS for ClickHouse connections
+      # @section -- Streaming Ingestion / ClickHouse
+      tls: false
+      # -- ClickHouse database name
+      # @section -- Streaming Ingestion / ClickHouse
+      database: default
+
+    kafka:
+      # -- Kafka username (not required when using an external secret)
+      # @section -- Streaming Ingestion / Kafka
+      username: ""
+      # -- Kafka password (not required when using an external secret)
+      # @section -- Streaming Ingestion / Kafka
+      password: ""
+      # -- Enable TLS for Kafka connections
+      # @section -- Streaming Ingestion / Kafka
+      tls: false
+      # -- Kafka SASL mechanism (`SCRAM-SHA-512`, `SCRAM-SHA-256`)
+      # @section -- Streaming Ingestion / Kafka
+      saslMechanisms:
+      # -- Kafka consumer group name
+      # @section -- Streaming Ingestion / Kafka
+      consumerGroup: events_consumer
+      # -- List of Kafka bootstrap servers
+      # @default -- `[]`
+      # @section -- Streaming Ingestion / Kafka
+      bootstrapServers: []
+      topics:
+        # -- Kafka topic for charged-in-advance events
+        # @section -- Streaming Ingestion / Kafka
+        eventsChargedInAdvance: events_charged_in_advance
+        # -- Kafka topic for dead-letter events
+        # @section -- Streaming Ingestion / Kafka
+        eventsDeadLetter: events_dead_letter
+        # -- Kafka topic for enriched events
+        # @section -- Streaming Ingestion / Kafka
+        eventsEnriched: events_enriched
+        # -- Kafka topic for expanded enriched events
+        # @section -- Streaming Ingestion / Kafka
+        eventsEnrichedExpanded: events_enriched_expanded
+        # -- Kafka topic for raw events
+        # @section -- Streaming Ingestion / Kafka
+        eventsRaw: events_raw
+        # -- Kafka topic for activity logs
+        # @section -- Streaming Ingestion / Kafka
+        activityLogs: activity_logs
+        # -- Kafka topic for API logs
+        # @section -- Streaming Ingestion / Kafka
+        apiLogs: api_logs
+        # -- Kafka topic for security logs
+        # @section -- Streaming Ingestion / Kafka
+        securityLogs: securityLogs
+
+# -- Local lago-config subchart settings
+# @default -- See [values.yaml](./values.yaml#L295)
+# @section -- Config
+config:
+  # -- Deploy the lago-config subchart
+  # @section -- Config
+  enabled: true
+  # -- Override the config subchart release name
+  # @section -- Config
+  nameOverride: lago-config
+  log:
+    # -- Log level (`debug`, `info`, `warn`, `error`)
+    # @section -- Config
+    level: info
+    # -- Log to stdout
+    # @section -- Config
+    stdout: true
+
+  database:
+    # -- (int) Override the global database pool size for this instance
+    # @section -- Config
+    pool:
+
+  otel:
+    # -- Enable OpenTelemetry tracing
+    # @section -- Config
+    enabled: false
+    # -- OpenTelemetry collector endpoint
+    # @section -- Config
+    endpoint:
+    # -- OpenTelemetry service name
+    # @section -- Config
+    serviceName:
+    # -- Traces sampler argument (e.g. sampling ratio)
+    # @section -- Config
+    tracesSamplerArg:
+    # -- Traces sampler type (e.g. `parentbased_traceidratio`)
+    # @section -- Config
+    tracesSampler:
+
+  web:
+    # -- (int) Puma maximum threads
+    # @section -- Config
+    maxThreads:
+    # -- (int) Puma minimum threads
+    # @section -- Config
+    minThreads:
+    # -- (int) Puma worker count (processes)
+    # @section -- Config
+    concurrency:
+    # -- Set to true when this instance runs Sidekiq instead of Puma
+    # @section -- Config
+    sidekiq: false
+
+  sidekiq:
+    # -- Enable Sidekiq Pro for this instance
+    # @section -- Config
+    pro: false
+    # -- Maximum dead jobs to retain
+    # @section -- Config
+    maxDeadJobs: 1000000
+    # -- Sidekiq concurrency (threads per process)
+    # @section -- Config
+    concurrency: 5
+
+  configMap:
+    # -- Use an existing ConfigMap by name (bypasses generated configmap)
+    # @section -- Config
+    name: ""
+  secret:
+    # -- Use an existing Secret by name (bypasses generated secret)
+    # @section -- Config
+    name: ""
+
+container:
+  # -- Override the container name (defaults to chart fullname)
+  # @section -- Container
+  name: ""
+  # -- Container entrypoint command
+  # @section -- Container
+  command: ["./scripts/start.api.sh"]
+  # -- Container command arguments
+  # @section -- Container
+  args: []
+  ports:
+    # -- HTTP container port
+    # @section -- Container
+    http: 3000
+
+# -- Number of replicas (ignored when autoscaling is enabled)
+# @section -- Deployment
+replicaCount: 1
+
+image:
+  # -- Container image repository
+  # @section -- Image
+  repository: getlago/api
+  # -- Image pull policy
+  # @section -- Image
+  pullPolicy: IfNotPresent
+  # -- Override the image tag (defaults to Chart appVersion)
+  # @section -- Image
+  tag:
+
+# -- Image pull secrets for private registries
+# @default -- `[]`
+# @section -- Image
+imagePullSecrets: []
+# -- Override the chart name
+# @section -- Deployment
+nameOverride: ""
+# -- Override the full release name
+# @section -- Deployment
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Create a ServiceAccount
+  # @section -- Service Account
+  create: true
+  # -- Automount the ServiceAccount API credentials
+  # @section -- Service Account
+  automount: true
+  # -- Annotations to add to the ServiceAccount
+  # @section -- Service Account
+  annotations: {}
+  # -- ServiceAccount name (generated from fullname if not set)
+  # @section -- Service Account
+  name: ""
+
+# -- Additional pod annotations
+# @section -- Pod
+podAnnotations: {}
+# -- Additional pod labels
+# @section -- Pod
+podLabels: {}
+
+# -- Pod-level security context
+# @section -- Pod
+podSecurityContext: {}
+
+# -- Container-level security context
+# @section -- Pod
+securityContext: {}
+
+# -- Extra environment variables (map format, deep-mergeable)
+# @section -- Pod
+extraEnv: {}
+  # Simple value:
+  #   MY_VAR: "value"
+  # From a Secret:
+  #   MY_SECRET:
+  #     valueFrom:
+  #       secretKeyRef:
+  #         name: secret-name
+  #         key: secret-key
+  # From a ConfigMap:
+  #   MY_CONFIG:
+  #     valueFrom:
+  #       configMapKeyRef:
+  #         name: configmap-name
+  #         key: config-key
+
+# -- Extra envFrom sources
+# @default -- `[]` (See [values.yaml])
+# @section -- Pod
+extraEnvFrom: []
+  # - configMapRef:
+  #     name: config-map-name
+  # - secretRef:
+  #     name: secret-name
+
+service:
+  # -- Create a Service
+  # @section -- Service
+  enabled: true
+  # -- Service type (`ClusterIP`, `NodePort`, `LoadBalancer`)
+  # @section -- Service
+  type: ClusterIP
+  # -- Service port
+  # @section -- Service
+  port: 80
+
+ingress:
+  # -- Enable Ingress
+  # @section -- Ingress
+  enabled: false
+  # -- Ingress class name
+  # @section -- Ingress
+  className: ""
+  # -- Ingress annotations
+  # @section -- Ingress
+  annotations: {}
+  # -- Ingress host rules
+  # @default -- See [values.yaml](./values.yaml#L487)
+  # @section -- Ingress
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  # -- Ingress TLS configuration
+  # @section -- Ingress
+  tls: []
+
+# -- Expose the service via Gateway API HTTPRoute
+# @default -- See [values.yaml](./values.yaml#L499)
+# @section -- HTTPRoute
+httpRoute:
+  # -- Enable HTTPRoute
+  # @section -- HTTPRoute
+  enabled: false
+  # -- HTTPRoute annotations
+  # @section -- HTTPRoute
+  annotations: {}
+  # -- Parent gateway references
+  # @default -- See [values.yaml](./values.yaml#L509)
+  # @section -- HTTPRoute
+  parentRefs:
+  - name: gateway
+    sectionName: http
+  # -- Hostnames to match
+  # @section -- HTTPRoute
+  hostnames:
+  - chart-example.local
+  # -- Routing rules and filters
+  # @default -- See [values.yaml](./values.yaml#L519)
+  # @section -- HTTPRoute
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /headers
+
+# -- Resource requests and limits
+# @section -- Pod
+resources: {}
+
+# -- Liveness probe configuration
+# @default -- See [values.yaml](./values.yaml#L532)
+# @section -- Pod
+livenessProbe:
+  failureThreshold: 5
+  httpGet:
+    path: /health
+    port: http
+    scheme: HTTP
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  successThreshold: 1
+  timeoutSeconds: 1
+# -- Readiness probe configuration
+# @default -- See [values.yaml](./values.yaml#L545)
+# @section -- Pod
+readinessProbe:
+  failureThreshold: 3
+  httpGet:
+    path: /health
+    port: http
+    scheme: HTTP
+  initialDelaySeconds: 10
+  periodSeconds: 3
+  successThreshold: 1
+  timeoutSeconds: 1
+
+autoscaling:
+  # -- Enable Horizontal Pod Autoscaler
+  # @section -- Autoscaling
+  enabled: false
+  # -- Set to true when using an external autoscaler (e.g. KEDA) to skip built-in HPA
+  # @section -- Autoscaling
+  external: false
+  # -- Minimum replicas
+  # @section -- Autoscaling
+  minReplicas: 1
+  # -- Maximum replicas
+  # @section -- Autoscaling
+  maxReplicas: 100
+  # -- Target CPU utilization percentage
+  # @section -- Autoscaling
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# -- Additional volumes
+# @section -- Pod
+volumes: []
+
+# -- Additional volume mounts
+# @section -- Pod
+volumeMounts: []
+
+# -- Node selector constraints
+# @section -- Pod
+nodeSelector: {}
+
+# -- Pod tolerations
+# @section -- Pod
+tolerations: []
+
+# -- Pod affinity rules
+# @section -- Pod
+affinity: {}
+
+# -- Array of extra K8s manifests to deploy
+# @section -- Extra Objects
+extraObjects: []
