@@ -1,0 +1,44 @@
+suite: Test lago-config helpers are resolved correctly from subcharts
+templates:
+  - charts/api/templates/deployment.yaml
+
+tests:
+  - it: should use global.config.secret when set (not hardcoded default)
+    set:
+      global:
+        lago:
+          env: production
+          version: v1.0.0
+        config:
+          configmap: custom-configmap-name
+          secret: custom-secret-name
+        urls:
+          api: http://api.test
+          front: http://front.test
+        database:
+          uri: postgresql://localhost
+        encryption:
+          key: test-key
+          salt: test-salt
+        signing:
+          hmac: test-hmac
+          rsa: test-rsa
+        redis:
+          uri: redis://localhost
+        redisCache:
+          uri: redis://localhost
+        redisStore:
+          uri: redis://localhost
+      config:
+        secret:
+          create: false
+      api:
+        config:
+          enabled: false
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_URL")].valueFrom.secretKeyRef.name
+          value: custom-secret-name
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "REDIS_URL")].valueFrom.configMapKeyRef.name
+          value: custom-configmap-name
