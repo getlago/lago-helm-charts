@@ -1,0 +1,4 @@
+# Required values for lago-events-processor-worker tests
+global:
+  streaming_ingestion:
+    enabled: true
