@@ -1,22 +1,83 @@
 version: 3
 
 vars:
-  VERSION: v1.32.4
+  VERSION: v1.41.2
   IMAGES:
     map:
-      postgres: postgres:15-alpine
+      postgres: getlago/postgres-partman:15.0-alpine
+      busybox: busybox:1.37
       redis: redis:7-alpine
       api: getlago/api:{{.VERSION}}
-      front: getlago/front:{{.VERSION}}
+      front: getlago/front:v1.41.0
       gotenberg: getlago/lago-gotenberg:8.15
+  CHARTS:
+    map:
+      # Base configs (no dependencies)
+      lago-config: ""
+      lago-data-config: ""
+      # Components depending on configs
+      lago-rails: deployment
+      lago-front: deployment
+      lago-events-processor-worker: deployment
+      lago-data-api: deployment
+      lago-data-worker: deployment
+      lago-data-forecasted-usage: cronjob
+      lago-mcp-server: deployment
+      lago-pdf: ""
+      # Umbrella charts (depend on components)
+      lago-data: ""
+      lago: ""
+      # Top-level (depends on umbrella charts)
+      lago-staging: ""
 
 tasks:
+  dependencies:update:
+    desc: Update all chart dependencies (removes stale Chart.lock files first)
+    sources:
+      - charts/*/Chart.yaml
+      - charts/*/values.yaml
+      - charts/*/templates/**/*
+    generates:
+      - charts/*/Chart.lock
+    cmds:
+      - for:
+          var: CHARTS
+        cmd: rm -f charts/{{.KEY}}/Chart.lock
+      - for:
+          var: CHARTS
+        cmd: helm dependency update charts/{{.KEY}}
+
   lint:
-    desc: Lint the chart
+    desc: Lint changed charts (compared to target branch)
     preconditions:
       - sh: command -v ct
         msg: "❌ chart-testing not found (see: https://github.com/helm/chart-testing)"
-    cmd: ct lint --config ct.yaml
+    cmd: ct lint --config tools/ct.yaml
+
+  lint:all:
+    desc: Lint all charts
+    preconditions:
+      - sh: command -v ct
+        msg: "❌ chart-testing not found (see: https://github.com/helm/chart-testing)"
+    cmd: ct lint --all --config tools/ct.yaml
+
+  docs:*:
+    desc: Generate README for a specific chart (e.g. task docs:lago)
+    vars:
+      CHART: '{{index .MATCH 0}}'
+    preconditions:
+      - sh: command -v helm-docs
+        msg: "❌ helm-docs not found (see: https://github.com/norwoodj/helm-docs)"
+      - sh: '[ -d "charts/{{.CHART}}" ]'
+        msg: "❌ Chart directory charts/{{.CHART}} does not exist"
+    cmd: helm-docs -c charts -g charts/{{.CHART}} -s file
+
+  docs:
+    desc: Generate README for all charts
+    preconditions:
+      - sh: command -v helm-docs
+        msg: "❌ helm-docs not found (see: https://github.com/norwoodj/helm-docs)"
+    cmd: helm-docs -c charts -s file
 
   # https://github.com/kubernetes-sigs/kind/issues/3795
   kind:images:apple_silicon:*_*:
@@ -65,12 +126,40 @@ tasks:
     desc: Delete the kind cluster
     cmd: kind delete cluster --name lago
 
+  test:unit:*:
+    internal: true
+    vars:
+      CHART: '{{index .MATCH 0}}'
+      CHART_TYPE: '{{index .CHARTS .CHART}}'
+    deps:
+      - dependencies:update:{{.CHART}}
+    cmds:
+      - cmd: '{{if .CHART_TYPE}}cp tests-common/{{.CHART_TYPE}}/common_patterns_test.yaml charts/{{.CHART}}/tests/{{end}}'
+      - defer: rm -f charts/{{.CHART}}/tests/common_patterns_test.yaml
+      - untt ./charts/{{.CHART}}
+
+  dependencies:update:*:
+    internal: true
+    vars:
+      CHART: '{{index .MATCH 0}}'
+    cmd: helm dependency update charts/{{.CHART}}
+
   test:unit:
-    desc: Run unit tests for the
+    desc: Run unit tests for the charts
     preconditions:
-      - sh: helm unittest -h
-        msg: "❌ helm unittest not found (see: https://github.com/helm-unittest/helm-unittest)"
-    cmd: helm unittest ./charts/lago
+      - sh: command -v untt
+        msg: "❌ untt not found (see: https://github.com/helm-unittest/helm-unittest)"
+    deps:
+      - test:unit:lago-config
+      - test:unit:lago-rails
+      - test:unit:lago-front
+      - test:unit:lago-events-processor-worker
+      - test:unit:lago-data-api
+      - test:unit:lago-data-worker
+      - test:unit:lago-mcp-server
+      - test:unit:lago-data-forecasted-usage
+      - test:unit:lago-pdf
+      - test:unit:lago
 
   test:e2e:
     desc: Create a kind cluster and deploy the chart
@@ -81,18 +170,16 @@ tasks:
         msg: "❌ chart-testing not found (see: https://github.com/helm/chart-testing)"
     cmds:
       - task: kind:up
-      - kubectl apply -f charts/lago/ci/postgres.yml
-      - kubectl apply -f charts/lago/ci/redis.yml
-      - ct install --config ct.yaml --namespace default
+      - ct install --config tools/ct.yaml --namespace default --charts charts/lago
 
   render:
-    cmd: >
-      helm template lago ./charts/lago
-      --set apiUrl=http://localhost:3000
-      --set frontUrl=http://localhost:3000
-      --set global.databaseUrl=postgres://postgres:postgres@localhost:5432/postgres
-      --set global.redisUrl=redis://localhost:6379
-      {{join " " .CLI_ARGS_LIST}}
+    desc: Render the lago chart from local directory with basic_workers example values
+    deps: [dependencies:update]
+    cmds:
+      - >
+        helm template lago ./charts/lago
+        -f charts/lago/examples/basic_workers.yaml
+        {{join " " .CLI_ARGS_LIST}}
 
   render:clickhouse:
     cmds:
@@ -101,3 +188,60 @@ tasks:
           CLI_ARGS_LIST: >
             --set global.clickhouse.enabled=true {{.CLI_ARGS}}
             --set global.clickhouse.kafka.bootstrapServers[0]=kafka-server:9092
+
+  render:oci:
+    desc: Render the lago chart from the OCI registry with basic_workers example values
+    vars:
+      REGISTRY: '{{.REGISTRY | default "oci://ghcr.io/getlago/helm-charts"}}'
+      CHART_VERSION:
+        sh: grep '^version:' charts/lago/Chart.yaml | awk '{print $2}'
+      OCI_VERSION: '{{.OCI_VERSION | default .CHART_VERSION}}'
+    cmds:
+      - >
+        helm template lago {{.REGISTRY}}/lago
+        --version {{.OCI_VERSION}}
+        -f charts/lago/examples/basic_workers.yaml
+        {{join " " .CLI_ARGS_LIST}}
+
+  # OCI Local Build
+  oci:build:*:
+    desc: Package a specific chart locally for testing (e.g. task oci:build:lago)
+    vars:
+      CHART: '{{index .MATCH 0}}'
+      SHA:
+        sh: git rev-parse --short HEAD
+      DIRTY:
+        sh: git diff --quiet && git diff --staged --quiet || echo "-dirty"
+      BUILD_VERSION: '{{.SHA}}{{.DIRTY}}'
+      CHART_VERSION:
+        sh: grep '^version:' charts/{{index .MATCH 0}}/Chart.yaml | awk '{print $2}'
+    preconditions:
+      - sh: '[ -d "charts/{{.CHART}}" ]'
+        msg: "Chart directory charts/{{.CHART}} does not exist"
+    deps:
+      - dependencies:update
+    cmds:
+      - mkdir -p .helm-packages
+      - helm package charts/{{.CHART}} --destination .helm-packages
+      - mv .helm-packages/{{.CHART}}-{{.CHART_VERSION}}.tgz .helm-packages/{{.CHART}}-{{.BUILD_VERSION}}.tgz
+      - cmd: |
+          echo ""
+          echo "Built {{.CHART}}-{{.BUILD_VERSION}}.tgz"
+          echo ""
+          echo "  helm install {{.CHART}} .helm-packages/{{.CHART}}-{{.BUILD_VERSION}}.tgz -f <values>"
+          echo "  helm template {{.CHART}} .helm-packages/{{.CHART}}-{{.BUILD_VERSION}}.tgz -f <values>"
+        silent: true
+
+  oci:build:
+    desc: Package the lago umbrella chart locally for testing
+    cmds:
+      - task: oci:build:lago
+
+  install:
+    desc: Install the lago chart from local directory with basic_workers example values
+    deps: [dependencies:update]
+    cmds:
+      - >
+        helm install lago ./charts/lago
+        -f charts/lago/examples/basic_workers.yaml
+        {{join " " .CLI_ARGS_LIST}}
