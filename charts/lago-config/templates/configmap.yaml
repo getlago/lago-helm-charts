@@ -1,0 +1,54 @@
+{{- if .Values.configmap.create -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "lago-config.configMapName" . }}
+  labels:
+    {{- include "lago-config.labels" . | nindent 4 }}
+    {{- with .Values.configmap.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.configmap.annotations }}
+  annotations:
+    {{- range $key, $value := . }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}
+data:
+  {{- with .Values.global.redis.uri }}
+  redis.uri: {{ . }}
+  {{- end }}
+  {{- with .Values.global.redisCache.uri }}
+  redisCache.uri: {{ . }}
+  {{- end }}
+  {{- with .Values.global.redisStore.uri }}
+  redisStore.uri: {{ . }}
+  {{- end }}
+  {{- with .Values.global.urls.pdf }}
+  pdf.endpoint: {{ . }}
+  {{- end }}
+  {{- if .Values.global.s3.enabled }}
+  s3.bucket: {{ required "global.s3.bucket is required" .Values.global.s3.bucket }}
+  s3.region: {{ required "global.s3.region is required" .Values.global.s3.region }}
+  {{- with .Values.global.s3.endpoint }}
+  s3.endpoint: {{ . }}
+  {{- end }}
+  {{- with .Values.global.s3.pathStyle }}
+  s3.pathStyle: {{ . }}
+  {{- end }}
+  {{- end }}
+  {{- if .Values.global.smtp.enabled }}
+  smtp.port: {{ .Values.global.smtp.port | quote | required "global.smtp.port is required" }}
+  smtp.address: {{ required "global.smtp.address is required" .Values.global.smtp.address }}
+  smtp.from: {{ required "global.smtp.from is required" .Values.global.smtp.from }}
+  {{- end }}
+  {{- if .Values.global.gocardless.enabled }}
+  gocardless.proxy: {{ required "global.gocardless.proxy is required" .Values.global.gocardless.proxy }}
+  {{- end }}
+  {{- if .Values.global.mcp.enabled }}
+  mcp.endpoint: {{ required "global.mcp.endpoint is required" .Values.global.mcp.endpoint }}
+  {{- end }}
+  {{- if .Values.global.data.enabled }}
+  data.endpoint: {{ required "global.data.endpoint is required" .Values.global.data.endpoint }}
+  {{- end }}
+{{- end }}
