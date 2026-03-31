@@ -1,0 +1,208 @@
+# Default values for lago-data-worker.
+
+global:
+  databaseAnalytical:
+    # -- Analytical database host
+    # @section -- Analytical Database
+    host: ""
+    # -- Analytical database name
+    # @section -- Analytical Database
+    name: ""
+    # -- Analytical database user
+    # @section -- Analytical Database
+    user: ""
+    # -- Analytical database password
+    # @section -- Analytical Database
+    password: ""
+    # -- Analytical database port
+    # @section -- Analytical Database
+    port: 5432
+    # -- Analytical database schema
+    # @section -- Analytical Database
+    schema: analytical
+
+  forecastedUsage:
+    # -- Enable forecasted usage feature (defaults to true when data-worker is deployed)
+    # @section -- Forecasted Usage
+    enabled: true
+    # -- Lago API token for forecasted usage calls
+    # @section -- Forecasted Usage
+    api_token:
+    celery:
+      # -- Celery broker URL
+      # @section -- Forecasted Usage
+      brokerUrl: ""
+      # -- Celery result backend URL
+      # @section -- Forecasted Usage
+      resultBackend: ""
+
+  dbtPipeline:
+    # -- Enable dbt pipeline
+    # @section -- dbt Pipeline
+    enabled: false
+    # -- Source schema for dbt pipeline
+    # @section -- dbt Pipeline
+    sourceSchema: public
+    # -- Target schema for dbt pipeline
+    # @section -- dbt Pipeline
+    targetSchema: analytical
+    # -- Tables to replicate
+    # @section -- dbt Pipeline
+    tables: []
+
+  databaseReplica:
+    # -- Replica database host
+    # @section -- Replica Database
+    host: ""
+    # -- Replica database name
+    # @section -- Replica Database
+    name: ""
+    # -- Replica database user
+    # @section -- Replica Database
+    user: ""
+    # -- Replica database password
+    # @section -- Replica Database
+    password: ""
+    # -- Replica database port
+    # @section -- Replica Database
+    port: 5432
+
+  data:
+    # -- Name of an existing ConfigMap for data configuration
+    # @section -- Data
+    configmap:
+    # -- Name of an existing Secret for data configuration
+    # @section -- Data
+    secret:
+    # -- API token to validate calls from lago-api
+    # @section -- Data
+    token:
+
+config:
+  # -- Deploy the data-config subchart
+  # @section -- Config
+  enabled: true
+  api:
+    # -- Lago API URL for the data worker
+    # @section -- Config
+    url: ""
+
+# -- Number of replicas (ignored when autoscaling is enabled)
+# @section -- Deployment
+replicaCount: 1
+
+image:
+  # -- Container image repository
+  # @section -- Image
+  repository: getlago/data-worker
+  # -- Image pull policy
+  # @section -- Image
+  pullPolicy: IfNotPresent
+  # -- Override the image tag (defaults to Chart appVersion)
+  # @section -- Image
+  tag: ""
+
+# -- Image pull secrets for private registries
+# @default -- `[]`
+# @section -- Image
+imagePullSecrets: []
+# -- Override the chart name
+# @section -- Deployment
+nameOverride: ""
+# -- Override the full release name
+# @section -- Deployment
+fullnameOverride: ""
+
+container:
+  # -- Override the container name (defaults to chart fullname)
+  # @section -- Container
+  name: ""
+  # -- Container entrypoint command
+  # @section -- Container
+  command: ["uv"]
+  # -- Container command arguments
+  # @section -- Container
+  args: ["run", "python", "worker/start_worker.py"]
+
+serviceAccount:
+  # -- Create a ServiceAccount
+  # @section -- Service Account
+  create: true
+  # -- Automount the ServiceAccount API credentials
+  # @section -- Service Account
+  automount: true
+  # -- Annotations to add to the ServiceAccount
+  # @section -- Service Account
+  annotations: {}
+  # -- ServiceAccount name (generated from fullname if not set)
+  # @section -- Service Account
+  name: ""
+
+# -- Additional pod annotations
+# @section -- Pod
+podAnnotations: {}
+# -- Additional pod labels
+# @section -- Pod
+podLabels: {}
+
+# -- Pod-level security context
+# @section -- Pod
+podSecurityContext: {}
+
+# -- Container-level security context
+# @section -- Pod
+securityContext: {}
+
+# -- Resource requests and limits
+# @section -- Pod
+resources: {}
+
+# -- Extra environment variables (map format, deep-mergeable)
+# @section -- Pod
+extraEnv: {}
+
+# -- Extra envFrom sources
+# @default -- `[]` (See [values.yaml])
+# @section -- Pod
+extraEnvFrom: []
+
+# -- Liveness probe configuration
+# @section -- Pod
+livenessProbe: {}
+
+autoscaling:
+  # -- Enable Horizontal Pod Autoscaler
+  # @section -- Autoscaling
+  enabled: false
+  # -- Set to true when using an external autoscaler (e.g. KEDA) to skip built-in HPA
+  # @section -- Autoscaling
+  external: false
+  # -- Minimum replicas
+  # @section -- Autoscaling
+  minReplicas: 1
+  # -- Maximum replicas
+  # @section -- Autoscaling
+  maxReplicas: 100
+  # -- Target CPU utilization percentage
+  # @section -- Autoscaling
+  targetCPUUtilizationPercentage: 80
+
+# -- Additional volumes
+# @section -- Pod
+volumes: []
+
+# -- Additional volume mounts
+# @section -- Pod
+volumeMounts: []
+
+# -- Node selector constraints
+# @section -- Pod
+nodeSelector: {}
+
+# -- Pod tolerations
+# @section -- Pod
+tolerations: []
+
+# -- Pod affinity rules
+# @section -- Pod
+affinity: {}
