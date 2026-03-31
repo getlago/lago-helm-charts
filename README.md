@@ -1,399 +1,156 @@
-# Lago Helm Chart
+# Lago Helm Charts
 
-This Helm chart deploys the Lago billing system with optional dependencies on MinIO. Below are details about configuring the chart for different environments.
-
+Helm charts for deploying [Lago](https://getlago.com), the open-source billing platform, on Kubernetes.
 
 ## Prerequisites
 
 - Kubernetes 1.19+
 - Helm 3.5+
-- Persistent storage provisioner enabled in the cluster
-- Optionally: Minio service for staging environments
+- PostgreSQL (managed recommended for production)
+- Redis (managed recommended for production)
+- S3-compatible object storage (recommended for production)
 
-:warning: Please note that we strongly recommend to use managed PostgreSQL, Redis and S3 in a production environment.
-
-## Installation
-
-To install the chart with the release name `my-lago-release`:
+## Repository Structure
 
 ```
-helm install my-lago-release .
+charts/
+  lago/                           # Main umbrella chart (start here)
+    examples/                     # Example value overlays
+  lago-config/                    # Shared ConfigMap/Secret (library)
+  lago-rails/                     # API + Sidekiq workers (reused via aliases)
+  lago-front/                     # Frontend (React)
+  lago-pdf/                       # PDF generation (worker + Gotenberg)
+  lago-events-processor-worker/   # Streaming ingestion (Kafka)
+  lago-mcp-server/                # MCP server (AI assistant)
+  lago-data/                      # Data umbrella chart (analytics)
+  lago-data-api/                  # Data API (FastAPI)
+  lago-data-worker/               # Data worker (Celery)
+  lago-data-config/               # Data shared config
+  lago-data-forecasted-usage/     # ML forecasting CronJob
+  lago-staging/                   # Staging umbrella (Lago + Data + deps)
 ```
-You can customize the installation by overriding values in `values.yaml` with your own. The full list of configurable parameters can be found in the following sections.
 
-### Sample Command
+The [`lago`](./charts/lago/) umbrella chart is the main entry point. It wires together all core components (API, frontend, clock, workers, PDF) via subchart aliases. See its [README](./charts/lago/README.md) for the full list of configurable values.
 
-```sh
-helm install my-lago-release . \
-  --set apiUrl=mydomain.dev \
-  --set frontUrl=mydomain.dev
+## Quick Start
+
+### Minimal deployment
+
+Install with the required secrets (database, redis, encryption keys):
+
+```bash
+helm install lago ./charts/lago -f charts/lago/examples/basic.yaml
 ```
 
-## Development Setup
+See [`charts/lago/examples/basic.yaml`](./charts/lago/examples/basic.yaml) for the minimal set of required values.
 
-You can use the provided `Taskfile.yaml` to easily set up a local development environment with [Task](https://taskfile.dev/).
+### With dedicated Sidekiq workers
 
-### Prerequisites
+Split Sidekiq queues into dedicated worker deployments for better isolation and scaling:
 
-- [Task](https://taskfile.dev/) installed (`brew install go-task` or see their docs)
-- [kind](https://kind.sigs.k8s.io/) (Kubernetes in Docker)
-- [kubectl](https://kubernetes.io/docs/tasks/tools/)
-- [helm](https://helm.sh/)
-- [ct (chart-testing)](https://github.com/helm/chart-testing)
-- [helm-unittest](https://github.com/helm-unittest/helm-unittest)
+```bash
+helm install lago ./charts/lago -f charts/lago/examples/basic_workers.yaml
+```
 
-### Use Taskfile
+See [`charts/lago/examples/basic_workers.yaml`](./charts/lago/examples/basic_workers.yaml) which enables billing, clock, events, webhook, and PDF workers.
 
-- List all task: `task --list`
-- Run end to end tests: `task e2e`
-- Run lint: `task lint`
-- ...
+### Production (resources + autoscaling)
+
+Layer resource requests/limits and HPA autoscaling on top of the workers config:
+
+```bash
+helm install lago ./charts/lago \
+  -f charts/lago/examples/basic_workers.yaml \
+  -f charts/lago/examples/basic_workers_resources.yaml
+```
+
+For higher minimum replicas matching production recommendations:
+
+```bash
+helm install lago ./charts/lago \
+  -f charts/lago/examples/basic_workers.yaml \
+  -f charts/lago/examples/basic_workers_resources.yaml \
+  -f charts/lago/examples/basic_workers_scaled.yaml
+```
+
+### With streaming ingestion (Kafka + ClickHouse)
+
+```bash
+helm install lago ./charts/lago -f charts/lago/examples/streaming_ingestion.yaml
+```
 
 ## Configuration
 
-### Global Parameters
+Each chart has a `values.yaml` with full documentation. See the individual chart READMEs:
 
-| Parameter                        | Description                                                                                             | Default           |
-|----------------------------------|---------------------------------------------------------------------------------------------------------|-------------------|
-| `global.license`                 | Lago Premium License key                                                                                | `""`              |
-| `global.databaseUrl`             | PostgreSQL connection string, should follow this format: postgresql://USER:PASSWORD@HOST:PORT/DB        | `""`              |
-| `global.redisUrl`                | Redis connection string, should follow this format: redis://... or redis+sentinel://...                 | `""`              |
-| `global.existingSecret`          | Name of the secret containing sensitive values (database URL, Redis URL, AWS keys, SMTP credentials)    | `""`              |
-| `global.s3.enabled`              | Enable S3 storage for file uploads                                                                      | `false`           |
-| `global.s3.accessKeyId`          | AWS S3 access key ID (not required if using existing secret)                                            | `""`              |
-| `global.s3.secretAccessKey`      | AWS S3 secret access key (not required if using existing secret)                                        | `""`              |
-| `global.s3.bucket`               | AWS S3 bucket name                                                                                      | `""`              |
-| `global.smtp.enabled`            | Enable SMTP configuration for email sending                                                             | `false`           |
-| `global.signup.enabled`          | Enable or disable Lago's signup feature                                                                 | `true`            |
-| `global.googleAuth.enabled`      | Enable or disable logging through Google Auth                                                           | `true`            |
-| `global.ingress.enabled`         | Enable ingress resources for the application                                                            | `false`           |
-| `global.kubectl.imageRegistry`   | Docker registry with kubectl image (for init containers)                                                | `docker.io`       |
-| `global.kubectl.imageRepository` | Docker repository with kubectl image (for init containers)                                              | `rancher/kubectl` |
-| `global.kubectl.imageTag`        | Tag of kubectl Docker image (for init containers) - if unset (default) it is set to k8s cluster version | `""`              |
-| `global.clickhouse.enabled`                | Enable ClickHouse integration within Lago                                      | `false`             |
-| `global.clickhouse.kafka.tls`              | Enable TLS support for Kafka when using ClickHouse                             | `true `             |
-| `global.clickhouse.kafka.saslMechanisms`   | Kafka SASL mechanism                                                           | `"SCRAM-SHA-512"`   |
-| `global.clickhouse.kafka.securityProtocol` | Kafka Security protocol                                                        | `"SASL_SSL"`        |
-| `global.clickhouse.kafka.consumerGroup`    | Kafka consumer group name                                                      | `"events_consumer"` |
-| `global.clickhouse.kafka.boostrapServers`  | *(Required)* Kafka list of endpoints                                           | `[]`                |
-| `global.clickhouse.kafka.topics`           | Dictionary of Kafka topics                                                     | {...}               |
+| Chart | Description |
+|-------|-------------|
+| [lago](./charts/lago/README.md) | Main umbrella chart with all global and per-component values |
+| [lago-rails](./charts/lago-rails/README.md) | API server and Sidekiq workers |
+| [lago-front](./charts/lago-front/README.md) | Frontend application |
+| [lago-pdf](./charts/lago-pdf/README.md) | PDF generation stack (worker + Gotenberg) |
+| [lago-events-processor-worker](./charts/lago-events-processor-worker/README.md) | Kafka events processor |
+| [lago-mcp-server](./charts/lago-mcp-server/README.md) | MCP AI assistant server |
+| [lago-config](./charts/lago-config/README.md) | Shared ConfigMap and Secret |
+| [lago-data](./charts/lago-data/README.md) | Data/analytics umbrella chart |
+| [lago-data-api](./charts/lago-data-api/README.md) | Data API |
+| [lago-data-worker](./charts/lago-data-worker/README.md) | Data worker |
+| [lago-data-forecasted-usage](./charts/lago-data-forecasted-usage/README.md) | ML forecasting CronJob |
 
-### Frontend Configuration
+## Development
 
-| Parameter                           | Description                                         | Default      |
-|-------------------------------------|-----------------------------------------------------|--------------|
-| `front.tolerations`                 | Pod tolerations for Frontend pods                  | `[]`         |
-| `front.nodeSelector`                | Node selector for Frontend pods                    | `{}`         |
-| `front.affinity`                    | Affinity rules for Frontend pods                   | `{}`         |
-| `front.replicas`                    | Number of frontend replicas                        | `1`          |
-| `front.service.port`                | Frontend service port                              | `80`         |
-| `front.resources.requests.memory`   | Memory request for the frontend                   | `512Mi`      |
-| `front.resources.requests.cpu`      | CPU request for the frontend                      | `200m`       |
-| `front.podAnnotations`              | Annotations to add to the frontend pod            | `{}`         |
-| `front.podLabels`                   | Labels to add to the frontend pod                 | `{}`         |
+### Prerequisites
 
+- [Task](https://taskfile.dev/) (`brew install go-task`)
+- [kind](https://kind.sigs.k8s.io/) (`brew install kind`)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [Helm](https://helm.sh/)
+- [ct (chart-testing)](https://github.com/helm/chart-testing)
+- [helm-unittest](https://github.com/helm-unittest/helm-unittest)
+- [helm-docs](https://github.com/norwoodj/helm-docs) (for README generation)
 
+### Local cluster with kind
 
-### API Configuration
-
-| Parameter                           | Description                                         | Default      |
-|-------------------------------------|-----------------------------------------------------|--------------|
-| `api.tolerations`                   | Pod tolerations for API pods                       | `[]`         |
-| `api.nodeSelector`                  | Node selector for API pods                         | `{}`         |
-| `api.affinity`                      | Affinity rules for API pods                        | `{}`         |
-| `api.replicas`                      | Number of API replicas                             | `1`          |
-| `api.service.port`                  | API service port                                   | `3000`       |
-| `api.rails.maxThreads`              | Maximum number of threads for the Rails app        | `10`         |
-| `api.rails.webConcurrency`          | Web concurrency setting for Rails                 | `4`          |
-| `api.rails.env`                     | Rails environment                                  | `production` |
-| `api.rails.logStdout`               | Enable or disable logging to stdout                | `true`       |
-| `api.rails.logLevel`                | Log level for the Rails app                        | `error`      |
-| `api.sidekiqWeb.enabled`            | Enable or disable Sidekiq Web                      | `true`       |
-| `api.resources.requests.memory`     | Memory request for the API                         | `1Gi`        |
-| `api.resources.requests.cpu`        | CPU request for the API                            | `1000m`      |
-| `api.volumes.storageClassName`      | Storage class name API's persistent storage        | `""`         |
-| `api.volumes.accessModes`           | Access mode for the API's persistent storage       | `ReadWriteOnce` |
-| `api.volumes.storage`               | Storage size for the API's persistent volume claim | `10Gi`       |
-| `api.podAnnotations`                | Annotations to add to the API pod                  | `{}`         |
-| `api.podLabels`                     | Labels to add to the API pod                       | `{}`         |
-| `api.livenessProbe.enabled`         | Enable or disable liveness probe                   | `true`       |
-| `api.livenessProbe.httpPath`        | HTTP path for liveness probe                       | `/health`    |
-| `api.livenessProbe.httpPort`        | HTTP port for liveness probe                       | `3000`       |
-| `api.livenessProbe.initialDelaySeconds` | Liveness probe initial delay                   | `0`          |
-| `api.livenessProbe.periodSeconds`       | Liveness probe period                          | `10`         |
-| `api.livenessProbe.timeoutSeconds`      | Liveness probe timeout                         | `1`          |
-| `api.livenessProbe.failureThreshold`    | Liveness probe failure threshold               | `3`          |
-
-
-### Worker Configuration
-
-| Parameter                          | Description                                        | Default   |
-|-------------------------------------|----------------------------------------------------|-----------|
-| `worker.tolerations`                | Pod tolerations for Worker pods                   | `[]`      |
-| `worker.nodeSelector`               | Node selector for Worker pods                     | `{}`      |
-| `worker.affinity`                   | Affinity rules for Worker pods                    | `{}`      |
-| `worker.replicas`                   | Number of Worker replicas                         | `1`       |
-| `worker.rails.sidekiqConcurrency`   | Sidekiq concurrency for Worker                   | `100`     |
-| `worker.rails.env`                  | Worker environment                                | `production` |
-| `worker.rails.logStdout`            | Enable or disable logging to stdout              | `true`    |
-| `worker.rails.logLevel`             | Log level for Worker                              | `error`   |
-| `worker.resources.requests.memory`  | Memory request for Worker                         | `1Gi`     |
-| `worker.resources.requests.cpu`     | CPU request for Worker                            | `1000m`   |
-| `worker.livenessProbe.enabled`      | Enable or disable liveness probe                   | `true`    |
-| `worker.livenessProbe.httpPath`     | HTTP path for liveness probe                       | `/`       |
-| `worker.livenessProbe.httpPort`     | HTTP port for liveness probe                       | `8080`    |
-| `worker.livenessProbe.initialDelaySeconds` | Liveness probe initial delay                    | `0`       |
-| `worker.livenessProbe.periodSeconds`       | Liveness probe period                            | `10`      |
-| `worker.livenessProbe.timeoutSeconds`      | Liveness probe timeout                           | `1`       |
-| `worker.livenessProbe.failureThreshold`    | Liveness probe failure threshold                | `3`       |
-
-
-### Events Consumer Configuration
-
-| Parameter                                  | Description                                         | Default        |
-|--------------------------------------------|-----------------------------------------------------|----------------|
-| `eventsConsumer.databasePool`              | Size of the database connection pool                | `10`           |
-| `eventsConsumer.tolerations`               | Pod tolerations for Events Consumer pods            | `[]`           |
-| `eventsConsumer.nodeSelector`              | Node selector for Events Consumer pods              | `{}`           |
-| `eventsConsumer.affinity`                  | Affinity rules for Events Consumer pods             | `{}`           |
-| `eventsConsumer.rails.env`                 | Events Consumer environment                         | `production`   |
-| `eventsConsumer.rails.logStdout`           | Enable or disable logging to stdout                 | `true`         |
-| `eventsConsumer.rails.logLevel`            | Log level for the Rails app                         | `error`        |
-| `eventsConsumer.resources.requests.memory` | Memory request for Events Consumer                  | `1Gi`          |
-| `eventsConsumer.resources.requests.cpu`    | CPU request for Events Consumer                     | `1100m`        |
-| `eventsConsumer.podAnnotations`            | Annotations to add to the Events Consumer pod       | `{}`           |
-| `eventsConsumer.podLabels`                 | Labels to add to the Events Consumer pod            | `{}`           |
-| `eventsConsumer.extraEnv`                  | Additional environment variables for pods           | `{}`           |
-
-### Events Processor Configuration
-
-| Parameter                                   | Description                                         | Default        |
-|---------------------------------------------|-----------------------------------------------------|----------------|
-| `eventsProcessor.databasePool`              | Size of the database connection pool                | `10`           |
-| `eventsProcessor.env`                       | Events Processor environment                        | `production`   |
-| `eventsProcessor.tolerations`               | Pod tolerations for Events Processor pods           | `[]`           |
-| `eventsProcessor.nodeSelector`              | Node selector for Events Processor pods             | `{}`           |
-| `eventsProcessor.affinity`                  | Affinity rules for Events Processor pods            | `{}`           |
-| `eventsProcessor.resources.requests.memory` | Memory request for Events Processor                 | `1Gi`          |
-| `eventsProcessor.resources.requests.cpu`    | CPU request for Events Processor                    | `1100m`        |
-| `eventsProcessor.podAnnotations`            | Annotations to add to the Events Processor pod      | `{}`           |
-| `eventsProcessor.podLabels`                 | Labels to add to the Events Processor pod           | `{}`           |
-| `eventsProcessor.extraEnv`                  | Additional environment variables for pods           | `{}`           |
-
-### Events Worker Configuration
-
-| Parameter                          | Description                                        | Default   |
-|-------------------------------------|----------------------------------------------------|-----------|
-| `eventsWorker.tolerations`         | Pod tolerations for Events Worker pods            | `[]`      |
-| `eventsWorker.nodeSelector`        | Node selector for Events Worker pods              | `{}`      |
-| `eventsWorker.affinity`            | Affinity rules for Events Worker pods             | `{}`      |
-| `eventsWorker.replicas`            | Number of Events Worker replicas                  | `1`       |
-| `eventsWorker.rails.sidekiqConcurrency` | Sidekiq concurrency for Events Worker         | `100`     |
-| `eventsWorker.rails.env`           | Events Worker environment                         | `production` |
-| `eventsWorker.resources.requests.memory` | Memory request for Events Worker              | `1Gi`     |
-| `eventsWorker.resources.requests.cpu` | CPU request for Events Worker                  | `1000m`   |
-| `eventsWorker.livenessProbe.enabled` | Enable or disable liveness probe                  | `true`    |
-| `eventsWorker.livenessProbe.httpPath` | HTTP path for liveness probe                     | `/`       |
-| `eventsWorker.livenessProbe.httpPort` | HTTP port for liveness probe                     | `8080`    |
-| `eventsWorker.livenessProbe.initialDelaySeconds` | Liveness probe initial delay          | `0`       |
-| `eventsWorker.livenessProbe.periodSeconds`       | Liveness probe period                  | `10`      |
-| `eventsWorker.livenessProbe.timeoutSeconds`      | Liveness probe timeout                 | `1`       |
-| `eventsWorker.livenessProbe.failureThreshold`    | Liveness probe failure threshold       | `3`       |
-
-### Clock Worker Configuration
-
-| Parameter                          | Description                                        | Default   |
-|-------------------------------------|----------------------------------------------------|-----------|
-| `clockWorker.tolerations`          | Pod tolerations for Clock Worker pods             | `[]`      |
-| `clockWorker.nodeSelector`         | Node selector for Clock Worker pods               | `{}`      |
-| `clockWorker.affinity`             | Affinity rules for Clock Worker pods              | `{}`      |
-| `clockWorker.replicas`             | Number of Clock Worker replicas                   | `1`       |
-| `clockWorker.rails.sidekiqConcurrency` | Sidekiq concurrency for Clock Worker          | `100`     |
-| `clockWorker.rails.env`            | Clock Worker environment                          | `production` |
-| `clockWorker.resources.requests.memory` | Memory request for Clock Worker               | `1Gi`     |
-| `clockWorker.resources.requests.cpu` | CPU request for Clock Worker                    | `1000m`   |
-| `clockWorker.livenessProbe.enabled` | Enable or disable liveness probe                  | `true`    |
-| `clockWorker.livenessProbe.httpPath` | HTTP path for liveness probe                     | `/`       |
-| `clockWorker.livenessProbe.httpPort` | HTTP port for liveness probe                     | `8080`    |
-| `clockWorker.livenessProbe.initialDelaySeconds` | Liveness probe initial delay          | `0`       |
-| `clockWorker.livenessProbe.periodSeconds`       | Liveness probe period                  | `10`      |
-| `clockWorker.livenessProbe.timeoutSeconds`      | Liveness probe timeout                 | `1`       |
-| `clockWorker.livenessProbe.failureThreshold`    | Liveness probe failure threshold       | `3`       |
-
-### Billing Worker Configuration
-
-| Parameter                          | Description                                        | Default   |
-|-------------------------------------|----------------------------------------------------|-----------|
-| `billingWorker.tolerations`        | Pod tolerations for Billing Worker pods           | `[]`      |
-| `billingWorker.nodeSelector`       | Node selector for Billing Worker pods             | `{}`      |
-| `billingWorker.affinity`           | Affinity rules for Billing Worker pods            | `{}`      |
-| `billingWorker.replicas`           | Number of Billing Worker replicas                 | `1`       |
-| `billingWorker.rails.sidekiqConcurrency` | Sidekiq concurrency for Billing Worker        | `100`     |
-| `billingWorker.rails.env`          | Billing Worker environment                        | `production` |
-| `billingWorker.resources.requests.memory` | Memory request for Billing Worker             | `1Gi`     |
-| `billingWorker.resources.requests.cpu` | CPU request for Billing Worker                  | `1000m`   |
-| `billingWorker.livenessProbe.enabled` | Enable or disable liveness probe                  | `true`    |
-| `billingWorker.livenessProbe.httpPath` | HTTP path for liveness probe                     | `/`       |
-| `billingWorker.livenessProbe.httpPort` | HTTP port for liveness probe                     | `8080`    |
-| `billingWorker.livenessProbe.initialDelaySeconds` | Liveness probe initial delay          | `0`       |
-| `billingWorker.livenessProbe.periodSeconds`       | Liveness probe period                  | `10`      |
-| `billingWorker.livenessProbe.timeoutSeconds`      | Liveness probe timeout                 | `1`       |
-| `billingWorker.livenessProbe.failureThreshold`    | Liveness probe failure threshold       | `3`       |
-
-### PDF Worker Configuration
-
-| Parameter                          | Description                                        | Default   |
-|-------------------------------------|----------------------------------------------------|-----------|
-| `pdfWorker.tolerations`            | Pod tolerations for PDF Worker pods               | `[]`      |
-| `pdfWorker.nodeSelector`           | Node selector for PDF Worker pods                 | `{}`      |
-| `pdfWorker.affinity`               | Affinity rules for PDF Worker pods                | `{}`      |
-| `pdfWorker.replicas`               | Number of PDF Worker replicas                     | `1`       |
-| `pdfWorker.rails.sidekiqConcurrency` | Sidekiq concurrency for PDF Worker              | `100`     |
-| `pdfWorker.rails.env`              | PDF Worker environment                            | `production` |
-| `pdfWorker.resources.requests.memory` | Memory request for PDF Worker                   | `1Gi`     |
-| `pdfWorker.resources.requests.cpu` | CPU request for PDF Worker                      | `1000m`   |
-| `pdfWorker.livenessProbe.enabled`  | Enable or disable liveness probe                  | `true`    |
-| `pdfWorker.livenessProbe.httpPath` | HTTP path for liveness probe                     | `/`       |
-| `pdfWorker.livenessProbe.httpPort` | HTTP port for liveness probe                     | `8080`    |
-| `pdfWorker.livenessProbe.initialDelaySeconds` | Liveness probe initial delay          | `0`       |
-| `pdfWorker.livenessProbe.periodSeconds`       | Liveness probe period                  | `10`      |
-| `pdfWorker.livenessProbe.timeoutSeconds`      | Liveness probe timeout                 | `1`       |
-| `pdfWorker.livenessProbe.failureThreshold`    | Liveness probe failure threshold       | `3`       |
-
-### Webhook Worker Configuration
-
-| Parameter                          | Description                                        | Default   |
-|-------------------------------------|----------------------------------------------------|-----------|
-| `webhookWorker.tolerations`        | Pod tolerations for Webhook Worker pods           | `[]`      |
-| `webhookWorker.nodeSelector`       | Node selector for Webhook Worker pods             | `{}`      |
-| `webhookWorker.affinity`           | Affinity rules for Webhook Worker pods            | `{}`      |
-| `webhookWorker.replicas`           | Number of Webhook Worker replicas                 | `1`       |
-| `webhookWorker.rails.sidekiqConcurrency` | Sidekiq concurrency for Webhook Worker        | `100`     |
-| `webhookWorker.rails.env`          | Webhook Worker environment                        | `production` |
-| `webhookWorker.resources.requests.memory` | Memory request for Webhook Worker             | `1Gi`     |
-| `webhookWorker.resources.requests.cpu` | CPU request for Webhook Worker                  | `1000m`   |
-| `webhookWorker.livenessProbe.enabled` | Enable or disable liveness probe                  | `true`    |
-| `webhookWorker.livenessProbe.httpPath` | HTTP path for liveness probe                     | `/`       |
-| `webhookWorker.livenessProbe.httpPort` | HTTP port for liveness probe                     | `8080`    |
-| `webhookWorker.livenessProbe.initialDelaySeconds` | Liveness probe initial delay          | `0`       |
-| `webhookWorker.livenessProbe.periodSeconds`       | Liveness probe period                  | `10`      |
-| `webhookWorker.livenessProbe.timeoutSeconds`      | Liveness probe timeout                 | `1`       |
-| `webhookWorker.livenessProbe.failureThreshold`    | Liveness probe failure threshold       | `3`       |
-
-### Payment Worker Configuration
-
-| Parameter                          | Description                                        | Default   |
-|-------------------------------------|----------------------------------------------------|-----------|
-| `paymentWorker.tolerations`        | Pod tolerations for Payment Worker pods           | `[]`      |
-| `paymentWorker.nodeSelector`       | Node selector for Payment Worker pods             | `{}`      |
-| `paymentWorker.affinity`           | Affinity rules for Payment Worker pods            | `{}`      |
-| `paymentWorker.replicas`           | Number of Payment Worker replicas                 | `1`       |
-| `paymentWorker.rails.sidekiqConcurrency` | Sidekiq concurrency for Payment Worker        | `100`     |
-| `paymentWorker.rails.env`          | Payment Worker environment                        | `production` |
-| `paymentWorker.resources.requests.memory` | Memory request for Payment Worker             | `1Gi`     |
-| `paymentWorker.resources.requests.cpu` | CPU request for Payment Worker                  | `1000m`   |
-| `paymentWorker.livenessProbe.enabled` | Enable or disable liveness probe                  | `true`    |
-| `paymentWorker.livenessProbe.httpPath` | HTTP path for liveness probe                     | `/`       |
-| `paymentWorker.livenessProbe.httpPort` | HTTP port for liveness probe                     | `8080`    |
-| `paymentWorker.livenessProbe.initialDelaySeconds` | Liveness probe initial delay          | `0`       |
-| `paymentWorker.livenessProbe.periodSeconds`       | Liveness probe period                  | `10`      |
-| `paymentWorker.livenessProbe.timeoutSeconds`      | Liveness probe timeout                 | `1`       |
-| `paymentWorker.livenessProbe.failureThreshold`    | Liveness probe failure threshold       | `3`       |
-
-**Note on Readiness Probes:** Currently, readiness probes are not explicitly configured for any of the components in this Helm chart.
-
-
-
-### MinIO Configuration
-
-| Parameter                          | Description                                                                    | Default               |
-|-------------------------------------|--------------------------------------------------------------------------------|-----------------------|
-| `minio.enabled`                     | Enable MinIO for object storage                                                | `true`                |
-| `minio.replicas`                    | Number of MinIO replicas                                                       | `2`                   |
-| `minio.persistence.size`            | Persistent volume size for MinIO                                               | `10Gi`                |
-| `minio.ingress.enabled`             | Enable ingress for MinIO                                                       | `true`                |
-| `minio.ingress.hosts`               | Hostnames for MinIO ingress                                                    | `minio.lago.dev`      |
-| `minio.ingress.ingressClassName`    | Specify the ingress class name for MinIO ingress                               | `nginx`               |
-| `minio.ingress.path`                | Path for the MinIO ingress                                                     | `/`                   |
-| `minio.buckets`                     | List of S3 buckets to create on MinIO                                          | `[]`                  |
-| `minio.buckets[].name`              | Name of the bucket (should match the release name if using `fullnameOverride`) | `my-lago-minio`       |
-| `minio.buckets[].policy`            | Access policy for the bucket (none, readonly, writeonly, readwrite)            | `none`                |
-| `minio.buckets[].purge`             | If true, purges the bucket upon deletion                                       | `false`               |
-| `minio.buckets[].versioning`        | Enable versioning for the bucket                                               | `false`               |
-| `minio.buckets[].objectlocking`     | Enable object locking for the bucket                                           | `false`               |
-| `minio.fullnameOverride`            | Override the full name for MinIO resources (should match the release name)     | `""`                  |
-| `minio.nameOverride`                | Override the short name for MinIO resources                                    | `minio`               |
-| `minio.endpoint`                    | Endpoint URL for accessing MinIO                                               | `""`                  |
-
-#### MinIO Configuration Notes
-
-When deploying MinIO with this Helm chart, it is recommended to align the `fullnameOverride` and the name of the first bucket with the release name to ensure proper resource naming and organization.
-
-##### Example:
-
-If you are installing the release with the name `old-lago`:
+Create a local Kubernetes cluster and run end-to-end tests:
 
 ```bash
-helm install old-lago ./lago-helm-charts --values value_old.yaml
+# Create the kind cluster and load container images
+task kind:up
+
+# Run the e2e test suite
+task test:e2e
+
+# Tear down
+task kind:down
 ```
 
-Your values.yaml for MinIO should include:
+### Common tasks
 
-```yaml
-minio:
-  enabled: true
-  fullnameOverride: "old-lago-minio"  # Matches the release name
-  buckets:
-    - name: "old-lago-minio"          # Matches the fullnameOverride
-      policy: none
-      purge: false
-      versioning: false
-      objectlocking: false
-  endpoint: "http://minio.yourdomain.tld"
+```bash
+task lint          # Lint changed charts
+task lint:all      # Lint all charts
+task test:unit     # Run unit tests
+task docs          # Regenerate all chart READMEs
+task docs:lago     # Regenerate a single chart README
+task --list        # List all available tasks
 ```
 
-### Key Points
+## Creating a First Account
 
-- **`fullnameOverride`**: This parameter allows you to set a custom name for MinIO resources. For better traceability, align it with the release name.
-- **First Bucket Name**: The first bucket in the `buckets` list should match the `fullnameOverride` to ensure consistent bucket naming conventions.
-- **Ingress Configuration**: Make sure the `hosts` in the ingress section match your MinIO endpoint URL.
+Once the stack is running, exec into the API pod and seed the initial organization:
 
-### Secrets
-
-The chart supports using an existing secret to store sensitive values such as database URLs, Redis URLs, AWS keys, and SMTP credentials. To use an existing secret, set the `global.existingSecret` parameter to the name of the secret.
-If you use an existing secret, the following keys are expected:
-
-- `databaseUrl` (required)
-- `redisUrl` (required)
-- `awsS3AccessKeyId` (optional)
-- `awsS3SecretAccessKey` (optional)
-- `smtpUsername` (optional)
-- `smtpPassword` (optional)
-- `googleAuthClientId` (optional)
-- `googleAuthClientSecret` (optionals)
-
-If you want to provide an existing secret for the encryption keys, you can also set the `encryption.existingSecret` parameter to the name of the secret.
-The following keys are expected:
-
-- `encryptionPrimaryKey` (required)
-- `encryptionDeterministicKey` (required)
-- `encryptionKeyDerivationSalt` (required)
-
-
-## Storage Recommendation
-
-We **strongly recommend** using either **Amazon S3** alternatives for object storage when deploying Lago. These solutions provide reliable, scalable storage that can be accessed by multiple pods without encountering issues.
-
-If neither S3 nor MinIO is configured, the system will default to using a Persistent Volume Claim (PVC). However, this approach is **strongly discouraged** as it can lead to issues such as multi-attach errors when volumes are accessed by more than one pod simultaneously. For this reason, it is important to configure S3 or MinIO to avoid potential complications with PVCs.
-
-By opting for S3 or alternatives, you ensure better reliability and scalability for your deployment.
-
-For additional customization, refer to the comments in `values.yaml`.
+```bash
+kubectl exec -ti <lago-api-pod> -- bash
+bundle exec rake roles:seed_predefined
+bundle exec rails signup:seed_organization \
+  LAGO_CREATE_ORG=true \
+  LAGO_ORG_NAME=Hooli \
+  LAGO_ORG_USER_EMAIL="admin@hooli.com" \
+  LAGO_ORG_USER_PASSWORD=pass1234
+```
 
 ## Uninstall
 
-To uninstall/delete the `my-lago-release`:
-
-```
-helm delete my-lago-release
+```bash
+helm uninstall lago
 ```
