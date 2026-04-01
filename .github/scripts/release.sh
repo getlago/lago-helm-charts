@@ -92,7 +92,7 @@ publish_oci() {
     cp -r "charts/$chart" .helm-build/
 
     # Transform file:// dependencies to OCI registry references
-    sed -i "s|repository:.*file://\.\./[^\"]*|repository: ${REGISTRY}|g" ".helm-build/$chart/Chart.yaml"
+    sed -i "s|repository: *\"file://[^\"]*\"|repository: ${REGISTRY}|g" ".helm-build/$chart/Chart.yaml"
     rm -f ".helm-build/$chart/Chart.lock"
 
     helm dependency update ".helm-build/$chart"
