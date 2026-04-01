@@ -6,7 +6,11 @@ on:
     branches:
       - main
   workflow_dispatch:
-
+    inputs:
+      version:
+        description: 'Release version (semver without v prefix, e.g. 0.4.0)'
+        required: true
+        type: string
 jobs:
   release:
     runs-on: ubuntu-latest
