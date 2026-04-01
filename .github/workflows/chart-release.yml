@@ -11,9 +11,15 @@ on:
         description: 'Release version (semver without v prefix, e.g. 0.4.0)'
         required: true
         type: string
+env:
+  REGISTRY: oci://ghcr.io/getlago/helm-charts
+
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
