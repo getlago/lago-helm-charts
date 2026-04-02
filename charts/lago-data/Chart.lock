@@ -15,4 +15,4 @@ dependencies:
   repository: file://../lago-data-worker
   version: 0.5.0
 digest: sha256:e3ddfbe787338020bea50e207b97b911260ff65d79f0e412743a583048b6a76d
-generated: "2026-04-02T17:07:26.479363+02:00"
+generated: "2026-04-02T15:08:33.482589588Z"
