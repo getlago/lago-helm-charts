@@ -68,6 +68,10 @@ dependencies:
     alias: pdf
     version: 0.4.0
     repository: "file://../lago-pdf"
+    condition: pdf.enabled
+  - name: lago-rails
+    alias: pdf-worker
+    repository: "file://../lago-rails"
     condition: global.sidekiq.queues.pdf
   - name: lago-rails
     alias: events-consumer-worker

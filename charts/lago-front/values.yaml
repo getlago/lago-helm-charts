@@ -22,7 +22,7 @@ global:
     api: ""
     # -- Internal URL of the PDF service (Gotenberg)
     # @section -- URLs
-    pdf: ""
+    pdf: "lago-pdf"
 
   nango:
     # -- Nango public key for frontend OAuth flows

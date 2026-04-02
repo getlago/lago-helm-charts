@@ -63,7 +63,7 @@ global:
     front: ""
     # -- Internal URL of the PDF service (Gotenberg)
     # @section -- URLs
-    pdf: ""
+    pdf: "lago-pdf"
 
   database:
     # -- PostgreSQL connection URI
@@ -566,13 +566,46 @@ webhook-worker:
     # @section -- Webhook Worker
     ports:
 
-# -- PDF stack subchart overrides (lago-pdf, conditional on `global.sidekiq.queues.pdf`)
+# -- PDF worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.pdf`)
+# @default -- See child values
+# @section -- PDF Worker
+pdf-worker:
+  # -- Override the pdf-worker subchart release name
+  # @section -- PDF Worker
+  nameOverride: lago-pdf-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- PDF Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- PDF Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- PDF Worker
+  livenessProbe: null
+  # -- Readiness probe (disabled for workers)
+  # @section -- PDF Worker
+  readinessProbe: null
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- PDF Worker
+    enabled: false
+  container:
+    # -- PDF worker entrypoint command
+    # @section -- PDF Worker
+    command: ["./scripts/start.pdfs.worker.sh"]
+    # -- Container ports (none needed)
+    # @section -- PDF Worker
+    ports:
+
+# -- PDF stack (gotenberg) subchart overrides
 # @default -- See child values
 # @section -- PDF
 pdf:
   # -- Override the PDF subchart release name
   # @section -- PDF
   nameOverride: lago-pdf
+  enabled: false
   config:
     # -- Disable nested config (uses parent config subchart)
     # @section -- PDF
@@ -580,12 +613,6 @@ pdf:
     # -- Config subchart name override
     # @section -- PDF
     nameOverride: lago-config
-
-  worker:
-    config:
-      # -- Config subchart name override for PDF worker
-      # @section -- PDF
-      nameOverride: lago-config
 
 # -- Events consumer worker subchart overrides (lago-rails, conditional on `global.streaming_ingestion.enabled`)
 # @default -- See child values

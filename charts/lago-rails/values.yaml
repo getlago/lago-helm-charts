@@ -60,7 +60,7 @@ global:
     front: ""
     # -- Internal URL of the PDF service (Gotenberg)
     # @section -- URLs
-    pdf: ""
+    pdf: "lago-pdf"
 
   database:
     # -- PostgreSQL connection URI

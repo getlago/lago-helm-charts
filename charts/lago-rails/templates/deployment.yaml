@@ -177,7 +177,7 @@ spec:
               value: {{ .Values.global.sidekiq.queues.webhook | quote }}
             - name: SIDEKIQ_PDFS
               value: {{ .Values.global.sidekiq.queues.pdf | quote }}
-            {{- if .Values.global.urls.pdf }}
+            {{- if .Values.global.lago.pdfGeneration }}
             - name: LAGO_PDF_URL
               valueFrom:
                 configMapKeyRef:
@@ -185,7 +185,7 @@ spec:
                   key: pdf.endpoint
             {{- else }}
             - name: LAGO_DISABLE_PDF_GENERATION
-              value: {{ not .Values.global.lago.pdfGeneration | quote }}
+              value: "false"
             {{- end }}
             {{- if .Values.global.s3.enabled }}
             - name: LAGO_USE_AWS_S3
