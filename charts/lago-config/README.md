@@ -1,6 +1,6 @@
 # lago-config
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -42,7 +42,7 @@ A Helm chart for Kubernetes
 |-----|------|---------|-------------|
 | global.urls.api | string | `""` | Public URL of the Lago API |
 | global.urls.front | string | `""` | Public URL of the Lago frontend |
-| global.urls.pdf | string | `""` | Internal URL of the PDF service (Gotenberg) |
+| global.urls.pdf | string | `"lago-pdf"` | Internal URL of the PDF service (Gotenberg) |
 
 ### Database
 

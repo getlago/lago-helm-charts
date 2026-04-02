@@ -1,6 +1,6 @@
 # lago-front
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.41.0](https://img.shields.io/badge/AppVersion-v1.41.0-informational?style=flat-square)
+![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.41.0](https://img.shields.io/badge/AppVersion-v1.41.0-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -8,7 +8,7 @@ A Helm chart for Kubernetes
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../lago-config | config(lago-config) | 0.3.0 |
+| file://../lago-config | config(lago-config) | 0.5.0 |
 
 ## Values
 
@@ -31,7 +31,7 @@ A Helm chart for Kubernetes
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | global.urls.api | string | `""` | Public URL of the Lago API |
-| global.urls.pdf | string | `""` | Internal URL of the PDF service (Gotenberg) |
+| global.urls.pdf | string | `"lago-pdf"` | Internal URL of the PDF service (Gotenberg) |
 
 ### Nango
 

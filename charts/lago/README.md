@@ -1,6 +1,6 @@
 # lago
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.41.2](https://img.shields.io/badge/AppVersion-v1.41.2-informational?style=flat-square)
+![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.41.2](https://img.shields.io/badge/AppVersion-v1.41.2-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -8,19 +8,20 @@ A Helm chart for Kubernetes
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../lago-config | config(lago-config) | 0.3.0 |
-| file://../lago-events-processor-worker | events-processor-worker(lago-events-processor-worker) | 0.3.0 |
-| file://../lago-front | front(lago-front) | 0.3.0 |
-| file://../lago-pdf | pdf(lago-pdf) | 0.3.0 |
-| file://../lago-rails | billing-worker(lago-rails) | 0.3.0 |
-| file://../lago-rails | analytics-worker(lago-rails) | 0.3.0 |
-| file://../lago-rails | clock(lago-rails) | 0.3.0 |
-| file://../lago-rails | clock-worker(lago-rails) | 0.3.0 |
-| file://../lago-rails | events-worker(lago-rails) | 0.3.0 |
-| file://../lago-rails | webhook-worker(lago-rails) | 0.3.0 |
-| file://../lago-rails | worker(lago-rails) | 0.3.0 |
-| file://../lago-rails | events-consumer-worker(lago-rails) | 0.3.0 |
-| file://../lago-rails | api(lago-rails) | 0.3.0 |
+| file://../lago-config | config(lago-config) | 0.5.0 |
+| file://../lago-events-processor-worker | events-processor-worker(lago-events-processor-worker) | 0.5.0 |
+| file://../lago-front | front(lago-front) | 0.5.0 |
+| file://../lago-pdf | pdf(lago-pdf) | 0.5.0 |
+| file://../lago-rails | billing-worker(lago-rails) | 0.5.0 |
+| file://../lago-rails | analytics-worker(lago-rails) | 0.5.0 |
+| file://../lago-rails | clock(lago-rails) | 0.5.0 |
+| file://../lago-rails | clock-worker(lago-rails) | 0.5.0 |
+| file://../lago-rails | events-worker(lago-rails) | 0.5.0 |
+| file://../lago-rails | webhook-worker(lago-rails) | 0.5.0 |
+| file://../lago-rails | worker(lago-rails) | 0.5.0 |
+| file://../lago-rails | pdf-worker(lago-rails) | 0.5.0 |
+| file://../lago-rails | events-consumer-worker(lago-rails) | 0.5.0 |
+| file://../lago-rails | api(lago-rails) | 0.5.0 |
 
 ## Values
 
@@ -147,15 +148,28 @@ A Helm chart for Kubernetes
 | webhook-worker.container.command | list | `["./scripts/start.webhook.worker.sh"]` | Webhook worker entrypoint command |
 | webhook-worker.container.ports | string | `nil` | Container ports (none needed) |
 
+### PDF Worker
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| pdf-worker | object | See child values | PDF worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.pdf`) |
+| pdf-worker.nameOverride | string | `"lago-pdf-worker"` | Override the pdf-worker subchart release name |
+| pdf-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
+| pdf-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
+| pdf-worker.livenessProbe | string | `nil` | Liveness probe (disabled for workers) |
+| pdf-worker.readinessProbe | string | `nil` | Readiness probe (disabled for workers) |
+| pdf-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
+| pdf-worker.container.command | list | `["./scripts/start.pdfs.worker.sh"]` | PDF worker entrypoint command |
+| pdf-worker.container.ports | string | `nil` | Container ports (none needed) |
+
 ### PDF
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| pdf | object | See child values | PDF stack subchart overrides (lago-pdf, conditional on `global.sidekiq.queues.pdf`) |
+| pdf | object | See child values | PDF stack (gotenberg) subchart overrides |
 | pdf.nameOverride | string | `"lago-pdf"` | Override the PDF subchart release name |
 | pdf.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | pdf.config.nameOverride | string | `"lago-config"` | Config subchart name override |
-| pdf.worker.config.nameOverride | string | `"lago-config"` | Config subchart name override for PDF worker |
 
 ### Events Consumer Worker
 
