@@ -78,6 +78,37 @@ create_release() {
   gh release create "v$version" --title "v$version" --generate-notes
 }
 
+strip_nested_subdeps() {
+  local chart_dir="$1"
+  local charts_dir="$chart_dir/charts"
+
+  [ -d "$charts_dir" ] || return 0
+
+  # Helm 3 bug workaround: when the same subchart (e.g. lago-rails) appears
+  # multiple times in the dependency list, Helm 3 fails to evaluate the
+  # `condition` field for sub-dependencies on the last instance.
+  #
+  # After `helm dependency update`, subchart deps are tarballs (.tgz).
+  # Extract each, remove nested charts/ dirs (sub-dependencies already
+  # provided by the umbrella chart), and repack.
+  local tmpdir
+  for tgz in "$charts_dir"/*.tgz; do
+    [ -f "$tgz" ] || continue
+    tmpdir=$(mktemp -d)
+    tar xzf "$tgz" -C "$tmpdir"
+
+    local subchart_name
+    subchart_name=$(ls "$tmpdir")
+    if [ -d "$tmpdir/$subchart_name/charts" ]; then
+      echo "  Stripping nested subdeps from $subchart_name"
+      rm -rf "$tmpdir/$subchart_name/charts"
+      COPYFILE_DISABLE=1 tar czf "$tgz" -C "$tmpdir" "$subchart_name"
+    fi
+
+    rm -rf "$tmpdir"
+  done
+}
+
 publish_oci() {
   local version
 
@@ -96,6 +127,19 @@ publish_oci() {
     rm -f ".helm-build/$chart/Chart.lock"
 
     helm dependency update ".helm-build/$chart"
+
+    # Helm 3 bug workaround: when the same subchart (e.g. lago-rails) appears
+    # multiple times in the dependency list, Helm 3 fails to evaluate the
+    # `condition` field for sub-dependencies (e.g. lago-config inside lago-rails)
+    # on the last instance. Strip nested sub-dependencies from umbrella charts
+    # only — they already provide these deps at the top level. Leaf charts
+    # (lago-rails, lago-front, etc.) must keep their nested deps intact for
+    # standalone usage.
+    case "$chart" in lago)
+      strip_nested_subdeps ".helm-build/$chart"
+      ;;
+    esac
+
     helm package ".helm-build/$chart" --destination .helm-packages
     helm push ".helm-packages/$chart-$version.tgz" "$REGISTRY"
 
