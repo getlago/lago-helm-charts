@@ -29,7 +29,9 @@ data:
   LAGO_KAFKA_RAW_EVENTS_TOPIC: {{ $kafka.topics.eventsRaw }}
   {{- with $kafka.saslMechanisms }}
   LAGO_KAFKA_SCRAM_ALGORITHM: {{ $kafka.saslMechanisms }}
+  LAGO_KAFKA_SASL_MECHANISMS: {{ $kafka.saslMechanisms }}
   {{- end }}
+  LAGO_KAFKA_SECURITY_PROTOCOL: {{ $kafka.securityProtocol }}
   LAGO_KAFKA_TLS: {{ $kafka.tls | quote }}
   LAGO_KAFKA_ACTIVITY_LOGS_TOPIC: {{ $kafka.topics.activityLogs }}
   LAGO_KAFKA_API_LOGS_TOPIC: {{ $kafka.topics.apiLogs }}

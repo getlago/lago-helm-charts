@@ -174,6 +174,7 @@ A Helm chart for Kubernetes
 | global.streaming_ingestion.kafka.password | string | `""` | Kafka password (not required when using an external secret) |
 | global.streaming_ingestion.kafka.tls | bool | `false` | Enable TLS for Kafka connections |
 | global.streaming_ingestion.kafka.saslMechanisms | string | `nil` | Kafka SASL mechanism (`SCRAM-SHA-512`, `SCRAM-SHA-256`) |
+| global.streaming_ingestion.kafka.securityProtocol | string | `nil` | Kafka Security protocol (`SASL_SSL`) |
 | global.streaming_ingestion.kafka.consumerGroup | string | `"events_consumer"` | Kafka consumer group name |
 | global.streaming_ingestion.kafka.bootstrapServers | list | `[]` | List of Kafka bootstrap servers |
 | global.streaming_ingestion.kafka.topics.eventsChargedInAdvance | string | `"events_charged_in_advance"` | Kafka topic for charged-in-advance events |
