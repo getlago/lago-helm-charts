@@ -264,6 +264,9 @@ global:
       # -- Kafka SASL mechanism (`SCRAM-SHA-512`, `SCRAM-SHA-256`)
       # @section -- Streaming Ingestion / Kafka
       saslMechanisms:
+      # -- Kafka Security Protocol (`SASL_SSL`)
+      # @section -- Streaming Ingestion / Kafka
+      securityProtocol:
       # -- Kafka consumer group name
       # @section -- Streaming Ingestion / Kafka
       consumerGroup: events_consumer
