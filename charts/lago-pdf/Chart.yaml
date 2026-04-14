@@ -4,19 +4,19 @@ description: A Helm chart for the Lago PDF stack (Gotenberg + optional Rails wor
 
 type: application
 
-version: 0.5.0
+version: 0.5.1
 
 appVersion: "8"
 
 dependencies:
   - name: lago-config
     alias: config
-    version: 0.5.0
+    version: 0.5.1
     repository: "file://../lago-config"
     condition: config.enabled
   - name: lago-rails
     alias: worker
-    version: 0.5.0
+    version: 0.5.1
     repository: "file://../lago-rails"
     condition: worker.enabled
 
