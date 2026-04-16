@@ -31,7 +31,9 @@ data:
   LAGO_KAFKA_SCRAM_ALGORITHM: {{ $kafka.saslMechanisms }}
   LAGO_KAFKA_SASL_MECHANISMS: {{ $kafka.saslMechanisms }}
   {{- end }}
+  {{- if $kafka.securityProtocol }}
   LAGO_KAFKA_SECURITY_PROTOCOL: {{ $kafka.securityProtocol }}
+  {{- end }}
   LAGO_KAFKA_TLS: {{ $kafka.tls | quote }}
   LAGO_KAFKA_ACTIVITY_LOGS_TOPIC: {{ $kafka.topics.activityLogs }}
   LAGO_KAFKA_API_LOGS_TOPIC: {{ $kafka.topics.apiLogs }}
