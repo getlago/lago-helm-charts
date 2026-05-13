@@ -241,7 +241,7 @@ spec:
             {{- include "kafkaEnvs" . | nindent 12 }}
             {{- include "clickhouseEnvs" . | nindent 12 }}
             {{ end }}
-          image: getlago/api:v{{ .Values.version }}
+          image: {{ .Values.global.image.registry }}/getlago/api:v{{ .Values.version }}
           name: {{ .Release.Name }}-api
           ports:
             - name: http
