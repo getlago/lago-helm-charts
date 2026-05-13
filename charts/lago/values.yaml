@@ -83,6 +83,13 @@ global:
     egress: []
     ingress: []
 
+  # Default registry used for all chart-managed images (getlago/api,
+  # getlago/front, getlago/lago-events-processor, getlago/lago-gotenberg,
+  # alpine). Override to point at a private registry or mirror. Must be
+  # reachable from cluster nodes.
+  image:
+    registry: docker.io
+
   kubectl:
     imageRegistry: docker.io
     imageRepository: rancher/kubectl

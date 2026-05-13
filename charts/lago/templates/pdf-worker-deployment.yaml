@@ -208,7 +208,7 @@ spec:
                   name: {{ .Release.Name }}-secrets
                   key: newRelicKey
             {{ end }}
-          image: getlago/api:v{{ .Values.version }}
+          image: {{ .Values.global.image.registry }}/getlago/api:v{{ .Values.version }}
           name: {{ .Release.Name }}-pdf-worker
           {{- if .Values.pdfWorker.livenessProbe.enabled }}
           livenessProbe:
