@@ -22,7 +22,7 @@ spec:
       serviceAccountName: {{ include "lago-data-rev-rec.serviceAccountName" . }}
       containers:
         - name: submitter
-          image: {{ include "lago-data-rev-rec.submitterImage" . }}
+          image: {{ include "lago-data-rev-rec.submitterImage" . | quote }}
           imagePullPolicy: {{ .Values.submitter.image.pullPolicy }}
           command:
             - python

@@ -13,7 +13,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  image: {{ include "lago-data-rev-rec.flinkImage" . }}
+  image: {{ include "lago-data-rev-rec.flinkImage" . | quote }}
   imagePullPolicy: {{ .Values.image.pullPolicy }}
   flinkVersion: {{ .Values.flinkVersion }}
   serviceAccount: {{ include "lago-data-rev-rec.serviceAccountName" . }}
@@ -46,7 +46,7 @@ spec:
             # Python SDK harness — Flink TaskManagers dial localhost:<port> for
             # python user code execution (rev_rec DoFns) when the pipeline runs
             # with --environment_type=EXTERNAL.
-            image: {{ include "lago-data-rev-rec.submitterImage" . }}
+            image: {{ include "lago-data-rev-rec.submitterImage" . | quote }}
             imagePullPolicy: {{ .Values.submitter.image.pullPolicy }}
             command:
               - python
