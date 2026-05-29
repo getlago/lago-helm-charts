@@ -13,6 +13,7 @@ CHARTS=(
   lago-data-api
   lago-data-worker
   lago-data-forecasted-usage
+  lago-data-rev-rec
   lago-mcp-server
   lago-pdf
   lago-data

@@ -1,0 +1,37 @@
+{{- /*
+RBAC for Flink Kubernetes HA: the JobManager uses ConfigMaps for leader
+election + JobGraph metadata, lists Pods to discover peers, and patches its
+own Deployment during shutdown. Binds to the chart-managed ServiceAccount
+(or to a Pulumi-owned SA when serviceAccount.create is false, e.g. for EKS
+Pod Identity wiring).
+*/ -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "lago-data-rev-rec.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "lago-data-rev-rec.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: [pods, configmaps]
+    verbs: [get, list, watch, create, update, patch, delete]
+  - apiGroups: [apps]
+    resources: [deployments, deployments/finalizers]
+    verbs: [get, list, watch, create, update, patch, delete]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "lago-data-rev-rec.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "lago-data-rev-rec.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "lago-data-rev-rec.serviceAccountName" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "lago-data-rev-rec.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
