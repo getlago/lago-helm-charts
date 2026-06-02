@@ -477,6 +477,9 @@ job:
     resources: {}
     extraEnv: {}
     loadSchema: false
+    tolerations: []
+    nodeSelector: {}
+    affinity: {}
   topics:
     resources: {}
     extraEnv: {}

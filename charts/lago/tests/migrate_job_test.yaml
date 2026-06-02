@@ -1,0 +1,53 @@
+suite: Test migration job scheduling controls
+templates:
+  - templates/migrate-job.yaml
+
+tests:
+  - it: has no scheduling constraints by default
+    set:
+      apiUrl: "https://api.lago.dev"
+      frontUrl: "https://app.lago.dev"
+      global.databaseUrl: "postgresql://lago:pw@db:5432/lago"
+      global.redisUrl: "redis://redis:6379"
+    asserts:
+      - isNull:
+          path: spec.template.spec.tolerations
+      - isNull:
+          path: spec.template.spec.nodeSelector
+      - isNull:
+          path: spec.template.spec.affinity
+
+  - it: sets tolerations, nodeSelector and affinity on the migration job
+    set:
+      apiUrl: "https://api.lago.dev"
+      frontUrl: "https://app.lago.dev"
+      global.databaseUrl: "postgresql://lago:pw@db:5432/lago"
+      global.redisUrl: "redis://redis:6379"
+      job.migrate.tolerations:
+        - key: dedicated
+          operator: Equal
+          value: lago
+          effect: NoSchedule
+      job.migrate.nodeSelector:
+        disktype: ssd
+      job.migrate.affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
+    asserts:
+      - equal:
+          path: spec.template.spec.tolerations[0].key
+          value: dedicated
+      - equal:
+          path: spec.template.spec.tolerations[0].effect
+          value: NoSchedule
+      - equal:
+          path: spec.template.spec.nodeSelector.disktype
+          value: ssd
+      - isNotEmpty:
+          path: spec.template.spec.affinity.nodeAffinity
