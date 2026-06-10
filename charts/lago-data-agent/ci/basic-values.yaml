@@ -1,0 +1,19 @@
+# Minimal values so `ct lint` can render the chart.
+# Sensitive env (PG_DSN, AWS_BEARER_TOKEN_BEDROCK) is expected from `existingSecret`
+# in real environments; here we only need the template to render for linting.
+existingSecret: lago-data-agent
+
+image:
+  tag: ci
+
+extraEnv:
+  - name: BEDROCK_MODEL_ID
+    value: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+  - name: AWS_DEFAULT_REGION
+    value: us-east-1
+  - name: LAGO_API_URL
+    value: http://lago-api.default.svc.cluster.local/api/v1
+
+extraEnvFrom:
+  - secretRef:
+      name: lago-data-agent
