@@ -1,18 +1,18 @@
 dependencies:
 - name: lago-config
   repository: file://../lago-config
-  version: 0.5.6
+  version: 0.5.7
 - name: lago-data-config
   repository: file://../lago-data-config
-  version: 0.5.6
+  version: 0.5.7
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.5.6
+  version: 0.5.7
 - name: lago-data-api
   repository: file://../lago-data-api
-  version: 0.5.6
+  version: 0.5.7
 - name: lago-data-worker
   repository: file://../lago-data-worker
-  version: 0.5.6
-digest: sha256:1375da1adee785ae5dad2c85c452439e604e478e0b822f73c7b4d9e241aad072
-generated: "2026-05-29T14:59:51.503668078Z"
+  version: 0.5.7
+digest: sha256:96f9bc53096d4bc8624c81353f3d43136eceb87843bd26d2282d5fd953290227
+generated: "2026-06-10T08:05:59.845773987Z"

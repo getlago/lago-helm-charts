@@ -1,6 +1,6 @@
 dependencies:
 - name: lago-config
   repository: file://../lago-config
-  version: 0.5.6
-digest: sha256:40a5ba4adaa3e7bda8145a9947a978482886f0cf933195b7f3120b5098d144f5
-generated: "2026-05-29T14:59:51.566410597Z"
+  version: 0.5.7
+digest: sha256:33d8bfa39749d8444d101d3ab13df009da275c51b379b78a1f8c7597ea81c7d7
+generated: "2026-06-10T08:05:59.900881641Z"
