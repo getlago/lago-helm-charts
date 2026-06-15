@@ -1,88 +1,100 @@
 # Default values for lago-data-agent.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 
-# Name of a pre-existing Secret (e.g. a SealedSecret-managed one) whose keys are
-# exposed to the container. The agent's sensitive values (PG_DSN, AWS_BEARER_TOKEN_BEDROCK)
-# are expected to come from this secret, referenced via `extraEnvFrom` below.
-existingSecret: ""
-
-# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
-  # Pushed by lago-data/.github/workflows/build-agent-image.yml
+  # -- Container image repository
+  # @section -- Image
   repository: 201661579678.dkr.ecr.us-east-1.amazonaws.com/lago-data-agent
-
-  # This sets the pull policy for images.
+  # -- Image pull policy
+  # @section -- Image
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
+  # -- Override the image tag (defaults to Chart appVersion)
+  # @section -- Image
   tag: ""
 
-# This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+# -- Image pull secrets for private registries
+# @default -- `[]`
+# @section -- Image
 imagePullSecrets: []
-# This is to override the chart name.
+# -- Override the chart name
+# @section -- Deployment
 nameOverride: ""
+# -- Override the full release name
+# @section -- Deployment
 fullnameOverride: ""
-
+# -- Number of replicas (ignored when autoscaling is enabled)
+# @section -- Deployment
 replicaCount: 1
 
 container:
+  # -- Override the container name (defaults to chart name)
+  # @section -- Container
   name: ""
-  # The agent image backs two entrypoints; `api` is the MCP-facing POST /ask service
-  # (X-LAGO-API-KEY auth) + unauthenticated /health. See agent/Dockerfile.
+  # -- Container entrypoint command. The agent image's `api` entrypoint serves the
+  # MCP-facing POST /ask (X-LAGO-API-KEY auth) and unauthenticated /health.
+  # @section -- Container
   command: ["python", "-m", "src"]
+  # -- Container command arguments
+  # @section -- Container
   args: ["api", "--host", "0.0.0.0", "--port", "8000"]
   ports:
+    # -- HTTP container port
+    # @section -- Container
     http: 8000
 
-# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Create a ServiceAccount
+  # @section -- Service Account
   create: true
-  # Automatically mount a ServiceAccount's API credentials?
+  # -- Automount the ServiceAccount API credentials
+  # @section -- Service Account
   automount: true
-  # Annotations to add to the service account.
-  # NOTE: if Bedrock access moves from AWS_BEARER_TOKEN_BEDROCK to IAM/Pod Identity,
-  # the IRSA / Pod Identity role association would be wired here.
+  # -- Annotations to add to the ServiceAccount (e.g. an IRSA / Pod Identity role,
+  # if Bedrock access moves from AWS_BEARER_TOKEN_BEDROCK to IAM)
+  # @section -- Service Account
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # -- ServiceAccount name (generated from fullname if not set)
+  # @section -- Service Account
   name: ""
 
-# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
-  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  # -- Service type (`ClusterIP`, `NodePort`, `LoadBalancer`)
+  # @section -- Service
   type: ClusterIP
-  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  # -- Service port
+  # @section -- Service
   port: 80
 
-# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:
+  # -- Enable Horizontal Pod Autoscaler
+  # @section -- Autoscaling
   enabled: false
+  # -- Minimum replicas
+  # @section -- Autoscaling
   minReplicas: 1
+  # -- Maximum replicas
+  # @section -- Autoscaling
   maxReplicas: 100
+  # -- Target CPU utilization percentage
+  # @section -- Autoscaling
   targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
 
-# This is for setting Kubernetes Annotations to a Pod.
-# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+# -- Additional pod annotations
+# @section -- Pod
 podAnnotations: {}
-# This is for setting Kubernetes Labels to a Pod.
-# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+# -- Additional pod labels
+# @section -- Pod
 podLabels: {}
 
-# the image runs as a fixed non-root uid (10001) baked into the Dockerfile
+# -- Pod-level security context
+# @section -- Pod
 podSecurityContext: {}
-  # fsGroup: 2000
 
+# -- Container-level security context
+# @section -- Pod
 securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 10001
 
-# /health is unauthenticated (see agent/Dockerfile). Probes hit it on the http port.
+# -- Liveness probe configuration (/health is unauthenticated)
+# @section -- Pod
 livenessProbe:
   httpGet:
     path: /health
@@ -92,6 +104,8 @@ livenessProbe:
   timeoutSeconds: 5
   failureThreshold: 5
 
+# -- Readiness probe configuration (/health is unauthenticated)
+# @section -- Pod
 readinessProbe:
   httpGet:
     path: /health
@@ -101,46 +115,37 @@ readinessProbe:
   timeoutSeconds: 5
   failureThreshold: 3
 
-# -- Environment variables to pass to the agent container (non-sensitive).
-# e.g. BEDROCK_MODEL_ID, AWS_DEFAULT_REGION, LAGO_API_URL — set per-env in lago-deploy.
-extraEnv: []
-  # - name: "MY_VAR"
-  #   value: "value"
+# -- Extra environment variables (map format, deep-mergeable). Non-sensitive config
+# such as BEDROCK_MODEL_ID, AWS_DEFAULT_REGION, LAGO_API_URL.
+# @section -- Pod
+extraEnv: {}
 
-# -- envFrom to pass to the agent container.
-# Used to pull the sensitive env (PG_DSN, AWS_BEARER_TOKEN_BEDROCK) from `existingSecret`.
+# -- Extra envFrom sources. Sensitive values (PG_DSN, AWS_BEARER_TOKEN_BEDROCK) are
+# injected from a pre-existing Secret here, e.g. a SealedSecret-managed one.
 # @default -- `[]` (See [values.yaml])
+# @section -- Pod
 extraEnvFrom: []
-  # - secretRef:
-  #     name: lago-data-agent
 
+# -- Resource requests and limits
+# @section -- Pod
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
 
-# Additional volumes on the output Deployment definition.
+# -- Additional volumes
+# @section -- Pod
 volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
 
-# Additional volumeMounts on the output Deployment definition.
+# -- Additional volume mounts
+# @section -- Pod
 volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
 
+# -- Node selector constraints
+# @section -- Pod
 nodeSelector: {}
 
+# -- Pod tolerations
+# @section -- Pod
 tolerations: []
 
+# -- Pod affinity rules
+# @section -- Pod
 affinity: {}

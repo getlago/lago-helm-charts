@@ -17,6 +17,8 @@ If release name contains chart name it will be used as a full name.
 {{- $name := default .Chart.Name .Values.nameOverride }}
 {{- if contains $name .Release.Name }}
 {{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else if contains .Release.Name $name }}
+{{- $name | trunc 63 | trimSuffix "-" }}
 {{- else }}
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
 {{- end }}
@@ -58,16 +60,5 @@ Create the name of the service account to use
 {{- default (include "lago-data-agent.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
-
-{{/*
-Get the name of the secret
-*/}}
-{{- define "lago-data-agent.secretName" -}}
-{{- if .Values.existingSecret }}
-{{- .Values.existingSecret }}
-{{- else }}
-{{- include "lago-data-agent.fullname" . }}
 {{- end }}
 {{- end }}

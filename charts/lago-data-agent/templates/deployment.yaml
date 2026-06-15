@@ -48,7 +48,15 @@ spec:
           {{- end }}
           {{- with .Values.extraEnv }}
           env:
-            {{- toYaml . | nindent 12 }}
+            {{- range $name, $val := . }}
+            {{- if kindIs "map" $val }}
+            - name: {{ $name }}
+              {{- toYaml $val | nindent 14 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- end }}
           {{- end }}
           ports:
             - name: http
