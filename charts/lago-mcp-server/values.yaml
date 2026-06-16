@@ -142,3 +142,7 @@ tolerations: []
 # -- Pod affinity rules
 # @section -- Pod
 affinity: {}
+
+# -- Pod topology spread constraints
+# @section -- Pod
+topologySpreadConstraints: []

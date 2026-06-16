@@ -482,6 +482,10 @@ gotenberg:
   # @section -- Gotenberg
   affinity: {}
 
+  # -- Pod topology spread constraints
+  # @section -- Gotenberg
+  topologySpreadConstraints: []
+
   # -- Image pull secrets for private registries
   # @section -- Gotenberg
   imagePullSecrets: []

@@ -94,6 +94,10 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.gotenberg.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.gotenberg.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}

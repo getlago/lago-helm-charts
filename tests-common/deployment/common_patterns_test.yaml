@@ -110,6 +110,40 @@ tests:
           path: spec.template.spec.containers[0].resources
 
   # ============================================================================
+  # topologySpreadConstraints Tests
+  # ============================================================================
+  - it: should include topologySpreadConstraints when specified
+    values:
+      - ./fixtures/required.yaml
+    set:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: test-app
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[0].maxSkew
+          value: 1
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[0].topologyKey
+          value: kubernetes.io/hostname
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[0].whenUnsatisfiable
+          value: DoNotSchedule
+
+  - it: should not include topologySpreadConstraints when empty
+    values:
+      - ./fixtures/required.yaml
+    set:
+      topologySpreadConstraints: []
+    asserts:
+      - notExists:
+          path: spec.template.spec.topologySpreadConstraints
+
+  # ============================================================================
   # Combined Test - All Common Patterns
   # ============================================================================
   - it: should correctly render all common patterns together

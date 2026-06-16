@@ -254,6 +254,10 @@ tolerations: []
 # @section -- Pod
 affinity: {}
 
+# -- Pod topology spread constraints
+# @section -- Pod
+topologySpreadConstraints: []
+
 # -- Array of extra K8s manifests to deploy
 # @section -- Extra Objects
 extraObjects: []
