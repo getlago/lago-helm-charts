@@ -75,6 +75,7 @@ A Helm chart for the Lago PDF stack (Gotenberg + optional Rails worker)
 | gotenberg.nodeSelector | object | `{}` | Node selector constraints |
 | gotenberg.tolerations | list | `[]` | Pod tolerations |
 | gotenberg.affinity | object | `{}` | Pod affinity rules |
+| gotenberg.topologySpreadConstraints | list | `[]` | Pod topology spread constraints |
 | gotenberg.imagePullSecrets | list | `[]` | Image pull secrets for private registries |
 | gotenberg.nameOverride | string | `""` | Override the Gotenberg chart name |
 | gotenberg.fullnameOverride | string | `""` | Override the Gotenberg full release name |

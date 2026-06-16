@@ -117,6 +117,7 @@ A Helm chart for Kubernetes
 | nodeSelector | object | `{}` | Node selector constraints |
 | tolerations | list | `[]` | Pod tolerations |
 | affinity | object | `{}` | Pod affinity rules |
+| topologySpreadConstraints | list | `[]` | Pod topology spread constraints |
 
 ### Autoscaling
 
