@@ -61,9 +61,11 @@ global:
     # -- Public URL of the Lago frontend
     # @section -- URLs
     front: ""
-    # -- Internal URL of the PDF service (Gotenberg)
+    # -- Internal URL of the PDF service (Gotenberg). Must include a scheme
+    # because lago-api joins this with a path via `URI.join`, which raises
+    # `URI::BadURIError: both URI are relative` if the value is scheme-less.
     # @section -- URLs
-    pdf: "lago-pdf"
+    pdf: "http://lago-pdf"
 
   database:
     # -- PostgreSQL connection URI
