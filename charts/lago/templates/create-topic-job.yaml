@@ -19,10 +19,14 @@ spec:
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       restartPolicy: Never
       containers:
         - name: create-topics
-          image: alpine:3.20
+          image: {{ .Values.global.image.registry }}/library/alpine:3.20
           command: [sh]
           args:
             - -c

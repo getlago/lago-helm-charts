@@ -24,6 +24,10 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
     spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.pdf.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
@@ -37,7 +41,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - image: getlago/lago-gotenberg:8.15
+        - image: {{ .Values.global.image.registry }}/getlago/lago-gotenberg:8.15
           name: {{ .Release.Name }}-pdf
           ports:
             - containerPort: 3000
