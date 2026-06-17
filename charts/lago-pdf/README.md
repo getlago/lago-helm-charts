@@ -86,6 +86,7 @@ A Helm chart for the Lago PDF stack (Gotenberg + optional Rails worker)
 |-----|------|---------|-------------|
 | nameOverride | string | `""` | Override the chart name |
 | fullnameOverride | string | `""` | Override the full release name |
+| annotations | object | `{}` | Deployment metadata annotations |
 
 ### Extra Objects
 
