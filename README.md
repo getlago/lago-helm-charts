@@ -27,6 +27,7 @@ charts/
   lago-data-worker/               # Data worker (Celery)
   lago-data-config/               # Data shared config
   lago-data-forecasted-usage/     # ML forecasting CronJob
+  lago-data-superset/             # Superset analytics dashboards (web + worker)
   lago-staging/                   # Staging umbrella (Lago + Data + deps)
 ```
 
@@ -96,6 +97,7 @@ Each chart has a `values.yaml` with full documentation. See the individual chart
 | [lago-data-api](./charts/lago-data-api/README.md) | Data API |
 | [lago-data-worker](./charts/lago-data-worker/README.md) | Data worker |
 | [lago-data-forecasted-usage](./charts/lago-data-forecasted-usage/README.md) | ML forecasting CronJob |
+| [lago-data-superset](./charts/lago-data-superset/README.md) | Superset analytics dashboards (web + worker) |
 
 ## Development
 

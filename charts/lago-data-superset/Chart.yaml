@@ -1,0 +1,10 @@
+apiVersion: v2
+name: lago-data-superset
+description: >-
+  Lago's custom Apache Superset — a content-free machinery image plus a separate
+  assets image staged into /assets by an init-container. Config is fully decoupled:
+  all env is supplied via extraEnv / extraEnvFrom.
+type: application
+version: 0.5.9
+# Tracks the upstream Apache Superset the machinery image is built on.
+appVersion: "6.0.0"
