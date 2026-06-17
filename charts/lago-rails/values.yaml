@@ -400,6 +400,10 @@ image:
 # @default -- `[]`
 # @section -- Image
 imagePullSecrets: []
+# -- Deployment metadata annotations (e.g. Stakater Reloader)
+# @section -- Deployment
+annotations: {}
+
 # -- Override the chart name
 # @section -- Deployment
 nameOverride: ""

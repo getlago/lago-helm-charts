@@ -31,6 +31,7 @@ A Helm chart for Kubernetes
 |-----|------|---------|-------------|
 | nameOverride | string | `""` | Override the chart name |
 | fullnameOverride | string | `""` | Override the full release name |
+| annotations | object | `{}` | Deployment metadata annotations |
 
 ### Container
 

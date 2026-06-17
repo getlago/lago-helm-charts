@@ -53,6 +53,7 @@ A Helm chart for Kubernetes
 | replicaCount | int | `1` | Number of replicas (ignored when autoscaling is enabled) |
 | nameOverride | string | `""` | Override the chart name |
 | fullnameOverride | string | `""` | Override the full release name |
+| annotations | object | `{}` | Deployment metadata annotations |
 
 ### Image
 

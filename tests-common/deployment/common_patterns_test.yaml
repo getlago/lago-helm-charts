@@ -144,6 +144,33 @@ tests:
           path: spec.template.spec.topologySpreadConstraints
 
   # ============================================================================
+  # Deployment Annotations Tests
+  # ============================================================================
+  - it: should include Deployment annotations when specified
+    values:
+      - ./fixtures/required.yaml
+    set:
+      annotations:
+        reloader.stakater.com/auto: "true"
+        custom.example.com/owner: "platform"
+    asserts:
+      - equal:
+          path: metadata.annotations["reloader.stakater.com/auto"]
+          value: "true"
+      - equal:
+          path: metadata.annotations["custom.example.com/owner"]
+          value: "platform"
+
+  - it: should not include Deployment annotations when empty
+    values:
+      - ./fixtures/required.yaml
+    set:
+      annotations: {}
+    asserts:
+      - notExists:
+          path: metadata.annotations
+
+  # ============================================================================
   # Combined Test - All Common Patterns
   # ============================================================================
   - it: should correctly render all common patterns together
