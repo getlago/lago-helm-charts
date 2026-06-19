@@ -39,6 +39,12 @@ global:
     # @section -- Redis
     password: ""
 
+  sentry:
+    dsn:
+      # -- Sentry DSN for the events processor worker (separate Sentry project from lago-rails)
+      # @section -- Observability
+      events: ""
+
   streaming_ingestion:
     # -- Enable streaming ingestion (ClickHouse + Kafka)
     # @section -- Streaming Ingestion

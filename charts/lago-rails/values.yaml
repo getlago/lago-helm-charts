@@ -110,9 +110,12 @@ global:
     # @section -- Redis
     password: ""
 
-  # -- Sentry DSN for error tracking
-  # @section -- Observability
-  sentryDsn: ""
+  sentry:
+    dsn:
+      # -- Sentry DSN for the backend (lago-rails and lago-events-processor-worker share this DSN)
+      # @section -- Observability
+      back: ""
+
   # -- Segment write key for analytics
   # @section -- Observability
   segmentWriteKey: ""

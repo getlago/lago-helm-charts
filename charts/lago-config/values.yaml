@@ -112,9 +112,24 @@ global:
     # @section -- Redis
     password: ""
 
-  # -- Sentry DSN for error tracking
-  # @section -- Observability
-  sentryDsn: ""
+  # One DSN per Sentry project. Components that report to the same Sentry
+  # project share a key so fingerprints, traces and release tracking line
+  # up. Add a new entry when a component is run as its own Sentry project
+  # (different SDK or operationally separate service).
+  sentry:
+    dsn:
+      # -- Sentry DSN for the Ruby backend / Sidekiq workers (lago-rails)
+      # @section -- Observability
+      back: ""
+      # -- Sentry DSN for the events processor worker (separate Sentry project from `back`)
+      # @section -- Observability
+      events: ""
+      # -- Sentry DSN for the JavaScript frontend (lago-front)
+      # @section -- Observability
+      front: ""
+      # Future component DSNs plug in as additional map entries:
+      # data: ""
+
   # -- Segment write key for analytics
   # @section -- Observability
   segmentWriteKey: ""

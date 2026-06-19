@@ -76,10 +76,6 @@ global:
     # @section -- Redis
     password: ""
 
-  # -- Sentry DSN for error tracking
-  # @section -- Observability
-  sentryDsn: ""
-
   databaseAnalytical:
     # -- Analytical database host
     # @section -- Analytical Database

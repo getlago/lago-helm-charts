@@ -151,7 +151,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ include "lago-rails.secretName" . }}
-                  key: sentryDsn
+                  key: sentry.dsn.back
                   optional: true
             - name: SEGMENT_WRITE_KEY
               valueFrom:
