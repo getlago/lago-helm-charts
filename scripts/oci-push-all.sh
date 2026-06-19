@@ -18,6 +18,7 @@ CHARTS=(
   lago-data-worker
   lago-data-forecasted-usage
   lago-data-rev-rec
+  lago-data-superset
   lago-mcp-server
   lago-pdf
   lago-data
