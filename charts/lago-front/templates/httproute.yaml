@@ -38,11 +38,18 @@ spec:
       filters:
       {{- toYaml . | nindent 8 }}
     {{- end }}
+    {{- if hasKey . "backendRefs" }}
+      {{- with .backendRefs }}
+      backendRefs:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- else }}
       backendRefs:
         - group: ""
           kind: Service
           name: {{ $fullName }}
           port: {{ $svcPort }}
           weight: 1
+    {{- end }}
     {{- end }}
 {{- end }}
