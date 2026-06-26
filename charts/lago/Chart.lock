@@ -1,45 +1,45 @@
 dependencies:
 - name: lago-config
   repository: file://../lago-config
-  version: 0.5.11
+  version: 0.5.12
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.5.11
+  version: 0.5.12
 - name: lago-front
   repository: file://../lago-front
-  version: 0.5.11
+  version: 0.5.12
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.5.11
+  version: 0.5.12
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.5.11
+  version: 0.5.12
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.5.11
+  version: 0.5.12
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.5.11
+  version: 0.5.12
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.5.11
+  version: 0.5.12
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.5.11
+  version: 0.5.12
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.5.11
+  version: 0.5.12
 - name: lago-pdf
   repository: file://../lago-pdf
-  version: 0.5.11
+  version: 0.5.12
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.5.11
+  version: 0.5.12
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.5.11
+  version: 0.5.12
 - name: lago-events-processor-worker
   repository: file://../lago-events-processor-worker
-  version: 0.5.11
-digest: sha256:88cce0e67307ec41d6147d3e1e4f14128d9c124a97af15a5cba878425303d04b
-generated: "2026-06-26T08:18:31.368701807Z"
+  version: 0.5.12
+digest: sha256:b27945e9b570a1bb9d5a3dff6928caed4dee2b778c1a556052fabb9b4030dc04
+generated: "2026-06-26T12:46:24.350926217Z"
