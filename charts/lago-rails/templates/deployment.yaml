@@ -153,6 +153,12 @@ spec:
                   name: {{ include "lago-rails.secretName" . }}
                   key: sentry.dsn.back
                   optional: true
+            - name: SENTRY_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: sentry.environment
+                  optional: true
             - name: SEGMENT_WRITE_KEY
               valueFrom:
                 secretKeyRef:

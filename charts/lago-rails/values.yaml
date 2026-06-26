@@ -111,6 +111,9 @@ global:
     password: ""
 
   sentry:
+    # -- Sentry environment name (e.g. "production", "staging"), injected as SENTRY_ENVIRONMENT
+    # @section -- Observability
+    environment: ""
     dsn:
       # -- Sentry DSN for the backend (lago-rails and lago-events-processor-worker share this DSN)
       # @section -- Observability

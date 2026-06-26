@@ -117,6 +117,9 @@ global:
   # up. Add a new entry when a component is run as its own Sentry project
   # (different SDK or operationally separate service).
   sentry:
+    # -- Sentry environment name (e.g. "production", "staging"), injected as SENTRY_ENVIRONMENT into every component that reports to Sentry
+    # @section -- Observability
+    environment: ""
     dsn:
       # -- Sentry DSN for the Ruby backend / Sidekiq workers (lago-rails)
       # @section -- Observability

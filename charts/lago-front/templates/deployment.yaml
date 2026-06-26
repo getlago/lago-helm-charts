@@ -67,6 +67,12 @@ spec:
                   name: {{ include "lago-front.secretName" . }}
                   key: sentry.dsn.front
                   optional: true
+            - name: SENTRY_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-front.configMapName" . }}
+                  key: sentry.environment
+                  optional: true
             - name: LAGO_DISABLE_SIGNUP
               value: {{ not .Values.global.lago.signup | quote }}
             {{- if .Values.global.gocardless.enabled }}

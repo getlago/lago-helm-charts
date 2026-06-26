@@ -51,4 +51,7 @@ data:
   {{- if .Values.global.data.enabled }}
   data.endpoint: {{ required "global.data.endpoint is required" .Values.global.data.endpoint }}
   {{- end }}
+  {{- with .Values.global.sentry.environment }}
+  sentry.environment: {{ . | quote }}
+  {{- end }}
 {{- end }}
