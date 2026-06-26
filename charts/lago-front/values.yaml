@@ -29,9 +29,14 @@ global:
     # @section -- Nango
     publicKey: ""
 
-  # -- Sentry DSN for error tracking
-  # @section -- Observability
-  sentryDsn: ""
+  sentry:
+    # -- Sentry environment name (e.g. "production", "staging"), injected as SENTRY_ENVIRONMENT
+    # @section -- Observability
+    environment: ""
+    dsn:
+      # -- Sentry DSN for the frontend
+      # @section -- Observability
+      front: ""
 
   gocardless:
     # -- Enable GoCardless integration

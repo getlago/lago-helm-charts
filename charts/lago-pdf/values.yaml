@@ -110,9 +110,6 @@ global:
     # @section -- Redis
     password: ""
 
-  # -- Sentry DSN for error tracking
-  # @section -- Observability
-  sentryDsn: ""
   # -- Segment write key for analytics
   # @section -- Observability
   segmentWriteKey: ""

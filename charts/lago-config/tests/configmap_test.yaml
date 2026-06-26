@@ -119,3 +119,27 @@ tests:
           count: 1
       - isKind:
           of: ConfigMap
+
+  - it: should emit sentry.environment when set
+    set:
+      global.urls.api: "http://api.test"
+      global.urls.front: "http://front.test"
+      global.redis.uri: "redis://localhost"
+      global.redisCache.uri: "redis://localhost"
+      global.redisStore.uri: "redis://localhost"
+      global.sentry.environment: "production"
+    asserts:
+      - equal:
+          path: data["sentry.environment"]
+          value: "production"
+
+  - it: should omit sentry.environment when unset
+    set:
+      global.urls.api: "http://api.test"
+      global.urls.front: "http://front.test"
+      global.redis.uri: "redis://localhost"
+      global.redisCache.uri: "redis://localhost"
+      global.redisStore.uri: "redis://localhost"
+    asserts:
+      - notExists:
+          path: data["sentry.environment"]

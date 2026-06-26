@@ -91,7 +91,13 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ include "lago-events-processor-worker.secretName" . }}
-                  key: sentryDsn
+                  key: sentry.dsn.events
+                  optional: true
+            - name: SENTRY_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-events-processor-worker.configMapName" . }}
+                  key: sentry.environment
                   optional: true
             {{- range $name, $val := .Values.extraEnv }}
             {{- if kindIs "map" $val }}
