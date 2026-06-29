@@ -71,13 +71,15 @@ web:
   # -- Web container resources
   # @section -- Web
   resources: {}
-  # -- Web startup probe (boot runs migrations + bundle import, so allow a generous window)
+  # -- Web startup probe (boot runs db upgrade + bundle import; budget covers slow metadata DB)
   # @section -- Web
   startupProbe:
     httpGet:
       path: /health
       port: http
+    initialDelaySeconds: 15
     periodSeconds: 10
+    timeoutSeconds: 5
     failureThreshold: 60
   # -- Web liveness probe
   # @section -- Web
@@ -85,14 +87,20 @@ web:
     httpGet:
       path: /health
       port: http
-    periodSeconds: 15
+    initialDelaySeconds: 15
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 5
   # -- Web readiness probe
   # @section -- Web
   readinessProbe:
     httpGet:
       path: /health
       port: http
-    periodSeconds: 15
+    initialDelaySeconds: 15
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 5
 
 worker:
   # -- Celery worker replica count
