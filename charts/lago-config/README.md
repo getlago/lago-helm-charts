@@ -50,6 +50,7 @@ A Helm chart for Kubernetes
 |-----|------|---------|-------------|
 | global.database.uri | string | `""` | PostgreSQL connection URI |
 | global.database.pool | int | `20` | Database connection pool size |
+| global.database.preparedStatement | bool | `nil` | Enable ActiveRecord prepared statements. Leave unset to use the Rails default (`true`); set to `false` when running behind a connection pooler that can't multiplex sessions issuing prepared statements. Renders the `DATABASE_PREPARED_STATEMENTS` env var on Rails pods only when explicitly set. |
 
 ### Encryption
 

@@ -65,6 +65,15 @@ spec:
               value: {{ default .Values.global.lago.env .Values.migrate.config.env }}
             - name: DATABASE_POOL
               value: {{ default .Values.global.database.pool .Values.migrate.config.database.pool | quote }}
+            {{/* Per-instance override wins over the umbrella default. */}}
+            {{- if kindIs "bool" .Values.migrate.config.database.preparedStatement }}
+            - name: DATABASE_PREPARED_STATEMENTS
+              value: {{ .Values.migrate.config.database.preparedStatement | quote }}
+            {{/* Fall back to the global value shared across every Rails pod. */}}
+            {{- else if kindIs "bool" .Values.global.database.preparedStatement }}
+            - name: DATABASE_PREPARED_STATEMENTS
+              value: {{ .Values.global.database.preparedStatement | quote }}
+            {{- end }}
             - name: LAGO_LOG_LEVEL
               value: {{ .Values.migrate.config.log.level }}
             - name: RAILS_LOG_TO_STDOUT

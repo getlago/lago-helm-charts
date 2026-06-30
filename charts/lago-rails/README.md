@@ -22,6 +22,7 @@ A Helm chart for Kubernetes
 | config.log.level | string | `"info"` | Log level (`debug`, `info`, `warn`, `error`) |
 | config.log.stdout | bool | `true` | Log to stdout |
 | config.database.pool | int | `nil` | Override the global database pool size for this instance |
+| config.database.preparedStatement | bool | `nil` | Override `global.database.preparedStatement` for this instance |
 | config.otel.enabled | bool | `false` | Enable OpenTelemetry tracing |
 | config.otel.endpoint | string | `nil` | OpenTelemetry collector endpoint |
 | config.otel.serviceName | string | `nil` | OpenTelemetry service name |

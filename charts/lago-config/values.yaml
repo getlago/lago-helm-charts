@@ -71,6 +71,13 @@ global:
     # -- Database connection pool size
     # @section -- Database
     pool: 20
+    # -- (bool) Enable ActiveRecord prepared statements. Leave unset to use the
+    # Rails default (`true`); set to `false` when running behind a connection
+    # pooler that can't multiplex sessions issuing prepared statements. Renders
+    # the `DATABASE_PREPARED_STATEMENTS` env var on Rails pods only when
+    # explicitly set.
+    # @section -- Database
+    preparedStatement:
 
   encryption:
     # -- Primary encryption key (`openssl rand -hex 16`)
