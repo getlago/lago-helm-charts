@@ -236,6 +236,7 @@ A Helm chart for Kubernetes
 | migrate.config.log.level | string | `"info"` | Log level (`debug`, `info`, `warn`, `error`) |
 | migrate.config.log.stdout | bool | `true` | Log to stdout |
 | migrate.config.database.pool | int | `nil` | Override the global database pool size for this instance |
+| migrate.config.database.preparedStatement | bool | `nil` | Override `global.database.preparedStatement` for this instance |
 
 ### Create Topics Job
 

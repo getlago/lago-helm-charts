@@ -61,6 +61,15 @@ spec:
               value: {{ .Values.config.log.stdout | quote }}
             - name: DATABASE_POOL
               value: {{ default .Values.global.database.pool .Values.config.database.pool | quote }}
+            {{/* Per-instance override wins over the umbrella default. */}}
+            {{- if kindIs "bool" .Values.config.database.preparedStatement }}
+            - name: DATABASE_PREPARED_STATEMENTS
+              value: {{ .Values.config.database.preparedStatement | quote }}
+            {{/* Fall back to the global value shared across every Rails pod. */}}
+            {{- else if kindIs "bool" .Values.global.database.preparedStatement }}
+            - name: DATABASE_PREPARED_STATEMENTS
+              value: {{ .Values.global.database.preparedStatement | quote }}
+            {{- end }}
             - name: LAGO_SIDEKIQ_PRO_REQUIRED
               value: {{ .Values.global.sidekiq.pro | quote }}
             - name: LAGO_SIDEKIQ_WEB
