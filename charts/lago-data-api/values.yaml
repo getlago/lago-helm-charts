@@ -203,7 +203,7 @@ resources: {}
 # @section -- Pod
 livenessProbe:
   httpGet:
-    path: /
+    path: /health-check/
     port: http
   initialDelaySeconds: 10
   periodSeconds: 30
@@ -214,7 +214,7 @@ livenessProbe:
 # @section -- Pod
 readinessProbe:
   httpGet:
-    path: /
+    path: /health-check/
     port: http
   initialDelaySeconds: 10
   periodSeconds: 3
