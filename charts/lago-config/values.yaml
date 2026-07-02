@@ -323,7 +323,10 @@ global:
         apiLogs: api_logs
         # -- Kafka topic for security logs
         # @section -- Streaming Ingestion / Kafka
-        securityLogs: securityLogs
+        securityLogs: security_logs
+        # -- Kafka topic for unprocessed events (dead-letter for pre-enrichment failures)
+        # @section -- Streaming Ingestion / Kafka
+        unprocessedEvents: unprocessed_events
 
 configmap:
   # -- Create the ConfigMap (set to false when using an externally managed ConfigMap)
