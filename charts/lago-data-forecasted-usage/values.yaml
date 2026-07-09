@@ -42,10 +42,10 @@ config:
       # -- Use an existing S3 secret by name
       # @section -- Config
       name:
-    # -- S3 access key ID for model storage
+    # -- S3 access key ID for model storage. Leave empty to authenticate via IRSA / EKS Pod Identity.
     # @section -- Config
     accessKeyId:
-    # -- S3 secret access key for model storage
+    # -- S3 secret access key for model storage. Leave empty to authenticate via IRSA / EKS Pod Identity.
     # @section -- Config
     secretAccessKey:
 

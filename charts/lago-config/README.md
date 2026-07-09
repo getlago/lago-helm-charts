@@ -96,8 +96,8 @@ A Helm chart for Kubernetes
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | global.s3.enabled | bool | `false` | Enable S3-compatible object storage |
-| global.s3.accessKeyId | string | `""` | S3 access key ID |
-| global.s3.secretAccessKey | string | `""` | S3 secret access key |
+| global.s3.accessKeyId | string | `""` | S3 access key ID. Leave empty to authenticate via IRSA / EKS Pod Identity. |
+| global.s3.secretAccessKey | string | `""` | S3 secret access key. Leave empty to authenticate via IRSA / EKS Pod Identity. |
 | global.s3.bucket | string | `""` | S3 bucket name |
 | global.s3.region | string | `""` | S3 region |
 | global.s3.endpoint | string | `""` | S3 custom endpoint (for MinIO, etc.) |

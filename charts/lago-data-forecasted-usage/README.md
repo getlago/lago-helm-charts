@@ -37,8 +37,8 @@ A Helm chart for Kubernetes
 | config.nameOverride | string | `"lago-data-forecasted-usage"` | Override the config subchart release name |
 | config.s3.secret.create | bool | `true` | Create the S3 credentials secret |
 | config.s3.secret.name | string | `nil` | Use an existing S3 secret by name |
-| config.s3.accessKeyId | string | `nil` | S3 access key ID for model storage |
-| config.s3.secretAccessKey | string | `nil` | S3 secret access key for model storage |
+| config.s3.accessKeyId | string | `nil` | S3 access key ID for model storage. Leave empty to authenticate via IRSA / EKS Pod Identity. |
+| config.s3.secretAccessKey | string | `nil` | S3 secret access key for model storage. Leave empty to authenticate via IRSA / EKS Pod Identity. |
 | config.ml.secret.create | bool | `true` | Create the ML config secret |
 | config.ml.secret.name | string | `nil` | Use an existing ML secret by name |
 | config.ml.config | string | `""` | ML model configuration (YAML or JSON string) |

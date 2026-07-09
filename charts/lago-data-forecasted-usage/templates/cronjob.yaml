@@ -96,11 +96,13 @@ spec:
                     secretKeyRef:
                       name: {{ include "lago-data-forecasted-usage.s3.secretName" . }}
                       key: s3.accessKeyId
+                      optional: true
                 - name: AWS_SECRET_ACCESS_KEY
                   valueFrom:
                     secretKeyRef:
                       name: {{ include "lago-data-forecasted-usage.s3.secretName" . }}
                       key: s3.secretAccessKey
+                      optional: true
                 - name: ML_CONFIG_YAML
                   valueFrom:
                     secretKeyRef:
