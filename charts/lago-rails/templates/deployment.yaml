@@ -338,19 +338,25 @@ spec:
               value: {{ $val | quote }}
             {{- end }}
             {{- end }}
-          {{- if .Values.container.ports.enabled }}
+          {{- with .Values.container.ports }}
+          {{- if .enabled }}
           ports:
             - name: http
-              containerPort: {{ .Values.container.ports.http }}
+              containerPort: {{ .http }}
               protocol: TCP
           {{- end }}
-          {{- if .Values.livenessProbe.enabled }}
-          livenessProbe:
-            {{- omit .Values.livenessProbe "enabled" | toYaml | nindent 12 }}
           {{- end }}
-          {{- if .Values.readinessProbe.enabled }}
+          {{- with .Values.livenessProbe }}
+          {{- if .enabled }}
+          livenessProbe:
+            {{- omit . "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          {{- if .enabled }}
           readinessProbe:
-            {{- omit .Values.readinessProbe "enabled" | toYaml | nindent 12 }}
+            {{- omit . "enabled" | toYaml | nindent 12 }}
+          {{- end }}
           {{- end }}
           {{- with .Values.resources }}
           resources:
