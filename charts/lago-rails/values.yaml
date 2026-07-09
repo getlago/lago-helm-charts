@@ -393,6 +393,9 @@ container:
   # @section -- Container
   args: []
   ports:
+    # -- Enable the HTTP container port (disabled for workers/clock)
+    # @section -- Container
+    enabled: true
     # -- HTTP container port
     # @section -- Container
     http: 3000
@@ -553,6 +556,9 @@ resources: {}
 # @default -- See [values.yaml](./values.yaml#L532)
 # @section -- Pod
 livenessProbe:
+  # -- Enable the liveness probe (disabled for workers/clock)
+  # @section -- Pod
+  enabled: true
   failureThreshold: 5
   httpGet:
     path: /health
@@ -566,6 +572,9 @@ livenessProbe:
 # @default -- See [values.yaml](./values.yaml#L545)
 # @section -- Pod
 readinessProbe:
+  # -- Enable the readiness probe (disabled for workers/clock)
+  # @section -- Pod
+  enabled: true
   failureThreshold: 3
   httpGet:
     path: /health

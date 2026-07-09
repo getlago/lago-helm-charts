@@ -388,10 +388,12 @@ worker:
 
   # -- Liveness probe (disabled for workers)
   # @section -- Default Worker
-  livenessProbe: null
+  livenessProbe:
+    enabled: false
   # -- Readiness probe (disabled for workers)
   # @section -- Default Worker
-  readinessProbe: null
+  readinessProbe:
+    enabled: false
 
   container:
     # -- Worker entrypoint command
@@ -400,6 +402,7 @@ worker:
     # -- Worker container ports (none needed)
     # @section -- Default Worker
     ports:
+      enabled: false
 
 # -- Clock scheduler subchart overrides (lago-rails)
 # @default -- See child values
@@ -417,10 +420,12 @@ clock:
     nameOverride: lago-config
   # -- Liveness probe (disabled for clock)
   # @section -- Clock
-  livenessProbe: null
+  livenessProbe:
+    enabled: false
   # -- Readiness probe (disabled for clock)
   # @section -- Clock
-  readinessProbe: null
+  readinessProbe:
+    enabled: false
   service:
     # -- Disable service for the clock (no inbound traffic)
     # @section -- Clock
@@ -432,6 +437,7 @@ clock:
     # -- Clock container ports (none needed)
     # @section -- Clock
     ports:
+      enabled: false
 
 # -- Analytics worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.analytics`)
 # @default -- See child values
@@ -449,10 +455,12 @@ analytics-worker:
     nameOverride: lago-config
   # -- Liveness probe (disabled for workers)
   # @section -- Analytics Worker
-  livenessProbe: null
+  livenessProbe:
+    enabled: false
   # -- Readiness probe (disabled for workers)
   # @section -- Analytics Worker
-  readinessProbe: null
+  readinessProbe:
+    enabled: false
   service:
     # -- Disable service (no inbound traffic)
     # @section -- Analytics Worker
@@ -464,6 +472,7 @@ analytics-worker:
     # -- Container ports (none needed)
     # @section -- Analytics Worker
     ports:
+      enabled: false
 
 # -- Billing worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.billing`)
 # @default -- See child values
@@ -481,10 +490,12 @@ billing-worker:
     nameOverride: lago-config
   # -- Liveness probe (disabled for workers)
   # @section -- Billing Worker
-  livenessProbe: null
+  livenessProbe:
+    enabled: false
   # -- Readiness probe (disabled for workers)
   # @section -- Billing Worker
-  readinessProbe: null
+  readinessProbe:
+    enabled: false
   service:
     # -- Disable service (no inbound traffic)
     # @section -- Billing Worker
@@ -496,6 +507,7 @@ billing-worker:
     # -- Container ports (none needed)
     # @section -- Billing Worker
     ports:
+      enabled: false
 
 # -- Clock worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.clock`)
 # @default -- See child values
@@ -513,10 +525,12 @@ clock-worker:
     nameOverride: lago-config
   # -- Liveness probe (disabled for workers)
   # @section -- Clock Worker
-  livenessProbe: null
+  livenessProbe:
+    enabled: false
   # -- Readiness probe (disabled for workers)
   # @section -- Clock Worker
-  readinessProbe: null
+  readinessProbe:
+    enabled: false
   service:
     # -- Disable service (no inbound traffic)
     # @section -- Clock Worker
@@ -528,6 +542,7 @@ clock-worker:
     # -- Container ports (none needed)
     # @section -- Clock Worker
     ports:
+      enabled: false
 
 # -- Events worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.events`)
 # @default -- See child values
@@ -545,10 +560,12 @@ events-worker:
     nameOverride: lago-config
   # -- Liveness probe (disabled for workers)
   # @section -- Events Worker
-  livenessProbe: null
+  livenessProbe:
+    enabled: false
   # -- Readiness probe (disabled for workers)
   # @section -- Events Worker
-  readinessProbe: null
+  readinessProbe:
+    enabled: false
   service:
     # -- Disable service (no inbound traffic)
     # @section -- Events Worker
@@ -560,6 +577,7 @@ events-worker:
     # -- Container ports (none needed)
     # @section -- Events Worker
     ports:
+      enabled: false
 
 # -- Webhook worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.webhook`)
 # @default -- See child values
@@ -577,10 +595,12 @@ webhook-worker:
     nameOverride: lago-config
   # -- Liveness probe (disabled for workers)
   # @section -- Webhook Worker
-  livenessProbe: null
+  livenessProbe:
+    enabled: false
   # -- Readiness probe (disabled for workers)
   # @section -- Webhook Worker
-  readinessProbe: null
+  readinessProbe:
+    enabled: false
   service:
     # -- Disable service (no inbound traffic)
     # @section -- Webhook Worker
@@ -592,6 +612,7 @@ webhook-worker:
     # -- Container ports (none needed)
     # @section -- Webhook Worker
     ports:
+      enabled: false
 
 # -- PDF worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.pdf`)
 # @default -- See child values
@@ -609,10 +630,12 @@ pdf-worker:
     nameOverride: lago-config
   # -- Liveness probe (disabled for workers)
   # @section -- PDF Worker
-  livenessProbe: null
+  livenessProbe:
+    enabled: false
   # -- Readiness probe (disabled for workers)
   # @section -- PDF Worker
-  readinessProbe: null
+  readinessProbe:
+    enabled: false
   service:
     # -- Disable service (no inbound traffic)
     # @section -- PDF Worker
@@ -624,6 +647,7 @@ pdf-worker:
     # -- Container ports (none needed)
     # @section -- PDF Worker
     ports:
+      enabled: false
 
 # -- PDF stack (gotenberg) subchart overrides
 # @default -- See child values
@@ -657,10 +681,12 @@ events-consumer-worker:
     nameOverride: lago-config
   # -- Liveness probe (disabled for workers)
   # @section -- Events Consumer Worker
-  livenessProbe: null
+  livenessProbe:
+    enabled: false
   # -- Readiness probe (disabled for workers)
   # @section -- Events Consumer Worker
-  readinessProbe: null
+  readinessProbe:
+    enabled: false
   service:
     # -- Disable service (no inbound traffic)
     # @section -- Events Consumer Worker
@@ -672,6 +698,7 @@ events-consumer-worker:
     # -- Container ports (none needed)
     # @section -- Events Consumer Worker
     ports:
+      enabled: false
 
 # -- Events processor worker subchart overrides (conditional on `global.streaming_ingestion.enabled`)
 # @default -- See child values

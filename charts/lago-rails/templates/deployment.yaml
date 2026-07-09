@@ -338,19 +338,19 @@ spec:
               value: {{ $val | quote }}
             {{- end }}
             {{- end }}
-          {{- with .Values.container.ports }}
+          {{- if .Values.container.ports.enabled }}
           ports:
             - name: http
-              containerPort: {{ .http }}
+              containerPort: {{ .Values.container.ports.http }}
               protocol: TCP
           {{- end }}
-          {{- with .Values.livenessProbe }}
+          {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
-            {{- toYaml . | nindent 12 }}
+            {{- omit .Values.livenessProbe "enabled" | toYaml | nindent 12 }}
           {{- end }}
-          {{- with .Values.readinessProbe }}
+          {{- if .Values.readinessProbe.enabled }}
           readinessProbe:
-            {{- toYaml . | nindent 12 }}
+            {{- omit .Values.readinessProbe "enabled" | toYaml | nindent 12 }}
           {{- end }}
           {{- with .Values.resources }}
           resources:
