@@ -236,11 +236,13 @@ spec:
                 secretKeyRef:
                   name: {{ include "lago-rails.secretName" . }}
                   key: s3.accessKeyId
+                  optional: true
             - name: LAGO_AWS_S3_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ include "lago-rails.secretName" . }}
                   key: s3.secretAccessKey
+                  optional: true
             {{- end }}
             {{- if .Values.global.smtp.enabled }}
             - name: LAGO_FROM_EMAIL

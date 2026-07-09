@@ -156,10 +156,10 @@ global:
     # -- Enable S3-compatible object storage
     # @section -- S3
     enabled: false
-    # -- S3 access key ID
+    # -- S3 access key ID. Leave empty to authenticate via IRSA / EKS Pod Identity.
     # @section -- S3
     accessKeyId: ""
-    # -- S3 secret access key
+    # -- S3 secret access key. Leave empty to authenticate via IRSA / EKS Pod Identity.
     # @section -- S3
     secretAccessKey: ""
     # -- S3 bucket name
