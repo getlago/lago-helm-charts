@@ -576,6 +576,18 @@ readinessProbe:
   successThreshold: 1
   timeoutSeconds: 1
 
+# -- (int) Pod termination grace period (seconds). Unset uses the K8s default (30)
+# @section -- Pod
+terminationGracePeriodSeconds:
+
+# -- Container lifecycle hooks (e.g. a preStop sleep to drain connections on shutdown)
+# @default -- `{}`
+# @section -- Pod
+lifecycle: {}
+  # preStop:
+  #   exec:
+  #     command: ["/bin/sleep", "15"]
+
 autoscaling:
   # -- Enable Horizontal Pod Autoscaler
   # @section -- Autoscaling
@@ -593,6 +605,17 @@ autoscaling:
   # @section -- Autoscaling
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
+
+podDisruptionBudget:
+  # -- Create a PodDisruptionBudget. Only enable on multi-replica deployments
+  # @section -- Pod Disruption Budget
+  enabled: false
+  # -- (int/string) Minimum pods that must stay available (mutually exclusive with maxUnavailable)
+  # @section -- Pod Disruption Budget
+  minAvailable:
+  # -- (int/string) Maximum pods that may be unavailable during disruption
+  # @section -- Pod Disruption Budget
+  maxUnavailable: 1
 
 # -- Additional volumes
 # @section -- Pod
