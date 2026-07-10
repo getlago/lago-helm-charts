@@ -323,10 +323,12 @@ worker:
 
   # -- Liveness probe (disabled for worker)
   # @section -- PDF Worker
-  livenessProbe: null
+  livenessProbe:
+    enabled: false
   # -- Readiness probe (disabled for worker)
   # @section -- PDF Worker
-  readinessProbe: null
+  readinessProbe:
+    enabled: false
 
   container:
     # -- Worker entrypoint command
@@ -334,7 +336,7 @@ worker:
     command: ["./scripts/start.worker.sh"]
     # -- Worker container ports (none needed)
     # @section -- PDF Worker
-    ports:
+    ports: []
 
 # -- Gotenberg HTML-to-PDF conversion service
 # @section -- Gotenberg

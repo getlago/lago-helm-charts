@@ -61,6 +61,15 @@ tasks:
         msg: "❌ chart-testing not found (see: https://github.com/helm/chart-testing)"
     cmd: ct lint --all --config tools/ct.yaml
 
+  lint:clean:
+    desc: Remove vendored subcharts, then lint changed charts with freshly rebuilt dependencies (mirrors CI)
+    preconditions:
+      - sh: command -v ct
+        msg: "❌ chart-testing not found (see: https://github.com/helm/chart-testing)"
+    cmds:
+      - find charts -mindepth 3 -maxdepth 3 -type f -path '*/charts/*.tgz' -delete
+      - ct lint --config tools/ct.yaml
+
   docs:*:
     desc: Generate README for a specific chart (e.g. task docs:lago)
     vars:

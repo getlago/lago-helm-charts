@@ -345,17 +345,21 @@ spec:
             {{- end }}
           {{- with .Values.container.ports }}
           ports:
-            - name: http
-              containerPort: {{ .http }}
-              protocol: TCP
+            {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.livenessProbe }}
+          {{- if .Values.customLivenessProbe }}
           livenessProbe:
-            {{- toYaml . | nindent 12 }}
+            {{- toYaml .Values.customLivenessProbe | nindent 12 }}
+          {{- else if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            {{- omit .Values.livenessProbe "enabled" | toYaml | nindent 12 }}
           {{- end }}
-          {{- with .Values.readinessProbe }}
+          {{- if .Values.customReadinessProbe }}
           readinessProbe:
-            {{- toYaml . | nindent 12 }}
+            {{- toYaml .Values.customReadinessProbe | nindent 12 }}
+          {{- else if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            {{- omit .Values.readinessProbe "enabled" | toYaml | nindent 12 }}
           {{- end }}
           {{- with .Values.lifecycle }}
           lifecycle:
