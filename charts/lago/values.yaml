@@ -401,8 +401,7 @@ worker:
     command: ["./scripts/start.worker.sh"]
     # -- Worker container ports (none needed)
     # @section -- Default Worker
-    ports:
-      enabled: false
+    ports: []
 
 # -- Clock scheduler subchart overrides (lago-rails)
 # @default -- See child values
@@ -436,8 +435,7 @@ clock:
     command: ["./scripts/start.clock.sh"]
     # -- Clock container ports (none needed)
     # @section -- Clock
-    ports:
-      enabled: false
+    ports: []
 
 # -- Analytics worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.analytics`)
 # @default -- See child values
@@ -471,8 +469,7 @@ analytics-worker:
     command: ["./scripts/start.analytics.worker.sh"]
     # -- Container ports (none needed)
     # @section -- Analytics Worker
-    ports:
-      enabled: false
+    ports: []
 
 # -- Billing worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.billing`)
 # @default -- See child values
@@ -506,8 +503,7 @@ billing-worker:
     command: ["./scripts/start.billing.worker.sh"]
     # -- Container ports (none needed)
     # @section -- Billing Worker
-    ports:
-      enabled: false
+    ports: []
 
 # -- Clock worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.clock`)
 # @default -- See child values
@@ -541,8 +537,7 @@ clock-worker:
     command: ["./scripts/start.clock.worker.sh"]
     # -- Container ports (none needed)
     # @section -- Clock Worker
-    ports:
-      enabled: false
+    ports: []
 
 # -- Events worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.events`)
 # @default -- See child values
@@ -576,8 +571,7 @@ events-worker:
     command: ["./scripts/start.events.worker.sh"]
     # -- Container ports (none needed)
     # @section -- Events Worker
-    ports:
-      enabled: false
+    ports: []
 
 # -- Webhook worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.webhook`)
 # @default -- See child values
@@ -611,8 +605,7 @@ webhook-worker:
     command: ["./scripts/start.webhook.worker.sh"]
     # -- Container ports (none needed)
     # @section -- Webhook Worker
-    ports:
-      enabled: false
+    ports: []
 
 # -- PDF worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.pdf`)
 # @default -- See child values
@@ -646,8 +639,7 @@ pdf-worker:
     command: ["./scripts/start.pdfs.worker.sh"]
     # -- Container ports (none needed)
     # @section -- PDF Worker
-    ports:
-      enabled: false
+    ports: []
 
 # -- PDF stack (gotenberg) subchart overrides
 # @default -- See child values
@@ -697,8 +689,7 @@ events-consumer-worker:
     command: ["./scripts/start.events.consumer.sh"]
     # -- Container ports (none needed)
     # @section -- Events Consumer Worker
-    ports:
-      enabled: false
+    ports: []
 
 # -- Events processor worker subchart overrides (conditional on `global.streaming_ingestion.enabled`)
 # @default -- See child values
