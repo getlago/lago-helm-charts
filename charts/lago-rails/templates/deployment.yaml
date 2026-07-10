@@ -339,24 +339,22 @@ spec:
             {{- end }}
             {{- end }}
           {{- with .Values.container.ports }}
-          {{- if .enabled }}
           ports:
-            - name: http
-              containerPort: {{ .http }}
-              protocol: TCP
+            {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- end }}
-          {{- with .Values.livenessProbe }}
-          {{- if .enabled }}
+          {{- if .Values.customLivenessProbe }}
           livenessProbe:
-            {{- omit . "enabled" | toYaml | nindent 12 }}
+            {{- toYaml .Values.customLivenessProbe | nindent 12 }}
+          {{- else if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            {{- omit .Values.livenessProbe "enabled" | toYaml | nindent 12 }}
           {{- end }}
-          {{- end }}
-          {{- with .Values.readinessProbe }}
-          {{- if .enabled }}
+          {{- if .Values.customReadinessProbe }}
           readinessProbe:
-            {{- omit . "enabled" | toYaml | nindent 12 }}
-          {{- end }}
+            {{- toYaml .Values.customReadinessProbe | nindent 12 }}
+          {{- else if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            {{- omit .Values.readinessProbe "enabled" | toYaml | nindent 12 }}
           {{- end }}
           {{- with .Values.resources }}
           resources:

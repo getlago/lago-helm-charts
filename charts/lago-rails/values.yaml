@@ -392,13 +392,13 @@ container:
   # -- Container command arguments
   # @section -- Container
   args: []
+  # -- Container ports. Set to `[]` (in the parent chart) to disable, e.g. for workers/clock.
+  # Lists replace on merge, so an empty list from a parent value cleanly overrides.
+  # @section -- Container
   ports:
-    # -- Enable the HTTP container port (disabled for workers/clock)
-    # @section -- Container
-    enabled: true
-    # -- HTTP container port
-    # @section -- Container
-    http: 3000
+    - name: http
+      containerPort: 3000
+      protocol: TCP
 
 # -- Number of replicas (ignored when autoscaling is enabled)
 # @section -- Deployment
@@ -552,12 +552,11 @@ httpRoute:
 # @section -- Pod
 resources: {}
 
-# -- Liveness probe configuration
+# -- Liveness probe configuration. Disable by setting `enabled: false` (e.g. for workers/clock).
+# Full replacement (e.g. `exec` for workers) goes through `customLivenessProbe`.
 # @default -- See [values.yaml](./values.yaml#L532)
 # @section -- Pod
 livenessProbe:
-  # -- Enable the liveness probe (disabled for workers/clock)
-  # @section -- Pod
   enabled: true
   failureThreshold: 5
   httpGet:
@@ -568,12 +567,15 @@ livenessProbe:
   periodSeconds: 30
   successThreshold: 1
   timeoutSeconds: 1
-# -- Readiness probe configuration
+# -- Custom liveness probe. When set (non-empty), this ProbeSpec replaces the default `livenessProbe`
+# above wholesale — useful for swapping `httpGet` for `exec` on workers without leaking the child's default.
+# @section -- Pod
+customLivenessProbe: {}
+# -- Readiness probe configuration. Disable by setting `enabled: false` (e.g. for workers/clock).
+# Full replacement goes through `customReadinessProbe`.
 # @default -- See [values.yaml](./values.yaml#L545)
 # @section -- Pod
 readinessProbe:
-  # -- Enable the readiness probe (disabled for workers/clock)
-  # @section -- Pod
   enabled: true
   failureThreshold: 3
   httpGet:
@@ -584,6 +586,9 @@ readinessProbe:
   periodSeconds: 3
   successThreshold: 1
   timeoutSeconds: 1
+# -- Custom readiness probe. When set (non-empty), this ProbeSpec replaces the default `readinessProbe`.
+# @section -- Pod
+customReadinessProbe: {}
 
 autoscaling:
   # -- Enable Horizontal Pod Autoscaler

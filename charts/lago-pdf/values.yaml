@@ -336,8 +336,7 @@ worker:
     command: ["./scripts/start.worker.sh"]
     # -- Worker container ports (none needed)
     # @section -- PDF Worker
-    ports:
-      enabled: false
+    ports: []
 
 # -- Gotenberg HTML-to-PDF conversion service
 # @section -- Gotenberg
