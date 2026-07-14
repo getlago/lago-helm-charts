@@ -81,6 +81,21 @@ global:
     # explicitly set.
     # @section -- Database
     preparedStatement:
+    # -- (int, milliseconds) Default `statement_timeout` for every Rails pod,
+    # rendered as `LAGO_DATABASE_STATEMENT_TIMEOUT`. Per-component
+    # `config.database.statementTimeout` overrides. Unset → Postgres server default.
+    # @section -- Database
+    statementTimeout:
+    # -- (int, milliseconds) Default `idle_in_transaction_session_timeout`,
+    # rendered as `LAGO_DATABASE_IDLE_TX_TIMEOUT`. Per-component override via
+    # `config.database.idleInTransactionTimeout`. Unset → Postgres server default.
+    # @section -- Database
+    idleInTransactionTimeout:
+    # -- (int, milliseconds) Default `lock_timeout`, rendered as
+    # `LAGO_DATABASE_LOCK_TIMEOUT`. Per-component override via
+    # `config.database.lockTimeout`. Unset → Postgres server default.
+    # @section -- Database
+    lockTimeout:
 
   encryption:
     # -- Primary encryption key (`openssl rand -hex 16`)
