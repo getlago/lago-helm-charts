@@ -41,5 +41,8 @@ dependencies:
 - name: lago-events-processor-worker
   repository: file://../lago-events-processor-worker
   version: 0.5.19
-digest: sha256:b51623072646ec83c9a2224880c98df9cac4b563a6073848bee5c0de81e4db71
-generated: "2026-07-16T15:37:05.731303719Z"
+- name: lago-rails
+  repository: file://../lago-rails
+  version: 0.5.19
+digest: sha256:f70e0b7dbf633de0e2906e4876a3581644a012d4a27924c6eeaa2fa4322398c1
+generated: "2026-07-16T13:05:44.940719-07:00"
