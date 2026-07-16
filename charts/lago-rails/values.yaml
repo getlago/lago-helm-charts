@@ -76,6 +76,21 @@ global:
     # explicitly set.
     # @section -- Database
     preparedStatement:
+    # -- (int, milliseconds) Per-instance `statement_timeout`, rendered as
+    # `LAGO_DATABASE_STATEMENT_TIMEOUT`. Overrides `global.database.statementTimeout`.
+    # Unset → falls back to the Postgres server default.
+    # @section -- Database
+    statementTimeout:
+    # -- (int, milliseconds) Per-instance `idle_in_transaction_session_timeout`,
+    # rendered as `LAGO_DATABASE_IDLE_TX_TIMEOUT`. Overrides
+    # `global.database.idleInTransactionTimeout`. Unset → Postgres server default.
+    # @section -- Database
+    idleInTransactionTimeout:
+    # -- (int, milliseconds) Per-instance `lock_timeout`, rendered as
+    # `LAGO_DATABASE_LOCK_TIMEOUT`. Overrides `global.database.lockTimeout`.
+    # Unset → Postgres server default.
+    # @section -- Database
+    lockTimeout:
 
   encryption:
     # -- Primary encryption key (`openssl rand -hex 16`)

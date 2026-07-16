@@ -73,6 +73,22 @@ spec:
             - name: DATABASE_PREPARED_STATEMENTS
               value: {{ .Values.global.database.preparedStatement | quote }}
             {{- end }}
+            {{/* DB session timeouts. Per-instance override wins over the umbrella default; rendered only when set so an unset value falls back to the Postgres server default. */}}
+            {{- $statementTimeout := default .Values.global.database.statementTimeout .Values.config.database.statementTimeout }}
+            {{- if $statementTimeout }}
+            - name: LAGO_DATABASE_STATEMENT_TIMEOUT
+              value: {{ $statementTimeout | quote }}
+            {{- end }}
+            {{- $idleInTransactionTimeout := default .Values.global.database.idleInTransactionTimeout .Values.config.database.idleInTransactionTimeout }}
+            {{- if $idleInTransactionTimeout }}
+            - name: LAGO_DATABASE_IDLE_TX_TIMEOUT
+              value: {{ $idleInTransactionTimeout | quote }}
+            {{- end }}
+            {{- $lockTimeout := default .Values.global.database.lockTimeout .Values.config.database.lockTimeout }}
+            {{- if $lockTimeout }}
+            - name: LAGO_DATABASE_LOCK_TIMEOUT
+              value: {{ $lockTimeout | quote }}
+            {{- end }}
             - name: LAGO_SIDEKIQ_PRO_REQUIRED
               value: {{ .Values.global.sidekiq.pro | quote }}
             - name: LAGO_SIDEKIQ_WEB
