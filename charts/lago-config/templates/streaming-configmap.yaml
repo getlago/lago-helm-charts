@@ -22,6 +22,9 @@ data:
   {{- end }}
   LAGO_KAFKA_BOOTSTRAP_SERVERS: {{ $kafka.bootstrapServers | join "," }}
   LAGO_KAFKA_CONSUMER_GROUP: {{ $kafka.consumerGroup }}
+  {{- with $kafka.consumerGroupEventsProcessor }}
+  LAGO_KAFKA_CONSUMER_GROUP_EVENTS_PROCESSOR: {{ . }}
+  {{- end }}
   LAGO_KAFKA_ENRICHED_EVENTS_EXPANDED_TOPIC: {{ $kafka.topics.eventsEnrichedExpanded }}
   LAGO_KAFKA_ENRICHED_EVENTS_TOPIC: {{ $kafka.topics.eventsEnriched }}
   LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC: {{ $kafka.topics.eventsChargedInAdvance }}
@@ -38,11 +41,16 @@ data:
   LAGO_KAFKA_ACTIVITY_LOGS_TOPIC: {{ $kafka.topics.activityLogs }}
   LAGO_KAFKA_API_LOGS_TOPIC: {{ $kafka.topics.apiLogs }}
   LAGO_KAFKA_SECURITY_LOGS_TOPIC: {{ $kafka.topics.securityLogs }}
-  LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP: {{ $kafka.consumerGroup }}
+  {{- with $kafka.clickhouseConsumerGroup }}
+  LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP: {{ . }}
+  {{- end }}
   LAGO_CLICKHOUSE_PORT: {{ $clickhouse.port | quote }}
   LAGO_CLICKHOUSE_HOST: {{ $clickhouse.address }}
+  {{- with $clickhouse.hostReadOnly }}
+  LAGO_CLICKHOUSE_HOST_READ_ONLY: {{ . }}
+  {{- end }}
   LAGO_CLICKHOUSE_SSL: {{ $clickhouse.tls | quote }}
   LAGO_CLICKHOUSE_ENABLED: "true"
   LAGO_CLICKHOUSE_DATABASE: {{$clickhouse.database}}
-  LAGO_CLICKHOUSE_MIGRATIONS_ENABLED: "true"
+  LAGO_CLICKHOUSE_MIGRATIONS_ENABLED: {{ $clickhouse.migrationsEnabled | quote }}
 {{- end }}
