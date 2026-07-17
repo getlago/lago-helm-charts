@@ -488,16 +488,20 @@ analytics-worker:
     # -- Container ports (none needed)
     # @section -- Analytics Worker
     ports: []
-  # -- Override `LAGO_CLICKHOUSE_HOST` on this Deployment only, reading
-  # the read-replica hostname from the streaming ConfigMap key
-  # `LAGO_CLICKHOUSE_HOST_READ_ONLY` (published by lago-config when
-  # `global.streaming_ingestion.clickhouse.hostReadOnly` is set).
-  # Rendered AFTER `envFrom`, so it wins for the analytics-worker pod
-  # while every other lago-rails alias keeps reading the primary host.
-  # `optional: true` — if `hostReadOnly` is unset upstream, the key is
-  # absent from the ConfigMap and this override is empty; either set
-  # the value at the lago-config layer or unset this extraEnv block
-  # (e.g. `extraEnv: null`) to fall back to the ConfigMap primary.
+  # -- Override the three `LAGO_CLICKHOUSE_*` env vars on this
+  # Deployment only, reading the read-replica endpoint + credentials
+  # from the streaming ConfigMap + Secret's `*_READ_ONLY` keys
+  # (published by lago-config when
+  # `global.streaming_ingestion.clickhouse.{hostReadOnly,
+  # usernameReadOnly, passwordReadOnly}` are set). Rendered AFTER
+  # `envFrom`, so they win for the analytics-worker pod while every
+  # other lago-rails alias keeps reading the primary.
+  #
+  # All three lookups are `optional: true`. If a specific read-only
+  # key is absent (e.g. the replica accepts the primary's
+  # username/password, so only `hostReadOnly` is set), the env var is
+  # empty and the AWS SDK falls back to the primary that `envFrom`
+  # already mounted — Rails picks up whichever value survives.
   # @section -- Analytics Worker
   extraEnv:
     LAGO_CLICKHOUSE_HOST:
@@ -505,6 +509,18 @@ analytics-worker:
         configMapKeyRef:
           name: lago-config-streaming
           key: LAGO_CLICKHOUSE_HOST_READ_ONLY
+          optional: true
+    LAGO_CLICKHOUSE_USERNAME:
+      valueFrom:
+        secretKeyRef:
+          name: lago-config-streaming
+          key: LAGO_CLICKHOUSE_USERNAME_READ_ONLY
+          optional: true
+    LAGO_CLICKHOUSE_PASSWORD:
+      valueFrom:
+        secretKeyRef:
+          name: lago-config-streaming
+          key: LAGO_CLICKHOUSE_PASSWORD_READ_ONLY
           optional: true
 
 # -- Billing worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.billing`)

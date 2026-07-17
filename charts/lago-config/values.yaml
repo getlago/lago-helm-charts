@@ -289,6 +289,20 @@ global:
       # of the box. Empty string = no extra key is written.
       # @section -- Streaming Ingestion / ClickHouse
       hostReadOnly: ""
+      # -- ClickHouse username for the read-replica, published as
+      # `LAGO_CLICKHOUSE_USERNAME_READ_ONLY` in the streaming Secret
+      # when set. Leave empty when the replica accepts the same
+      # credentials as the primary — the analytics-worker's extraEnv
+      # picks the primary `LAGO_CLICKHOUSE_USERNAME` from the same
+      # Secret via `optional: true` if this key doesn't exist.
+      # @section -- Streaming Ingestion / ClickHouse
+      usernameReadOnly: ""
+      # -- ClickHouse password for the read-replica, published as
+      # `LAGO_CLICKHOUSE_PASSWORD_READ_ONLY` in the streaming Secret
+      # when set. Same story as usernameReadOnly — leave empty when
+      # the replica shares credentials with the primary.
+      # @section -- Streaming Ingestion / ClickHouse
+      passwordReadOnly: ""
 
     kafka:
       # -- Kafka username (not required when using an external secret)

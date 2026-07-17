@@ -39,7 +39,7 @@ set:
           - kafka:9092
 
 tests:
-  - it: injects LAGO_CLICKHOUSE_HOST as a valueFrom pointing at LAGO_CLICKHOUSE_HOST_READ_ONLY on lago-config-streaming
+  - it: injects LAGO_CLICKHOUSE_HOST as a valueFrom pointing at LAGO_CLICKHOUSE_HOST_READ_ONLY on the streaming ConfigMap
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -49,4 +49,28 @@ tests:
               configMapKeyRef:
                 name: lago-config-streaming
                 key: LAGO_CLICKHOUSE_HOST_READ_ONLY
+                optional: true
+
+  - it: injects LAGO_CLICKHOUSE_USERNAME as an optional valueFrom pointing at the read-only key on the streaming Secret
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_CLICKHOUSE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: lago-config-streaming
+                key: LAGO_CLICKHOUSE_USERNAME_READ_ONLY
+                optional: true
+
+  - it: injects LAGO_CLICKHOUSE_PASSWORD as an optional valueFrom pointing at the read-only key on the streaming Secret
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_CLICKHOUSE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: lago-config-streaming
+                key: LAGO_CLICKHOUSE_PASSWORD_READ_ONLY
                 optional: true
