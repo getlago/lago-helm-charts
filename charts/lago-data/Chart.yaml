@@ -15,30 +15,30 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.5.19
+version: 0.6.0
 
 dependencies:
   - name: lago-config
     alias: config
-    version: 0.5.19
+    version: 0.6.0
     repository: "file://../lago-config"
     condition: global.forecastedUsage.enabled
   - name: lago-data-config
     alias: data-config
-    version: 0.5.19
+    version: 0.6.0
     repository: "file://../lago-data-config"
   - name: lago-rails
     alias: api
-    version: 0.5.19
+    version: 0.6.0
     repository: "file://../lago-rails"
     condition: global.forecastedUsage.enabled
   - name: lago-data-api
     alias: data-api
-    version: 0.5.19
+    version: 0.6.0
     repository: "file://../lago-data-api"
   - name: lago-data-worker
     alias: data-worker
-    version: 0.5.19
+    version: 0.6.0
     repository: "file://../lago-data-worker"
     condition: global.forecastedUsage.enabled
 
