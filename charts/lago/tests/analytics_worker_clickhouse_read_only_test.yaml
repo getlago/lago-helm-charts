@@ -51,26 +51,15 @@ tests:
                 key: LAGO_CLICKHOUSE_HOST_READ_ONLY
                 optional: true
 
-  - it: injects LAGO_CLICKHOUSE_USERNAME as an optional valueFrom pointing at the read-only key on the streaming Secret
+  - it: does not override LAGO_CLICKHOUSE_USERNAME or LAGO_CLICKHOUSE_PASSWORD — they resolve via envFrom against the primary
     asserts:
-      - contains:
+      - notContains:
           path: spec.template.spec.containers[0].env
           content:
             name: LAGO_CLICKHOUSE_USERNAME
-            valueFrom:
-              secretKeyRef:
-                name: lago-config-streaming
-                key: LAGO_CLICKHOUSE_USERNAME_READ_ONLY
-                optional: true
-
-  - it: injects LAGO_CLICKHOUSE_PASSWORD as an optional valueFrom pointing at the read-only key on the streaming Secret
-    asserts:
-      - contains:
+          any: true
+      - notContains:
           path: spec.template.spec.containers[0].env
           content:
             name: LAGO_CLICKHOUSE_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: lago-config-streaming
-                key: LAGO_CLICKHOUSE_PASSWORD_READ_ONLY
-                optional: true
+          any: true

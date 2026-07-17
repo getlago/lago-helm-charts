@@ -166,14 +166,12 @@ A Helm chart for Kubernetes
 |-----|------|---------|-------------|
 | global.streaming_ingestion.clickhouse.address | string | `"clickhouse"` | ClickHouse server address |
 | global.streaming_ingestion.clickhouse.database | string | `"default"` | ClickHouse database name |
-| global.streaming_ingestion.clickhouse.hostReadOnly | string | `""` | ClickHouse read-replica hostname, published as `LAGO_CLICKHOUSE_HOST_READ_ONLY` in the streaming ConfigMap when set. Sub-charts that need to route reads to the replica flip `useClickhouseReadOnly: true` on themselves — the umbrella lago chart wires that flag on for the `analytics-worker` alias out of the box. Empty string = no extra key is written. |
+| global.streaming_ingestion.clickhouse.hostReadOnly | string | `""` | ClickHouse read-replica hostname, published as `LAGO_CLICKHOUSE_HOST_READ_ONLY` in the streaming ConfigMap when set. The umbrella lago chart's `analytics-worker` alias reads this key via `optional: true` extraEnv to override `LAGO_CLICKHOUSE_HOST` on that Deployment only. Username + password are NOT split — CH Cloud data warehouses share a user directory across all their compute services, so the primary `LAGO_CLICKHOUSE_USERNAME` / `LAGO_CLICKHOUSE_PASSWORD` mounted via `envFrom` authenticate against the replica too. Empty string = no extra key is written. |
 | global.streaming_ingestion.clickhouse.migrationsEnabled | bool | `true` | Enable in-Rails ClickHouse migrations (`LAGO_CLICKHOUSE_MIGRATIONS_ENABLED`). Set to `false` when ClickHouse schema is managed out-of-band (dedicated migration job, dbt, or a CI pipeline). Default `true` for back-compat with earlier chart versions that hardcoded it. |
 | global.streaming_ingestion.clickhouse.password | string | `""` | ClickHouse password (not required when using an external secret) |
-| global.streaming_ingestion.clickhouse.passwordReadOnly | string | `""` | ClickHouse password for the read-replica, published as `LAGO_CLICKHOUSE_PASSWORD_READ_ONLY` in the streaming Secret when set. Same story as usernameReadOnly — leave empty when the replica shares credentials with the primary. |
 | global.streaming_ingestion.clickhouse.port | int | `9000` | ClickHouse native protocol port |
 | global.streaming_ingestion.clickhouse.tls | bool | `false` | Enable TLS for ClickHouse connections |
 | global.streaming_ingestion.clickhouse.username | string | `""` | ClickHouse username (not required when using an external secret) |
-| global.streaming_ingestion.clickhouse.usernameReadOnly | string | `""` | ClickHouse username for the read-replica, published as `LAGO_CLICKHOUSE_USERNAME_READ_ONLY` in the streaming Secret when set. Leave empty when the replica accepts the same credentials as the primary — the analytics-worker's extraEnv picks the primary `LAGO_CLICKHOUSE_USERNAME` from the same Secret via `optional: true` if this key doesn't exist. |
 
 ### Streaming Ingestion
 
