@@ -275,6 +275,24 @@ global:
       # -- ClickHouse database name
       # @section -- Streaming Ingestion / ClickHouse
       database: default
+      # -- Enable in-Rails ClickHouse migrations (`LAGO_CLICKHOUSE_MIGRATIONS_ENABLED`).
+      # Set to `false` when ClickHouse schema is managed out-of-band (dedicated
+      # migration job, dbt, or a CI pipeline). Default `true` for back-compat
+      # with earlier chart versions that hardcoded it.
+      # @section -- Streaming Ingestion / ClickHouse
+      migrationsEnabled: true
+      # -- ClickHouse read-replica hostname, published as
+      # `LAGO_CLICKHOUSE_HOST_READ_ONLY` in the streaming ConfigMap when
+      # set. The umbrella lago chart's `analytics-worker` alias reads
+      # this key via `optional: true` extraEnv to override
+      # `LAGO_CLICKHOUSE_HOST` on that Deployment only. Username +
+      # password are NOT split — CH Cloud data warehouses share a user
+      # directory across all their compute services, so the primary
+      # `LAGO_CLICKHOUSE_USERNAME` / `LAGO_CLICKHOUSE_PASSWORD` mounted
+      # via `envFrom` authenticate against the replica too. Empty
+      # string = no extra key is written.
+      # @section -- Streaming Ingestion / ClickHouse
+      hostReadOnly: ""
 
     kafka:
       # -- Kafka username (not required when using an external secret)
@@ -292,9 +310,35 @@ global:
       # -- Kafka Security Protocol (`SASL_SSL`)
       # @section -- Streaming Ingestion / Kafka
       securityProtocol:
-      # -- Kafka consumer group name
+      # -- Kafka consumer group name for the Rails events consumer
+      # (`LAGO_KAFKA_CONSUMER_GROUP`). Published in the streaming
+      # ConfigMap. Sub-charts that need a distinct group (e.g. the Go
+      # events-processor) flip their own `useKafkaConsumerGroupEventsProcessor`
+      # flag and read `consumerGroupEventsProcessor` (below) from the
+      # same ConfigMap instead.
       # @section -- Streaming Ingestion / Kafka
       consumerGroup: events_consumer
+      # -- Kafka consumer group for the Go events-processor worker,
+      # published as `LAGO_KAFKA_CONSUMER_GROUP_EVENTS_PROCESSOR` in
+      # the streaming ConfigMap when set. The
+      # `lago-events-processor-worker` subchart's
+      # `useKafkaConsumerGroupEventsProcessor` flag (defaulted on by
+      # the umbrella lago chart) redirects that worker's
+      # `LAGO_KAFKA_CONSUMER_GROUP` env at this key, so the processor
+      # consumes in parallel with the Rails events consumer instead of
+      # competing on the same group. Empty string = no extra key is
+      # written.
+      # @section -- Streaming Ingestion / Kafka
+      consumerGroupEventsProcessor: ""
+      # -- Kafka consumer group for the ClickHouse Kafka engine
+      # (`LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP`). Only relevant when
+      # ClickHouse ingests directly from Kafka via its Kafka table
+      # engine (staging/dev). Leave empty in production stacks that
+      # rely on ClickPipes / dedicated processor workers — the
+      # `LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP` env var is omitted
+      # from the streaming ConfigMap when this value is empty.
+      # @section -- Streaming Ingestion / Kafka
+      clickhouseConsumerGroup: ""
       # -- List of Kafka bootstrap servers
       # @default -- `[]`
       # @section -- Streaming Ingestion / Kafka

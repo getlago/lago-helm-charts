@@ -1,0 +1,65 @@
+suite: Test analytics-worker gets the LAGO_CLICKHOUSE_HOST override that
+  redirects reads to LAGO_CLICKHOUSE_HOST_READ_ONLY from the streaming
+  ConfigMap. Only this alias is wired — other lago-rails aliases keep
+  reading the primary host.
+templates:
+  # analytics-worker is aliased from lago-rails; its templates live under
+  # charts/analytics-worker/ once helm dep update assembles them.
+  - charts/analytics-worker/templates/deployment.yaml
+
+set:
+  global:
+    lago:
+      env: production
+      version: v1.0.0
+    urls:
+      api: http://api.test
+      front: http://front.test
+    database:
+      uri: postgresql://localhost
+    encryption:
+      key: test-key
+      salt: test-salt
+    signing:
+      hmac: test-hmac
+      rsa: test-rsa
+    redis:
+      uri: redis://localhost
+    redisCache:
+      uri: redis://localhost
+    redisStore:
+      uri: redis://localhost
+    sidekiq:
+      queues:
+        analytics: true
+    streaming_ingestion:
+      enabled: true
+      kafka:
+        bootstrapServers:
+          - kafka:9092
+
+tests:
+  - it: injects LAGO_CLICKHOUSE_HOST as a valueFrom pointing at LAGO_CLICKHOUSE_HOST_READ_ONLY on the streaming ConfigMap
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_CLICKHOUSE_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: lago-config-streaming
+                key: LAGO_CLICKHOUSE_HOST_READ_ONLY
+                optional: true
+
+  - it: does not override LAGO_CLICKHOUSE_USERNAME or LAGO_CLICKHOUSE_PASSWORD — they resolve via envFrom against the primary
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_CLICKHOUSE_USERNAME
+          any: true
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_CLICKHOUSE_PASSWORD
+          any: true

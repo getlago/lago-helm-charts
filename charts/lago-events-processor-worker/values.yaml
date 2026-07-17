@@ -208,9 +208,28 @@ podSecurityContext: {}
 # @section -- Pod
 securityContext: {}
 
-# -- Extra environment variables (map format, deep-mergeable)
+# -- Extra environment variables (map format, deep-mergeable).
+#
+# Default: point `LAGO_KAFKA_CONSUMER_GROUP` at the streaming
+# ConfigMap key `LAGO_KAFKA_CONSUMER_GROUP_EVENTS_PROCESSOR` (published
+# by lago-config when
+# `global.streaming_ingestion.kafka.consumerGroupEventsProcessor` is
+# set). Rendered AFTER `envFrom` so it wins — the Go events-processor
+# consumes in parallel with the Rails events consumer (which stays on
+# `events_consumer` via the same ConfigMap) instead of joining the
+# same group and splitting partitions. `optional: true` — if the
+# upstream value is unset, the ConfigMap key is absent and this
+# override resolves to empty; set the value at the lago-config layer
+# to activate, or override this map (`extraEnv: {}`) to fall back to
+# the shared `LAGO_KAFKA_CONSUMER_GROUP` value.
 # @section -- Pod
-extraEnv: {}
+extraEnv:
+  LAGO_KAFKA_CONSUMER_GROUP:
+    valueFrom:
+      configMapKeyRef:
+        name: lago-config-streaming
+        key: LAGO_KAFKA_CONSUMER_GROUP_EVENTS_PROCESSOR
+        optional: true
 
 # -- Extra envFrom sources
 # @default -- `[]` (See [values.yaml])
