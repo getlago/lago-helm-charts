@@ -215,6 +215,10 @@ spec:
               value: {{ .Values.global.sidekiq.queues.webhook | quote }}
             - name: SIDEKIQ_PDFS
               value: {{ .Values.global.sidekiq.queues.pdf | quote }}
+            - name: SIDEKIQ_ALERTS
+              value: {{ .Values.global.sidekiq.queues.alerts | quote }}
+            - name: SIDEKIQ_WALLETS
+              value: {{ .Values.global.sidekiq.queues.wallets | quote }}
             {{- if .Values.global.lago.pdfGeneration }}
             - name: LAGO_PDF_URL
               valueFrom:
