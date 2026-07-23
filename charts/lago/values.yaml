@@ -48,6 +48,12 @@ global:
       # -- Enable the Meilisearch indexing queue
       # @section -- Sidekiq
       meilisearch: false
+      # -- Enable the alerts background queue
+      # @section -- Sidekiq
+      alerts: false
+      # -- Enable the wallets background queue
+      # @section -- Sidekiq
+      wallets: false
 
   config:
     # -- Name of an existing ConfigMap for shared configuration (bypasses auto-generated configmap)
@@ -541,6 +547,74 @@ billing-worker:
     command: ["./scripts/start.billing.worker.sh"]
     # -- Container ports (none needed)
     # @section -- Billing Worker
+    ports: []
+
+# -- Alerts worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.alerts`)
+# @default -- See child values
+# @section -- Alerts Worker
+alerts-worker:
+  # -- Override the alerts-worker subchart release name
+  # @section -- Alerts Worker
+  nameOverride: lago-alerts-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Alerts Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- Alerts Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- Alerts Worker
+  livenessProbe:
+    enabled: false
+  # -- Readiness probe (disabled for workers)
+  # @section -- Alerts Worker
+  readinessProbe:
+    enabled: false
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- Alerts Worker
+    enabled: false
+  container:
+    # -- Alerts worker entrypoint command
+    # @section -- Alerts Worker
+    command: ["./scripts/start.alerts.worker.sh"]
+    # -- Container ports (none needed)
+    # @section -- Alerts Worker
+    ports: []
+
+# -- Wallets worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.wallets`)
+# @default -- See child values
+# @section -- Wallets Worker
+wallets-worker:
+  # -- Override the wallets-worker subchart release name
+  # @section -- Wallets Worker
+  nameOverride: lago-wallets-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Wallets Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- Wallets Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- Wallets Worker
+  livenessProbe:
+    enabled: false
+  # -- Readiness probe (disabled for workers)
+  # @section -- Wallets Worker
+  readinessProbe:
+    enabled: false
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- Wallets Worker
+    enabled: false
+  container:
+    # -- Wallets worker entrypoint command
+    # @section -- Wallets Worker
+    command: ["./scripts/start.wallets.worker.sh"]
+    # -- Container ports (none needed)
+    # @section -- Wallets Worker
     ports: []
 
 # -- Meilisearch worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.meilisearch`)

@@ -89,6 +89,16 @@ dependencies:
     version: 0.6.0
     repository: "file://../lago-rails"
     condition: global.sidekiq.queues.meilisearch
+  - name: lago-rails
+    alias: alerts-worker
+    version: 0.6.0
+    repository: "file://../lago-rails"
+    condition: global.sidekiq.queues.alerts
+  - name: lago-rails
+    alias: wallets-worker
+    version: 0.6.0
+    repository: "file://../lago-rails"
+    condition: global.sidekiq.queues.wallets
 
 annotations:
   org.opencontainers.image.source: "https://github.com/getlago/lago-helm-charts"
