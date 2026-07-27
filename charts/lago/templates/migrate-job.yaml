@@ -85,7 +85,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ include "lago.secretName" . }}
-                  key: database.uri
+                  key: {{ default "database.uri" .Values.migrate.config.database.secretKey }}
               {{- end }}
             - name: LAGO_RSA_PRIVATE_KEY
               {{- with .Values.global.signing.rsa }}

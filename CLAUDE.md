@@ -30,6 +30,8 @@ The canonical reference is `charts/lago-data-rev-rec/` — most recently restruc
 
 All charts share the same `version`. `charts/lago/Chart.yaml` is the source of truth — the release script's `bump_versions` reads its current version and `sed`s every other `Chart.yaml` from that exact string.
 
+**Never bump `version:` in a feature PR.** CI (`.github/workflows/chart-release.yml` → `release.sh` → `bump_versions`) owns version increments and does it in a dedicated release commit like `fd132a5 chore: bump chart versions to 0.7.0`. If you bump it in a feature PR, you race the release script and produce drift between the umbrella and its subcharts. Only touch `version:` when adding a **new** chart (see below).
+
 **Consequence (the one that bites):** if a chart's `version:` doesn't match the umbrella's current version, `bump_versions` silently skips it, and the drift recurs every release. Before committing a new chart, copy the umbrella's current `version:` value verbatim into the new `Chart.yaml`. See the skill for the full failure-mode walk-through.
 
 ## Adding a new chart

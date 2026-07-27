@@ -879,6 +879,13 @@ migrate:
       # -- (bool) Override `global.database.preparedStatement` for this instance
       # @section -- Database Migration / Config
       preparedStatement:
+      # -- Secret key that provides `DATABASE_URL` for the migration job.
+      # Defaults to `database.uri`. Override to point at an alternate key
+      # (e.g. `database.direct.uri`) when migrations need a different
+      # endpoint — bypassing an RDS Proxy for DDL that would exceed the
+      # 16 KB per-statement pin threshold is the driving use case.
+      # @section -- Database Migration / Config
+      secretKey:
   image:
     # -- Migration job image repository
     # @section -- Database Migration
