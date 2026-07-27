@@ -15,88 +15,88 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.7.0
+version: 0.7.1
 appVersion: v1.41.2
 
 dependencies:
   - name: lago-config
     alias: config
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-config"
   - name: lago-rails
     alias: api
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-rails"
   - name: lago-front
     alias: front
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-front"
   - name: lago-rails
     alias: worker
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-rails"
   - name: lago-rails
     alias: clock
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-rails"
   - name: lago-rails
     alias: analytics-worker
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-rails"
     condition: global.sidekiq.queues.analytics
   - name: lago-rails
     alias: billing-worker
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-rails"
     condition: global.sidekiq.queues.billing
   - name: lago-rails
     alias: clock-worker
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-rails"
     condition: global.sidekiq.queues.clock
   - name: lago-rails
     alias: events-worker
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-rails"
     condition: global.sidekiq.queues.events
   - name: lago-rails
     alias: webhook-worker
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-rails"
     condition: global.sidekiq.queues.webhook
   - name: lago-pdf
     alias: pdf
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-pdf"
     condition: pdf.enabled
   - name: lago-rails
     alias: pdf-worker
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-rails"
     condition: global.sidekiq.queues.pdf
   - name: lago-rails
     alias: events-consumer-worker
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-rails"
     condition: global.streaming_ingestion.enabled
   - name: lago-events-processor-worker
     alias: events-processor-worker
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-events-processor-worker"
     condition: global.streaming_ingestion.enabled
   - name: lago-rails
     alias: meilisearch-worker
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-rails"
     condition: global.sidekiq.queues.meilisearch
   - name: lago-rails
     alias: alerts-worker
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-rails"
     condition: global.sidekiq.queues.alerts
   - name: lago-rails
     alias: wallets-worker
-    version: 0.7.0
+    version: 0.7.1
     repository: "file://../lago-rails"
     condition: global.sidekiq.queues.wallets
 

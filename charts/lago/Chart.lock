@@ -1,54 +1,54 @@
 dependencies:
 - name: lago-config
   repository: file://../lago-config
-  version: 0.7.0
+  version: 0.7.1
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.7.0
+  version: 0.7.1
 - name: lago-front
   repository: file://../lago-front
-  version: 0.7.0
+  version: 0.7.1
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.7.0
+  version: 0.7.1
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.7.0
+  version: 0.7.1
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.7.0
+  version: 0.7.1
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.7.0
+  version: 0.7.1
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.7.0
+  version: 0.7.1
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.7.0
+  version: 0.7.1
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.7.0
+  version: 0.7.1
 - name: lago-pdf
   repository: file://../lago-pdf
-  version: 0.7.0
+  version: 0.7.1
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.7.0
+  version: 0.7.1
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.7.0
+  version: 0.7.1
 - name: lago-events-processor-worker
   repository: file://../lago-events-processor-worker
-  version: 0.7.0
+  version: 0.7.1
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.7.0
+  version: 0.7.1
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.7.0
+  version: 0.7.1
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.7.0
-digest: sha256:7d184dffcb834a4e3aaaec6b46926ac1f311321658604b6dd2c84a8ae1abb442
-generated: "2026-07-23T08:22:42.826852228Z"
+  version: 0.7.1
+digest: sha256:d4a2bbb94277ac9bc8c04247463c34116481526526eaf68b419b8e3f23a34a90
+generated: "2026-07-27T08:34:34.583994429Z"
