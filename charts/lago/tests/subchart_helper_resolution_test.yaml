@@ -43,7 +43,7 @@ tests:
           path: spec.template.spec.containers[0].env[?(@.name == "REDIS_URL")].valueFrom.configMapKeyRef.name
           value: custom-configmap-name
 
-  - it: should default DATABASE_URL secretKeyRef.key to database.uri
+  - it: should bind DATABASE_URL to the database.uri secret key
     set:
       global:
         lago:
@@ -73,8 +73,10 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_URL")].valueFrom.secretKeyRef.key
           value: database.uri
+      - isNull:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_PROXY_URL")]
 
-  - it: should honour api.config.database.secretKey when overriding the URI key
+  - it: should expose DATABASE_PROXY_URL when config.database.proxy is set
     set:
       global:
         lago:
@@ -101,8 +103,15 @@ tests:
         config:
           enabled: false
           database:
-            secretKey: database.direct.uri
+            proxy: database.proxy.uri
     asserts:
       - equal:
           path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_URL")].valueFrom.secretKeyRef.key
-          value: database.direct.uri
+          value: database.uri
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_PROXY_URL")].valueFrom.secretKeyRef.key
+          value: database.proxy.uri
+      # DATABASE_PREPARED_STATEMENTS is derived on the app side from
+      # DATABASE_PROXY_URL — the chart doesn't emit it.
+      - isNull:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_PREPARED_STATEMENTS")]

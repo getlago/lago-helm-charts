@@ -64,15 +64,10 @@ spec:
               value: {{ .Values.config.log.stdout | quote }}
             - name: DATABASE_POOL
               value: {{ default .Values.global.database.pool .Values.config.database.pool | quote }}
-            {{/* Per-instance override wins over the umbrella default. */}}
-            {{- if kindIs "bool" .Values.config.database.preparedStatement }}
-            - name: DATABASE_PREPARED_STATEMENTS
-              value: {{ .Values.config.database.preparedStatement | quote }}
-            {{/* Fall back to the global value shared across every Rails pod. */}}
-            {{- else if kindIs "bool" .Values.global.database.preparedStatement }}
-            - name: DATABASE_PREPARED_STATEMENTS
-              value: {{ .Values.global.database.preparedStatement | quote }}
-            {{- end }}
+            {{/* DATABASE_PREPARED_STATEMENTS is derived on the app side from
+                 DATABASE_PROXY_URL presence (getlago/lago-api#6029), so the chart
+                 no longer emits it. Setting `config.database.proxy` automatically
+                 turns prepared statements off inside Rails. */}}
             {{/* DB session timeouts. Per-instance override wins over the umbrella default; rendered only when set so an unset value falls back to the Postgres server default. */}}
             {{- $statementTimeout := default .Values.global.database.statementTimeout .Values.config.database.statementTimeout }}
             {{- if $statementTimeout }}
@@ -113,7 +108,14 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ include "lago-rails.secretName" . }}
-                  key: {{ default "database.uri" .Values.config.database.secretKey }}
+                  key: database.uri
+            {{- with .Values.config.database.proxy }}
+            - name: DATABASE_PROXY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" $ }}
+                  key: {{ . }}
+            {{- end }}
             - name: ENCRYPTION_PRIMARY_KEY
               valueFrom:
                 secretKeyRef:
