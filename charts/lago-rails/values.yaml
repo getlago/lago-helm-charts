@@ -345,13 +345,16 @@ config:
     # -- (bool) Override `global.database.preparedStatement` for this instance
     # @section -- Config
     preparedStatement:
-    # -- Secret key that provides `DATABASE_URL` for this instance. Defaults
-    # to `database.uri` (the lago-config secret's primary URI). Override to
-    # point at an alternate key (e.g. `database.direct.uri`) when a workload
-    # needs a different endpoint — bypassing an RDS Proxy for pin-prone jobs
-    # or migrations is the driving use case.
+    # -- Name of the secret key that provides `DATABASE_PROXY_URL`.
+    # Optional. When set, the pod is exposed to a pooler / RDS Proxy URL
+    # in addition to the (direct) `DATABASE_URL`. The app decides routing:
+    # `:writing` traffic goes through the pooler, `:direct` traffic bypasses
+    # it. Setting this also implies `DATABASE_PREPARED_STATEMENTS=false`
+    # (unless overridden here or globally) — RDS Proxy session-pins on
+    # prepared statements, so the two knobs must move together. Point at
+    # `database.proxy.uri` (or a custom key) in the lago-config secret.
     # @section -- Config
-    secretKey:
+    proxy:
 
   otel:
     # -- Enable OpenTelemetry tracing
