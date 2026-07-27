@@ -345,6 +345,13 @@ config:
     # -- (bool) Override `global.database.preparedStatement` for this instance
     # @section -- Config
     preparedStatement:
+    # -- Secret key that provides `DATABASE_URL` for this instance. Defaults
+    # to `database.uri` (the lago-config secret's primary URI). Override to
+    # point at an alternate key (e.g. `database.direct.uri`) when a workload
+    # needs a different endpoint — bypassing an RDS Proxy for pin-prone jobs
+    # or migrations is the driving use case.
+    # @section -- Config
+    secretKey:
 
   otel:
     # -- Enable OpenTelemetry tracing

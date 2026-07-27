@@ -113,7 +113,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ include "lago-rails.secretName" . }}
-                  key: database.uri
+                  key: {{ default "database.uri" .Values.config.database.secretKey }}
             - name: ENCRYPTION_PRIMARY_KEY
               valueFrom:
                 secretKeyRef:

@@ -42,3 +42,67 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].env[?(@.name == "REDIS_URL")].valueFrom.configMapKeyRef.name
           value: custom-configmap-name
+
+  - it: should default DATABASE_URL secretKeyRef.key to database.uri
+    set:
+      global:
+        lago:
+          env: production
+          version: v1.0.0
+        urls:
+          api: http://api.test
+          front: http://front.test
+        database:
+          uri: ""
+        encryption:
+          key: test-key
+          salt: test-salt
+        signing:
+          hmac: test-hmac
+          rsa: test-rsa
+        redis:
+          uri: redis://localhost
+        redisCache:
+          uri: redis://localhost
+        redisStore:
+          uri: redis://localhost
+      api:
+        config:
+          enabled: false
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_URL")].valueFrom.secretKeyRef.key
+          value: database.uri
+
+  - it: should honour api.config.database.secretKey when overriding the URI key
+    set:
+      global:
+        lago:
+          env: production
+          version: v1.0.0
+        urls:
+          api: http://api.test
+          front: http://front.test
+        database:
+          uri: ""
+        encryption:
+          key: test-key
+          salt: test-salt
+        signing:
+          hmac: test-hmac
+          rsa: test-rsa
+        redis:
+          uri: redis://localhost
+        redisCache:
+          uri: redis://localhost
+        redisStore:
+          uri: redis://localhost
+      api:
+        config:
+          enabled: false
+          database:
+            secretKey: database.direct.uri
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_URL")].valueFrom.secretKeyRef.key
+          value: database.direct.uri

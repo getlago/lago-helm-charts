@@ -172,6 +172,20 @@ tests:
     asserts:
       - isNotNull:
           path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_URL")].valueFrom.secretKeyRef
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_URL")].valueFrom.secretKeyRef.key
+          value: database.uri
+
+  - it: should honour migrate.config.database.secretKey when overriding the URI key
+    set:
+      global.database.uri: ""
+      migrate.config.database.secretKey: database.direct.uri
+    release:
+      name: my-release
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_URL")].valueFrom.secretKeyRef.key
+          value: database.direct.uri
 
   # -------------------------------------------------------------------
   # Extra env / envFrom
