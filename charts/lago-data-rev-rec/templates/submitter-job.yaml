@@ -18,6 +18,18 @@ spec:
         {{- include "lago-data-rev-rec.labels" . | nindent 8 }}
         app.kubernetes.io/component: submitter
     spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       restartPolicy: Never
       serviceAccountName: {{ include "lago-data-rev-rec.serviceAccountName" . }}
       containers:

@@ -15,6 +15,12 @@ image:
   tag: ""
   pullPolicy: IfNotPresent
 
+# Applied to every pod this chart creates: the FlinkDeployment's JobManager
+# and TaskManagers, and the submitter Job. Empty by default.
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
 # Annotations applied to the FlinkDeployment resource.
 annotations: {}
 
