@@ -5,6 +5,6 @@ description: >-
   assets image staged into /assets by an init-container. Config is fully decoupled:
   all env is supplied via extraEnv / extraEnvFrom.
 type: application
-version: 0.7.2
+version: 0.7.3
 # Tracks the upstream Apache Superset the machinery image is built on.
 appVersion: "6.0.0"
