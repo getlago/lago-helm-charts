@@ -99,6 +99,16 @@ dependencies:
     version: 0.7.3
     repository: "file://../lago-rails"
     condition: global.sidekiq.queues.wallets
+  - name: lago-rails
+    alias: dedicated-worker
+    version: 0.7.3
+    repository: "file://../lago-rails"
+    condition: global.sidekiq.queues.dedicated.enabled
+  - name: lago-rails
+    alias: ai-agent-worker
+    version: 0.7.3
+    repository: "file://../lago-rails"
+    condition: global.sidekiq.queues.aiAgent
 
 annotations:
   org.opencontainers.image.source: "https://github.com/getlago/lago-helm-charts"

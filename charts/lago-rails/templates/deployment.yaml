@@ -234,6 +234,28 @@ spec:
               value: {{ .Values.global.sidekiq.queues.alerts | quote }}
             - name: SIDEKIQ_WALLETS
               value: {{ .Values.global.sidekiq.queues.wallets | quote }}
+            {{- if .Values.global.sidekiq.queues.aiAgent }}
+            - name: SIDEKIQ_AI_AGENT
+              value: "true"
+            {{- end }}
+            {{/*
+              global.sidekiq.queues.dedicated.* is owned by the umbrella
+              chart (charts/lago/values.yaml + charts/lago-config). Traverse
+              with `dig` so lago-rails stays renderable standalone when
+              the key doesn't exist.
+            */}}
+            {{- if dig "sidekiq" "queues" "dedicated" "enabled" false .Values.global }}
+            - name: LAGO_DEDICATED_WORKER_ORG_IDS
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: sidekiq.dedicated.orgIds
+            - name: LAGO_DEDICATED_REFRESH_INTERVAL_SECONDS
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: sidekiq.dedicated.refreshIntervalSeconds
+            {{- end }}
             {{- if .Values.global.lago.pdfGeneration }}
             - name: LAGO_PDF_URL
               valueFrom:

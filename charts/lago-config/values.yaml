@@ -44,6 +44,20 @@ global:
       # -- Enable the PDF background queue
       # @section -- Sidekiq
       pdf: false
+      # -- Dedicated worker queue toggle (dict, unlike other queue flags).
+      # See charts/lago/values.yaml for the full contract.
+      # @section -- Sidekiq
+      dedicated:
+        # -- Gate for the dedicated worker: writes sidekiq.dedicated.*
+        # keys to the shared ConfigMap when true.
+        # @section -- Sidekiq
+        enabled: false
+        # -- Comma-separated tenant org UUIDs (LAGO_DEDICATED_WORKER_ORG_IDS).
+        # @section -- Sidekiq
+        orgIds: ""
+        # -- Optional refresh cadence (LAGO_DEDICATED_REFRESH_INTERVAL_SECONDS).
+        # @section -- Sidekiq
+        refreshIntervalSeconds: ""
 
   config:
     # -- Name of an existing ConfigMap for shared configuration (bypasses auto-generated configmap)
