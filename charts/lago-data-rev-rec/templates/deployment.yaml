@@ -17,6 +17,9 @@ spec:
   imagePullPolicy: {{ .Values.image.pullPolicy }}
   flinkVersion: {{ .Values.flinkVersion }}
   serviceAccount: {{ include "lago-data-rev-rec.serviceAccountName" . }}
+  {{- with .Values.restartNonce }}
+  restartNonce: {{ . }}
+  {{- end }}
   # The K8s operator manages kubernetes.cluster-id internally — setting it here
   # is rejected by the admission webhook.
   flinkConfiguration:
