@@ -54,4 +54,8 @@ data:
   {{- with .Values.global.sentry.environment }}
   sentry.environment: {{ . | quote }}
   {{- end }}
+  {{- if .Values.global.sidekiq.queues.dedicated.enabled }}
+  sidekiq.dedicated.orgIds: {{ .Values.global.sidekiq.queues.dedicated.orgIds | quote }}
+  sidekiq.dedicated.refreshIntervalSeconds: {{ .Values.global.sidekiq.queues.dedicated.refreshIntervalSeconds | quote }}
+  {{- end }}
 {{- end }}

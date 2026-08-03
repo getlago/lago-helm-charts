@@ -54,6 +54,35 @@ global:
       # -- Enable the wallets background queue
       # @section -- Sidekiq
       wallets: false
+      # -- Enable the AI agent worker (isolates the `ai_agent` Sidekiq
+      # queue on a separate deployment; also renders `SIDEKIQ_AI_AGENT=true`
+      # on every rails workload so `AiConversations::StreamJob` enqueues to
+      # the `ai_agent` queue instead of `default`). Off by default.
+      # @section -- Sidekiq
+      aiAgent: false
+      # -- Dedicated worker queue toggle. Unlike the other queue flags this
+      # is a dict rather than a bool: the dedicated_alerts / dedicated_wallets
+      # queues are populated by per-org routing decisions in
+      # `Utils::DedicatedWorkerConfig`, which needs the tenant list at both
+      # enqueue and consume time. `enabled` gates the subchart + the shared
+      # ConfigMap keys; `orgIds` / `refreshIntervalSeconds` become
+      # LAGO_DEDICATED_WORKER_ORG_IDS / LAGO_DEDICATED_REFRESH_INTERVAL_SECONDS
+      # on every rails pod via configMapKeyRef.
+      # @section -- Sidekiq
+      dedicated:
+        # -- Enable the dedicated-worker subchart + propagate LAGO_DEDICATED_*
+        # env to every rails pod.
+        # @section -- Sidekiq
+        enabled: false
+        # -- Comma-separated tenant org UUIDs pinned to the dedicated_alerts
+        # / dedicated_wallets queues. Unset → key not written → env var
+        # absent → routing off.
+        # @section -- Sidekiq
+        orgIds: ""
+        # -- (int, seconds) Optional override for the org-list poll
+        # cadence. Unset → Rails default (5s) via `.presence.to_i`.
+        # @section -- Sidekiq
+        refreshIntervalSeconds: ""
 
   config:
     # -- Name of an existing ConfigMap for shared configuration (bypasses auto-generated configmap)
@@ -615,6 +644,85 @@ wallets-worker:
     command: ["./scripts/start.wallets.worker.sh"]
     # -- Container ports (none needed)
     # @section -- Wallets Worker
+    ports: []
+
+# -- Dedicated worker subchart overrides (lago-rails, conditional on `global.sidekiq.dedicated.enabled`).
+# Runs `bundle exec sidekiq -C config/sidekiq/sidekiq_dedicated.yml` which
+# consumes the hard-coded `dedicated_alerts` + `dedicated_wallets` queues.
+# The tenant org routing list is set once at `global.sidekiq.dedicated.orgIds`
+# and rendered as `LAGO_DEDICATED_WORKER_ORG_IDS` on every rails pod (enqueue
+# side + consume side stay in sync automatically).
+# @default -- See child values
+# @section -- Dedicated Worker
+dedicated-worker:
+  # -- Override the dedicated-worker subchart release name
+  # @section -- Dedicated Worker
+  nameOverride: lago-dedicated-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Dedicated Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- Dedicated Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- Dedicated Worker
+  livenessProbe:
+    enabled: false
+  # -- Readiness probe (disabled for workers)
+  # @section -- Dedicated Worker
+  readinessProbe:
+    enabled: false
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- Dedicated Worker
+    enabled: false
+  container:
+    # -- Dedicated worker entrypoint command — invokes sidekiq with the
+    # `sidekiq_dedicated.yml` config that hard-codes the two dedicated queues.
+    # @section -- Dedicated Worker
+    command: ["./scripts/start.dedicated.worker.sh"]
+    # -- Container ports (none needed)
+    # @section -- Dedicated Worker
+    ports: []
+
+# -- AI agent worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.aiAgent`).
+# Runs `bundle exec sidekiq -C config/sidekiq/sidekiq_ai_agent.yml` which
+# consumes the hard-coded `ai_agent` queue. Enqueuing side is gated by
+# `SIDEKIQ_AI_AGENT` (rendered on every rails workload from the same toggle);
+# `AiConversations::StreamJob` reads it to pick `:ai_agent` vs `:default`.
+# @default -- See child values
+# @section -- AI Agent Worker
+ai-agent-worker:
+  # -- Override the ai-agent-worker subchart release name
+  # @section -- AI Agent Worker
+  nameOverride: lago-ai-agent-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- AI Agent Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- AI Agent Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- AI Agent Worker
+  livenessProbe:
+    enabled: false
+  # -- Readiness probe (disabled for workers)
+  # @section -- AI Agent Worker
+  readinessProbe:
+    enabled: false
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- AI Agent Worker
+    enabled: false
+  container:
+    # -- AI agent worker entrypoint command — invokes sidekiq with the
+    # `sidekiq_ai_agent.yml` config that hard-codes the `ai_agent` queue.
+    # @section -- AI Agent Worker
+    command: ["./scripts/start.ai_agent.worker.sh"]
+    # -- Container ports (none needed)
+    # @section -- AI Agent Worker
     ports: []
 
 # -- Meilisearch worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.meilisearch`)
