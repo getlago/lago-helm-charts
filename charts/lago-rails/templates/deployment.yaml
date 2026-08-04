@@ -379,6 +379,20 @@ spec:
                   name: {{ include "lago-rails.secretName" . }}
                   key: mcp.clientSecret
             {{- end }}
+            {{- if .Values.global.meilisearch.enabled }}
+            - name: LAGO_MEILISEARCH_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: meilisearch.endpoint
+            - name: LAGO_MEILISEARCH_SEARCH_ENABLED
+              value: "true"
+            - name: LAGO_MEILISEARCH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: meilisearch.apiKey
+            {{- end }}
             {{- if .Values.global.data.enabled }}
             - name: LAGO_DATA_API_URL
               valueFrom:

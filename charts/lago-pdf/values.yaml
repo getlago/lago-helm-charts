@@ -201,6 +201,19 @@ global:
     # @section -- MCP
     endpoint:
 
+  meilisearch:
+    # -- Enable Meilisearch integration. When true, renders
+    # `LAGO_MEILISEARCH_URL`, `LAGO_MEILISEARCH_SEARCH_ENABLED` and
+    # `LAGO_MEILISEARCH_API_KEY` on every Rails workload.
+    # @section -- Meilisearch
+    enabled: false
+    # -- Meilisearch endpoint URL.
+    # @section -- Meilisearch
+    url:
+    # -- Meilisearch API key.
+    # @section -- Meilisearch
+    apiKey:
+
   data:
     # -- Enable Lago Data analytics
     # @section -- Data

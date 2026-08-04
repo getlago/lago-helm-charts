@@ -48,6 +48,9 @@ data:
   {{- if .Values.global.mcp.enabled }}
   mcp.endpoint: {{ required "global.mcp.endpoint is required" .Values.global.mcp.endpoint }}
   {{- end }}
+  {{- if .Values.global.meilisearch.enabled }}
+  meilisearch.endpoint: {{ required "global.meilisearch.url is required" .Values.global.meilisearch.url }}
+  {{- end }}
   {{- if .Values.global.data.enabled }}
   data.endpoint: {{ required "global.data.endpoint is required" .Values.global.data.endpoint }}
   {{- end }}
