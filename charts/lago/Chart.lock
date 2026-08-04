@@ -1,60 +1,60 @@
 dependencies:
 - name: lago-config
   repository: file://../lago-config
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-front
   repository: file://../lago-front
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-pdf
   repository: file://../lago-pdf
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-events-processor-worker
   repository: file://../lago-events-processor-worker
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.8.0
+  version: 0.9.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.8.0
-digest: sha256:478caeb3c8db4702417f28c775a7bb5a6ece67841aa0bff64861e32d0d8d92fc
-generated: "2026-08-03T12:04:37.092676617Z"
+  version: 0.9.0
+digest: sha256:6f19f4b646f1d9438ae45cdc1ee13c8aacf33006a4ff70fe73f653c64e6fa428
+generated: "2026-08-04T08:13:39.064172075Z"
