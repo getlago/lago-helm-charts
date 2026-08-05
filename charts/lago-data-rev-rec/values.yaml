@@ -29,6 +29,20 @@ labels: {}
 
 flinkVersion: v1_20
 
+# Populates FlinkDeployment.spec.restartNonce when set — the Flink K8s
+# operator's mechanism to force a spec-change reconcile without editing any
+# real field. Leave null in steady state so upgrades don't churn the JM.
+#
+# When to set (or bump): the operator's session-recovery path
+# (SessionReconciler.recoverSession) creates a JM Deployment without the
+# ownerReference + `flinkdeployment.flink.apache.org/generation` annotation
+# the observer requires, so any Deployment produced by that path is
+# perpetually flagged MISSING and the operator loops on 409-AlreadyExists
+# recreates. Setting or bumping restartNonce routes the next reconcile
+# through SessionReconciler.deploy() instead, which stamps both markers
+# correctly.
+restartNonce: null
+
 jobManager:
   replicas: 2
   resource:
