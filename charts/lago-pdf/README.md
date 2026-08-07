@@ -1,6 +1,6 @@
 # lago-pdf
 
-![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8](https://img.shields.io/badge/AppVersion-8-informational?style=flat-square)
+![Version: 0.9.0](https://img.shields.io/badge/Version-0.9.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.32](https://img.shields.io/badge/AppVersion-8.32-informational?style=flat-square)
 
 A Helm chart for the Lago PDF stack (Gotenberg + optional Rails worker)
 
@@ -8,8 +8,8 @@ A Helm chart for the Lago PDF stack (Gotenberg + optional Rails worker)
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../lago-config | config(lago-config) | 0.5.0 |
-| file://../lago-rails | worker(lago-rails) | 0.5.0 |
+| file://../lago-config | config(lago-config) | 0.9.0 |
+| file://../lago-rails | worker(lago-rails) | 0.9.0 |
 
 ## Values
 
@@ -25,29 +25,27 @@ A Helm chart for the Lago PDF stack (Gotenberg + optional Rails worker)
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| worker | object | `{"config":{"enabled":false,"nameOverride":"lago-pdf-config"},"container":{"command":["./scripts/start.worker.sh"],"ports":null},"enabled":true,"livenessProbe":null,"nameOverride":"lago-pdf-worker","readinessProbe":null,"service":{"enabled":false}}` | PDF worker subchart (lago-rails configured as a background worker) |
 | worker.enabled | bool | `true` | Deploy the PDF worker |
 | worker.nameOverride | string | `"lago-pdf-worker"` | Override the worker subchart release name |
 | worker.config.enabled | bool | `false` | Disable nested config (uses parent config) |
 | worker.config.nameOverride | string | `"lago-pdf-config"` | Config subchart name override |
 | worker.service.enabled | bool | `false` | Disable service for the worker (no inbound traffic) |
-| worker.livenessProbe | string | `nil` | Liveness probe (disabled for worker) |
-| worker.readinessProbe | string | `nil` | Readiness probe (disabled for worker) |
+| worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for worker) |
+| worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for worker) |
 | worker.container.command | list | `["./scripts/start.worker.sh"]` | Worker entrypoint command |
-| worker.container.ports | string | `nil` | Worker container ports (none needed) |
+| worker.container.ports | list | `[]` | Worker container ports (none needed) |
 
 ### Gotenberg
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| gotenberg | object | `{"affinity":{},"autoscaling":{"enabled":false,"external":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":80},"container":{"args":["gotenberg","--api-disable-health-check-logging"],"command":[],"name":"","ports":{"http":3000}},"extraEnv":{},"extraEnvFrom":[],"fullnameOverride":"","image":{"pullPolicy":"IfNotPresent","repository":"getlago/lago-gotenberg","tag":null},"imagePullSecrets":[],"livenessProbe":{"httpGet":{"path":"/health","port":"http"},"initialDelaySeconds":10,"periodSeconds":30},"nameOverride":"","nodeSelector":{},"podAnnotations":{},"podLabels":{},"podSecurityContext":{},"readinessProbe":{"httpGet":{"path":"/health","port":"http"},"initialDelaySeconds":10,"periodSeconds":3},"replicaCount":1,"resources":{},"securityContext":{},"service":{"enabled":true,"port":80,"type":"ClusterIP"},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"tolerations":[],"volumeMounts":[],"volumes":[]}` | Gotenberg HTML-to-PDF conversion service |
-| gotenberg.image.repository | string | `"getlago/lago-gotenberg"` | Gotenberg image repository |
+| gotenberg.image.repository | string | `"ghcr.io/getlago/gotenberg"` | Gotenberg image repository |
 | gotenberg.image.tag | string | `nil` | Override the Gotenberg image tag |
 | gotenberg.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | gotenberg.replicaCount | int | `1` | Number of Gotenberg replicas (ignored when autoscaling is enabled) |
 | gotenberg.container.name | string | `""` | Override the container name |
 | gotenberg.container.command | list | `[]` | Container entrypoint command |
-| gotenberg.container.args | list | `["gotenberg","--api-disable-health-check-logging"]` | Container command arguments |
+| gotenberg.container.args | list | `["gotenberg","--libreoffice-disable-routes=true","--chromium-ignore-certificate-errors=true","--chromium-disable-javascript=true","--api-timeout=30s","--chromium-max-queue-size=20","--chromium-restart-after=100"]` | Container command arguments. These are the best-performing values we have found in production: restart Chromium every 100 jobs to avoid zombie processes, cap the queue at 20, disable JS in invoice HTML, ignore certificate errors on the Chromium fetcher, disable LibreOffice routes we do not use, and cap the API timeout at 30s. `--api-disable-health-check-logging` was renamed to `--api-disable-health-check-route-telemetry` in Gotenberg 8.32 and defaults to `true`, so it is intentionally not set here. |
 | gotenberg.container.ports.http | int | `3000` | HTTP container port |
 | gotenberg.service.enabled | bool | `true` | Create a Service for Gotenberg |
 | gotenberg.service.type | string | `"ClusterIP"` | Service type |
@@ -84,9 +82,9 @@ A Helm chart for the Lago PDF stack (Gotenberg + optional Rails worker)
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| annotations | object | `{}` | Deployment metadata annotations (e.g. Stakater Reloader) |
 | nameOverride | string | `""` | Override the chart name |
 | fullnameOverride | string | `""` | Override the full release name |
-| annotations | object | `{}` | Deployment metadata annotations |
 
 ### Extra Objects
 

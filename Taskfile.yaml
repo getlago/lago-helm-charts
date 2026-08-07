@@ -9,7 +9,7 @@ vars:
       redis: redis:7-alpine
       api: getlago/api:{{.VERSION}}
       front: getlago/front:v1.41.0
-      gotenberg: getlago/lago-gotenberg:8.15
+      gotenberg: ghcr.io/getlago/gotenberg:8.32
   CHARTS:
     map:
       # Base configs (no dependencies)
