@@ -312,7 +312,6 @@ config:
   # @section -- PDF Config
   nameOverride: lago-pdf-config
 
-# -- PDF worker subchart (lago-rails configured as a background worker)
 # @section -- PDF Worker
 worker:
   # -- Deploy the PDF worker
@@ -351,13 +350,12 @@ worker:
     # @section -- PDF Worker
     ports: []
 
-# -- Gotenberg HTML-to-PDF conversion service
 # @section -- Gotenberg
 gotenberg:
   image:
     # -- Gotenberg image repository
     # @section -- Gotenberg
-    repository: getlago/lago-gotenberg
+    repository: ghcr.io/getlago/gotenberg
     # -- Override the Gotenberg image tag
     # @section -- Gotenberg
     tag:
@@ -376,9 +374,24 @@ gotenberg:
     # -- Container entrypoint command
     # @section -- Gotenberg
     command: []
-    # -- Container command arguments
+    # -- Container command arguments. These are the best-performing
+    # values we have found in production: restart Chromium every 100
+    # jobs to avoid zombie processes, cap the queue at 20, disable JS
+    # in invoice HTML, ignore certificate errors on the Chromium
+    # fetcher, disable LibreOffice routes we do not use, and cap the
+    # API timeout at 30s. `--api-disable-health-check-logging` was
+    # renamed to `--api-disable-health-check-route-telemetry` in
+    # Gotenberg 8.32 and defaults to `true`, so it is intentionally
+    # not set here.
     # @section -- Gotenberg
-    args: ["gotenberg", "--api-disable-health-check-logging"]
+    args:
+      - gotenberg
+      - --libreoffice-disable-routes=true
+      - --chromium-ignore-certificate-errors=true
+      - --chromium-disable-javascript=true
+      - --api-timeout=30s
+      - --chromium-max-queue-size=20
+      - --chromium-restart-after=100
     ports:
       # -- HTTP container port
       # @section -- Gotenberg
