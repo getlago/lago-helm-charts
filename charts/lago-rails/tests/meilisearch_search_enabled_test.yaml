@@ -25,11 +25,11 @@ tests:
             name: LAGO_MEILISEARCH_SEARCH_ENABLED
             value: "true"
 
-  - it: should project LAGO_MEILISEARCH_SEARCH_ENABLED="false" when meilisearch.searchEnabled=false
+  - it: should project LAGO_MEILISEARCH_SEARCH_ENABLED="false" when global.meilisearch.searchEnabled=false
     values:
       - ./fixtures/required.yaml
     set:
-      meilisearch.searchEnabled: false
+      global.meilisearch.searchEnabled: false
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -45,7 +45,7 @@ tests:
     values:
       - ./fixtures/required.yaml
     set:
-      meilisearch.searchEnabled: false
+      global.meilisearch.searchEnabled: false
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
