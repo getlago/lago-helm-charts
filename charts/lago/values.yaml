@@ -296,6 +296,11 @@ global:
     # `LAGO_MEILISEARCH_API_KEY` on every Rails workload.
     # @section -- Meilisearch
     enabled: false
+    # -- Projected as `LAGO_MEILISEARCH_SEARCH_ENABLED`. Set to
+    # `false` to stop serving search queries while keeping indexing
+    # wired (URL + API key unchanged).
+    # @section -- Meilisearch
+    search: true
     # -- Meilisearch endpoint URL (e.g.
     # `http://meilisearch.meilisearch.svc.cluster.local:7700`).
     # @section -- Meilisearch
