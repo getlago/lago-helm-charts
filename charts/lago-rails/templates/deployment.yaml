@@ -386,7 +386,7 @@ spec:
                   name: {{ include "lago-rails.configMapName" . }}
                   key: meilisearch.endpoint
             - name: LAGO_MEILISEARCH_SEARCH_ENABLED
-              value: {{ .Values.global.meilisearch.searchEnabled | quote }}
+              value: {{ .Values.global.meilisearch.search | quote }}
             - name: LAGO_MEILISEARCH_API_KEY
               valueFrom:
                 secretKeyRef:

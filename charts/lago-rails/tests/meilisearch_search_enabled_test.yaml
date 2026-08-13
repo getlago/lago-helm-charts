@@ -13,7 +13,7 @@ set:
 
 tests:
   # ============================================================================
-  # meilisearch.searchEnabled (per-workload)
+  # global.meilisearch.search
   # ============================================================================
   - it: should project LAGO_MEILISEARCH_SEARCH_ENABLED="true" by default
     values:
@@ -25,11 +25,11 @@ tests:
             name: LAGO_MEILISEARCH_SEARCH_ENABLED
             value: "true"
 
-  - it: should project LAGO_MEILISEARCH_SEARCH_ENABLED="false" when global.meilisearch.searchEnabled=false
+  - it: should project LAGO_MEILISEARCH_SEARCH_ENABLED="false" when global.meilisearch.search=false
     values:
       - ./fixtures/required.yaml
     set:
-      global.meilisearch.searchEnabled: false
+      global.meilisearch.search: false
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -38,14 +38,14 @@ tests:
             value: "false"
 
   # LAGO_MEILISEARCH_URL and LAGO_MEILISEARCH_API_KEY stay wired even when
-  # searchEnabled is false — the workload can still hit Meilisearch for
+  # search is false — the workload can still hit Meilisearch for
   # non-search paths (e.g. indexing from a worker); only the read-side is
   # disabled.
-  - it: should still project URL + API_KEY when searchEnabled=false
+  - it: should still project URL + API_KEY when search=false
     values:
       - ./fixtures/required.yaml
     set:
-      global.meilisearch.searchEnabled: false
+      global.meilisearch.search: false
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -65,7 +65,7 @@ tests:
                 key: meilisearch.apiKey
 
   # When Meilisearch is globally disabled, the whole env block is elided
-  # regardless of the per-workload searchEnabled.
+  # regardless of `search`.
   - it: should not project the block when global.meilisearch.enabled=false
     values:
       - ./fixtures/required.yaml
