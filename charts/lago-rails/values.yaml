@@ -527,6 +527,20 @@ extraEnvFrom: []
   # - secretRef:
   #     name: secret-name
 
+# Per-workload Meilisearch settings (only take effect when
+# `global.meilisearch.enabled` is true — the whole
+# `LAGO_MEILISEARCH_URL`/`LAGO_MEILISEARCH_SEARCH_ENABLED`/`LAGO_MEILISEARCH_API_KEY`
+# block is otherwise unrendered).
+meilisearch:
+  # -- Value projected into `LAGO_MEILISEARCH_SEARCH_ENABLED` on this
+  # workload's pods. Defaults to `true`; set to `false` to keep the
+  # URL + API key wired (so meili-adjacent code paths still work) but
+  # disable search itself on this specific workload — useful e.g. to
+  # stop the api from querying Meilisearch while the worker keeps
+  # indexing during a heavy backfill.
+  # @section -- Meilisearch
+  searchEnabled: true
+
 service:
   # -- Create a Service
   # @section -- Service
