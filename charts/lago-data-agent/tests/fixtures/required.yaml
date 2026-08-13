@@ -1,0 +1,4 @@
+# Required values for lago-data-agent tests.
+# The chart has no strictly-required values — sensitive config is injected at deploy
+# time via extraEnvFrom — so this fixture is intentionally empty.
+{}

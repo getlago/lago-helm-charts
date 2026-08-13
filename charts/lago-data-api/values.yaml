@@ -1,0 +1,267 @@
+# Default values for lago-data-api.
+
+global:
+  databaseAnalytical:
+    # -- Analytical database host
+    # @section -- Analytical Database
+    host: ""
+    # -- Analytical database name
+    # @section -- Analytical Database
+    name: ""
+    # -- Analytical database user
+    # @section -- Analytical Database
+    user: ""
+    # -- Analytical database password
+    # @section -- Analytical Database
+    password: ""
+    # -- Analytical database port
+    # @section -- Analytical Database
+    port: 5432
+    # -- Analytical database schema
+    # @section -- Analytical Database
+    schema: analytical
+
+  forecastedUsage:
+    # -- Enable forecasted usage feature
+    # @section -- Forecasted Usage
+    enabled: false
+    # -- Lago API token for forecasted usage calls
+    # @section -- Forecasted Usage
+    api_token:
+    celery:
+      # -- Celery broker URL
+      # @section -- Forecasted Usage
+      brokerUrl: ""
+      # -- Celery result backend URL
+      # @section -- Forecasted Usage
+      resultBackend: ""
+
+  data:
+    # -- Name of an existing ConfigMap for data configuration
+    # @section -- Data
+    configmap:
+    # -- Name of an existing Secret for data configuration
+    # @section -- Data
+    secret:
+    # -- API token to validate calls from lago-api
+    # @section -- Data
+    token:
+
+config:
+  # -- Deploy the data-config subchart
+  # @section -- Config
+  enabled: true
+
+# -- Number of replicas (ignored when autoscaling is enabled)
+# @section -- Deployment
+replicaCount: 1
+
+image:
+  # -- Container image repository
+  # @section -- Image
+  repository: getlago/data-api
+  # -- Image pull policy
+  # @section -- Image
+  pullPolicy: IfNotPresent
+  # -- Override the image tag (defaults to Chart appVersion)
+  # @section -- Image
+  tag:
+
+# -- Image pull secrets for private registries
+# @default -- `[]`
+# @section -- Image
+imagePullSecrets: []
+# -- Deployment metadata annotations (e.g. Stakater Reloader)
+# @section -- Deployment
+annotations: {}
+
+# -- Override the chart name
+# @section -- Deployment
+nameOverride: ""
+# -- Override the full release name
+# @section -- Deployment
+fullnameOverride: ""
+
+container:
+  # -- Override the container name (defaults to chart fullname)
+  # @section -- Container
+  name: ""
+  # -- Container entrypoint command
+  # @section -- Container
+  command: ["uv"]
+  # -- Container command arguments
+  # @section -- Container
+  args: ["run", "fastapi", "run", "app/main.py", "--port", "80"]
+  ports:
+    # -- HTTP container port
+    # @section -- Container
+    http: 80
+
+serviceAccount:
+  # -- Create a ServiceAccount
+  # @section -- Service Account
+  create: true
+  # -- Automount the ServiceAccount API credentials
+  # @section -- Service Account
+  automount: true
+  # -- Annotations to add to the ServiceAccount
+  # @section -- Service Account
+  annotations: {}
+  # -- ServiceAccount name (generated from fullname if not set)
+  # @section -- Service Account
+  name: ""
+
+# -- Additional pod annotations
+# @section -- Pod
+podAnnotations: {}
+# -- Additional pod labels
+# @section -- Pod
+podLabels: {}
+
+# -- Pod-level security context
+# @section -- Pod
+podSecurityContext: {}
+
+# -- Container-level security context
+# @section -- Pod
+securityContext: {}
+
+# -- Extra environment variables (map format, deep-mergeable)
+# @section -- Pod
+extraEnv: {}
+
+# -- Extra envFrom sources
+# @default -- `[]` (See [values.yaml])
+# @section -- Pod
+extraEnvFrom: []
+
+service:
+  # -- Service type (`ClusterIP`, `NodePort`, `LoadBalancer`)
+  # @section -- Service
+  type: ClusterIP
+  # -- Service port
+  # @section -- Service
+  port: 80
+
+ingress:
+  # -- Enable Ingress
+  # @section -- Ingress
+  enabled: false
+  # -- Ingress class name
+  # @section -- Ingress
+  className: ""
+  # -- Ingress annotations
+  # @section -- Ingress
+  annotations: {}
+  # -- Ingress host rules
+  # @default -- See [values.yaml](./values.yaml#L155)
+  # @section -- Ingress
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  # -- Ingress TLS configuration
+  # @section -- Ingress
+  tls: []
+
+# -- Expose the service via Gateway API HTTPRoute
+# @default -- See [values.yaml](./values.yaml#L167)
+# @section -- HTTPRoute
+httpRoute:
+  # -- Enable HTTPRoute
+  # @section -- HTTPRoute
+  enabled: false
+  # -- HTTPRoute annotations
+  # @section -- HTTPRoute
+  annotations: {}
+  # -- Parent gateway references
+  # @default -- See [values.yaml](./values.yaml#L177)
+  # @section -- HTTPRoute
+  parentRefs:
+  - name: gateway
+    sectionName: http
+  # -- Hostnames to match
+  # @section -- HTTPRoute
+  hostnames:
+  - chart-example.local
+  # -- Routing rules and filters
+  # @default -- See [values.yaml](./values.yaml#L187)
+  # @section -- HTTPRoute
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /headers
+
+# -- Resource requests and limits
+# @section -- Pod
+resources: {}
+
+# -- Liveness probe configuration
+# @default -- See [values.yaml](./values.yaml#L200)
+# @section -- Pod
+livenessProbe:
+  httpGet:
+    path: /health-check/
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  successThreshold: 1
+  timeoutSeconds: 1
+# -- Readiness probe configuration
+# @default -- See [values.yaml](./values.yaml#L211)
+# @section -- Pod
+readinessProbe:
+  httpGet:
+    path: /health-check/
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 3
+  successThreshold: 1
+  timeoutSeconds: 1
+
+autoscaling:
+  # -- Enable Horizontal Pod Autoscaler
+  # @section -- Autoscaling
+  enabled: false
+  # -- Set to true when using an external autoscaler (e.g. KEDA) to skip built-in HPA
+  # @section -- Autoscaling
+  external: false
+  # -- Minimum replicas
+  # @section -- Autoscaling
+  minReplicas: 1
+  # -- Maximum replicas
+  # @section -- Autoscaling
+  maxReplicas: 100
+  # -- Target CPU utilization percentage
+  # @section -- Autoscaling
+  targetCPUUtilizationPercentage: 80
+
+# -- Additional volumes
+# @section -- Pod
+volumes: []
+
+# -- Additional volume mounts
+# @section -- Pod
+volumeMounts: []
+
+# -- Node selector constraints
+# @section -- Pod
+nodeSelector: {}
+
+# -- Pod tolerations
+# @section -- Pod
+tolerations: []
+
+# -- Pod affinity rules
+# @section -- Pod
+affinity: {}
+
+# -- Pod topology spread constraints
+# @section -- Pod
+topologySpreadConstraints: []
+
+# -- Array of extra K8s manifests to deploy
+# @section -- Extra Objects
+extraObjects: []

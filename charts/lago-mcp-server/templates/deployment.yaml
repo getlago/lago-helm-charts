@@ -2,6 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "lago-mcp-server.fullname" . }}
+  {{- with .Values.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     {{- include "lago-mcp-server.labels" . | nindent 4 }}
 spec:
@@ -42,6 +46,10 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: {{ toJson .Values.container.command }}
           args: {{ toJson .Values.container.args }}
+          {{- with .Values.extraEnvFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: LAGO_API_URL
               value: {{ required "config.api.url must be provided " .Values.config.api.url }}
@@ -59,8 +67,14 @@ spec:
             - name: RUST_LOG
               value: {{ . }}
             {{- end }}
-            {{- with .Values.extraEnv }}
-            {{- toYaml . | nindent 12 }}
+            {{- range $name, $val := .Values.extraEnv }}
+            {{- if kindIs "map" $val }}
+            - name: {{ $name }}
+              {{- toYaml $val | nindent 14 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $val | quote }}
+            {{- end }}
             {{- end }}
           ports:
             - name: http
@@ -88,6 +102,10 @@ spec:
       {{- end }}
       {{- with .Values.affinity }}
       affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.tolerations }}

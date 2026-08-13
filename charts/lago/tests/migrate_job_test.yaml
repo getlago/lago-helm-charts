@@ -1,0 +1,292 @@
+suite: Test migrate job
+templates:
+  - templates/migrate-job.yaml
+
+set:
+  migrate.enabled: true
+  global.lago.env: production
+  global.lago.version: v1.0.0
+  global.database.uri: "postgresql://localhost"
+  global.database.pool: 20
+  global.encryption.key: test-key
+  global.encryption.salt: test-salt
+  global.signing.hmac: test-hmac
+  global.signing.rsa: test-rsa
+  global.redis.uri: "redis://localhost"
+
+tests:
+  # -------------------------------------------------------------------
+  # Basic rendering
+  # -------------------------------------------------------------------
+  - it: should not render when migrate is disabled
+    set:
+      migrate.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render a Job when migrate is enabled
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Job
+
+  # -------------------------------------------------------------------
+  # Config defaults
+  # -------------------------------------------------------------------
+  - it: should use global.lago.env as RAILS_ENV by default
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "RAILS_ENV")].value
+          value: production
+
+  - it: should use global.database.pool as DATABASE_POOL by default
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_POOL")].value
+          value: "20"
+
+  - it: should set default LAGO_LOG_LEVEL to info
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "LAGO_LOG_LEVEL")].value
+          value: info
+
+  - it: should set default RAILS_LOG_TO_STDOUT to true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "RAILS_LOG_TO_STDOUT")].value
+          value: "true"
+
+  # -------------------------------------------------------------------
+  # Config overrides
+  # -------------------------------------------------------------------
+  - it: should override RAILS_ENV when migrate.config.env is set
+    set:
+      migrate.config.env: staging
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "RAILS_ENV")].value
+          value: staging
+
+  - it: should override DATABASE_POOL when migrate.config.database.pool is set
+    set:
+      migrate.config.database.pool: 5
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_POOL")].value
+          value: "5"
+
+  - it: should override LAGO_LOG_LEVEL when migrate.config.log.level is set
+    set:
+      migrate.config.log.level: debug
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "LAGO_LOG_LEVEL")].value
+          value: debug
+
+  - it: should override RAILS_LOG_TO_STDOUT when migrate.config.log.stdout is set
+    set:
+      migrate.config.log.stdout: false
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "RAILS_LOG_TO_STDOUT")].value
+          value: "false"
+
+  # -------------------------------------------------------------------
+  # Job spec defaults
+  # -------------------------------------------------------------------
+  - it: should omit ttlSecondsAfterFinished when set to 0 (default)
+    asserts:
+      - isNull:
+          path: spec.ttlSecondsAfterFinished
+
+  - it: should render ttlSecondsAfterFinished when set to a positive value
+    set:
+      migrate.ttlSecondsAfterFinished: 300
+    asserts:
+      - equal:
+          path: spec.ttlSecondsAfterFinished
+          value: 300
+
+  - it: should set activeDeadlineSeconds to 600 by default
+    asserts:
+      - equal:
+          path: spec.activeDeadlineSeconds
+          value: 600
+
+  - it: should set backoffLimit to 3 by default
+    asserts:
+      - equal:
+          path: spec.backoffLimit
+          value: 3
+
+  - it: should use the correct image
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "getlago/api:v1.0.0"
+
+  - it: should use the correct command
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value: ["./scripts/migrate.sh"]
+
+  # -------------------------------------------------------------------
+  # Helm hook annotations
+  # -------------------------------------------------------------------
+  - it: should have pre-install and pre-upgrade helm hooks
+    asserts:
+      - equal:
+          path: metadata.annotations["helm.sh/hook"]
+          value: pre-install,pre-upgrade
+
+  - it: should have the correct hook weight
+    asserts:
+      - equal:
+          path: metadata.annotations["helm.sh/hook-weight"]
+          value: "-5"
+
+  - it: should have the correct hook delete policy
+    asserts:
+      - equal:
+          path: metadata.annotations["helm.sh/hook-delete-policy"]
+          value: before-hook-creation
+
+  # -------------------------------------------------------------------
+  # Secrets (DATABASE_URL, RSA, HMAC)
+  # -------------------------------------------------------------------
+  - it: should use global.database.uri when set
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_URL")].value
+          value: "postgresql://localhost"
+
+  - it: should use secretKeyRef for DATABASE_URL when global.database.uri is empty
+    set:
+      global.database.uri: ""
+    release:
+      name: my-release
+    asserts:
+      - isNotNull:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_URL")].valueFrom.secretKeyRef
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_URL")].valueFrom.secretKeyRef.key
+          value: database.uri
+
+  - it: should not expose DATABASE_PROXY_URL from the migrate job
+    set:
+      global.database.uri: ""
+    release:
+      name: my-release
+    asserts:
+      - isNull:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_PROXY_URL")]
+
+  # -------------------------------------------------------------------
+  # Extra env / envFrom
+  # -------------------------------------------------------------------
+  - it: should render extraEnv as plain values
+    set:
+      migrate.extraEnv:
+        MY_VAR: my-value
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MY_VAR
+            value: "my-value"
+
+  - it: should render extraEnvFrom
+    set:
+      migrate.extraEnvFrom:
+        - secretRef:
+            name: my-secret
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].envFrom
+          content:
+            secretRef:
+              name: my-secret
+
+  # -------------------------------------------------------------------
+  # Init containers
+  # -------------------------------------------------------------------
+  - it: should not render initContainers when none are set
+    asserts:
+      - isNull:
+          path: spec.template.spec.initContainers
+
+  - it: should render initContainers when set
+    set:
+      migrate.initContainers:
+        - name: wait-for-db
+          image: busybox:1.37
+          command: ["sh", "-c", "until nc -z db 5432; do sleep 2; done"]
+    asserts:
+      - lengthEqual:
+          path: spec.template.spec.initContainers
+          count: 1
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: wait-for-db
+
+  # -------------------------------------------------------------------
+  # Resources, security, scheduling
+  # -------------------------------------------------------------------
+  - it: should render resources when set
+    set:
+      migrate.resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          memory: 256Mi
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: 100m
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: 256Mi
+
+  - it: should render nodeSelector when set
+    set:
+      migrate.nodeSelector:
+        role: migration
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector.role
+          value: migration
+
+  - it: should render tolerations when set
+    set:
+      migrate.tolerations:
+        - key: dedicated
+          operator: Equal
+          value: lago
+          effect: NoSchedule
+    asserts:
+      - lengthEqual:
+          path: spec.template.spec.tolerations
+          count: 1
+
+  - it: should render podAnnotations when set
+    set:
+      migrate.podAnnotations:
+        my-annotation: test
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations.my-annotation
+          value: test
+
+  - it: should render additional job annotations when set
+    set:
+      migrate.annotations:
+        custom/annotation: value
+    asserts:
+      - equal:
+          path: metadata.annotations.custom/annotation
+          value: value

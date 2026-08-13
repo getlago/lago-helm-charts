@@ -1,0 +1,15 @@
+global:
+  databaseAnalytical:
+    host: lago-postgres.svc.cluster.local
+    name: lago
+    user: lago
+    password: some_password
+
+config:
+  s3:
+    accessKeyId: AKIAIOSFODNN7EXAMPLE
+    secretAccessKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+  ml:
+    config: |
+      some: yaml_config

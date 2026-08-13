@@ -1,0 +1,345 @@
+# Default values for the lago-data umbrella chart.
+
+global:
+  ago:
+    # -- Rails environment (`production`, `staging`, `development`)
+    # @section -- Lago
+    env: "production"
+    # -- Lago Premium license key
+    # @section -- Lago
+    license: ""
+
+  config:
+    # -- Name of an existing ConfigMap for shared configuration
+    # @section -- Config
+    configmap:
+    # -- Name of an existing Secret for shared configuration
+    # @section -- Config
+    secret:
+
+  urls:
+    # -- Public URL of the Lago API
+    # @section -- URLs
+    api: ""
+    # -- Public URL of the Lago frontend
+    # @section -- URLs
+    front: ""
+    # -- Internal URL of the PDF service (Gotenberg)
+    # @section -- URLs
+    pdf: "lago-pdf"
+
+  database:
+    # -- PostgreSQL connection URI
+    # @section -- Database
+    uri: ""
+    # -- Database connection pool size
+    # @section -- Database
+    pool: 20
+
+  encryption:
+    # -- Primary encryption key (`openssl rand -hex 16`)
+    # @section -- Encryption
+    key: ""
+    # -- Key derivation salt (`openssl rand -hex 16`)
+    # @section -- Encryption
+    salt: ""
+
+  signing:
+    # -- HMAC signing key (HS256)
+    # @section -- Signing
+    hmac: ""
+    # -- RSA private key (RS256), base64-encoded
+    # @section -- Signing
+    rsa: ""
+
+  redis:
+    # -- Redis URI for Sidekiq job queue
+    # @section -- Redis
+    url: ""
+    # -- Redis password
+    # @section -- Redis
+    password: ""
+
+  redisCache:
+    # -- Redis URI for Rails cache
+    # @section -- Redis
+    url: ""
+    # -- Redis cache password
+    # @section -- Redis
+    password: ""
+
+  redisStore:
+    # -- Redis URI for ActionCable / general store
+    # @section -- Redis
+    url: ""
+    # -- Redis store password
+    # @section -- Redis
+    password: ""
+
+  databaseAnalytical:
+    # -- Analytical database host
+    # @section -- Analytical Database
+    host: ""
+    # -- Analytical database name
+    # @section -- Analytical Database
+    name: ""
+    # -- Analytical database user
+    # @section -- Analytical Database
+    user: ""
+    # -- Analytical database password
+    # @section -- Analytical Database
+    password: ""
+    # -- Analytical database port
+    # @section -- Analytical Database
+    port: 5432
+    # -- Analytical database schema
+    # @section -- Analytical Database
+    schema: analytical
+
+  databaseReplica:
+    # -- Replica database host
+    # @section -- Replica Database
+    host: ""
+    # -- Replica database name
+    # @section -- Replica Database
+    name: ""
+    # -- Replica database user
+    # @section -- Replica Database
+    user: ""
+    # -- Replica database password
+    # @section -- Replica Database
+    password: ""
+    # -- Replica database port
+    # @section -- Replica Database
+    port: 5432
+
+  dbtPipeline:
+    # -- Enable dbt pipeline
+    # @section -- dbt Pipeline
+    enabled: false
+    # -- Source schema for dbt pipeline
+    # @section -- dbt Pipeline
+    sourceSchema: public
+    # -- Target schema for dbt pipeline
+    # @section -- dbt Pipeline
+    targetSchema: analytical
+    # -- Tables to replicate
+    # @section -- dbt Pipeline
+    tables: []
+
+  forecastedUsage:
+    # -- Enable forecasted usage feature
+    # @section -- Forecasted Usage
+    enabled: false
+    # -- Lago API token for forecasted usage calls
+    # @section -- Forecasted Usage
+    api_token:
+    celery:
+      # -- Celery broker URL
+      # @section -- Forecasted Usage
+      brokerUrl: ""
+      # -- Celery result backend URL
+      # @section -- Forecasted Usage
+      resultBackend: ""
+
+  data:
+    # -- Name of an existing ConfigMap for data configuration
+    # @section -- Data
+    configmap:
+    # -- Name of an existing Secret for data configuration
+    # @section -- Data
+    secret:
+    # -- API token to validate calls from lago-api
+    # @section -- Data
+    token:
+
+# -- lago-config subchart overrides
+# @default -- See child values
+# @section -- Config
+config:
+  # -- Override the config subchart release name
+  # @section -- Config
+  nameOverride: lago-config
+
+# -- lago-data-config subchart overrides
+# @default -- See child values
+# @section -- Data Config
+data-config:
+  # -- Override the data-config subchart release name
+  # @section -- Data Config
+  nameOverride: lago-data-config
+
+# -- lago-api subchart overrides (lago-rails)
+# @default -- See child values
+# @section -- API
+api:
+  # -- Override the API subchart release name
+  # @section -- API
+  nameOverride: lago-api
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- API
+    enabled: false
+    # -- Config subchart name override
+    # @section -- API
+    nameOverride: lago-config
+
+  extraEnv:
+    # -- Inject the Data API bearer token from the data-config secret
+    # @section -- API
+    LAGO_DATA_API_BEARER_TOKEN:
+      valueFrom:
+        secretKeyRef:
+          name: lago-data-config
+          key: api.token
+
+# -- lago-data-api subchart overrides
+# @default -- See child values
+# @section -- Data API
+data-api:
+  # -- Override the data-api subchart release name
+  # @section -- Data API
+  nameOverride: lago-data-api
+  config:
+    # -- Disable nested config (uses parent data-config subchart)
+    # @section -- Data API
+    enabled: false
+    # -- Data-config subchart name override
+    # @section -- Data API
+    nameOverride: lago-data-config
+    api:
+      # -- Internal Lago API service URL
+      # @section -- Data API
+      url: lago-api
+
+# -- lago-data-worker subchart overrides
+# @default -- See child values
+# @section -- Data Worker
+data-worker:
+  # -- Override the data-worker subchart release name
+  # @section -- Data Worker
+  nameOverride: lago-data-worker
+  config:
+    # -- Disable nested config (uses parent data-config subchart)
+    # @section -- Data Worker
+    enabled: false
+    # -- Data-config subchart name override
+    # @section -- Data Worker
+    nameOverride: lago-data-config
+    api:
+      # -- Internal Lago API URL for data worker
+      # @section -- Data Worker
+      url: http://lago-api
+
+# -- dbt pipeline CronJob configuration
+# @default -- See child values
+# @section -- dbt Pipeline Job
+dbtPipeline:
+  image:
+    # -- dbt pipeline image repository
+    # @section -- dbt Pipeline Job
+    repository: getlago/data-dbt-pipeline
+    # -- dbt pipeline image tag
+    # @section -- dbt Pipeline Job
+    tag: latest
+    # -- Image pull policy
+    # @section -- dbt Pipeline Job
+    pullPolicy: IfNotPresent
+
+  # -- Image pull secrets for private registries
+  # @section -- dbt Pipeline Job
+  imagePullSecrets: []
+
+  container:
+    # -- Container entrypoint command
+    # @section -- dbt Pipeline Job
+    command: []
+    # -- Container command arguments
+    # @section -- dbt Pipeline Job
+    args: []
+
+  cronjob:
+    # -- Cron schedule expression
+    # @section -- dbt Pipeline Job
+    schedule: "0 5 * * *"
+    # -- How to treat concurrent job executions (`Allow`, `Forbid`, `Replace`)
+    # @section -- dbt Pipeline Job
+    concurrencyPolicy: Forbid
+    # -- Number of successful finished jobs to retain
+    # @section -- dbt Pipeline Job
+    successfulJobsHistoryLimit: 3
+    # -- Number of failed finished jobs to retain
+    # @section -- dbt Pipeline Job
+    failedJobsHistoryLimit: 1
+    # -- (int) Optional deadline in seconds for starting the job
+    # @section -- dbt Pipeline Job
+    startingDeadlineSeconds:
+    # -- Suspend subsequent executions
+    # @section -- dbt Pipeline Job
+    suspend: false
+    # -- (int) Duration in seconds the job may be active
+    # @section -- dbt Pipeline Job
+    activeDeadlineSeconds:
+    # -- Number of retries before marking the job as failed
+    # @section -- dbt Pipeline Job
+    backoffLimit: 0
+    # -- Restart policy (`OnFailure`, `Never`)
+    # @section -- dbt Pipeline Job
+    restartPolicy: Never
+
+  trigger:
+    # -- Enable a trigger job on install via Helm hook
+    # @section -- dbt Pipeline Job
+    enabled: false
+    image:
+      # -- Trigger job image repository
+      # @section -- dbt Pipeline Job
+      repository: rancher/kubectl
+      # -- Trigger job image tag
+      # @section -- dbt Pipeline Job
+      tag: latest
+
+  serviceAccount:
+    # -- Create a ServiceAccount
+    # @section -- dbt Pipeline Job
+    create: true
+    # -- Automount the ServiceAccount API credentials
+    # @section -- dbt Pipeline Job
+    automount: true
+    # -- Annotations to add to the ServiceAccount
+    # @section -- dbt Pipeline Job
+    annotations: {}
+
+  # -- Additional pod annotations
+  # @section -- dbt Pipeline Job
+  podAnnotations: {}
+  # -- Additional pod labels
+  # @section -- dbt Pipeline Job
+  podLabels: {}
+  # -- Pod-level security context
+  # @section -- dbt Pipeline Job
+  podSecurityContext: {}
+  # -- Container-level security context
+  # @section -- dbt Pipeline Job
+  securityContext: {}
+  # -- Resource requests and limits
+  # @section -- dbt Pipeline Job
+  resources: {}
+  # -- Additional volumes
+  # @section -- dbt Pipeline Job
+  volumes: []
+  # -- Additional volume mounts
+  # @section -- dbt Pipeline Job
+  volumeMounts: []
+  # -- Node selector constraints
+  # @section -- dbt Pipeline Job
+  nodeSelector: {}
+  # -- Pod tolerations
+  # @section -- dbt Pipeline Job
+  tolerations: []
+  # -- Pod affinity rules
+  # @section -- dbt Pipeline Job
+  affinity: []
+  # -- Extra environment variables (map format, deep-mergeable)
+  # @section -- dbt Pipeline Job
+  extraEnv: {}

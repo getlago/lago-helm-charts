@@ -1,0 +1,56 @@
+{{- if .Values.global.streaming_ingestion.enabled }}
+{{- $kafka := .Values.global.streaming_ingestion.kafka -}}
+{{- $clickhouse := .Values.global.streaming_ingestion.clickhouse -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "lago-config.streaming.configMapName" . }}
+  labels:
+    {{- include "lago-config.labels" . | nindent 4 }}
+    {{- with .Values.configmapStreaming.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.configmapStreaming.annotations }}
+  annotations:
+    {{- range $key, $value := . }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}
+data:
+  {{- if empty $kafka.bootstrapServers }}
+  {{- fail "If streaming_ingestion is enabled, you must provide a list of Kafka servers" }}
+  {{- end }}
+  LAGO_KAFKA_BOOTSTRAP_SERVERS: {{ $kafka.bootstrapServers | join "," }}
+  LAGO_KAFKA_CONSUMER_GROUP: {{ $kafka.consumerGroup }}
+  {{- with $kafka.consumerGroupEventsProcessor }}
+  LAGO_KAFKA_CONSUMER_GROUP_EVENTS_PROCESSOR: {{ . }}
+  {{- end }}
+  LAGO_KAFKA_ENRICHED_EVENTS_EXPANDED_TOPIC: {{ $kafka.topics.eventsEnrichedExpanded }}
+  LAGO_KAFKA_ENRICHED_EVENTS_TOPIC: {{ $kafka.topics.eventsEnriched }}
+  LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC: {{ $kafka.topics.eventsChargedInAdvance }}
+  LAGO_KAFKA_EVENTS_DEAD_LETTER_TOPIC: {{ $kafka.topics.eventsDeadLetter }}
+  LAGO_KAFKA_RAW_EVENTS_TOPIC: {{ $kafka.topics.eventsRaw }}
+  {{- with $kafka.saslMechanisms }}
+  LAGO_KAFKA_SCRAM_ALGORITHM: {{ $kafka.saslMechanisms }}
+  LAGO_KAFKA_SASL_MECHANISMS: {{ $kafka.saslMechanisms }}
+  {{- end }}
+  {{- if $kafka.securityProtocol }}
+  LAGO_KAFKA_SECURITY_PROTOCOL: {{ $kafka.securityProtocol }}
+  {{- end }}
+  LAGO_KAFKA_TLS: {{ $kafka.tls | quote }}
+  LAGO_KAFKA_ACTIVITY_LOGS_TOPIC: {{ $kafka.topics.activityLogs }}
+  LAGO_KAFKA_API_LOGS_TOPIC: {{ $kafka.topics.apiLogs }}
+  LAGO_KAFKA_SECURITY_LOGS_TOPIC: {{ $kafka.topics.securityLogs }}
+  {{- with $kafka.clickhouseConsumerGroup }}
+  LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP: {{ . }}
+  {{- end }}
+  LAGO_CLICKHOUSE_PORT: {{ $clickhouse.port | quote }}
+  LAGO_CLICKHOUSE_HOST: {{ $clickhouse.address }}
+  {{- with $clickhouse.hostReadOnly }}
+  LAGO_CLICKHOUSE_HOST_READ_ONLY: {{ . }}
+  {{- end }}
+  LAGO_CLICKHOUSE_SSL: {{ $clickhouse.tls | quote }}
+  LAGO_CLICKHOUSE_ENABLED: "true"
+  LAGO_CLICKHOUSE_DATABASE: {{$clickhouse.database}}
+  LAGO_CLICKHOUSE_MIGRATIONS_ENABLED: {{ $clickhouse.migrationsEnabled | quote }}
+{{- end }}

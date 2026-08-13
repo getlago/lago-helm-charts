@@ -1,0 +1,8 @@
+extraEnv:
+  BEDROCK_MODEL_ID: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+  AWS_DEFAULT_REGION: us-east-1
+  LAGO_API_URL: http://lago-api.default.svc.cluster.local/api/v1
+
+extraEnvFrom:
+  - secretRef:
+      name: lago-data-agent

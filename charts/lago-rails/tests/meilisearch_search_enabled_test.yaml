@@ -1,0 +1,82 @@
+suite: Test LAGO_MEILISEARCH_SEARCH_ENABLED projection
+templates:
+  - templates/deployment.yaml
+values:
+  - ../values.yaml
+
+# Common values that any deployment render needs; parked here so each
+# test doesn't re-set them.
+set:
+  global.meilisearch.enabled: true
+  global.meilisearch.url: "http://meilisearch.meilisearch.svc.cluster.local:7700"
+  global.meilisearch.apiKey: "test-key"
+
+tests:
+  # ============================================================================
+  # global.meilisearch.search
+  # ============================================================================
+  - it: should project LAGO_MEILISEARCH_SEARCH_ENABLED="true" by default
+    values:
+      - ./fixtures/required.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_MEILISEARCH_SEARCH_ENABLED
+            value: "true"
+
+  - it: should project LAGO_MEILISEARCH_SEARCH_ENABLED="false" when global.meilisearch.search=false
+    values:
+      - ./fixtures/required.yaml
+    set:
+      global.meilisearch.search: false
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_MEILISEARCH_SEARCH_ENABLED
+            value: "false"
+
+  # LAGO_MEILISEARCH_URL and LAGO_MEILISEARCH_API_KEY stay wired even when
+  # search is false — the workload can still hit Meilisearch for
+  # non-search paths (e.g. indexing from a worker); only the read-side is
+  # disabled.
+  - it: should still project URL + API_KEY when search=false
+    values:
+      - ./fixtures/required.yaml
+    set:
+      global.meilisearch.search: false
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_MEILISEARCH_URL
+            valueFrom:
+              configMapKeyRef:
+                name: RELEASE-NAME-lago-config
+                key: meilisearch.endpoint
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_MEILISEARCH_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: RELEASE-NAME-lago-config
+                key: meilisearch.apiKey
+
+  # When Meilisearch is globally disabled, the whole env block is elided
+  # regardless of `search`.
+  - it: should not project the block when global.meilisearch.enabled=false
+    values:
+      - ./fixtures/required.yaml
+    set:
+      global.meilisearch.enabled: false
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_MEILISEARCH_SEARCH_ENABLED
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_MEILISEARCH_URL

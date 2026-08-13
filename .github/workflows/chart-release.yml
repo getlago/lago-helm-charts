@@ -1,30 +1,70 @@
 name: Release charts
 
-# yaml-anchor: force workflow re-index
 on:
   push:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (semver without v prefix, e.g. 0.4.0)'
+        required: true
+        type: string
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    env:
+      VERSION: ${{ inputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: configure Git
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      - name: Validate version format
+        run: .github/scripts/release.sh validate_version "$VERSION"
 
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.7.0
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
         with:
-          config: cr.yaml
-          charts_dir: charts/
+          version: v3.18.4
+
+      - name: Bump chart versions
+        run: .github/scripts/release.sh bump_versions "$VERSION"
+
+      - name: Update chart dependencies
+        run: .github/scripts/release.sh update_deps
+
+      - name: Commit, tag, and push
+        run: .github/scripts/release.sh commit_and_tag "$VERSION"
+
+      - name: Create or update GitHub release
         env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: .github/scripts/release.sh create_release "$VERSION"
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Publish all charts to GHCR
+        run: .github/scripts/release.sh publish_oci
+
+      - name: Add OCI links to GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: .github/scripts/release.sh add_oci_links "$VERSION"
+
+      - name: Package charts for GitHub release
+        run: .github/scripts/release.sh package_charts
+
+      - name: Upload chart tarballs to GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: .github/scripts/release.sh upload_tarballs "$VERSION"
+
+      - name: Update Helm repo index on gh-pages
+        run: .github/scripts/release.sh update_repo_index "$VERSION"

@@ -1,0 +1,204 @@
+# Common tests for Deployment charts - validates extraEnv, extraEnvFrom, resources
+# This file is copied to each chart's tests/ directory by the Taskfile
+# Required: each chart must have tests/fixtures/required.yaml with chart-specific values
+suite: Test common deployment patterns
+templates:
+  - templates/deployment.yaml
+values:
+  - ../values.yaml
+
+tests:
+  # ============================================================================
+  # extraEnv Tests
+  # ============================================================================
+  - it: should include extraEnv variables in container env
+    values:
+      - ./fixtures/required.yaml
+    set:
+      extraEnv:
+        TEST_EXTRA_ENV_VAR: "test-value-123"
+        TEST_EXTRA_ENV_FROM_FIELD:
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        TEST_EXTRA_ENV_FROM_SECRET:
+          valueFrom:
+            secretKeyRef:
+              name: test-secret
+              key: test-key
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TEST_EXTRA_ENV_VAR
+            value: "test-value-123"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TEST_EXTRA_ENV_FROM_FIELD
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TEST_EXTRA_ENV_FROM_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: test-secret
+                key: test-key
+
+  # ============================================================================
+  # extraEnvFrom Tests
+  # ============================================================================
+  - it: should include extraEnvFrom references in container envFrom
+    values:
+      - ./fixtures/required.yaml
+    set:
+      extraEnvFrom:
+        - configMapRef:
+            name: test-config-map
+        - secretRef:
+            name: test-secret-ref
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].envFrom
+          content:
+            configMapRef:
+              name: test-config-map
+      - contains:
+          path: spec.template.spec.containers[0].envFrom
+          content:
+            secretRef:
+              name: test-secret-ref
+
+  # ============================================================================
+  # Resources Tests
+  # ============================================================================
+  - it: should include resources when specified
+    values:
+      - ./fixtures/required.yaml
+    set:
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: 500m
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: 512Mi
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: 100m
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.memory
+          value: 128Mi
+
+  - it: should not include resources when empty
+    values:
+      - ./fixtures/required.yaml
+    set:
+      resources: {}
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].resources
+
+  # ============================================================================
+  # topologySpreadConstraints Tests
+  # ============================================================================
+  - it: should include topologySpreadConstraints when specified
+    values:
+      - ./fixtures/required.yaml
+    set:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: test-app
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[0].maxSkew
+          value: 1
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[0].topologyKey
+          value: kubernetes.io/hostname
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[0].whenUnsatisfiable
+          value: DoNotSchedule
+
+  - it: should not include topologySpreadConstraints when empty
+    values:
+      - ./fixtures/required.yaml
+    set:
+      topologySpreadConstraints: []
+    asserts:
+      - notExists:
+          path: spec.template.spec.topologySpreadConstraints
+
+  # ============================================================================
+  # Deployment Annotations Tests
+  # ============================================================================
+  - it: should include Deployment annotations when specified
+    values:
+      - ./fixtures/required.yaml
+    set:
+      annotations:
+        reloader.stakater.com/auto: "true"
+        custom.example.com/owner: "platform"
+    asserts:
+      - equal:
+          path: metadata.annotations["reloader.stakater.com/auto"]
+          value: "true"
+      - equal:
+          path: metadata.annotations["custom.example.com/owner"]
+          value: "platform"
+
+  - it: should not include Deployment annotations when empty
+    values:
+      - ./fixtures/required.yaml
+    set:
+      annotations: {}
+    asserts:
+      - notExists:
+          path: metadata.annotations
+
+  # ============================================================================
+  # Combined Test - All Common Patterns
+  # ============================================================================
+  - it: should correctly render all common patterns together
+    values:
+      - ./fixtures/required.yaml
+    set:
+      extraEnv:
+        TEST_COMBINED_VAR: "combined-test"
+      extraEnvFrom:
+        - configMapRef:
+            name: test-combined-configmap
+      resources:
+        limits:
+          cpu: 1
+          memory: 1Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TEST_COMBINED_VAR
+            value: "combined-test"
+      - contains:
+          path: spec.template.spec.containers[0].envFrom
+          content:
+            configMapRef:
+              name: test-combined-configmap
+      - isNotNull:
+          path: spec.template.spec.containers[0].resources

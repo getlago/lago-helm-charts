@@ -1,0 +1,146 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "lago-data-worker.fullname" . }}
+  {{- with .Values.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "lago-data-worker.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "lago-data-worker.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "lago-data-worker.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "lago-data-worker.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ default .Chart.Name .Values.container.name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: {{ toJson .Values.container.command }}
+          args: {{ toJson .Values.container.args }}
+          {{- with .Values.extraEnvFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: ANALYTICAL_DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-data-worker.configMapName" . }}
+                  key: databaseAnalytical.host
+            - name: ANALYTICAL_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-data-worker.configMapName" . }}
+                  key: databaseAnalytical.name
+            - name: ANALYTICAL_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-data-worker.secretName" . }}
+                  key: databaseAnalytical.password
+            - name: ANALYTICAL_DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-data-worker.configMapName" . }}
+                  key: databaseAnalytical.port
+            - name: ANALYTICAL_DB_SCHEMA
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-data-worker.configMapName" . }}
+                  key: databaseAnalytical.schema
+            - name: ANALYTICAL_DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-data-worker.configMapName" . }}
+                  key: databaseAnalytical.user
+            - name: BEARER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-data-worker.secretName" . }}
+                  key: api.token
+            - name: CELERY_BROKER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-data-worker.configMapName" . }}
+                  key: celery.brokerUrl
+            - name: CELERY_RESULT_BACKEND
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-data-worker.configMapName" . }}
+                  key: celery.resultBackend
+            - name: LAGO_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-data-worker.secretName" . }}
+                  key: api.token
+            - name: LAGO_RAILS_API_URL
+              value: {{ required "config.api.url must be provided " .Values.config.api.url }}
+            {{- range $name, $val := .Values.extraEnv }}
+            {{- if kindIs "map" $val }}
+            - name: {{ $name }}
+              {{- toYaml $val | nindent 14 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

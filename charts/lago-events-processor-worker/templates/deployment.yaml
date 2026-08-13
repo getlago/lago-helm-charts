@@ -1,0 +1,150 @@
+{{- if not .Values.global.streaming_ingestion.enabled }}
+{{- fail "lago-events-processor-worker requires global.streaming_ingestion.enabled to be true" }}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "lago-events-processor-worker.fullname" . }}
+  {{- with .Values.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "lago-events-processor-worker.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "lago-events-processor-worker.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "lago-events-processor-worker.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "lago-events-processor-worker.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ default .Chart.Name .Values.container.name }}
+          image: "{{ .Values.image.repository }}:{{ include "lago-events-processor-worker.version" .}}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: {{ toJson .Values.container.command }}
+          args: {{ toJson .Values.container.args }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "lago-events-processor-worker.streaming.configMapName" . }}
+            - secretRef:
+                name: {{ include "lago-events-processor-worker.streaming.secretName" . }}
+            {{- with .Values.extraEnvFrom }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+            - name: ENV
+              value: {{ default .Values.global.lago.env .Values.config.env }}
+            - name: LAGO_EVENTS_PROCESSOR_DATABASE_MAX_CONNECTIONS
+              value: {{ .Values.config.database.pool | quote }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-events-processor-worker.secretName" . }}
+                  key: database.uri
+            - name: LAGO_REDIS_CACHE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-events-processor-worker.configMapName" . }}
+                  key: redisCache.uri
+                  optional: true
+            - name: LAGO_REDIS_CACHE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-events-processor-worker.secretName" . }}
+                  key: redisCache.password
+                  optional: true
+            - name: LAGO_REDIS_STORE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-events-processor-worker.configMapName" . }}
+                  key: redisStore.uri
+                  optional: true
+            - name: LAGO_REDIS_STORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-events-processor-worker.secretName" . }}
+                  key: redisStore.password
+                  optional: true
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-events-processor-worker.secretName" . }}
+                  key: sentry.dsn.events
+                  optional: true
+            - name: SENTRY_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-events-processor-worker.configMapName" . }}
+                  key: sentry.environment
+                  optional: true
+            {{- range $name, $val := .Values.extraEnv }}
+            {{- if kindIs "map" $val }}
+            - name: {{ $name }}
+              {{- toYaml $val | nindent 14 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

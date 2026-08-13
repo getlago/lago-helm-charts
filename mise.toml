@@ -1,0 +1,11 @@
+[tools]
+"github:helm-unittest/helm-unittest" = "1.0.3"
+"github:helm/chart-testing" = "3.14.0"
+helm = "4"
+helm-docs = "1.14"
+kind = "0.31"
+kubectl = "1.33"
+yamllint = "1.38"
+python = "3.14"
+pipx = "1.8"
+"pipx:yamale" = "6.1.0"

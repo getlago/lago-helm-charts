@@ -1,0 +1,64 @@
+suite: Test ai-agent-worker subchart is gated by global.sidekiq.queues.aiAgent
+  and invokes the sidekiq_ai_agent.yml config via its dedicated start script,
+  and that the toggle also renders SIDEKIQ_AI_AGENT=true on every rails pod so
+  any enqueuer can route AiConversations jobs to the ai_agent queue. Toggle off
+  → the env is absent (less noise on non-users of the feature).
+templates:
+  - charts/ai-agent-worker/templates/deployment.yaml
+  - charts/api/templates/deployment.yaml
+
+set:
+  global:
+    lago:
+      env: production
+      version: v1.0.0
+    urls:
+      api: http://api.test
+      front: http://front.test
+    database:
+      uri: postgresql://localhost
+    encryption:
+      key: test-key
+      salt: test-salt
+    signing:
+      hmac: test-hmac
+      rsa: test-rsa
+    redis:
+      uri: redis://localhost
+    redisCache:
+      uri: redis://localhost
+    redisStore:
+      uri: redis://localhost
+
+tests:
+  - it: renders the ai-agent-worker deployment with its dedicated start script
+    template: charts/ai-agent-worker/templates/deployment.yaml
+    set:
+      global.sidekiq.queues.aiAgent: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-lago-ai-agent-worker
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value: ["./scripts/start.ai_agent.worker.sh"]
+
+  - it: renders SIDEKIQ_AI_AGENT=true on every rails pod when the toggle is on
+    template: charts/api/templates/deployment.yaml
+    set:
+      global.sidekiq.queues.aiAgent: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SIDEKIQ_AI_AGENT
+            value: "true"
+
+  - it: omits SIDEKIQ_AI_AGENT from rails pods when the toggle is off
+    template: charts/api/templates/deployment.yaml
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SIDEKIQ_AI_AGENT
+            value: "true"

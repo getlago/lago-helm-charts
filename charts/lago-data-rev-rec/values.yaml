@@ -1,0 +1,156 @@
+# Default values for the lago-data-rev-rec chart.
+#
+# Namespace comes from the helm release (`--namespace`, or Argo Application
+# `destination.namespace`) and is read via `.Release.Namespace` in the
+# templates — there is no namespace value to override here.
+#
+# The primary resource is the FlinkDeployment — its image/annotations/replicas/
+# etc. live at the root. Subordinate resources (submitter Job, RBAC) live under
+# their own keys.
+
+# Flink runtime image (Java side, with the Beam SDK boot binary + S3 plugin
+# baked in). The submitter / harness Python image lives under `submitter.image`.
+image:
+  repository: ""
+  tag: ""
+  pullPolicy: IfNotPresent
+
+# Applied to every pod this chart creates: the FlinkDeployment's JobManager
+# and TaskManagers, and the submitter Job. Empty by default.
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Annotations applied to the FlinkDeployment resource.
+annotations: {}
+
+# Additional labels merged into the FlinkDeployment resource labels.
+labels: {}
+
+flinkVersion: v1_20
+
+# Populates FlinkDeployment.spec.restartNonce when set — the Flink K8s
+# operator's mechanism to force a spec-change reconcile without editing any
+# real field. Leave null in steady state so upgrades don't churn the JM.
+#
+# When to set (or bump): the operator's session-recovery path
+# (SessionReconciler.recoverSession) creates a JM Deployment without the
+# ownerReference + `flinkdeployment.flink.apache.org/generation` annotation
+# the observer requires, so any Deployment produced by that path is
+# perpetually flagged MISSING and the operator loops on 409-AlreadyExists
+# recreates. Setting or bumping restartNonce routes the next reconcile
+# through SessionReconciler.deploy() instead, which stamps both markers
+# correctly.
+restartNonce: null
+
+jobManager:
+  replicas: 2
+  resource:
+    cpu: 1
+    memory: 2048m
+
+taskManager:
+  replicas: 2
+  resource:
+    cpu: 1
+    memory: 2048m
+  # Resources for the beam-py-harness sidecar that runs the Python SDK
+  # worker pool. Sized for the pickled rev_rec DoFn graph; bump if you
+  # increase pipeline parallelism or stream count.
+  sidecarResources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: '1'
+      memory: 1Gi
+
+harnessSidecar:
+  port: 50000
+
+# Flink configuration map. Chart-managed defaults (HA + checkpointing) are
+# emitted first, then `config.extraConfig` — when both set the same key, YAML
+# last-wins gives extraConfig precedence.
+config:
+  highAvailability:
+    # Required. K8s-API HA via ConfigMaps for leader election + JobGraph storage,
+    # plus the storageDir on S3 for JobGraph blobs. Set via Pulumi valuesObject
+    # from the data-services stack output (do not hardcode).
+    storageDir: ""
+  checkpointing:
+    # Required. Set via Pulumi valuesObject (data-services checkpoint bucket).
+    storageDir: ""
+    # Required. Set via Pulumi valuesObject.
+    savepointDir: ""
+    stateBackend: rocksdb
+    incremental: "true"
+  # Additional Flink config keys merged on top of the chart-rendered ones.
+  extraConfig:
+    taskmanager.numberOfTaskSlots: "2"
+    classloader.resolve-order: parent-first
+    env.java.opts.jobmanager: "-Djava.security.egd=file:/dev/./urandom"
+    env.java.opts.taskmanager: "-Djava.security.egd=file:/dev/./urandom"
+
+# ServiceAccount used by the FlinkDeployment (JobManager + TaskManagers) and
+# the submitter Job. Must be bound to an IAM role with read/write on the Flink
+# checkpoint bucket via EKS Pod Identity. Default is to create the SA here;
+# the lago-data Pulumi component sets `create: false` and provides `name` when
+# it owns the SA out-of-band (so it can wire it into the Pod Identity assoc).
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  # If not set and create is true, a name is generated using the fullname template.
+  name: ""
+
+submitter:
+  # Python image used by both the submitter Job AND the beam-py-harness sidecar
+  # on each TaskManager pod.
+  image:
+    repository: ""
+    tag: ""
+    pullPolicy: IfNotPresent
+  # Annotations applied to the submitter Job.
+  annotations: {}
+  # Names of pre-existing Secrets the submitter Job consumes via envFrom.
+  # Provision them out-of-band (e.g. as SealedSecrets in the resources/ Argo
+  # source).
+  secrets:
+    # Postgres: SOURCE_DATABASE_URL, SINK_DATABASE_URL
+    postgres: ""
+    # Redpanda: KAFKA_BOOTSTRAP_SERVERS, KAFKA_SECURITY_PROTOCOL,
+    #           KAFKA_SASL_MECHANISM, KAFKA_SASL_USERNAME, KAFKA_SASL_PASSWORD
+    kafka: ""
+  # Time-of-day (HH:MM) the daily revenue-recognition trigger fires, in each
+  # organisation's timezone.
+  triggerTime: "00:30"
+  kafka:
+    # Consumer group used by the submitter's organisation-cache bootstrap and by
+    # the FlinkRunner's source operators.
+    consumerGroup: "rev-rec"
+    # Where consumers start when no committed offset exists for the group.
+    # Use `earliest` for a one-off backfill, `latest` for steady-state.
+    autoOffsetReset: "latest"
+  logging:
+    # Log level for rev_rec's own loggers.
+    level: "INFO"
+    # Log level for noisy framework loggers (Beam expansion service, gRPC, etc.).
+    frameworkLevel: "WARNING"
+  # Beam overrides Flink's cluster-level checkpoint interval; without this set,
+  # Python ParDo bundles never close and no records flow out of the source.
+  checkpointingIntervalMs: 30000
+  resources:
+    requests:
+      cpu: "200m"
+      memory: "1Gi"
+    limits:
+      cpu: "1"
+      memory: "4Gi"
+  # JVM tuning for the in-process Beam Java IO expansion service. Default direct
+  # buffer memory (~250MB) OOMs while streaming Beam SDK artifact jars over gRPC.
+  javaToolOptions: "-Xmx1500m -XX:MaxDirectMemorySize=1500m"
+  # How long completed/failed submitter Jobs are retained before garbage collection.
+  ttlSecondsAfterFinished: 1800
+  backoffLimit: 2
+  # Extra Beam pipeline options appended to the python -m run argv.
+  extraArgs: []

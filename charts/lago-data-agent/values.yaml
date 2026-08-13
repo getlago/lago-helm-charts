@@ -1,0 +1,151 @@
+# Default values for lago-data-agent.
+
+image:
+  # -- Container image repository
+  # @section -- Image
+  repository: 201661579678.dkr.ecr.us-east-1.amazonaws.com/lago-data-agent
+  # -- Image pull policy
+  # @section -- Image
+  pullPolicy: IfNotPresent
+  # -- Override the image tag (defaults to Chart appVersion)
+  # @section -- Image
+  tag: ""
+
+# -- Image pull secrets for private registries
+# @default -- `[]`
+# @section -- Image
+imagePullSecrets: []
+# -- Override the chart name
+# @section -- Deployment
+nameOverride: ""
+# -- Override the full release name
+# @section -- Deployment
+fullnameOverride: ""
+# -- Number of replicas (ignored when autoscaling is enabled)
+# @section -- Deployment
+replicaCount: 1
+
+container:
+  # -- Override the container name (defaults to chart name)
+  # @section -- Container
+  name: ""
+  # -- Container entrypoint command. The agent image's `api` entrypoint serves the
+  # MCP-facing POST /ask (X-LAGO-API-KEY auth) and unauthenticated /health.
+  # @section -- Container
+  command: ["python", "-m", "src"]
+  # -- Container command arguments
+  # @section -- Container
+  args: ["api", "--host", "0.0.0.0", "--port", "8000"]
+  ports:
+    # -- HTTP container port
+    # @section -- Container
+    http: 8000
+
+serviceAccount:
+  # -- Create a ServiceAccount
+  # @section -- Service Account
+  create: true
+  # -- Automount the ServiceAccount API credentials
+  # @section -- Service Account
+  automount: true
+  # -- Annotations to add to the ServiceAccount (e.g. an IRSA / Pod Identity role,
+  # if Bedrock access moves from AWS_BEARER_TOKEN_BEDROCK to IAM)
+  # @section -- Service Account
+  annotations: {}
+  # -- ServiceAccount name (generated from fullname if not set)
+  # @section -- Service Account
+  name: ""
+
+service:
+  # -- Service type (`ClusterIP`, `NodePort`, `LoadBalancer`)
+  # @section -- Service
+  type: ClusterIP
+  # -- Service port
+  # @section -- Service
+  port: 80
+
+autoscaling:
+  # -- Enable Horizontal Pod Autoscaler
+  # @section -- Autoscaling
+  enabled: false
+  # -- Minimum replicas
+  # @section -- Autoscaling
+  minReplicas: 1
+  # -- Maximum replicas
+  # @section -- Autoscaling
+  maxReplicas: 100
+  # -- Target CPU utilization percentage
+  # @section -- Autoscaling
+  targetCPUUtilizationPercentage: 80
+
+# -- Additional pod annotations
+# @section -- Pod
+podAnnotations: {}
+# -- Additional pod labels
+# @section -- Pod
+podLabels: {}
+
+# -- Pod-level security context
+# @section -- Pod
+podSecurityContext: {}
+
+# -- Container-level security context
+# @section -- Pod
+securityContext: {}
+
+# -- Liveness probe configuration (/health is unauthenticated)
+# @section -- Pod
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 15
+  timeoutSeconds: 5
+  failureThreshold: 5
+
+# -- Readiness probe configuration (/health is unauthenticated)
+# @section -- Pod
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# -- Extra environment variables (map format, deep-mergeable). Non-sensitive config
+# such as BEDROCK_MODEL_ID, AWS_DEFAULT_REGION, LAGO_API_URL.
+# @section -- Pod
+extraEnv: {}
+
+# -- Extra envFrom sources. Sensitive values (PG_DSN, AWS_BEARER_TOKEN_BEDROCK) are
+# injected from a pre-existing Secret here, e.g. a SealedSecret-managed one.
+# @default -- `[]` (See [values.yaml])
+# @section -- Pod
+extraEnvFrom: []
+
+# -- Resource requests and limits
+# @section -- Pod
+resources: {}
+
+# -- Additional volumes
+# @section -- Pod
+volumes: []
+
+# -- Additional volume mounts
+# @section -- Pod
+volumeMounts: []
+
+# -- Node selector constraints
+# @section -- Pod
+nodeSelector: {}
+
+# -- Pod tolerations
+# @section -- Pod
+tolerations: []
+
+# -- Pod affinity rules
+# @section -- Pod
+affinity: {}

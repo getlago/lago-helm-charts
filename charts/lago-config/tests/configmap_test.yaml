@@ -1,0 +1,145 @@
+suite: Test lago-config.configMapName helper
+templates:
+  - templates/configmap.yaml
+
+tests:
+  - it: should use default configmap name when no custom name is set
+    set:
+      global.urls.api: "http://api.test"
+      global.urls.front: "http://front.test"
+      global.redis.uri: "redis://localhost"
+      global.redisCache.uri: "redis://localhost"
+      global.redisStore.uri: "redis://localhost"
+    release:
+      name: my-release
+    chart:
+      name: lago-config
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-release-lago-config
+
+  - it: should use configmap.name when provided
+    set:
+      configmap.name: "custom-configmap"
+      global.urls.api: "http://api.test"
+      global.urls.front: "http://front.test"
+      global.redis.uri: "redis://localhost"
+      global.redisCache.uri: "redis://localhost"
+      global.redisStore.uri: "redis://localhost"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: custom-configmap
+
+  - it: should use config.configmap.name when provided
+    set:
+      config.configmap.name: "config-configmap"
+      global.urls.api: "http://api.test"
+      global.urls.front: "http://front.test"
+      global.redis.uri: "redis://localhost"
+      global.redisCache.uri: "redis://localhost"
+      global.redisStore.uri: "redis://localhost"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: config-configmap
+
+  - it: should use global.config.configmap when provided
+    set:
+      global.config.configmap: "global-configmap"
+      global.urls.api: "http://api.test"
+      global.urls.front: "http://front.test"
+      global.redis.uri: "redis://localhost"
+      global.redisCache.uri: "redis://localhost"
+      global.redisStore.uri: "redis://localhost"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: global-configmap
+
+  - it: should prioritize configmap.name over config.configmap.name
+    set:
+      configmap.name: "direct-configmap"
+      config.configmap.name: "config-configmap"
+      global.urls.api: "http://api.test"
+      global.urls.front: "http://front.test"
+      global.redis.uri: "redis://localhost"
+      global.redisCache.uri: "redis://localhost"
+      global.redisStore.uri: "redis://localhost"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: direct-configmap
+
+  - it: should prioritize configmap.name over global.config.configmap
+    set:
+      configmap.name: "direct-configmap"
+      global.config.configmap: "global-configmap"
+      global.urls.api: "http://api.test"
+      global.urls.front: "http://front.test"
+      global.redis.uri: "redis://localhost"
+      global.redisCache.uri: "redis://localhost"
+      global.redisStore.uri: "redis://localhost"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: direct-configmap
+
+  - it: should prioritize config.configmap.name over global.config.configmap
+    set:
+      config.configmap.name: "config-configmap"
+      global.config.configmap: "global-configmap"
+      global.urls.api: "http://api.test"
+      global.urls.front: "http://front.test"
+      global.redis.uri: "redis://localhost"
+      global.redisCache.uri: "redis://localhost"
+      global.redisStore.uri: "redis://localhost"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: config-configmap
+
+  - it: should not create configmap when configmap.create is false
+    set:
+      configmap.create: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should create configmap by default
+    set:
+      global.urls.api: "http://api.test"
+      global.urls.front: "http://front.test"
+      global.redis.uri: "redis://localhost"
+      global.redisCache.uri: "redis://localhost"
+      global.redisStore.uri: "redis://localhost"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: ConfigMap
+
+  - it: should emit sentry.environment when set
+    set:
+      global.urls.api: "http://api.test"
+      global.urls.front: "http://front.test"
+      global.redis.uri: "redis://localhost"
+      global.redisCache.uri: "redis://localhost"
+      global.redisStore.uri: "redis://localhost"
+      global.sentry.environment: "production"
+    asserts:
+      - equal:
+          path: data["sentry.environment"]
+          value: "production"
+
+  - it: should omit sentry.environment when unset
+    set:
+      global.urls.api: "http://api.test"
+      global.urls.front: "http://front.test"
+      global.redis.uri: "redis://localhost"
+      global.redisCache.uri: "redis://localhost"
+      global.redisStore.uri: "redis://localhost"
+    asserts:
+      - notExists:
+          path: data["sentry.environment"]

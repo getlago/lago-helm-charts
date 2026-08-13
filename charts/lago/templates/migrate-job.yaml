@@ -1,88 +1,157 @@
+{{- if .Values.migrate.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Release.Name }}-migrate-db
+  name: {{ include "lago.fullname" . }}-migrate
+  labels:
+    {{- include "lago.labels" . | nindent 4 }}
+    app.kubernetes.io/component: migrate
   annotations:
-    helm.sh/hook: pre-install,pre-upgrade
-    helm.sh/hook-weight: "-1"
-    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": {{ .Values.migrate.hookWeight | quote }}
+    "helm.sh/hook-delete-policy": {{ .Values.migrate.hookDeletePolicy }}
+    {{- with .Values.migrate.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
+  {{- with .Values.migrate.ttlSecondsAfterFinished }}
+  ttlSecondsAfterFinished: {{ . }}
+  {{- end }}
+  {{- with .Values.migrate.activeDeadlineSeconds }}
+  activeDeadlineSeconds: {{ . }}
+  {{- end }}
+  backoffLimit: {{ .Values.migrate.backoffLimit }}
   template:
     metadata:
-      labels:
-        {{- with .Values.job.migrate.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
-      {{- with .Values.job.migrate.podAnnotations }}
+      {{- with .Values.migrate.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      labels:
+        {{- include "lago.labels" . | nindent 8 }}
+        app.kubernetes.io/component: migrate
+        {{- with .Values.migrate.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
-      restartPolicy: Never
+      {{- with .Values.migrate.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.migrate.serviceAccountName }}
+      serviceAccountName: {{ . }}
+      {{- end }}
+      {{- with .Values.migrate.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: {{ .Values.migrate.restartPolicy }}
+      {{- with .Values.migrate.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
-        - name: lago-migrate
-          image: getlago/api:v{{ .Values.version }}
-          {{ if .Values.job.migrate.loadSchema }}
-          command: ["bin/rails"]
-          args:
-            - "db:schema:load"
-          {{ else }}
-          args:
-            - ./scripts/migrate.sh
-          {{end}}
+        - name: migrate
+          image: "{{ .Values.migrate.image.repository }}:{{ include "lago.version" . }}"
+          imagePullPolicy: {{ .Values.migrate.image.pullPolicy }}
+          command: {{ toJson .Values.migrate.command }}
+          args: {{ toJson .Values.migrate.args }}
+          {{- with .Values.migrate.extraEnvFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: RAILS_ENV
-              value: {{ .Values.api.rails.env }}
+              value: {{ default .Values.global.lago.env .Values.migrate.config.env }}
+            - name: DATABASE_POOL
+              value: {{ default .Values.global.database.pool .Values.migrate.config.database.pool | quote }}
+            {{/* Per-instance override wins over the umbrella default. */}}
+            {{- if kindIs "bool" .Values.migrate.config.database.preparedStatement }}
+            - name: DATABASE_PREPARED_STATEMENTS
+              value: {{ .Values.migrate.config.database.preparedStatement | quote }}
+            {{/* Fall back to the global value shared across every Rails pod. */}}
+            {{- else if kindIs "bool" .Values.global.database.preparedStatement }}
+            - name: DATABASE_PREPARED_STATEMENTS
+              value: {{ .Values.global.database.preparedStatement | quote }}
+            {{- end }}
+            - name: LAGO_LOG_LEVEL
+              value: {{ .Values.migrate.config.log.level }}
+            - name: RAILS_LOG_TO_STDOUT
+              value: {{ .Values.migrate.config.log.stdout | quote }}
             - name: DATABASE_URL
+              {{- with .Values.global.database.uri }}
+              value: {{ . }}
+              {{- else }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "secret-path" . }}
-                  key: databaseUrl
-            - name: REDIS_URL
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "secret-path" . }}
-                  key: redisUrl
+                  name: {{ include "lago.secretName" . }}
+                  key: database.uri
+              {{- end }}
             - name: LAGO_RSA_PRIVATE_KEY
+              {{- with .Values.global.signing.rsa }}
+              value: {{ . }}
+              {{- else }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
-                  key: rsaPrivateKey
+                  name: {{ include "lago.secretName" . }}
+                  key: signing.rsa
+              {{- end }}
             - name: SECRET_KEY_BASE
+              {{- with .Values.global.signing.hmac }}
+              value: {{ . }}
+              {{- else }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secrets
-                  key: secretKeyBase
-            - name: ENCRYPTION_DETERMINISTIC_KEY
+                  name: {{ include "lago.secretName" . }}
+                  key: signing.hmac
+              {{- end }}
+            - name: REDIS_URL
+              value: {{ .Values.global.redis.uri }}
+            - name: REDIS_PASSWORD
+              {{- with .Values.global.redis.password }}
+              value: {{ . }}
+              {{- else }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "encryption-secret-path" . }}
-                  key: encryptionDeterministicKey
-            - name: ENCRYPTION_KEY_DERIVATION_SALT
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "encryption-secret-path" . }}
-                  key: encryptionKeyDerivationSalt
-            - name: ENCRYPTION_PRIMARY_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "encryption-secret-path" . }}
-                  key: encryptionPrimaryKey
-            {{ if .Values.global.clickhouse.enabled }}
-            {{- include "kafkaEnvs" . | nindent 12 }}
-            {{- include "clickhouseEnvs" . | nindent 12 }}
-            - name: LAGO_CLICKHOUSE_MIGRATIONS_ENABLED
-              value: "true"
-            - name: LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP
-              value: clickhouse
-            {{ end }}
-            {{- with .Values.job.migrate.extraEnv }}
-            {{- range $key, $value := . }}
-            - name: {{ $key }}
-              value: {{ $value | quote }}
+                  name: {{ include "lago.secretName" . }}
+                  key: redis.password
+                  optional: true
+              {{- end }}
+            {{- range $name, $val := .Values.migrate.extraEnv }}
+            {{- if kindIs "map" $val }}
+            - name: {{ $name }}
+              {{- toYaml $val | nindent 14 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $val | quote }}
             {{- end }}
             {{- end }}
-          {{- with .Values.job.migrate.resources }}
+          {{- with .Values.migrate.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with .Values.migrate.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.migrate.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.migrate.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.migrate.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.migrate.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.migrate.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

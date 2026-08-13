@@ -1,0 +1,150 @@
+suite: Test lago-config helpers are resolved correctly from subcharts
+templates:
+  - charts/api/templates/deployment.yaml
+
+tests:
+  - it: should use global.config.secret when set (not hardcoded default)
+    set:
+      global:
+        lago:
+          env: production
+          version: v1.0.0
+        config:
+          configmap: custom-configmap-name
+          secret: custom-secret-name
+        urls:
+          api: http://api.test
+          front: http://front.test
+        database:
+          uri: postgresql://localhost
+        encryption:
+          key: test-key
+          salt: test-salt
+        signing:
+          hmac: test-hmac
+          rsa: test-rsa
+        redis:
+          uri: redis://localhost
+        redisCache:
+          uri: redis://localhost
+        redisStore:
+          uri: redis://localhost
+      config:
+        secret:
+          create: false
+      api:
+        config:
+          enabled: false
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_URL")].valueFrom.secretKeyRef.name
+          value: custom-secret-name
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "REDIS_URL")].valueFrom.configMapKeyRef.name
+          value: custom-configmap-name
+
+  - it: should bind DATABASE_URL to the database.uri secret key
+    set:
+      global:
+        lago:
+          env: production
+          version: v1.0.0
+        urls:
+          api: http://api.test
+          front: http://front.test
+        database:
+          uri: ""
+        encryption:
+          key: test-key
+          salt: test-salt
+        signing:
+          hmac: test-hmac
+          rsa: test-rsa
+        redis:
+          uri: redis://localhost
+        redisCache:
+          uri: redis://localhost
+        redisStore:
+          uri: redis://localhost
+      api:
+        config:
+          enabled: false
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_URL")].valueFrom.secretKeyRef.key
+          value: database.uri
+      - isNull:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_PROXY_URL")]
+
+  - it: should expose DATABASE_PROXY_URL and auto-off prepared statements when config.database.proxy is set
+    set:
+      global:
+        lago:
+          env: production
+          version: v1.0.0
+        urls:
+          api: http://api.test
+          front: http://front.test
+        database:
+          uri: ""
+        encryption:
+          key: test-key
+          salt: test-salt
+        signing:
+          hmac: test-hmac
+          rsa: test-rsa
+        redis:
+          uri: redis://localhost
+        redisCache:
+          uri: redis://localhost
+        redisStore:
+          uri: redis://localhost
+      api:
+        config:
+          enabled: false
+          database:
+            proxy: database.proxy.uri
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_URL")].valueFrom.secretKeyRef.key
+          value: database.uri
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_PROXY_URL")].valueFrom.secretKeyRef.key
+          value: database.proxy.uri
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_PREPARED_STATEMENTS")].value
+          value: "false"
+
+  - it: should let an explicit preparedStatement override win over the proxy auto-off
+    set:
+      global:
+        lago:
+          env: production
+          version: v1.0.0
+        urls:
+          api: http://api.test
+          front: http://front.test
+        database:
+          uri: ""
+        encryption:
+          key: test-key
+          salt: test-salt
+        signing:
+          hmac: test-hmac
+          rsa: test-rsa
+        redis:
+          uri: redis://localhost
+        redisCache:
+          uri: redis://localhost
+        redisStore:
+          uri: redis://localhost
+      api:
+        config:
+          enabled: false
+          database:
+            proxy: database.proxy.uri
+            preparedStatement: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_PREPARED_STATEMENTS")].value
+          value: "true"
