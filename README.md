@@ -302,6 +302,20 @@ You can use the provided `Taskfile.yaml` to easily set up a local development en
 
 **Note on Readiness Probes:** Currently, readiness probes are not explicitly configured for any of the components in this Helm chart.
 
+### Migration Job Configuration
+
+The database migration runs as a `pre-install`/`pre-upgrade` Helm hook Job. Use these
+to keep it schedulable on clusters with tainted or dedicated nodes.
+
+| Parameter                          | Description                                        | Default   |
+|-------------------------------------|----------------------------------------------------|-----------|
+| `job.migrate.tolerations`          | Pod tolerations for the migration Job             | `[]`      |
+| `job.migrate.nodeSelector`         | Node selector for the migration Job               | `{}`      |
+| `job.migrate.affinity`             | Affinity rules for the migration Job              | `{}`      |
+| `job.migrate.resources`            | Resource requests/limits for the migration Job    | `{}`      |
+| `job.migrate.extraEnv`             | Extra environment variables for the migration Job | `{}`      |
+| `job.migrate.loadSchema`           | Load the schema (`db:schema:load`) instead of running migrations | `false` |
+
 
 
 ### MinIO Configuration

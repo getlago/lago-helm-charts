@@ -19,6 +19,18 @@ spec:
       {{- end }}
     spec:
       restartPolicy: Never
+      {{- with .Values.job.migrate.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.job.migrate.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.job.migrate.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: lago-migrate
           image: getlago/api:v{{ .Values.version }}
