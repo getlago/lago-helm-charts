@@ -36,6 +36,11 @@ dependencies:
     version: 0.10.0
     repository: "file://../lago-rails"
   - name: lago-rails
+    alias: worker-arm64
+    version: 0.10.0
+    repository: "file://../lago-rails"
+    condition: global.arm64.enabled
+  - name: lago-rails
     alias: clock
     version: 0.10.0
     repository: "file://../lago-rails"
