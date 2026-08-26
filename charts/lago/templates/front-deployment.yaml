@@ -23,6 +23,10 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
     spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.front.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
@@ -53,7 +57,7 @@ spec:
               value: {{ $value | quote }}
             {{- end }}
             {{- end }}
-          image: getlago/front:v{{ .Values.version }}
+          image: {{ .Values.global.image.registry }}/getlago/front:v{{ .Values.version }}
           name: {{ .Release.Name }}-front
           ports:
             - containerPort: 80

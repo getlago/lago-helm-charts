@@ -67,6 +67,8 @@ You can use the provided `Taskfile.yaml` to easily set up a local development en
 | `global.signup.enabled`          | Enable or disable Lago's signup feature                                                                 | `true`            |
 | `global.googleAuth.enabled`      | Enable or disable logging through Google Auth                                                           | `true`            |
 | `global.ingress.enabled`         | Enable ingress resources for the application                                                            | `false`           |
+| `global.image.registry`          | Registry/mirror for all chart-managed images (getlago/*, alpine). Override to use a private registry or pull-through mirror | `docker.io`       |
+| `global.imagePullSecrets`        | Pull secrets applied to every chart-managed pod (e.g. `[{name: my-cred}]`); required for authenticated registries/mirrors | `[]`              |
 | `global.kubectl.imageRegistry`   | Docker registry with kubectl image (for init containers)                                                | `docker.io`       |
 | `global.kubectl.imageRepository` | Docker repository with kubectl image (for init containers)                                              | `rancher/kubectl` |
 | `global.kubectl.imageTag`        | Tag of kubectl Docker image (for init containers) - if unset (default) it is set to k8s cluster version | `""`              |

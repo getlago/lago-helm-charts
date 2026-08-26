@@ -24,6 +24,10 @@ spec:
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.eventsProcessor.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
@@ -38,7 +42,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Release.Name }}-events-processor-worker
-          image: getlago/lago-events-processor:v{{ .Values.version }}
+          image: {{ .Values.global.image.registry }}/getlago/lago-events-processor:v{{ .Values.version }}
           command: ["./event_processors"]
         {{- with .Values.eventsProcessor.resources }}
           resources:

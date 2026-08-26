@@ -24,6 +24,10 @@ spec:
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.eventsConsumer.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
@@ -38,7 +42,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Release.Name }}-events-consumer-worker
-          image: getlago/api:v{{ .Values.version }}
+          image: {{ .Values.global.image.registry }}/getlago/api:v{{ .Values.version }}
           command: ["./scripts/start.events.consumer.sh"]
         {{- with .Values.eventsConsumer.resources }}
           resources:

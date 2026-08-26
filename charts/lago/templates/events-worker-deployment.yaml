@@ -23,6 +23,10 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
     spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.eventsWorker.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
@@ -111,7 +115,7 @@ spec:
                   name: {{ .Release.Name }}-secrets
                   key: newRelicKey
             {{ end }}
-          image: getlago/api:v{{ .Values.version }}
+          image: {{ .Values.global.image.registry }}/getlago/api:v{{ .Values.version }}
           name: {{ .Release.Name }}-events-worker
           {{- with .Values.eventsWorker.resources }}
           resources:
