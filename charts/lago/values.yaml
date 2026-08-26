@@ -45,6 +45,24 @@ global:
     # region: "<your-aws-region>"
     # endpoint: "https://s3.<region>.amazonaws.com" # Leave empty for default AWS S3 endpoint
 
+  # Google Cloud Storage. Mutually exclusive with s3 and minio: when s3 is also
+  # enabled Lago falls back to S3, since LAGO_USE_AWS_S3 takes precedence.
+  gcs:
+    enabled: false
+    # project: "<your-gcp-project>"
+    # bucket: "<your-gcs-bucket>"
+    #
+    # Recommended on GKE: authenticate with Workload Identity instead of a keyfile.
+    # Set global.serviceAccountName to a ServiceAccount you have annotated with
+    # iam.gke.io/gcp-service-account, and point gsaEmail at the same Google service
+    # account so Lago can sign URLs through the IAM API.
+    # iam: true
+    # gsaEmail: "<service-account>@<your-gcp-project>.iam.gserviceaccount.com"
+    #
+    # Alternative: path to a service account keyfile. The chart does not mount the
+    # keyfile for you, so it has to already be present in the container at this path.
+    # keyfileJsonPath: "/etc/gcs/keyfile.json"
+
   smtp:
     # username and password are not required here if using existingSecret
     enabled: false

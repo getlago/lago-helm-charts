@@ -85,3 +85,34 @@
       key: clickhousePassword
       optional: true
 {{- end }}
+
+{{- define "gcsEnvs" }}
+{{- $gcs := .Values.global.gcs -}}
+- name: LAGO_USE_GCS
+  value: "true"
+- name: LAGO_GCS_PROJECT
+  value: {{ required "If gcs is enabled, you must provide global.gcs.project" $gcs.project | quote }}
+- name: LAGO_GCS_BUCKET
+  value: {{ required "If gcs is enabled, you must provide global.gcs.bucket" $gcs.bucket | quote }}
+{{- if $gcs.iam }}
+- name: LAGO_GCS_IAM
+  value: "true"
+- name: LAGO_GCS_GSA_EMAIL
+  value: {{ required "If gcs iam is enabled, you must provide global.gcs.gsaEmail" $gcs.gsaEmail | quote }}
+{{- end }}
+{{- with $gcs.keyfileJsonPath }}
+- name: LAGO_GCS_KEYFILE_JSON_PATH
+  value: {{ . | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
+Renders "true" when no object storage backend is configured, meaning the chart
+has to provision and mount its bundled local-storage PersistentVolumeClaim.
+Empty (falsy) otherwise, so it can be used as {{ if include "localStorage" . }}.
+*/}}
+{{- define "localStorage" -}}
+{{- if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) (not .Values.global.gcs.enabled) -}}
+true
+{{- end -}}
+{{- end }}

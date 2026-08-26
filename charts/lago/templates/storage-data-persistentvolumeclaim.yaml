@@ -1,4 +1,4 @@
-{{- if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) -}}
+{{- if include "localStorage" . -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

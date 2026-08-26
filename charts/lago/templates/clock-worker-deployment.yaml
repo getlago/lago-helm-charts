@@ -182,6 +182,9 @@ spec:
                         {{ default "us-east-1" .Values.minio.region | quote }}
                       {{ end }}
             {{ end }}
+            {{- if .Values.global.gcs.enabled }}
+            {{- include "gcsEnvs" . | nindent 12 }}
+            {{- end }}
 
             {{ if .Values.global.newRelic.enabled }}
             - name: NEW_RELIC_KEY
@@ -206,13 +209,13 @@ spec:
           resources:
             {{- toYaml . | nindent 12}}
           {{- end }}
-          {{ if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) }}
+          {{ if include "localStorage" . }}
           volumeMounts:
             - mountPath: /app/storage
               name: {{ .Release.Name }}-storage-data
           {{ end }}
       restartPolicy: Always
-      {{ if and (not .Values.global.s3.enabled) (not .Values.minio.enabled) }}
+      {{ if include "localStorage" . }}
       volumes:
         - name: {{ .Release.Name }}-storage-data
           persistentVolumeClaim:
