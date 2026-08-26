@@ -1,0 +1,202 @@
+suite: Test object storage backends and the bundled local-storage volume
+templates:
+  - templates/storage-data-persistentvolumeclaim.yaml
+  - templates/api-deployment.yaml
+  - templates/worker-deployment.yaml
+  - templates/billing-worker-deployment.yaml
+  - templates/payment-worker-deployment.yaml
+  - templates/pdf-worker-deployment.yaml
+  - templates/clock-worker-deployment.yaml
+
+set:
+  apiUrl: "api.lago.dev"
+  frontUrl: "front.lago.dev"
+  billingWorker.enabled: true
+  paymentWorker.enabled: true
+  pdfWorker.enabled: true
+  clockWorker.enabled: true
+
+tests:
+  - it: should provision the local storage claim when no object storage is configured
+    template: templates/storage-data-persistentvolumeclaim.yaml
+    asserts:
+      - containsDocument:
+          apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: RELEASE-NAME-storage-data
+
+  - it: should mount the local storage claim in every storage aware workload by default
+    documentSelector:
+      path: kind
+      value: Deployment
+      matchMany: true
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: RELEASE-NAME-storage-data
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-storage-data
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            mountPath: /app/storage
+            name: RELEASE-NAME-storage-data
+
+  - it: should not provision the local storage claim when gcs is enabled
+    template: templates/storage-data-persistentvolumeclaim.yaml
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: "lago-project"
+      global.gcs.bucket: "lago-bucket"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not mount the local storage claim in any workload when gcs is enabled
+    documentSelector:
+      path: kind
+      value: Deployment
+      matchMany: true
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: "lago-project"
+      global.gcs.bucket: "lago-bucket"
+    asserts:
+      - notExists:
+          path: spec.template.spec.volumes
+      - notExists:
+          path: spec.template.spec.containers[0].volumeMounts
+
+  - it: should not provision the local storage claim when s3 is enabled
+    template: templates/storage-data-persistentvolumeclaim.yaml
+    set:
+      global.s3.enabled: true
+      global.s3.bucket: "lago-bucket"
+      global.s3.region: "eu-west-1"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not provision the local storage claim when minio is enabled
+    template: templates/storage-data-persistentvolumeclaim.yaml
+    set:
+      minio.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should wire the gcs environment in every storage aware workload
+    documentSelector:
+      path: kind
+      value: Deployment
+      matchMany: true
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: "lago-project"
+      global.gcs.bucket: "lago-bucket"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_USE_GCS
+            value: "true"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_GCS_PROJECT
+            value: "lago-project"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_GCS_BUCKET
+            value: "lago-bucket"
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_USE_AWS_S3
+            value: "true"
+
+  - it: should use workload identity when gcs iam is enabled
+    template: templates/api-deployment.yaml
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: "lago-project"
+      global.gcs.bucket: "lago-bucket"
+      global.gcs.iam: true
+      global.gcs.gsaEmail: "lago@lago-project.iam.gserviceaccount.com"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_GCS_IAM
+            value: "true"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_GCS_GSA_EMAIL
+            value: "lago@lago-project.iam.gserviceaccount.com"
+
+  - it: should pass the keyfile path when workload identity is not used
+    template: templates/api-deployment.yaml
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: "lago-project"
+      global.gcs.bucket: "lago-bucket"
+      global.gcs.keyfileJsonPath: "/etc/gcs/keyfile.json"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_GCS_KEYFILE_JSON_PATH
+            value: "/etc/gcs/keyfile.json"
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_GCS_IAM
+            value: "true"
+
+  - it: should not emit any gcs environment by default
+    template: templates/api-deployment.yaml
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_USE_GCS
+            value: "true"
+
+  - it: should require a project when gcs is enabled
+    # helm renders templates in reverse alphabetical order, so the required
+    # value is reported against the last of the storage aware deployments
+    template: templates/worker-deployment.yaml
+    set:
+      global.gcs.enabled: true
+      global.gcs.bucket: "lago-bucket"
+    asserts:
+      - failedTemplate:
+          errorMessage: "If gcs is enabled, you must provide global.gcs.project"
+
+  - it: should require a bucket when gcs is enabled
+    # helm renders templates in reverse alphabetical order, so the required
+    # value is reported against the last of the storage aware deployments
+    template: templates/worker-deployment.yaml
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: "lago-project"
+    asserts:
+      - failedTemplate:
+          errorMessage: "If gcs is enabled, you must provide global.gcs.bucket"
+
+  - it: should require a service account email when gcs iam is enabled
+    # helm renders templates in reverse alphabetical order, so the required
+    # value is reported against the last of the storage aware deployments
+    template: templates/worker-deployment.yaml
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: "lago-project"
+      global.gcs.bucket: "lago-bucket"
+      global.gcs.iam: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "If gcs iam is enabled, you must provide global.gcs.gsaEmail"
