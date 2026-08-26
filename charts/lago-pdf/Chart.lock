@@ -1,9 +1,9 @@
 dependencies:
 - name: lago-config
   repository: file://../lago-config
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
-digest: sha256:153bfb946731a81c6791b00706a6686b840d062b538b15ec7a94bccc554ac2a9
-generated: "2026-08-13T08:47:33.808659665Z"
+  version: 0.11.0
+digest: sha256:fdaa78296db5ea6b0d80ce75f316627694ff8b457e845ea431292b7f48d34353
+generated: "2026-08-26T15:50:29.660746099Z"

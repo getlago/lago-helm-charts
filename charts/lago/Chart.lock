@@ -1,63 +1,63 @@
 dependencies:
 - name: lago-config
   repository: file://../lago-config
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-front
   repository: file://../lago-front
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-pdf
   repository: file://../lago-pdf
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-events-processor-worker
   repository: file://../lago-events-processor-worker
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
+  version: 0.11.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.10.0
-digest: sha256:362f12a2020ca3b60c2bd832de536c7861547b9b81c88aa6a180ded49b80cd12
-generated: "2026-08-26T16:29:47.163824755+03:00"
+  version: 0.11.0
+digest: sha256:84d939cca1ea14a2f728090e2cb9b142e7161b82f85ef0d3997ec8c035d7527b
+generated: "2026-08-26T15:50:29.864606422Z"
