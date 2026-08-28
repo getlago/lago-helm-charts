@@ -22,15 +22,24 @@ global:
     # @section -- Lago
     pdfGeneration: false
 
-  # -- arm64 (Graviton) migration pilot. Gates the `worker-arm64` subchart —
-  # a second copy of the default Sidekiq worker, pinned to arm64 nodes via
-  # its own nodeSelector/tolerations, run side-by-side with `worker` for
-  # comparison. Off by default so bumping this chart's version is a no-op on
-  # any cluster without an arm64 nodepool (the pod would otherwise sit
-  # Pending forever with no schedulable node).
+  # -- arm64 (Graviton) migration pilot. Each flag gates a second copy of a
+  # workload (`worker-arm64` / `api-arm64`), pinned to arm64 nodes via its own
+  # nodeSelector/tolerations and run side-by-side with the amd64 original for
+  # comparison. The worker and api flags are independent so the two migrations
+  # can be phased separately (workers first, then the API). Both off by default
+  # so bumping this chart's version is a no-op on any cluster without an arm64
+  # nodepool (the pod would otherwise sit Pending forever with no schedulable
+  # node).
   # @section -- Arm64 Pilot
   arm64:
-    enabled: false
+    # -- Gate the `worker-arm64` subchart (a Sidekiq worker on arm64 nodes).
+    # @section -- Arm64 Pilot
+    worker:
+      enabled: false
+    # -- Gate the `api-arm64` subchart (an API replica on arm64 nodes).
+    # @section -- Arm64 Pilot
+    api:
+      enabled: false
 
   sidekiq:
     # -- Enable Sidekiq Pro (requires valid license)
@@ -420,7 +429,7 @@ config:
 # -- lago-api subchart overrides (lago-rails)
 # @default -- See child values
 # @section -- API
-api:
+api: &apiDefaults
   config:
     # -- Disable nested config (uses parent config subchart)
     # @section -- API
@@ -436,6 +445,36 @@ api:
   # -- Override the API subchart release name
   # @section -- API
   nameOverride: lago-api
+
+# -- arm64 pilot subchart overrides (lago-rails, conditional on
+# `global.arm64.api.enabled`). Same image/command as `api` — a second,
+# separate API Deployment pinned to arm64 nodes for side-by-side comparison —
+# so it merges `api`'s defaults via YAML anchor instead of repeating them, and
+# only overrides what actually differs: release name, replica count, and
+# scheduling. Its own Service comes with the subchart, so the pilot can be
+# health-checked directly without touching the amd64 api's traffic.
+# @default -- See child values
+# @section -- Arm64 Pilot API
+api-arm64:
+  <<: *apiDefaults
+  # -- Override the api-arm64 subchart release name
+  # @section -- Arm64 Pilot API
+  nameOverride: lago-api-arm64
+  # -- Single replica for the pilot — scaled up manually once the baseline
+  # watch window is clean.
+  # @section -- Arm64 Pilot API
+  replicaCount: 1
+  # -- Pin to the arm64 Karpenter nodepool's label.
+  # @section -- Arm64 Pilot API
+  nodeSelector:
+    arch: arm64
+  # -- Match the arm64 nodepool's taint so only this deployment schedules there.
+  # @section -- Arm64 Pilot API
+  tolerations:
+    - key: arch
+      operator: Equal
+      value: arm64
+      effect: NoSchedule
 
 # -- lago-front subchart overrides
 # @default -- See child values
@@ -488,7 +527,7 @@ worker: &workerDefaults
     ports: []
 
 # -- arm64 pilot subchart overrides (lago-rails, conditional on
-# `global.arm64.enabled`). Same queue/command as `worker` — a second,
+# `global.arm64.worker.enabled`). Same queue/command as `worker` — a second,
 # separate Deployment pinned to arm64 nodes for side-by-side comparison, not
 # a new queue type — so it merges `worker`'s defaults via YAML anchor
 # instead of repeating them, and only overrides what actually differs:

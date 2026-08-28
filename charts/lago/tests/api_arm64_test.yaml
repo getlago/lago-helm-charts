@@ -1,11 +1,11 @@
-suite: Test worker-arm64 subchart mirrors worker's shape via the shared YAML
-  anchor and only differs in scheduling (nodeSelector/tolerations/replicas).
-  global.arm64.worker.enabled gates the subchart at the dependency level
-  (verified manually via `helm template` with the flag unset — a disabled
-  conditional dependency isn't selectable as a test template).
+suite: Test api-arm64 subchart mirrors api's shape via the shared YAML anchor
+  and only differs in scheduling (nodeSelector/tolerations/replicas).
+  global.arm64.api.enabled gates the subchart at the dependency level (verified
+  manually via `helm template` with the flag unset — a disabled conditional
+  dependency isn't selectable as a test template).
 templates:
-  - charts/worker/templates/deployment.yaml
-  - charts/worker-arm64/templates/deployment.yaml
+  - charts/api/templates/deployment.yaml
+  - charts/api-arm64/templates/deployment.yaml
 
 set:
   global:
@@ -30,25 +30,25 @@ set:
     redisStore:
       uri: redis://localhost
     arm64:
-      worker:
+      api:
         enabled: true
 
 tests:
-  - it: renders worker-arm64 with the same start script as worker
-    template: charts/worker-arm64/templates/deployment.yaml
+  - it: renders api-arm64 with the same start script as api
+    template: charts/api-arm64/templates/deployment.yaml
     asserts:
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-lago-worker-arm64
+          value: RELEASE-NAME-lago-api-arm64
       - equal:
           path: spec.template.spec.containers[0].command
-          value: ["./scripts/start.worker.sh"]
+          value: ["./scripts/start.api.sh"]
       - equal:
           path: spec.replicas
           value: 1
 
-  - it: pins worker-arm64 to arm64 nodes via nodeSelector and a matching toleration
-    template: charts/worker-arm64/templates/deployment.yaml
+  - it: pins api-arm64 to arm64 nodes via nodeSelector and a matching toleration
+    template: charts/api-arm64/templates/deployment.yaml
     asserts:
       - equal:
           path: spec.template.spec.nodeSelector
@@ -62,15 +62,15 @@ tests:
             value: arm64
             effect: NoSchedule
 
-  - it: leaves worker unaffected — same command, no arm64 scheduling fields
-    template: charts/worker/templates/deployment.yaml
+  - it: leaves api unaffected — same command, no arm64 scheduling fields
+    template: charts/api/templates/deployment.yaml
     asserts:
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-lago-worker
+          value: RELEASE-NAME-lago-api
       - equal:
           path: spec.template.spec.containers[0].command
-          value: ["./scripts/start.worker.sh"]
+          value: ["./scripts/start.api.sh"]
       - notExists:
           path: spec.template.spec.nodeSelector
       - notExists:
