@@ -27,6 +27,11 @@ dependencies:
     alias: api
     version: 0.11.0
     repository: "file://../lago-rails"
+  - name: lago-rails
+    alias: api-arm64
+    version: 0.11.0
+    repository: "file://../lago-rails"
+    condition: global.arm64.api.enabled
   - name: lago-front
     alias: front
     version: 0.11.0
@@ -39,7 +44,7 @@ dependencies:
     alias: worker-arm64
     version: 0.11.0
     repository: "file://../lago-rails"
-    condition: global.arm64.enabled
+    condition: global.arm64.worker.enabled
   - name: lago-rails
     alias: clock
     version: 0.11.0
