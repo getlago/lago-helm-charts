@@ -704,6 +704,109 @@ entries:
       org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
     apiVersion: v2
     appVersion: v1.41.2
+    created: "2026-08-31T15:43:06.908505904Z"
+    dependencies:
+    - alias: config
+      name: lago-config
+      repository: file://../lago-config
+      version: 0.13.0
+    - alias: api
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    - alias: front
+      name: lago-front
+      repository: file://../lago-front
+      version: 0.13.0
+    - alias: worker
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    - alias: clock
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    - alias: analytics-worker
+      condition: global.sidekiq.queues.analytics
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    - alias: billing-worker
+      condition: global.sidekiq.queues.billing
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    - alias: clock-worker
+      condition: global.sidekiq.queues.clock
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    - alias: events-worker
+      condition: global.sidekiq.queues.events
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    - alias: webhook-worker
+      condition: global.sidekiq.queues.webhook
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    - alias: pdf
+      condition: pdf.enabled
+      name: lago-pdf
+      repository: file://../lago-pdf
+      version: 0.13.0
+    - alias: pdf-worker
+      condition: global.sidekiq.queues.pdf
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    - alias: events-consumer-worker
+      condition: global.streaming_ingestion.enabled
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    - alias: events-processor-worker
+      condition: global.streaming_ingestion.enabled
+      name: lago-events-processor-worker
+      repository: file://../lago-events-processor-worker
+      version: 0.13.0
+    - alias: meilisearch-worker
+      condition: global.sidekiq.queues.meilisearch
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    - alias: alerts-worker
+      condition: global.sidekiq.queues.alerts
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    - alias: wallets-worker
+      condition: global.sidekiq.queues.wallets
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    - alias: dedicated-worker
+      condition: global.sidekiq.queues.dedicated.enabled
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    - alias: ai-agent-worker
+      condition: global.sidekiq.queues.aiAgent
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    description: A Helm chart for Kubernetes
+    digest: 1f4701e699f5e43c1fb89f1abb9d4e968392debf67d5eb41cbc83d055e29afb2
+    name: lago
+    type: application
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/v0.13.0/lago-0.13.0.tgz
+    version: 0.13.0
+  - annotations:
+      org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
+    apiVersion: v2
+    appVersion: v1.41.2
     created: "2026-08-31T06:55:35.101834095Z"
     dependencies:
     - alias: config
@@ -3322,6 +3425,17 @@ entries:
   - annotations:
       org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
     apiVersion: v2
+    created: "2026-08-31T15:43:06.909350337Z"
+    description: A Helm chart for Kubernetes
+    digest: 905407349a0bca32b481821b60b7f0244a537229d6146825af65e8f934807391
+    name: lago-config
+    type: application
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/v0.13.0/lago-config-0.13.0.tgz
+    version: 0.13.0
+  - annotations:
+      org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
+    apiVersion: v2
     created: "2026-08-31T06:55:35.102662012Z"
     description: A Helm chart for Kubernetes
     digest: 8d631210e41b79757e9a9e3748a92d639bb8beaae4d26fa7d4c5a39ca850b441
@@ -3661,6 +3775,41 @@ entries:
     - https://github.com/getlago/lago-helm-charts/releases/download/v0.4.0/lago-config-0.4.0.tgz
     version: 0.4.0
   lago-data:
+  - annotations:
+      org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
+    apiVersion: v2
+    created: "2026-08-31T15:43:06.914031836Z"
+    dependencies:
+    - alias: config
+      condition: global.forecastedUsage.enabled
+      name: lago-config
+      repository: file://../lago-config
+      version: 0.13.0
+    - alias: data-config
+      name: lago-data-config
+      repository: file://../lago-data-config
+      version: 0.13.0
+    - alias: api
+      condition: global.forecastedUsage.enabled
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    - alias: data-api
+      name: lago-data-api
+      repository: file://../lago-data-api
+      version: 0.13.0
+    - alias: data-worker
+      condition: global.forecastedUsage.enabled
+      name: lago-data-worker
+      repository: file://../lago-data-worker
+      version: 0.13.0
+    description: A Helm chart for Kubernetes
+    digest: 9e35f0d2c284b55138af28717a919b9f5dad178be168d4b5872f8f9045f21261
+    name: lago-data
+    type: application
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/v0.13.0/lago-data-0.13.0.tgz
+    version: 0.13.0
   - annotations:
       org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
     apiVersion: v2
@@ -4751,15 +4900,33 @@ entries:
       org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
     apiVersion: v2
     appVersion: 0.1.0
-    created: "2026-08-31T06:55:35.107275751Z"
+    created: "2026-08-31T15:43:06.914393026Z"
     description: A Helm chart for Kubernetes
-    digest: c1ed85b24d0d63802f4d6168363a60e4077a46b222ccf09d18a14fcc01fcb2b2
+    digest: 3127fa658c810f54d8c193cd0583494a7bd3008402396d00b1f189bf495c7f68
     name: lago-data-agent
     type: application
     urls:
-    - https://github.com/getlago/lago-helm-charts/releases/download/v0.12.0/lago-data-agent-0.5.7.tgz
+    - https://github.com/getlago/lago-helm-charts/releases/download/v0.13.0/lago-data-agent-0.5.7.tgz
     version: 0.5.7
   lago-data-api:
+  - annotations:
+      org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
+    apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-08-31T15:43:06.915239245Z"
+    dependencies:
+    - alias: config
+      condition: config.enabled
+      name: lago-data-config
+      repository: file://../lago-data-config
+      version: 0.13.0
+    description: A Helm chart for Kubernetes
+    digest: afa7b719e3d14c02a6119f1dc8e0f079f9d1f747bb9c9cf60b2825d52cc2644b
+    name: lago-data-api
+    type: application
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/v0.13.0/lago-data-api-0.13.0.tgz
+    version: 0.13.0
   - annotations:
       org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
     apiVersion: v2
@@ -5322,6 +5489,17 @@ entries:
   - annotations:
       org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
     apiVersion: v2
+    created: "2026-08-31T15:43:06.915590471Z"
+    description: A Helm chart for Kubernetes
+    digest: f689986d2abf01e3949d4bf196a13ebf5b32d3daa04849d29d972fc728eb9dc0
+    name: lago-data-config
+    type: application
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/v0.13.0/lago-data-config-0.13.0.tgz
+    version: 0.13.0
+  - annotations:
+      org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
+    apiVersion: v2
     created: "2026-08-31T06:55:35.108441599Z"
     description: A Helm chart for Kubernetes
     digest: 2b5ed106bca6469c4136fa891dd1241a1c55e2beb0317f6fac6d3a08b0b01f6e
@@ -5661,6 +5839,24 @@ entries:
     - https://github.com/getlago/lago-helm-charts/releases/download/v0.4.0/lago-data-config-0.4.0.tgz
     version: 0.4.0
   lago-data-forecasted-usage:
+  - annotations:
+      org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
+    apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-08-31T15:43:06.916242452Z"
+    dependencies:
+    - alias: config
+      condition: config.enabled
+      name: lago-data-config
+      repository: file://../lago-data-config
+      version: 0.13.0
+    description: A Helm chart for Kubernetes
+    digest: b88741788e1855c9f6a8157aab5b78bf11105162767abbfc76c3d8032e556a56
+    name: lago-data-forecasted-usage
+    type: application
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/v0.13.0/lago-data-forecasted-usage-0.13.0.tgz
+    version: 0.13.0
   - annotations:
       org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
     apiVersion: v2
@@ -6222,6 +6418,16 @@ entries:
   lago-data-rev-rec:
   - apiVersion: v2
     appVersion: 0.5.1
+    created: "2026-08-31T15:43:06.916627779Z"
+    description: Apache Beam revenue-recognition pipeline on Flink
+    digest: 79bd2c9516bce95f8d8078bb7e3042b8730a79a0d0452c7f15b457f34583f839
+    name: lago-data-rev-rec
+    type: application
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/v0.13.0/lago-data-rev-rec-0.13.0.tgz
+    version: 0.13.0
+  - apiVersion: v2
+    appVersion: 0.5.1
     created: "2026-08-31T06:55:35.110702203Z"
     description: Apache Beam revenue-recognition pipeline on Flink
     digest: 7d17b7cd6f92bb8014e9ab3c3a0c489ef76cc80c5a4ea4b916b022089d601ad6
@@ -6483,6 +6689,18 @@ entries:
   lago-data-superset:
   - apiVersion: v2
     appVersion: 6.0.0
+    created: "2026-08-31T15:43:06.917056938Z"
+    description: 'Lago''s custom Apache Superset — a content-free machinery image
+      plus a separate assets image staged into /assets by an init-container. Config
+      is fully decoupled: all env is supplied via extraEnv / extraEnvFrom.'
+    digest: db8cc11513fa0fcab8ba509bbffe770cb04763a59715b377c0860a88b40bd500
+    name: lago-data-superset
+    type: application
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/v0.13.0/lago-data-superset-0.13.0.tgz
+    version: 0.13.0
+  - apiVersion: v2
+    appVersion: 6.0.0
     created: "2026-08-31T06:55:35.111159737Z"
     description: 'Lago''s custom Apache Superset — a content-free machinery image
       plus a separate assets image staged into /assets by an init-container. Config
@@ -6722,6 +6940,24 @@ entries:
     - https://github.com/getlago/lago-helm-charts/releases/download/v0.5.10/lago-data-superset-0.5.10.tgz
     version: 0.5.10
   lago-data-worker:
+  - annotations:
+      org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
+    apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-08-31T15:43:06.91874692Z"
+    dependencies:
+    - alias: config
+      condition: config.enabled
+      name: lago-data-config
+      repository: file://../lago-data-config
+      version: 0.13.0
+    description: A Helm chart for Kubernetes
+    digest: 11d4947da52a59553f3ddcaa38fc36e95c31ef7bf7b8e4f06a834706fc3dec10
+    name: lago-data-worker
+    type: application
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/v0.13.0/lago-data-worker-0.13.0.tgz
+    version: 0.13.0
   - annotations:
       org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
     apiVersion: v2
@@ -7285,6 +7521,24 @@ entries:
       org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
     apiVersion: v2
     appVersion: v1.41.2
+    created: "2026-08-31T15:43:06.920178883Z"
+    dependencies:
+    - alias: config
+      condition: config.enabled
+      name: lago-config
+      repository: file://../lago-config
+      version: 0.13.0
+    description: A Helm chart for Kubernetes
+    digest: 77c096e91bd2f012c29f5a515b02e865ff06d4901b0aabef2e16ade69716adbe
+    name: lago-events-processor-worker
+    type: application
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/v0.13.0/lago-events-processor-worker-0.13.0.tgz
+    version: 0.13.0
+  - annotations:
+      org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
+    apiVersion: v2
+    appVersion: v1.41.2
     created: "2026-08-31T06:55:35.113152771Z"
     dependencies:
     - alias: config
@@ -7840,6 +8094,24 @@ entries:
     - https://github.com/getlago/lago-helm-charts/releases/download/v0.4.0/lago-events-processor-worker-0.4.0.tgz
     version: 0.4.0
   lago-front:
+  - annotations:
+      org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
+    apiVersion: v2
+    appVersion: v1.41.0
+    created: "2026-08-31T15:43:06.921456319Z"
+    dependencies:
+    - alias: config
+      condition: config.enabled
+      name: lago-config
+      repository: file://../lago-config
+      version: 0.13.0
+    description: A Helm chart for Kubernetes
+    digest: 71f3f40718ffc848a4b3c46d4e6c54b19aaa9b3254fffaa02a08fa468a89f90d
+    name: lago-front
+    type: application
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/v0.13.0/lago-front-0.13.0.tgz
+    version: 0.13.0
   - annotations:
       org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
     apiVersion: v2
@@ -8403,6 +8675,18 @@ entries:
       org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
     apiVersion: v2
     appVersion: 0.1.0
+    created: "2026-08-31T15:43:06.921779542Z"
+    description: A Helm chart for Kubernetes
+    digest: 5e35717b987d4a96c715be8da1d8f6d187bf3aebfe17e2c90b749c895ad0ccac
+    name: lago-mcp-server
+    type: application
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/v0.13.0/lago-mcp-server-0.13.0.tgz
+    version: 0.13.0
+  - annotations:
+      org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
+    apiVersion: v2
+    appVersion: 0.1.0
     created: "2026-08-31T06:55:35.115085201Z"
     description: A Helm chart for Kubernetes
     digest: 4d371e7a0089bed3d04b54071753f563fbb879e34a870b53c4ae296ce0c5bf7e
@@ -8782,6 +9066,29 @@ entries:
     - https://github.com/getlago/lago-helm-charts/releases/download/lago-mcp-server-0.1.0/lago-mcp-server-0.1.0.tgz
     version: 0.1.0
   lago-pdf:
+  - annotations:
+      org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
+    apiVersion: v2
+    appVersion: "8.32"
+    created: "2026-08-31T15:43:06.92489003Z"
+    dependencies:
+    - alias: config
+      condition: config.enabled
+      name: lago-config
+      repository: file://../lago-config
+      version: 0.13.0
+    - alias: worker
+      condition: worker.enabled
+      name: lago-rails
+      repository: file://../lago-rails
+      version: 0.13.0
+    description: A Helm chart for the Lago PDF stack (Gotenberg + optional Rails worker)
+    digest: e556bc78f12a73f9734cb873a9d45b6adc117159446076dc9d04b51a31451fe2
+    name: lago-pdf
+    type: application
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/v0.13.0/lago-pdf-0.13.0.tgz
+    version: 0.13.0
   - annotations:
       org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
     apiVersion: v2
@@ -9500,6 +9807,24 @@ entries:
       org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
     apiVersion: v2
     appVersion: v1.41.2
+    created: "2026-08-31T15:43:06.927125527Z"
+    dependencies:
+    - alias: config
+      condition: config.enabled
+      name: lago-config
+      repository: file://../lago-config
+      version: 0.13.0
+    description: A Helm chart for Kubernetes
+    digest: 9baf7d9cd01dd052406112f5d9fc869fc7f41e77e11b491f22aa5ecd659b4ff5
+    name: lago-rails
+    type: application
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/v0.13.0/lago-rails-0.13.0.tgz
+    version: 0.13.0
+  - annotations:
+      org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
+    apiVersion: v2
+    appVersion: v1.41.2
     created: "2026-08-31T06:55:35.120779703Z"
     dependencies:
     - alias: config
@@ -10055,6 +10380,25 @@ entries:
     - https://github.com/getlago/lago-helm-charts/releases/download/v0.4.0/lago-rails-0.4.0.tgz
     version: 0.4.0
   lago-staging:
+  - annotations:
+      org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
+    apiVersion: v2
+    created: "2026-08-31T15:43:06.934408107Z"
+    dependencies:
+    - name: lago
+      repository: file://../lago
+      version: 0.13.0
+    - condition: global.data.enabled
+      name: lago-data
+      repository: file://../lago-data
+      version: 0.13.0
+    description: A Helm chart for Kubernetes
+    digest: 9ed79632efe8e492bb4a14419e3c890fd9974a8425428c89d986d04500d2bc0c
+    name: lago-staging
+    type: application
+    urls:
+    - https://github.com/getlago/lago-helm-charts/releases/download/v0.13.0/lago-staging-0.13.0.tgz
+    version: 0.13.0
   - annotations:
       org.opencontainers.image.source: https://github.com/getlago/lago-helm-charts
     apiVersion: v2
@@ -10644,4 +10988,4 @@ entries:
     urls:
     - https://github.com/getlago/lago-helm-charts/releases/download/v0.4.0/lago-staging-0.4.0.tgz
     version: 0.4.0
-generated: "2026-08-31T06:55:35.089323782Z"
+generated: "2026-08-31T15:43:06.89757168Z"
