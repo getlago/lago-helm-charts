@@ -1,9 +1,9 @@
 dependencies:
 - name: lago
   repository: file://../lago
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-data
   repository: file://../lago-data
-  version: 0.11.0
-digest: sha256:4522f7acd6c2016daaf79dd379a130f965748b15119f25f00a61ae4fcf912c48
-generated: "2026-08-26T15:50:29.742509366Z"
+  version: 0.12.0
+digest: sha256:4d5d5b6bdccae947455d0f6ea15f7614f7d93816b80a2bae3740d1767d6bcaf7
+generated: "2026-08-31T06:54:46.370056496Z"

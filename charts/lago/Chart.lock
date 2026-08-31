@@ -1,66 +1,66 @@
 dependencies:
 - name: lago-config
   repository: file://../lago-config
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-front
   repository: file://../lago-front
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-pdf
   repository: file://../lago-pdf
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-events-processor-worker
   repository: file://../lago-events-processor-worker
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
+  version: 0.12.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.11.0
-digest: sha256:ce2cdada8770b530be84636e6a58c117e3b73a9f4894533d7d9c3ef8f4e7876f
-generated: "2026-08-28T14:11:56.639766979+03:00"
+  version: 0.12.0
+digest: sha256:6f31f754f413050f94098daeb98d5d216906e775ecbde3e8a45b24423f478ca9
+generated: "2026-08-31T06:54:46.503186033Z"
