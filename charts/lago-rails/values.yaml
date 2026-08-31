@@ -2,6 +2,12 @@
 
 # -- @ignore
 global:
+  architectures:
+    amd64:
+      enabled: true
+    arm64:
+      enabled: false
+
   lago:
     # -- Override the application Docker image tag (defaults to Chart appVersion)
     # @section -- Lago
@@ -665,6 +671,50 @@ autoscaling:
   # @section -- Autoscaling
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
+
+# -- Replica and scheduling overrides for each supported CPU architecture.
+# The amd64 values fall back to the existing top-level workload values.
+# The arm64 deployment uses the same workload values and applies only these
+# architecture-specific overrides.
+# @section -- Architectures
+architectures:
+  amd64:
+    # -- Override the existing `replicaCount` for the amd64 deployment
+    # @section -- Architectures
+    replicaCount:
+    # -- Additional node selector constraints for the amd64 deployment
+    # @section -- Architectures
+    nodeSelector: {}
+    # -- Additional tolerations for the amd64 deployment
+    # @section -- Architectures
+    tolerations: []
+  arm64:
+    # -- Replica count for the arm64 deployment. Zero disables this workload.
+    # @section -- Architectures
+    replicaCount: 0
+    # -- Additional node selector constraints for the arm64 deployment
+    # @section -- Architectures
+    nodeSelector:
+      kubernetes.io/arch: arm64
+    # -- Additional tolerations for the arm64 deployment
+    # @section -- Architectures
+    tolerations: []
+    autoscaling:
+      # -- Enable the built-in HPA for the arm64 deployment
+      # @section -- Architectures
+      enabled: false
+      # -- Set to true when an external autoscaler controls the arm64 deployment
+      # @section -- Architectures
+      external: false
+      # -- Minimum arm64 replicas
+      # @section -- Architectures
+      minReplicas: 1
+      # -- Maximum arm64 replicas
+      # @section -- Architectures
+      maxReplicas: 100
+      # -- Target CPU utilization percentage for arm64 pods
+      # @section -- Architectures
+      targetCPUUtilizationPercentage: 80
 
 podDisruptionBudget:
   # -- Create a PodDisruptionBudget. Only enable on multi-replica deployments
