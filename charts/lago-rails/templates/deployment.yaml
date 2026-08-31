@@ -1,20 +1,21 @@
+{{- define "lago-rails.deployment" -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "lago-rails.fullname" . }}
+  name: {{ include "lago-rails.architecture.fullname" . }}
   {{- with .Values.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
-    {{- include "lago-rails.labels" . | nindent 4 }}
+    {{- include "lago-rails.architecture.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "lago-rails.selectorLabels" . | nindent 6 }}
+      {{- include "lago-rails.architecture.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -22,7 +23,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "lago-rails.labels" . | nindent 8 }}
+        {{- include "lago-rails.architecture.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -468,3 +469,34 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+{{- end }}
+
+{{- $amd64 := .Values.architectures.amd64 }}
+{{- $amd64Values := deepCopy .Values }}
+{{- if ne $amd64.replicaCount nil }}
+{{- $_ := set $amd64Values "replicaCount" $amd64.replicaCount }}
+{{- end }}
+{{- $_ := set $amd64Values "nodeSelector" (mustMergeOverwrite (deepCopy .Values.nodeSelector) $amd64.nodeSelector) }}
+{{- $_ := set $amd64Values "tolerations" (concat .Values.tolerations $amd64.tolerations) }}
+{{- $amd64Context := dict "Values" $amd64Values "Chart" .Chart "Release" .Release "Capabilities" .Capabilities "Template" .Template "Files" .Files }}
+{{- $architectureFullname := include "lago-rails.fullname" $amd64Context }}
+{{- $architectureName := include "lago-rails.name" $amd64Context }}
+{{- if .Values.global.architectures.amd64.enabled }}
+{{ include "lago-rails.deployment" $amd64Context }}
+{{- end }}
+
+{{- $arm64 := .Values.architectures.arm64 }}
+{{- $arm64Enabled := and .Values.global.architectures.arm64.enabled (or (gt (int $arm64.replicaCount) 0) $arm64.autoscaling.enabled) }}
+{{- if $arm64Enabled }}
+---
+{{- $arm64Values := deepCopy .Values }}
+{{- $_ := set $arm64Values "internalArchitecture" "arm64" }}
+{{- $_ := set $arm64Values "internalArchitectureFullname" $architectureFullname }}
+{{- $_ := set $arm64Values "internalArchitectureName" $architectureName }}
+{{- $_ := set $arm64Values "replicaCount" $arm64.replicaCount }}
+{{- $_ := set $arm64Values "nodeSelector" (mustMergeOverwrite (deepCopy .Values.nodeSelector) $arm64.nodeSelector) }}
+{{- $_ := set $arm64Values "tolerations" (concat .Values.tolerations $arm64.tolerations) }}
+{{- $_ := set $arm64Values "autoscaling" $arm64.autoscaling }}
+{{- $arm64Context := dict "Values" $arm64Values "Chart" .Chart "Release" .Release "Capabilities" .Capabilities "Template" .Template "Files" .Files }}
+{{ include "lago-rails.deployment" $arm64Context }}
+{{- end }}

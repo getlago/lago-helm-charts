@@ -53,6 +53,56 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Return true when the current resource is the arm64 architecture variant.
+*/}}
+{{- define "lago-rails.architecture.isArm64" -}}
+{{- eq (default "amd64" .Values.internalArchitecture) "arm64" -}}
+{{- end }}
+
+{{/*
+Create an architecture-specific workload name without changing the existing
+amd64 name.
+*/}}
+{{- define "lago-rails.architecture.fullname" -}}
+{{- $fullname := include "lago-rails.fullname" . -}}
+{{- if eq (include "lago-rails.architecture.isArm64" .) "true" -}}
+{{- printf "%s-arm64" .Values.internalArchitectureFullname | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $fullname -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Create architecture-specific selector labels. The amd64 result delegates to
+the existing helper so its rendered labels do not change.
+*/}}
+{{- define "lago-rails.architecture.selectorLabels" -}}
+{{- if eq (include "lago-rails.architecture.isArm64" .) "true" -}}
+app.kubernetes.io/name: {{ printf "%s-arm64" .Values.internalArchitectureName | trunc 63 | trimSuffix "-" }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- else -}}
+{{- include "lago-rails.selectorLabels" . -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Create architecture-specific labels. The amd64 result delegates to the
+existing helper so its rendered labels do not change.
+*/}}
+{{- define "lago-rails.architecture.labels" -}}
+{{- if eq (include "lago-rails.architecture.isArm64" .) "true" -}}
+helm.sh/chart: {{ include "lago-rails.chart" . }}
+{{ include "lago-rails.architecture.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- else -}}
+{{- include "lago-rails.labels" . -}}
+{{- end -}}
+{{- end }}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "lago-rails.serviceAccountName" -}}
