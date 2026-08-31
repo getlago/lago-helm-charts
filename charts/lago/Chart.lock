@@ -1,60 +1,60 @@
 dependencies:
 - name: lago-config
   repository: file://../lago-config
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-front
   repository: file://../lago-front
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-pdf
   repository: file://../lago-pdf
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-events-processor-worker
   repository: file://../lago-events-processor-worker
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.12.0
+  version: 0.13.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.12.0
-digest: sha256:65f9fb2858fbb769db6c28fb4c3ef26533ca80772051376cb56bf24a29ad9729
-generated: "2026-08-31T17:59:45.533840433+03:00"
+  version: 0.13.0
+digest: sha256:9155971d9c6b4c4185916444dfd2fc3c8bc9c71ed13e2651da769805d9688dbd
+generated: "2026-08-31T15:42:11.775475171Z"
