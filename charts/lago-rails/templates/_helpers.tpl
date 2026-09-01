@@ -37,7 +37,7 @@ Common labels
 */}}
 {{- define "lago-rails.labels" -}}
 helm.sh/chart: {{ include "lago-rails.chart" . }}
-{{ include "lago-rails.selectorLabels" . }}
+{{ include "lago-rails.architecture.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -73,12 +73,13 @@ amd64 name.
 {{- end }}
 
 {{/*
-Create architecture-specific selector labels. The amd64 result delegates to
-the existing helper so its rendered labels do not change.
+Create architecture-specific selector labels. Each architecture keeps its own
+`app.kubernetes.io/name`, so a Deployment selector matches only its own pods.
+The Deployment selector is immutable, so this helper must not change.
 */}}
 {{- define "lago-rails.architecture.selectorLabels" -}}
 {{- if eq (include "lago-rails.architecture.isArm64" .) "true" -}}
-app.kubernetes.io/name: {{ printf "%s-arm64" .Values.internalArchitectureName | trunc 63 | trimSuffix "-" }}
+app.kubernetes.io/name: {{ printf "%s-arm64" (include "lago-rails.name" .) | trunc 63 | trimSuffix "-" }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- else -}}
 {{- include "lago-rails.selectorLabels" . -}}
@@ -86,19 +87,26 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Create architecture-specific labels. The amd64 result delegates to the
-existing helper so its rendered labels do not change.
+The architecture-independent label that every pod of this workload carries. The
+Service and the PodDisruptionBudget select it, so they reach the pods of all
+architectures.
 */}}
-{{- define "lago-rails.architecture.labels" -}}
-{{- if eq (include "lago-rails.architecture.isArm64" .) "true" -}}
-helm.sh/chart: {{ include "lago-rails.chart" . }}
-{{ include "lago-rails.architecture.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- define "lago-rails.componentLabel" -}}
+app.kubernetes.io/component: {{ include "lago-rails.name" . }}
 {{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+
+{{/*
+Selector labels for the Service and the PodDisruptionBudget. arm64 pods have a
+different `app.kubernetes.io/name`, so the selector moves to the `component`
+label when arm64 is enabled. Every pod already carries that label, because the
+chart adds it to all pod templates.
+*/}}
+{{- define "lago-rails.service.selectorLabels" -}}
+{{- if .Values.global.architectures.arm64.enabled -}}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{ include "lago-rails.componentLabel" . }}
 {{- else -}}
-{{- include "lago-rails.labels" . -}}
+{{- include "lago-rails.selectorLabels" . -}}
 {{- end -}}
 {{- end }}
 

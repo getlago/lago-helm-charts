@@ -2,6 +2,7 @@ suite: Test amd64 and arm64 API and worker deployments
 templates:
   - charts/api/templates/deployment.yaml
   - charts/worker/templates/deployment.yaml
+  - charts/api/templates/service.yaml
 
 set:
   global:
@@ -200,6 +201,59 @@ tests:
     asserts:
       - hasDocuments:
           count: 1
+
+  - it: keeps a separate name in each deployment selector
+    template: charts/api/templates/deployment.yaml
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: lago-api
+            app.kubernetes.io/instance: RELEASE-NAME
+        documentIndex: 0
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: lago-api-arm64
+            app.kubernetes.io/instance: RELEASE-NAME
+        documentIndex: 1
+
+  - it: gives the pods of both architectures the same component label
+    template: charts/api/templates/deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.metadata.labels["app.kubernetes.io/component"]
+          value: lago-api
+        documentIndex: 0
+      - equal:
+          path: spec.template.metadata.labels["app.kubernetes.io/component"]
+          value: lago-api
+        documentIndex: 1
+
+  - it: renders one API service that selects the component when arm64 is on
+    template: charts/api/templates/service.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/component: lago-api
+
+  - it: keeps the original API service selector when arm64 is off
+    template: charts/api/templates/service.yaml
+    set:
+      global:
+        architectures:
+          arm64:
+            enabled: false
+    asserts:
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/name: lago-api
+            app.kubernetes.io/instance: RELEASE-NAME
 
   - it: renders an arm64 worker without replicas when KEDA controls it
     template: charts/worker/templates/deployment.yaml
