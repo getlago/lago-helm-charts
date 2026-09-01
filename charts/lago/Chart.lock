@@ -1,60 +1,60 @@
 dependencies:
 - name: lago-config
   repository: file://../lago-config
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-front
   repository: file://../lago-front
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-pdf
   repository: file://../lago-pdf
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-events-processor-worker
   repository: file://../lago-events-processor-worker
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.13.0
+  version: 0.14.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.13.0
-digest: sha256:9155971d9c6b4c4185916444dfd2fc3c8bc9c71ed13e2651da769805d9688dbd
-generated: "2026-08-31T15:42:11.775475171Z"
+  version: 0.14.0
+digest: sha256:e73b21705c94c53b7e54aa7d52a3b449383b0b120dac9fb105ea9e64b023f7af
+generated: "2026-09-01T12:21:03.50482992Z"
