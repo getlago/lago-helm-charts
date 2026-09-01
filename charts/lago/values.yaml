@@ -45,9 +45,6 @@ global:
       # -- Enable the PDF background queue
       # @section -- Sidekiq
       pdf: false
-      # -- Enable the Meilisearch indexing queue
-      # @section -- Sidekiq
-      meilisearch: false
 
   config:
     # -- Name of an existing ConfigMap for shared configuration (bypasses auto-generated configmap)
@@ -541,40 +538,6 @@ billing-worker:
     command: ["./scripts/start.billing.worker.sh"]
     # -- Container ports (none needed)
     # @section -- Billing Worker
-    ports: []
-
-# -- Meilisearch worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.meilisearch`)
-# @default -- See child values
-# @section -- Meilisearch Worker
-meilisearch-worker:
-  # -- Override the meilisearch-worker subchart release name
-  # @section -- Meilisearch Worker
-  nameOverride: lago-meilisearch-worker
-  config:
-    # -- Disable nested config (uses parent config subchart)
-    # @section -- Meilisearch Worker
-    enabled: false
-    # -- Config subchart name override
-    # @section -- Meilisearch Worker
-    nameOverride: lago-config
-  # -- Liveness probe (disabled for workers)
-  # @section -- Meilisearch Worker
-  livenessProbe:
-    enabled: false
-  # -- Readiness probe (disabled for workers)
-  # @section -- Meilisearch Worker
-  readinessProbe:
-    enabled: false
-  service:
-    # -- Disable service (no inbound traffic)
-    # @section -- Meilisearch Worker
-    enabled: false
-  container:
-    # -- Meilisearch worker entrypoint command
-    # @section -- Meilisearch Worker
-    command: ["./scripts/start.meilisearch.worker.sh"]
-    # -- Container ports (none needed)
-    # @section -- Meilisearch Worker
     ports: []
 
 # -- Clock worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.clock`)

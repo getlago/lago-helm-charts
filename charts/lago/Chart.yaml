@@ -84,11 +84,6 @@ dependencies:
     version: 0.6.0
     repository: "file://../lago-events-processor-worker"
     condition: global.streaming_ingestion.enabled
-  - name: lago-rails
-    alias: meilisearch-worker
-    version: 0.6.0
-    repository: "file://../lago-rails"
-    condition: global.sidekiq.queues.meilisearch
 
 annotations:
   org.opencontainers.image.source: "https://github.com/getlago/lago-helm-charts"

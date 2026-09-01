@@ -22,7 +22,6 @@ A Helm chart for Kubernetes
 | file://../lago-rails | pdf-worker(lago-rails) | 0.5.19 |
 | file://../lago-rails | events-consumer-worker(lago-rails) | 0.5.19 |
 | file://../lago-rails | api(lago-rails) | 0.5.19 |
-| file://../lago-rails | meilisearch-worker(lago-rails) | 0.5.19 |
 
 ## Values
 
@@ -206,20 +205,6 @@ A Helm chart for Kubernetes
 | front | object | See child values | lago-front subchart overrides |
 | front.config.enabled | bool | `false` | Disable nested config |
 | front.nameOverride | string | `"lago-front"` | Override the front subchart release name |
-
-### Meilisearch Worker
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| meilisearch-worker | object | See child values | Meilisearch worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.meilisearch`) |
-| meilisearch-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
-| meilisearch-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
-| meilisearch-worker.container.command | list | `["./scripts/start.meilisearch.worker.sh"]` | Meilisearch worker entrypoint command |
-| meilisearch-worker.container.ports | list | `[]` | Container ports (none needed) |
-| meilisearch-worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for workers) |
-| meilisearch-worker.nameOverride | string | `"lago-meilisearch-worker"` | Override the meilisearch-worker subchart release name |
-| meilisearch-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |
-| meilisearch-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
 
 ### Database Migration
 
