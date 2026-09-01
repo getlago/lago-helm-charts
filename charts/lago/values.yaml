@@ -55,9 +55,6 @@ global:
       # -- Enable the PDF background queue
       # @section -- Sidekiq
       pdf: false
-      # -- Enable the Meilisearch indexing queue
-      # @section -- Sidekiq
-      meilisearch: false
       # -- Enable the alerts background queue
       # @section -- Sidekiq
       alerts: false
@@ -299,27 +296,6 @@ global:
     # -- MCP endpoint URL
     # @section -- MCP
     endpoint:
-
-  meilisearch:
-    # -- Enable Meilisearch integration. When true, renders
-    # `LAGO_MEILISEARCH_URL`, `LAGO_MEILISEARCH_SEARCH_ENABLED` and
-    # `LAGO_MEILISEARCH_API_KEY` on every Rails workload.
-    # @section -- Meilisearch
-    enabled: false
-    # -- Projected as `LAGO_MEILISEARCH_SEARCH_ENABLED`. Set to
-    # `false` to stop serving search queries while keeping indexing
-    # wired (URL + API key unchanged).
-    # @section -- Meilisearch
-    search: true
-    # -- Meilisearch endpoint URL (e.g.
-    # `http://meilisearch.meilisearch.svc.cluster.local:7700`).
-    # @section -- Meilisearch
-    url:
-    # -- Meilisearch API key (rendered into the shared Secret as
-    # `meilisearch.apiKey`; projected as `LAGO_MEILISEARCH_API_KEY`
-    # on Rails pods).
-    # @section -- Meilisearch
-    apiKey:
 
   data:
     # -- Enable Lago Data analytics
@@ -782,40 +758,6 @@ ai-agent-worker:
     command: ["./scripts/start.ai_agent.worker.sh"]
     # -- Container ports (none needed)
     # @section -- AI Agent Worker
-    ports: []
-
-# -- Meilisearch worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.meilisearch`)
-# @default -- See child values
-# @section -- Meilisearch Worker
-meilisearch-worker:
-  # -- Override the meilisearch-worker subchart release name
-  # @section -- Meilisearch Worker
-  nameOverride: lago-meilisearch-worker
-  config:
-    # -- Disable nested config (uses parent config subchart)
-    # @section -- Meilisearch Worker
-    enabled: false
-    # -- Config subchart name override
-    # @section -- Meilisearch Worker
-    nameOverride: lago-config
-  # -- Liveness probe (disabled for workers)
-  # @section -- Meilisearch Worker
-  livenessProbe:
-    enabled: false
-  # -- Readiness probe (disabled for workers)
-  # @section -- Meilisearch Worker
-  readinessProbe:
-    enabled: false
-  service:
-    # -- Disable service (no inbound traffic)
-    # @section -- Meilisearch Worker
-    enabled: false
-  container:
-    # -- Meilisearch worker entrypoint command
-    # @section -- Meilisearch Worker
-    command: ["./scripts/start.meilisearch.worker.sh"]
-    # -- Container ports (none needed)
-    # @section -- Meilisearch Worker
     ports: []
 
 # -- Clock worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.clock`)

@@ -22,7 +22,6 @@ A Helm chart for Kubernetes
 | file://../lago-rails | pdf-worker(lago-rails) | 0.6.0 |
 | file://../lago-rails | events-consumer-worker(lago-rails) | 0.6.0 |
 | file://../lago-rails | api(lago-rails) | 0.6.0 |
-| file://../lago-rails | meilisearch-worker(lago-rails) | 0.6.0 |
 | file://../lago-rails | alerts-worker(lago-rails) | 0.6.0 |
 | file://../lago-rails | wallets-worker(lago-rails) | 0.6.0 |
 
@@ -137,20 +136,6 @@ A Helm chart for Kubernetes
 | wallets-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
 | wallets-worker.container.command | list | `["./scripts/start.wallets.worker.sh"]` | Wallets worker entrypoint command |
 | wallets-worker.container.ports | list | `[]` | Container ports (none needed) |
-
-### Meilisearch Worker
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| meilisearch-worker | object | See child values | Meilisearch worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.meilisearch`) |
-| meilisearch-worker.nameOverride | string | `"lago-meilisearch-worker"` | Override the meilisearch-worker subchart release name |
-| meilisearch-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
-| meilisearch-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
-| meilisearch-worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for workers) |
-| meilisearch-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |
-| meilisearch-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
-| meilisearch-worker.container.command | list | `["./scripts/start.meilisearch.worker.sh"]` | Meilisearch worker entrypoint command |
-| meilisearch-worker.container.ports | list | `[]` | Container ports (none needed) |
 
 ### Clock Worker
 
