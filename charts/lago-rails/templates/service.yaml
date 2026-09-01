@@ -1,10 +1,14 @@
-{{- define "lago-rails.service" -}}
+{{/*
+One Service for all architectures. The selector has no
+`app.kubernetes.io/component`, so it matches amd64 pods and arm64 pods.
+*/}}
+{{- if .Values.service.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "lago-rails.architecture.fullname" . }}
+  name: {{ include "lago-rails.fullname" . }}
   labels:
-    {{- include "lago-rails.architecture.labels" . | nindent 4 }}
+    {{- include "lago-rails.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -13,21 +17,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "lago-rails.architecture.selectorLabels" . | nindent 4 }}
-{{- end }}
-
-{{- if .Values.service.enabled }}
-{{- $amd64Values := deepCopy .Values }}
-{{- $amd64Context := dict "Values" $amd64Values "Chart" .Chart "Release" .Release "Capabilities" .Capabilities "Template" .Template "Files" .Files }}
-{{ include "lago-rails.service" $amd64Context }}
-{{- $arm64 := .Values.architectures.arm64 }}
-{{- if and .Values.global.architectures.arm64.enabled (or (gt (int $arm64.replicaCount) 0) $arm64.autoscaling.enabled) }}
----
-{{- $arm64Values := deepCopy .Values }}
-{{- $_ := set $arm64Values "internalArchitecture" "arm64" }}
-{{- $_ := set $arm64Values "internalArchitectureFullname" (include "lago-rails.fullname" .) }}
-{{- $_ := set $arm64Values "internalArchitectureName" (include "lago-rails.name" .) }}
-{{- $arm64Context := dict "Values" $arm64Values "Chart" .Chart "Release" .Release "Capabilities" .Capabilities "Template" .Template "Files" .Files }}
-{{ include "lago-rails.service" $arm64Context }}
-{{- end }}
+    {{- include "lago-rails.service.selectorLabels" . | nindent 4 }}
 {{- end }}

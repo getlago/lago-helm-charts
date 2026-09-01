@@ -1,10 +1,14 @@
-{{- define "lago-rails.pdb" -}}
+{{/*
+One PodDisruptionBudget for all architectures. The pods of both serve the same
+Service, so one budget applies to them together.
+*/}}
+{{- if .Values.podDisruptionBudget.enabled }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ include "lago-rails.architecture.fullname" . }}
+  name: {{ include "lago-rails.fullname" . }}
   labels:
-    {{- include "lago-rails.architecture.labels" . | nindent 4 }}
+    {{- include "lago-rails.labels" . | nindent 4 }}
 spec:
   {{- with .Values.podDisruptionBudget.minAvailable }}
   minAvailable: {{ . }}
@@ -14,21 +18,5 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      {{- include "lago-rails.architecture.selectorLabels" . | nindent 6 }}
-{{- end }}
-
-{{- if .Values.podDisruptionBudget.enabled }}
-{{- $amd64Values := deepCopy .Values }}
-{{- $amd64Context := dict "Values" $amd64Values "Chart" .Chart "Release" .Release "Capabilities" .Capabilities "Template" .Template "Files" .Files }}
-{{ include "lago-rails.pdb" $amd64Context }}
-{{- $arm64 := .Values.architectures.arm64 }}
-{{- if and .Values.global.architectures.arm64.enabled (or (gt (int $arm64.replicaCount) 0) $arm64.autoscaling.enabled) }}
----
-{{- $arm64Values := deepCopy .Values }}
-{{- $_ := set $arm64Values "internalArchitecture" "arm64" }}
-{{- $_ := set $arm64Values "internalArchitectureFullname" (include "lago-rails.fullname" .) }}
-{{- $_ := set $arm64Values "internalArchitectureName" (include "lago-rails.name" .) }}
-{{- $arm64Context := dict "Values" $arm64Values "Chart" .Chart "Release" .Release "Capabilities" .Capabilities "Template" .Template "Files" .Files }}
-{{ include "lago-rails.pdb" $arm64Context }}
-{{- end }}
+      {{- include "lago-rails.service.selectorLabels" . | nindent 6 }}
 {{- end }}
