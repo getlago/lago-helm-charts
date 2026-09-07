@@ -104,6 +104,11 @@ dependencies:
     version: 0.14.0
     repository: "file://../lago-rails"
     condition: global.sidekiq.queues.aiAgent
+  - name: lago-rails
+    alias: streaming-worker
+    version: 0.14.0
+    repository: "file://../lago-rails"
+    condition: global.sidekiq.queues.streaming
 
 annotations:
   org.opencontainers.image.source: "https://github.com/getlago/lago-helm-charts"

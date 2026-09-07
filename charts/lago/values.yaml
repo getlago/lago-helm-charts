@@ -67,6 +67,15 @@ global:
       # the `ai_agent` queue instead of `default`). Off by default.
       # @section -- Sidekiq
       aiAgent: false
+      # -- Enable the streaming worker (isolates the `streaming` Sidekiq queue
+      # on a separate deployment). `DeliverEventJob` is pinned to that queue
+      # with `queue_as :streaming`, so there is no enqueue-side env flag: the
+      # job is enqueued only for an organization that holds a
+      # `streaming_destinations` row. A cluster that runs no streaming worker
+      # therefore never fills the queue. The worker needs an AWS identity that
+      # can assume the destination role, so it is off by default.
+      # @section -- Sidekiq
+      streaming: false
       # -- Dedicated worker queue toggle. Unlike the other queue flags this
       # is a dict rather than a bool: the dedicated_alerts / dedicated_wallets
       # queues are populated by per-org routing decisions in
@@ -758,6 +767,47 @@ ai-agent-worker:
     command: ["./scripts/start.ai_agent.worker.sh"]
     # -- Container ports (none needed)
     # @section -- AI Agent Worker
+    ports: []
+
+# -- Streaming worker subchart overrides (lago-rails, conditional on
+# `global.sidekiq.queues.streaming`). Runs
+# `bundle exec sidekiq -C config/sidekiq/sidekiq_streaming.yml`, which consumes
+# the hard-coded `streaming` queue. `DeliverEventJob` writes each event to the
+# transport named by the organization's `streaming_destinations` row, so this
+# pod assumes an external IAM role. Give its ServiceAccount that permission
+# through EKS Pod Identity.
+# @default -- See child values
+# @section -- Streaming Worker
+streaming-worker:
+  # -- Override the streaming-worker subchart release name
+  # @section -- Streaming Worker
+  nameOverride: lago-streaming-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Streaming Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- Streaming Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- Streaming Worker
+  livenessProbe:
+    enabled: false
+  # -- Readiness probe (disabled for workers)
+  # @section -- Streaming Worker
+  readinessProbe:
+    enabled: false
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- Streaming Worker
+    enabled: false
+  container:
+    # -- Streaming worker entrypoint command — invokes sidekiq with the
+    # `sidekiq_streaming.yml` config that hard-codes the `streaming` queue.
+    # @section -- Streaming Worker
+    command: ["./scripts/start.streaming.worker.sh"]
+    # -- Container ports (none needed)
+    # @section -- Streaming Worker
     ports: []
 
 # -- Clock worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.clock`)
