@@ -1,60 +1,60 @@
 dependencies:
 - name: lago-config
   repository: file://../lago-config
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-front
   repository: file://../lago-front
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-pdf
   repository: file://../lago-pdf
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-events-processor-worker
   repository: file://../lago-events-processor-worker
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.14.0
+  version: 0.15.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.14.0
-digest: sha256:2e13b2453479e1caccf7a2f39acf96d9b3f9f78f1f501b0ef22a876b63d2feaf
-generated: "2026-09-07T14:32:12.986316781+03:00"
+  version: 0.15.0
+digest: sha256:f466212ea79fddd99be83ff6da214329c33de9ab413b165f583ffacb4a44a5f4
+generated: "2026-09-07T12:58:46.584459327Z"
