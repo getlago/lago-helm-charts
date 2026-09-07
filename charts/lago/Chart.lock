@@ -53,5 +53,8 @@ dependencies:
 - name: lago-rails
   repository: file://../lago-rails
   version: 0.14.0
-digest: sha256:f28e6bb3f6c1a348c55cafa01ffb0c47208fa80b4db9e0ed54c596aa3d4a0805
-generated: "2026-09-01T10:02:37.273184-07:00"
+- name: lago-rails
+  repository: file://../lago-rails
+  version: 0.14.0
+digest: sha256:2e13b2453479e1caccf7a2f39acf96d9b3f9f78f1f501b0ef22a876b63d2feaf
+generated: "2026-09-07T14:32:12.986316781+03:00"
