@@ -124,6 +124,8 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| global.newRelic.enabled | bool | `false` | Enable the New Relic APM agent. Off by default — clusters without a provisioned license key otherwise see the agent 401 at boot and spam the log with restart attempts. |
+| global.newRelic.licenseKey | string | `""` | New Relic license key. Written to the shared Secret when `newRelic.enabled` is true; leave empty and point `global.config.secret` at an externally managed Secret exposing `newRelic.licenseKey` instead. |
 | global.segmentWriteKey | string | `""` | Segment write key for analytics |
 | global.sentry.dsn.back | string | `""` | Sentry DSN for the Ruby backend / Sidekiq workers (lago-rails) |
 | global.sentry.dsn.events | string | `""` | Sentry DSN for the events processor worker (separate Sentry project from `back`) |

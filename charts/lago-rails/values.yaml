@@ -151,6 +151,18 @@ global:
   # @section -- Observability
   segmentWriteKey: ""
 
+  newRelic:
+    # -- Enable the New Relic APM agent. Off by default — clusters without a
+    # provisioned license key otherwise see the agent 401 at boot and spam the
+    # log with restart attempts.
+    # @section -- Observability
+    enabled: false
+    # -- New Relic license key. Written to the shared Secret when
+    # `newRelic.enabled` is true; leave empty and point `global.config.secret`
+    # at an externally managed Secret exposing `newRelic.licenseKey` instead.
+    # @section -- Observability
+    licenseKey: ""
+
   nango:
     # -- Nango secret key for OAuth integrations
     # @section -- Nango
