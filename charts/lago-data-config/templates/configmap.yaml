@@ -20,10 +20,6 @@ data:
   databaseAnalytical.user: {{ required "global.databaseAnalytical.user is required" .Values.global.databaseAnalytical.user }}
   databaseAnalytical.port: {{ required "global.databaseAnalytical.port is required" .Values.global.databaseAnalytical.port | quote }}
   databaseAnalytical.schema: {{ required "global.databaseAnalytical.schema is required" .Values.global.databaseAnalytical.schema }}
-  {{- if .Values.global.forecastedUsage.enabled }}
-  celery.brokerUrl: {{ required "global.forecastedUsage.celery.brokerUrl is required" .Values.global.forecastedUsage.celery.brokerUrl }}
-  celery.resultBackend: {{ required "global.forecastedUsage.celery.resultBackend is required" .Values.global.forecastedUsage.celery.resultBackend }}
-  {{- end }}
   {{- if .Values.global.dbtPipeline.enabled }}
   dbt.sourceSchema: {{ required "global.dbtPipeline.sourceSchema is required" .Values.global.dbtPipeline.sourceSchema }}
   dbt.targetSchema: {{ required "global.dbtPipeline.targetSchema is required" .Values.global.dbtPipeline.targetSchema }}

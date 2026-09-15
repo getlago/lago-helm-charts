@@ -1,6 +1,6 @@
 # lago-data
 
-![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.15.0](https://img.shields.io/badge/Version-0.15.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -8,75 +8,10 @@ A Helm chart for Kubernetes
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../lago-config | config(lago-config) | 0.5.0 |
-| file://../lago-data-api | data-api(lago-data-api) | 0.5.0 |
-| file://../lago-data-config | data-config(lago-data-config) | 0.5.0 |
-| file://../lago-data-worker | data-worker(lago-data-worker) | 0.5.0 |
-| file://../lago-rails | api(lago-rails) | 0.5.0 |
+| file://../lago-data-api | data-api(lago-data-api) | 0.15.0 |
+| file://../lago-data-config | data-config(lago-data-config) | 0.15.0 |
 
 ## Values
-
-### Lago
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| global.ago.env | string | `"production"` | Rails environment (`production`, `staging`, `development`) |
-| global.ago.license | string | `""` | Lago Premium license key |
-
-### Config
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| global.config.configmap | string | `nil` | Name of an existing ConfigMap for shared configuration |
-| global.config.secret | string | `nil` | Name of an existing Secret for shared configuration |
-| config | object | See child values | lago-config subchart overrides |
-| config.nameOverride | string | `"lago-config"` | Override the config subchart release name |
-
-### URLs
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| global.urls.api | string | `""` | Public URL of the Lago API |
-| global.urls.front | string | `""` | Public URL of the Lago frontend |
-| global.urls.pdf | string | `"lago-pdf"` | Internal URL of the PDF service (Gotenberg) |
-
-### Database
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| global.database.uri | string | `""` | PostgreSQL connection URI |
-| global.database.pool | int | `20` | Database connection pool size |
-
-### Encryption
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| global.encryption.key | string | `""` | Primary encryption key (`openssl rand -hex 16`) |
-| global.encryption.salt | string | `""` | Key derivation salt (`openssl rand -hex 16`) |
-
-### Signing
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| global.signing.hmac | string | `""` | HMAC signing key (HS256) |
-| global.signing.rsa | string | `""` | RSA private key (RS256), base64-encoded |
-
-### Redis
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| global.redis.url | string | `""` | Redis URI for Sidekiq job queue |
-| global.redis.password | string | `""` | Redis password |
-| global.redisCache.url | string | `""` | Redis URI for Rails cache |
-| global.redisCache.password | string | `""` | Redis cache password |
-| global.redisStore.url | string | `""` | Redis URI for ActionCable / general store |
-| global.redisStore.password | string | `""` | Redis store password |
-
-### Observability
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| global.sentryDsn | string | `""` | Sentry DSN for error tracking |
 
 ### Analytical Database
 
@@ -108,15 +43,6 @@ A Helm chart for Kubernetes
 | global.dbtPipeline.targetSchema | string | `"analytical"` | Target schema for dbt pipeline |
 | global.dbtPipeline.tables | list | `[]` | Tables to replicate |
 
-### Forecasted Usage
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| global.forecastedUsage.enabled | bool | `false` | Enable forecasted usage feature |
-| global.forecastedUsage.api_token | string | `nil` | Lago API token for forecasted usage calls |
-| global.forecastedUsage.celery.brokerUrl | string | `""` | Celery broker URL |
-| global.forecastedUsage.celery.resultBackend | string | `""` | Celery result backend URL |
-
 ### Data
 
 | Key | Type | Default | Description |
@@ -132,16 +58,6 @@ A Helm chart for Kubernetes
 | data-config | object | See child values | lago-data-config subchart overrides |
 | data-config.nameOverride | string | `"lago-data-config"` | Override the data-config subchart release name |
 
-### API
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| api | object | See child values | lago-api subchart overrides (lago-rails) |
-| api.nameOverride | string | `"lago-api"` | Override the API subchart release name |
-| api.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
-| api.config.nameOverride | string | `"lago-config"` | Config subchart name override |
-| api.extraEnv.LAGO_DATA_API_BEARER_TOKEN | object | `{"valueFrom":{"secretKeyRef":{"key":"api.token","name":"lago-data-config"}}}` | Inject the Data API bearer token from the data-config secret |
-
 ### Data API
 
 | Key | Type | Default | Description |
@@ -150,17 +66,6 @@ A Helm chart for Kubernetes
 | data-api.nameOverride | string | `"lago-data-api"` | Override the data-api subchart release name |
 | data-api.config.enabled | bool | `false` | Disable nested config (uses parent data-config subchart) |
 | data-api.config.nameOverride | string | `"lago-data-config"` | Data-config subchart name override |
-| data-api.config.api.url | string | `"lago-api"` | Internal Lago API service URL |
-
-### Data Worker
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| data-worker | object | See child values | lago-data-worker subchart overrides |
-| data-worker.nameOverride | string | `"lago-data-worker"` | Override the data-worker subchart release name |
-| data-worker.config.enabled | bool | `false` | Disable nested config (uses parent data-config subchart) |
-| data-worker.config.nameOverride | string | `"lago-data-config"` | Data-config subchart name override |
-| data-worker.config.api.url | string | `"http://lago-api"` | Internal Lago API URL for data worker |
 
 ### dbt Pipeline Job
 

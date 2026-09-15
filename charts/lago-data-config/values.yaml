@@ -21,21 +21,6 @@ global:
     # @section -- Analytical Database
     schema: analytical
 
-  forecastedUsage:
-    # -- Enable forecasted usage feature
-    # @section -- Forecasted Usage
-    enabled: false
-    # -- Lago API token for forecasted usage calls
-    # @section -- Forecasted Usage
-    api_token:
-    celery:
-      # -- Celery broker URL
-      # @section -- Forecasted Usage
-      brokerUrl: ""
-      # -- Celery result backend URL
-      # @section -- Forecasted Usage
-      resultBackend: ""
-
   dbtPipeline:
     # -- Enable dbt pipeline
     # @section -- dbt Pipeline

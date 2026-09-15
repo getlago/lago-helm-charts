@@ -1,6 +1,6 @@
 # lago-data-api
 
-![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
+![Version: 0.15.0](https://img.shields.io/badge/Version-0.15.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -8,7 +8,7 @@ A Helm chart for Kubernetes
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../lago-data-config | config(lago-data-config) | 0.5.0 |
+| file://../lago-data-config | config(lago-data-config) | 0.15.0 |
 
 ## Values
 
@@ -22,15 +22,6 @@ A Helm chart for Kubernetes
 | global.databaseAnalytical.password | string | `""` | Analytical database password |
 | global.databaseAnalytical.port | int | `5432` | Analytical database port |
 | global.databaseAnalytical.schema | string | `"analytical"` | Analytical database schema |
-
-### Forecasted Usage
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| global.forecastedUsage.enabled | bool | `false` | Enable forecasted usage feature |
-| global.forecastedUsage.api_token | string | `nil` | Lago API token for forecasted usage calls |
-| global.forecastedUsage.celery.brokerUrl | string | `""` | Celery broker URL |
-| global.forecastedUsage.celery.resultBackend | string | `""` | Celery result backend URL |
 
 ### Data
 
@@ -51,9 +42,9 @@ A Helm chart for Kubernetes
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | replicaCount | int | `1` | Number of replicas (ignored when autoscaling is enabled) |
+| annotations | object | `{}` | Deployment metadata annotations (e.g. Stakater Reloader) |
 | nameOverride | string | `""` | Override the chart name |
 | fullnameOverride | string | `""` | Override the full release name |
-| annotations | object | `{}` | Deployment metadata annotations |
 
 ### Image
 

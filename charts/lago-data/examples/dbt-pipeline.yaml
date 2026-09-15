@@ -1,7 +1,4 @@
 global:
-  urls:
-    api: "https://lago-api.example.com"
-
   databaseAnalytical:
     host: lago-analytical-postgres.svc.cluster.local
     name: lago
