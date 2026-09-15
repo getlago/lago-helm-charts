@@ -465,9 +465,11 @@ serviceAccount:
   # -- Create a ServiceAccount
   # @section -- Service Account
   create: true
-  # -- Automount the ServiceAccount API credentials
+  # -- Automount the ServiceAccount API credentials. Lago Rails does not call
+  # the Kubernetes API, so we ship the token off by default — a compromised
+  # pod can't reach the API server without an explicit opt-in per env.
   # @section -- Service Account
-  automount: true
+  automount: false
   # -- Annotations to add to the ServiceAccount
   # @section -- Service Account
   annotations: {}
@@ -482,13 +484,25 @@ podAnnotations: {}
 # @section -- Pod
 podLabels: {}
 
-# -- Pod-level security context
+# -- Pod-level security context. Safe defaults applied to every deployment;
+# UID/GID hardening (runAsNonRoot, runAsUser, runAsGroup, fsGroup) is left
+# out of chart defaults so images that still ship a root-based runtime keep
+# starting — set those in per-env values once the Wolfi/apko base image
+# (uid 65532) is in use.
 # @section -- Pod
-podSecurityContext: {}
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
 
-# -- Container-level security context
+# -- Container-level security context. Drops every Linux capability by default
+# and forbids privilege escalation — both work for any Rails workload
+# regardless of base image, so they're safe as chart defaults.
 # @section -- Pod
-securityContext: {}
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
 
 # -- Extra environment variables (map format, deep-mergeable)
 # @section -- Pod
