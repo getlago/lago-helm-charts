@@ -1,81 +1,6 @@
 # Default values for the lago-data umbrella chart.
 
 global:
-  ago:
-    # -- Rails environment (`production`, `staging`, `development`)
-    # @section -- Lago
-    env: "production"
-    # -- Lago Premium license key
-    # @section -- Lago
-    license: ""
-
-  config:
-    # -- Name of an existing ConfigMap for shared configuration
-    # @section -- Config
-    configmap:
-    # -- Name of an existing Secret for shared configuration
-    # @section -- Config
-    secret:
-
-  urls:
-    # -- Public URL of the Lago API
-    # @section -- URLs
-    api: ""
-    # -- Public URL of the Lago frontend
-    # @section -- URLs
-    front: ""
-    # -- Internal URL of the PDF service (Gotenberg)
-    # @section -- URLs
-    pdf: "lago-pdf"
-
-  database:
-    # -- PostgreSQL connection URI
-    # @section -- Database
-    uri: ""
-    # -- Database connection pool size
-    # @section -- Database
-    pool: 20
-
-  encryption:
-    # -- Primary encryption key (`openssl rand -hex 16`)
-    # @section -- Encryption
-    key: ""
-    # -- Key derivation salt (`openssl rand -hex 16`)
-    # @section -- Encryption
-    salt: ""
-
-  signing:
-    # -- HMAC signing key (HS256)
-    # @section -- Signing
-    hmac: ""
-    # -- RSA private key (RS256), base64-encoded
-    # @section -- Signing
-    rsa: ""
-
-  redis:
-    # -- Redis URI for Sidekiq job queue
-    # @section -- Redis
-    url: ""
-    # -- Redis password
-    # @section -- Redis
-    password: ""
-
-  redisCache:
-    # -- Redis URI for Rails cache
-    # @section -- Redis
-    url: ""
-    # -- Redis cache password
-    # @section -- Redis
-    password: ""
-
-  redisStore:
-    # -- Redis URI for ActionCable / general store
-    # @section -- Redis
-    url: ""
-    # -- Redis store password
-    # @section -- Redis
-    password: ""
-
   databaseAnalytical:
     # -- Analytical database host
     # @section -- Analytical Database
@@ -127,21 +52,6 @@ global:
     # @section -- dbt Pipeline
     tables: []
 
-  forecastedUsage:
-    # -- Enable forecasted usage feature
-    # @section -- Forecasted Usage
-    enabled: false
-    # -- Lago API token for forecasted usage calls
-    # @section -- Forecasted Usage
-    api_token:
-    celery:
-      # -- Celery broker URL
-      # @section -- Forecasted Usage
-      brokerUrl: ""
-      # -- Celery result backend URL
-      # @section -- Forecasted Usage
-      resultBackend: ""
-
   data:
     # -- Name of an existing ConfigMap for data configuration
     # @section -- Data
@@ -153,14 +63,6 @@ global:
     # @section -- Data
     token:
 
-# -- lago-config subchart overrides
-# @default -- See child values
-# @section -- Config
-config:
-  # -- Override the config subchart release name
-  # @section -- Config
-  nameOverride: lago-config
-
 # -- lago-data-config subchart overrides
 # @default -- See child values
 # @section -- Data Config
@@ -168,30 +70,6 @@ data-config:
   # -- Override the data-config subchart release name
   # @section -- Data Config
   nameOverride: lago-data-config
-
-# -- lago-api subchart overrides (lago-rails)
-# @default -- See child values
-# @section -- API
-api:
-  # -- Override the API subchart release name
-  # @section -- API
-  nameOverride: lago-api
-  config:
-    # -- Disable nested config (uses parent config subchart)
-    # @section -- API
-    enabled: false
-    # -- Config subchart name override
-    # @section -- API
-    nameOverride: lago-config
-
-  extraEnv:
-    # -- Inject the Data API bearer token from the data-config secret
-    # @section -- API
-    LAGO_DATA_API_BEARER_TOKEN:
-      valueFrom:
-        secretKeyRef:
-          name: lago-data-config
-          key: api.token
 
 # -- lago-data-api subchart overrides
 # @default -- See child values
@@ -207,29 +85,6 @@ data-api:
     # -- Data-config subchart name override
     # @section -- Data API
     nameOverride: lago-data-config
-    api:
-      # -- Internal Lago API service URL
-      # @section -- Data API
-      url: lago-api
-
-# -- lago-data-worker subchart overrides
-# @default -- See child values
-# @section -- Data Worker
-data-worker:
-  # -- Override the data-worker subchart release name
-  # @section -- Data Worker
-  nameOverride: lago-data-worker
-  config:
-    # -- Disable nested config (uses parent data-config subchart)
-    # @section -- Data Worker
-    enabled: false
-    # -- Data-config subchart name override
-    # @section -- Data Worker
-    nameOverride: lago-data-config
-    api:
-      # -- Internal Lago API URL for data worker
-      # @section -- Data Worker
-      url: http://lago-api
 
 # -- dbt pipeline CronJob configuration
 # @default -- See child values

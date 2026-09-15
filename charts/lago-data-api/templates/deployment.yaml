@@ -86,25 +86,6 @@ spec:
                 secretKeyRef:
                   name: {{ include "lago-data-api.secretName" . }}
                   key: bearer
-            {{- if .Values.global.forecastedUsage.enabled }}
-            - name: LAGO_RAILS_API_URL
-              value: {{ required "global.urls.api must be provided " .Values.global.urls.api }}
-            - name: LAGO_API_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "lago-data-api.secretName" . }}
-                  key: api.token
-            - name: CELERY_BROKER_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "lago-data-api.configMapName" . }}
-                  key: celery.brokerUrl
-            - name: CELERY_RESULT_BACKEND
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "lago-data-api.configMapName" . }}
-                  key: celery.resultBackend
-            {{- end }}
             {{- range $name, $val := .Values.extraEnv }}
             {{- if kindIs "map" $val }}
             - name: {{ $name }}

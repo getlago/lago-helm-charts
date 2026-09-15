@@ -20,8 +20,6 @@ vars:
       lago-front: deployment
       lago-events-processor-worker: deployment
       lago-data-api: deployment
-      lago-data-worker: deployment
-      lago-data-forecasted-usage: cronjob
       lago-mcp-server: deployment
       lago-pdf: ""
       # Umbrella charts (depend on components)
@@ -164,9 +162,7 @@ tasks:
       - test:unit:lago-front
       - test:unit:lago-events-processor-worker
       - test:unit:lago-data-api
-      - test:unit:lago-data-worker
       - test:unit:lago-mcp-server
-      - test:unit:lago-data-forecasted-usage
       - test:unit:lago-pdf
       - test:unit:lago
 
