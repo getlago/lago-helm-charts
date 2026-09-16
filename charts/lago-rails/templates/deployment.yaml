@@ -393,6 +393,15 @@ spec:
                   name: {{ include "lago-rails.secretName" . }}
                   key: data.token
             {{- end }}
+            - name: NEW_RELIC_AGENT_ENABLED
+              value: {{ .Values.global.newRelic.enabled | quote }}
+            {{- if .Values.global.newRelic.enabled }}
+            - name: NEW_RELIC_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago-rails.secretName" . }}
+                  key: newRelic.licenseKey
+            {{- end }}
             {{- range $name, $val := .Values.extraEnv }}
             {{- if kindIs "map" $val }}
             - name: {{ $name }}
