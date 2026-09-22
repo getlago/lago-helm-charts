@@ -176,6 +176,29 @@ tests:
           path: spec.template.spec.containers[0].env[?(@.name == "DATABASE_URL")].valueFrom.secretKeyRef.key
           value: database.uri
 
+  - it: should use global.encryption values as literals when set
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "ENCRYPTION_PRIMARY_KEY")].value
+          value: test-key
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "ENCRYPTION_KEY_DERIVATION_SALT")].value
+          value: test-salt
+
+  - it: should use secretKeyRef for encryption env when global.encryption is empty
+    set:
+      global.encryption.key: ""
+      global.encryption.salt: ""
+    release:
+      name: my-release
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "ENCRYPTION_PRIMARY_KEY")].valueFrom.secretKeyRef.key
+          value: encryption.key
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name == "ENCRYPTION_KEY_DERIVATION_SALT")].valueFrom.secretKeyRef.key
+          value: encryption.salt
+
   - it: should not expose DATABASE_PROXY_URL from the migrate job
     set:
       global.database.uri: ""
