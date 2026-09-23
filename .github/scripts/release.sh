@@ -11,8 +11,6 @@ CHARTS=(
   lago-front
   lago-events-processor-worker
   lago-data-api
-  lago-data-worker
-  lago-data-forecasted-usage
   lago-data-rev-rec
   lago-data-superset
   lago-mcp-server
