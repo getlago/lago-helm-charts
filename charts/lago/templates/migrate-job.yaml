@@ -87,6 +87,24 @@ spec:
                   name: {{ include "lago.secretName" . }}
                   key: database.uri
               {{- end }}
+            - name: ENCRYPTION_PRIMARY_KEY
+              {{- with .Values.global.encryption.key }}
+              value: {{ . }}
+              {{- else }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago.secretName" . }}
+                  key: encryption.key
+              {{- end }}
+            - name: ENCRYPTION_KEY_DERIVATION_SALT
+              {{- with .Values.global.encryption.salt }}
+              value: {{ . }}
+              {{- else }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "lago.secretName" . }}
+                  key: encryption.salt
+              {{- end }}
             - name: LAGO_RSA_PRIVATE_KEY
               {{- with .Values.global.signing.rsa }}
               value: {{ . }}
