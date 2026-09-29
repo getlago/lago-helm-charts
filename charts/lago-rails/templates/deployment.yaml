@@ -402,6 +402,19 @@ spec:
                   name: {{ include "lago-rails.secretName" . }}
                   key: newRelic.licenseKey
             {{- end }}
+            {{- if .Values.tmpfs.enabled }}
+            {{/*
+              Point Ruby's Dir.tmpdir at the tmpfs volume mounted below.
+              Under readOnlyRootFilesystem the default emptyDir at /tmp
+              lacks the sticky bit, which Ruby refuses, and every
+              Tempfile.new blows up with "could not find a temporary
+              directory" — see the tmpfs block in values.yaml.
+              Extra-env of the same key wins: users can override with
+              `extraEnv.TMPDIR` to point elsewhere.
+            */}}
+            - name: TMPDIR
+              value: {{ .Values.tmpfs.path | quote }}
+            {{- end }}
             {{- range $name, $val := .Values.extraEnv }}
             {{- if kindIs "map" $val }}
             - name: {{ $name }}
@@ -437,17 +450,31 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.volumeMounts }}
+          {{- if or .Values.tmpfs.enabled .Values.volumeMounts }}
           volumeMounts:
+            {{- if .Values.tmpfs.enabled }}
+            - name: rails-tmp
+              mountPath: {{ .Values.tmpfs.path | quote }}
+            {{- end }}
+            {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
           {{- with .Values.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{- with .Values.volumes }}
+      {{- if or .Values.tmpfs.enabled .Values.volumes }}
       volumes:
+        {{- if .Values.tmpfs.enabled }}
+        - name: rails-tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: {{ .Values.tmpfs.sizeLimit }}
+        {{- end }}
+        {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

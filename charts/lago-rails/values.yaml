@@ -718,6 +718,38 @@ podDisruptionBudget:
   # @section -- Pod Disruption Budget
   maxUnavailable: 1
 
+# In-memory scratch space mounted at `tmpfs.path`, with `TMPDIR` pointed at
+# it so Ruby's `Tempfile` / `Dir.tmpdir` / anything using `IO.write` to a
+# temp path lands in the tmpfs instead of the container's own filesystem.
+#
+# This exists because hardened images run with `readOnlyRootFilesystem: true`
+# and Kubernetes' default emptyDir mount at /tmp lacks the sticky bit,
+# which Ruby refuses to use — `Tempfile.new` throws
+# `could not find a temporary directory` (observed 2026-09-29 on max-test
+# hardened pods when `Invoices::GeneratePdfService#build_pdf_file`
+# tried to stage the PDF between gotenberg and S3).
+#
+# The mount is an `emptyDir` with `medium: Memory`, so contents live in
+# tmpfs (RAM), never touch disk, and vanish on pod restart — the ideal
+# home for a Tempfile. `fsGroup: 65532` on the pod (set by the hardening
+# block) makes it writable by the nonroot user without an initContainer.
+#
+# Disable this if the workload doesn't need scratch space and every byte
+# of memory matters — most Rails workloads on this chart create tempfiles
+# somewhere in their flow (PDF rendering, active-storage direct uploads,
+# CSV export, …), so leaving it on is safe.
+# @section -- Pod
+tmpfs:
+  # -- Mount an in-memory scratch volume at `tmpfs.path` and point `TMPDIR` at it.
+  # @section -- Pod
+  enabled: true
+  # -- Mount path for the tmpfs volume, used as `TMPDIR` inside the container.
+  # @section -- Pod
+  path: /rails-tmp
+  # -- Upper bound on the tmpfs volume's memory usage (Kubernetes enforces this).
+  # @section -- Pod
+  sizeLimit: 128Mi
+
 # -- Additional volumes
 # @section -- Pod
 volumes: []

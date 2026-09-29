@@ -1,0 +1,123 @@
+suite: Test tmpfs scratch volume
+templates:
+  - templates/deployment.yaml
+values:
+  - ../values.yaml
+
+tests:
+  - it: should mount an in-memory scratch volume and set TMPDIR by default
+    template: templates/deployment.yaml
+    values:
+      - ./fixtures/required.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TMPDIR
+            value: /rails-tmp
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rails-tmp
+            mountPath: /rails-tmp
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: rails-tmp
+            emptyDir:
+              medium: Memory
+              sizeLimit: 128Mi
+
+  - it: should honour tmpfs.path and tmpfs.sizeLimit overrides
+    template: templates/deployment.yaml
+    values:
+      - ./fixtures/required.yaml
+    set:
+      tmpfs:
+        enabled: true
+        path: /var/scratch
+        sizeLimit: 512Mi
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TMPDIR
+            value: /var/scratch
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rails-tmp
+            mountPath: /var/scratch
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: rails-tmp
+            emptyDir:
+              medium: Memory
+              sizeLimit: 512Mi
+
+  - it: should skip TMPDIR, the volume and its mount when tmpfs.enabled is false
+    template: templates/deployment.yaml
+    values:
+      - ./fixtures/required.yaml
+    set:
+      tmpfs:
+        enabled: false
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TMPDIR
+      - notExists:
+          path: spec.template.spec.volumes
+      - notExists:
+          path: spec.template.spec.containers[0].volumeMounts
+
+  - it: should co-exist with user-supplied volumes and volumeMounts
+    template: templates/deployment.yaml
+    values:
+      - ./fixtures/required.yaml
+    set:
+      volumes:
+        - name: cache
+          emptyDir: {}
+      volumeMounts:
+        - name: cache
+          mountPath: /cache
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: rails-tmp
+            emptyDir:
+              medium: Memory
+              sizeLimit: 128Mi
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: cache
+            emptyDir: {}
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rails-tmp
+            mountPath: /rails-tmp
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: cache
+            mountPath: /cache
+
+  - it: should let extraEnv.TMPDIR override the chart default (extraEnv wins by order)
+    template: templates/deployment.yaml
+    values:
+      - ./fixtures/required.yaml
+    set:
+      extraEnv:
+        TMPDIR: /custom-tmp
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TMPDIR
+            value: /custom-tmp
