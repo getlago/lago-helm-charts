@@ -1,0 +1,73 @@
+{{- /*
+Restricts ingress to the session cluster's JobManager. Flink's REST API (:8081) has no
+authentication and can submit and cancel jobs, so an open port is code execution inside the
+cluster. Only two callers need it: the Flink Kubernetes Operator (upgrades, savepoints) and this
+chart's submitter Job (cancel/resubmit).
+
+Ingress only: egress is untouched, so the JobManager can still reach S3, Postgres and Redpanda.
+Selecting the JobManager does not restart it, and does not touch TaskManagers.
+
+The submitter is matched on the labels submitter-job.yaml sets on its pod template. The
+TaskManager rule is scoped to this release's own TaskManager pods, not the namespace: an
+ns-wide allow would let every pod in it back onto :8081.
+*/ -}}
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "lago-data-rev-rec.fullname" . }}-jobmanager
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "lago-data-rev-rec.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ include "lago-data-rev-rec.fullname" . }}
+      component: jobmanager
+  policyTypes:
+    - Ingress
+  ingress:
+    # REST: the Flink Kubernetes Operator.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Values.networkPolicy.operator.namespace }}
+          podSelector:
+            matchLabels:
+              {{- toYaml .Values.networkPolicy.operator.podLabels | nindent 14 }}
+      ports:
+        - protocol: TCP
+          port: 8081
+    # REST: this chart's submitter Job.
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ .Chart.Name }}
+              app.kubernetes.io/instance: {{ .Release.Name }}
+              app.kubernetes.io/component: submitter
+      ports:
+        - protocol: TCP
+          port: 8081
+    # RPC and blob server: this release's TaskManagers.
+    - from:
+        - podSelector:
+            matchLabels:
+              app: {{ include "lago-data-rev-rec.fullname" . }}
+              component: taskmanager
+      ports:
+        - protocol: TCP
+          port: 6123
+        - protocol: TCP
+          port: 6124
+    # Prometheus metrics: the metrics collector, scraping the reporter port.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Values.networkPolicy.metrics.namespace }}
+          podSelector:
+            matchLabels:
+              {{- toYaml .Values.networkPolicy.metrics.podLabels | nindent 14 }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.networkPolicy.metrics.port }}
+{{- end }}
