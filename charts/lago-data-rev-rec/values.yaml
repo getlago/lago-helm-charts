@@ -103,6 +103,24 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template.
   name: ""
 
+# Ingress lockdown for the JobManager (templates/networkpolicy.yaml). Flink REST (:8081) is
+# unauthenticated and can submit/cancel jobs, so only the operator and the submitter Job may reach
+# it. `metrics` lets the collector scrape the reporter port. `operator` and `metrics` are the
+# identities of the allowed callers; override them if the cluster runs them under different labels
+# or in another namespace.
+networkPolicy:
+  enabled: true
+  operator:
+    namespace: flink
+    podLabels:
+      app.kubernetes.io/name: flink-kubernetes-operator
+  # Metrics collector (Grafana Alloy) scraping the Flink metrics reporter port.
+  metrics:
+    namespace: grafana
+    port: 9249
+    podLabels:
+      app.kubernetes.io/name: alloy-metrics
+
 submitter:
   # Python image used by both the submitter Job AND the beam-py-harness sidecar
   # on each TaskManager pod.
