@@ -1,60 +1,60 @@
 dependencies:
 - name: lago-config
   repository: file://../lago-config
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-front
   repository: file://../lago-front
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-pdf
   repository: file://../lago-pdf
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-events-processor-worker
   repository: file://../lago-events-processor-worker
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.16.0
+  version: 0.17.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.16.0
-digest: sha256:3041fa847dc7885fb8ce9112db88350725cfeb702d9c5182023c7be31d87d998
-generated: "2026-09-24T13:57:40.911794735Z"
+  version: 0.17.0
+digest: sha256:3f90b784a2bd9c1a7328210e81dc323c0fcc7bc7d3cff4f90e06ed078c31554c
+generated: "2026-09-30T10:20:11.913929142Z"
