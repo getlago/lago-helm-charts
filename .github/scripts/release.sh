@@ -107,6 +107,25 @@ strip_nested_subdeps() {
 
     rm -rf "$tmpdir"
   done
+
+  # `helm dependency update` resolves a file:// dependency into a directory
+  # rather than a tarball, so the loop above never sees those. Same treatment.
+  local subchart
+  for subchart in "$charts_dir"/*/; do
+    [ -d "$subchart/charts" ] || continue
+    echo "  Stripping nested subdeps from $(basename "$subchart")"
+    rm -rf "$subchart/charts"
+  done
+}
+
+# Umbrella charts provide every leaf chart at top level, so the nested copies
+# their subcharts carry are always redundant — and, because of the Helm 3 bug
+# above, actively harmful.
+is_umbrella() {
+  case "$1" in
+    lago | lago-data | lago-staging) return 0 ;;
+    *) return 1 ;;
+  esac
 }
 
 publish_oci() {
@@ -135,10 +154,9 @@ publish_oci() {
     # only — they already provide these deps at the top level. Leaf charts
     # (lago-rails, lago-front, etc.) must keep their nested deps intact for
     # standalone usage.
-    case "$chart" in lago)
+    if is_umbrella "$chart"; then
       strip_nested_subdeps ".helm-build/$chart"
-      ;;
-    esac
+    fi
 
     helm package ".helm-build/$chart" --destination .helm-packages
     helm push ".helm-packages/$chart-$version.tgz" "$REGISTRY"
@@ -179,14 +197,25 @@ EOF
 }
 
 package_charts() {
-  mkdir -p .cr-release-packages
+  mkdir -p .cr-release-packages .cr-build
   for chart in charts/*/; do
     local chart_name
     chart_name=$(basename "$chart")
     echo "::group::Packaging $chart_name"
-    helm package "$chart" --destination .cr-release-packages
+
+    # Package from a copy: the umbrellas need their nested sub-dependencies
+    # stripped exactly as publish_oci does, and the working tree is the tagged
+    # commit — it must not be mutated here.
+    rm -rf ".cr-build/$chart_name"
+    cp -r "$chart" ".cr-build/$chart_name"
+    if is_umbrella "$chart_name"; then
+      strip_nested_subdeps ".cr-build/$chart_name"
+    fi
+
+    helm package ".cr-build/$chart_name" --destination .cr-release-packages
     echo "::endgroup::"
   done
+  rm -rf .cr-build
   ls -lh .cr-release-packages/
 }
 
