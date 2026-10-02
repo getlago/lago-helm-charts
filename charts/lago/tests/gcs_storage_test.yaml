@@ -1,0 +1,152 @@
+suite: Test global.gcs.* flows through the shared lago-config ConfigMap and is
+  consumed by every rails pod as LAGO_GCS_* env vars via configMapKeyRef, and
+  that enabling GCS does not also switch on the S3 env (which Lago checks first).
+templates:
+  - charts/config/templates/configmap.yaml
+  - charts/api/templates/deployment.yaml
+  - charts/worker/templates/deployment.yaml
+
+set:
+  global:
+    lago:
+      env: production
+      version: v1.0.0
+    urls:
+      api: http://api.test
+      front: http://front.test
+    database:
+      uri: postgresql://localhost
+    encryption:
+      key: test-key
+      salt: test-salt
+    signing:
+      hmac: test-hmac
+      rsa: test-rsa
+    redis:
+      uri: redis://localhost
+    redisCache:
+      uri: redis://localhost
+    redisStore:
+      uri: redis://localhost
+
+tests:
+  - it: writes gcs.* keys into the shared lago-config ConfigMap when enabled
+    template: charts/config/templates/configmap.yaml
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: my-project
+      global.gcs.bucket: my-bucket
+      global.gcs.iam: true
+      global.gcs.gsaEmail: lago@my-project.iam.gserviceaccount.com
+    asserts:
+      - equal:
+          path: data["gcs.project"]
+          value: my-project
+      - equal:
+          path: data["gcs.bucket"]
+          value: my-bucket
+      - equal:
+          path: data["gcs.iam"]
+          value: "true"
+      - equal:
+          path: data["gcs.gsaEmail"]
+          value: lago@my-project.iam.gserviceaccount.com
+
+  - it: sets LAGO_USE_GCS and reads LAGO_GCS_* via configMapKeyRef on the api when enabled
+    template: charts/api/templates/deployment.yaml
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: my-project
+      global.gcs.bucket: my-bucket
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_USE_GCS
+            value: "true"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_GCS_PROJECT
+            valueFrom:
+              configMapKeyRef:
+                name: RELEASE-NAME-lago-config
+                key: gcs.project
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_GCS_BUCKET
+            valueFrom:
+              configMapKeyRef:
+                name: RELEASE-NAME-lago-config
+                key: gcs.bucket
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_GCS_IAM
+            valueFrom:
+              configMapKeyRef:
+                name: RELEASE-NAME-lago-config
+                key: gcs.iam
+                optional: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_GCS_GSA_EMAIL
+            valueFrom:
+              configMapKeyRef:
+                name: RELEASE-NAME-lago-config
+                key: gcs.gsaEmail
+                optional: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_GCS_KEYFILE_JSON_PATH
+            valueFrom:
+              configMapKeyRef:
+                name: RELEASE-NAME-lago-config
+                key: gcs.keyfileJsonPath
+                optional: true
+
+  - it: also sets LAGO_USE_GCS on worker pods
+    template: charts/worker/templates/deployment.yaml
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: my-project
+      global.gcs.bucket: my-bucket
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_USE_GCS
+            value: "true"
+
+  - it: does not set LAGO_USE_AWS_S3 when only GCS is enabled
+    template: charts/api/templates/deployment.yaml
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: my-project
+      global.gcs.bucket: my-bucket
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_USE_AWS_S3
+            value: "true"
+
+  - it: omits LAGO_GCS_* env from rails pods when GCS is off
+    template: charts/api/templates/deployment.yaml
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_USE_GCS
+            value: "true"
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_GCS_BUCKET
+            valueFrom:
+              configMapKeyRef:
+                name: RELEASE-NAME-lago-config
+                key: gcs.bucket
