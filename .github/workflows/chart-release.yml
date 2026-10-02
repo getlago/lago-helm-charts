@@ -1,9 +1,8 @@
 name: Release charts
 
+# Manual dispatch only. The job needs an explicit version: every step reads
+# `inputs.version`, so a push-triggered run would fail on validate_version.
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       version:

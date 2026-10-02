@@ -2,6 +2,16 @@
 
 Helm charts for deploying [Lago](https://getlago.com), the open-source billing platform, on Kubernetes.
 
+## Coming from chart 1.x?
+
+**2.0 is a new install, not an upgrade.** The 1.x `lago` chart was a single monolithic
+chart; 2.x is an umbrella over independent subcharts with a different values schema and
+different resource names. `helm upgrade` from 1.x will not migrate cleanly and is not
+supported — install 2.x as a new release and point it at your existing database.
+
+1.x is frozen on the [`v1`](https://github.com/getlago/lago-helm-charts/tree/v1) branch and
+still receives fixes. Its last release is 1.28.0.
+
 ## Prerequisites
 
 - Kubernetes 1.19+
