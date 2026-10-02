@@ -1,0 +1,7 @@
+# Required values for lago-mcp-server tests
+config:
+  api:
+    url: "http://api.test.local"
+  mistral:
+    agentID: "test-agent-id"
+    apiKey: "test-api-key"

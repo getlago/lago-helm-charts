@@ -1,0 +1,6 @@
+dependencies:
+- name: lago-data-config
+  repository: file://../lago-data-config
+  version: 0.17.0
+digest: sha256:86814f7c2334f47a533af047c088a366ddd46fff63d54f1f03aacfaf53825eca
+generated: "2026-09-30T10:20:11.677620453Z"

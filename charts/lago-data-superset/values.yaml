@@ -1,0 +1,209 @@
+# Default values for lago-data-superset.
+#
+# Non-sensitive platform config (SUPERSET_*, LAGO_BUNDLES, LAGO_PRUNE) is typed
+# under config.superset.* and config.lago.*. Credentials are injected via
+# per-domain secretRef entries rendered as envFrom. LAGO_DATASOURCE_* and any
+# other operator-managed env flows through extraEnv / extraEnvFrom.
+
+# Machinery image (data/superset): content-free Superset that reads its assets
+# from /assets at boot.
+image:
+  # -- Machinery image repository (data/superset)
+  # @section -- Image
+  repository: ""
+  # -- Machinery image tag
+  # @section -- Image
+  tag: ""
+  # -- Machinery image pull policy
+  # @section -- Image
+  pullPolicy: IfNotPresent
+
+# Assets image (data/superset-config): a busybox image carrying the assets/ tree
+# at /assets, staged into a shared volume by an init-container.
+assets:
+  # -- Assets image repository (data/superset-config)
+  # @section -- Image
+  repository: ""
+  # -- Assets image tag
+  # @section -- Image
+  tag: ""
+  # -- Assets image pull policy
+  # @section -- Image
+  pullPolicy: IfNotPresent
+
+# -- Image pull secrets for private registries
+# @section -- Image
+imagePullSecrets: []
+
+# -- Annotations applied to the Deployment resources
+# @section -- Deployment
+annotations: {}
+# -- Additional labels merged onto all resources
+# @section -- Deployment
+labels: {}
+
+serviceAccount:
+  # -- Create a ServiceAccount
+  # @section -- Service Account
+  create: true
+  # -- Automount the ServiceAccount API credentials
+  # @section -- Service Account
+  automount: true
+  # -- Annotations to add to the ServiceAccount
+  # @section -- Service Account
+  annotations: {}
+  # -- ServiceAccount name (generated from fullname when create is true; required when create is false)
+  # @section -- Service Account
+  name: ""
+
+service:
+  # -- Service type
+  # @section -- Service
+  type: ClusterIP
+  # -- Service port (the web container listens on 8088)
+  # @section -- Service
+  port: 8088
+
+web:
+  # -- Web (API/UI) replica count
+  # @section -- Web
+  replicaCount: 1
+  # -- Web container resources
+  # @section -- Web
+  resources: {}
+  # -- Web startup probe (boot runs db upgrade + bundle import; budget covers slow metadata DB)
+  # @section -- Web
+  startupProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 60
+  # -- Web liveness probe
+  # @section -- Web
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 15
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 5
+  # -- Web readiness probe
+  # @section -- Web
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 15
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 5
+
+worker:
+  # -- Celery worker replica count
+  # @section -- Worker
+  replicaCount: 1
+  # -- Worker container resources
+  # @section -- Worker
+  resources: {}
+
+config:
+  superset:
+    secretKey:
+      # -- Secret containing SUPERSET_SECRET_KEY (required)
+      # @section -- Config
+      secretRef:
+        name: ""
+    metadataDb:
+      uri:
+        # -- Secret containing SUPERSET_METADATA_DB_URI
+        # @section -- Config
+        secretRef:
+          name: ""
+      # -- SUPERSET_METADATA_DB_POOL_SIZE
+      # @section -- Config
+      poolSize: 20
+      # -- SUPERSET_METADATA_DB_MAX_OVERFLOW
+      # @section -- Config
+      maxOverflow: 40
+      # -- SUPERSET_METADATA_DB_POOL_TIMEOUT
+      # @section -- Config
+      poolTimeout: 60
+    redis:
+      # -- Secret containing SUPERSET_REDIS_URL
+      # @section -- Config
+      secretRef:
+        name: ""
+    admin:
+      # -- Secret containing SUPERSET_ADMIN_USERNAME, _PASSWORD, _FIRSTNAME, _LASTNAME, _EMAIL
+      # @section -- Config
+      secretRef:
+        name: ""
+    # -- SUPERSET_ENV
+    # @section -- Config
+    env: production
+    celery:
+      # -- SUPERSET_CELERY_CONCURRENCY
+      # @section -- Config
+      concurrency: 4
+      # -- SUPERSET_CELERY_LOG_LEVEL
+      # @section -- Config
+      logLevel: info
+    # -- SUPERSET_CORS_ORIGINS (required — comma-separated allowed embed origins)
+    # @section -- Config
+    corsOrigins: ""
+    # -- SUPERSET_GUEST_ROLE
+    # @section -- Config
+    guestRole: "LagoViewer"
+    # -- SUPERSET_JWT_EXPIRE_MINUTES
+    # @section -- Config
+    jwtExpireMinutes: 300
+    # -- SUPERSET_CACHE_DEFAULT_TIMEOUT
+    # @section -- Config
+    cacheDefaultTimeout: 86400
+    # -- SUPERSET_LOG_LEVEL
+    # @section -- Config
+    logLevel: INFO
+    # -- SUPERSET_LOCAL_SSL
+    # @section -- Config
+    localSsl: false
+  lago:
+    # -- LAGO_BUNDLES: comma-separated bundle keys to activate (empty → import nothing)
+    # @section -- Config
+    bundles: ""
+    # -- LAGO_PRUNE: converge to desired state after import
+    # @section -- Config
+    prune: true
+
+# -- Extra environment variables (map; each value is a string, or a map for valueFrom)
+# @section -- Pod
+extraEnv: {}
+# -- Extra envFrom sources (e.g. for LAGO_DATASOURCE_* and other operator-injected config)
+# @default -- `[]`
+# @section -- Pod
+extraEnvFrom: []
+
+# -- Pod annotations
+# @section -- Pod
+podAnnotations: {}
+# -- Pod labels
+# @section -- Pod
+podLabels: {}
+# -- Pod security context
+# @section -- Pod
+podSecurityContext: {}
+# -- Container security context
+# @section -- Pod
+securityContext: {}
+# -- Node selector
+# @section -- Pod
+nodeSelector: {}
+# -- Affinity rules
+# @section -- Pod
+affinity: {}
+# -- Tolerations
+# @section -- Pod
+tolerations: []

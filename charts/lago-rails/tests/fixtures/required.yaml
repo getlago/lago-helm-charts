@@ -1,0 +1,5 @@
+# Required values for lago-rails tests
+global:
+  urls:
+    api: "http://api.lago.dev"
+    front: "http://front.lago.dev"

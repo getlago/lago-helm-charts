@@ -1,0 +1,91 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: {{ include "lago-data-rev-rec.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "lago-data-rev-rec.labels" . | nindent 4 }}
+    {{- with .Values.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  image: {{ include "lago-data-rev-rec.flinkImage" . | quote }}
+  imagePullPolicy: {{ .Values.image.pullPolicy }}
+  flinkVersion: {{ .Values.flinkVersion }}
+  serviceAccount: {{ include "lago-data-rev-rec.serviceAccountName" . }}
+  {{- with .Values.restartNonce }}
+  restartNonce: {{ . }}
+  {{- end }}
+  # The K8s operator manages kubernetes.cluster-id internally — setting it here
+  # is rejected by the admission webhook.
+  flinkConfiguration:
+    high-availability.type: kubernetes
+    high-availability.storageDir: {{ required "config.highAvailability.storageDir is required" .Values.config.highAvailability.storageDir | quote }}
+    state.backend.type: {{ .Values.config.checkpointing.stateBackend | default "rocksdb" | quote }}
+    state.backend.incremental: {{ .Values.config.checkpointing.incremental | default "true" | toString | quote }}
+    state.checkpoints.dir: {{ required "config.checkpointing.storageDir is required" .Values.config.checkpointing.storageDir | quote }}
+    state.savepoints.dir: {{ required "config.checkpointing.savepointDir is required" .Values.config.checkpointing.savepointDir | quote }}
+    {{- range $k, $v := .Values.config.extraConfig }}
+    {{ $k }}: {{ $v | toString | quote }}
+    {{- end }}
+  jobManager:
+    replicas: {{ .Values.jobManager.replicas }}
+    resource:
+      {{- toYaml .Values.jobManager.resource | nindent 6 }}
+    {{- if or .Values.nodeSelector .Values.tolerations .Values.affinity }}
+    podTemplate:
+      spec:
+        {{- with .Values.nodeSelector }}
+        nodeSelector:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.tolerations }}
+        tolerations:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.affinity }}
+        affinity:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+    {{- end }}
+  taskManager:
+    replicas: {{ .Values.taskManager.replicas }}
+    resource:
+      {{- toYaml .Values.taskManager.resource | nindent 6 }}
+    podTemplate:
+      spec:
+        {{- with .Values.nodeSelector }}
+        nodeSelector:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.tolerations }}
+        tolerations:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.affinity }}
+        affinity:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        containers:
+          - name: flink-main-container
+            # operator injects flink config; nothing else to set here
+          - name: beam-py-harness
+            # Python SDK harness — Flink TaskManagers dial localhost:<port> for
+            # python user code execution (rev_rec DoFns) when the pipeline runs
+            # with --environment_type=EXTERNAL.
+            image: {{ include "lago-data-rev-rec.submitterImage" . | quote }}
+            imagePullPolicy: {{ .Values.submitter.image.pullPolicy }}
+            command:
+              - python
+              - -m
+              - apache_beam.runners.worker.worker_pool_main
+              - --service_port={{ .Values.harnessSidecar.port }}
+            ports:
+              - containerPort: {{ .Values.harnessSidecar.port }}
+                name: py-harness
+            resources:
+              {{- toYaml .Values.taskManager.sidecarResources | nindent 14 }}

@@ -1,0 +1,4 @@
+# Required values for lago-front tests
+global:
+  urls:
+    api: "http://api.lago.dev"

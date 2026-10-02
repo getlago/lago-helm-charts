@@ -1,0 +1,100 @@
+suite: Test graceful shutdown and PodDisruptionBudget
+templates:
+  - templates/deployment.yaml
+  - templates/pdb.yaml
+values:
+  - ../values.yaml
+
+tests:
+  # ============================================================================
+  # terminationGracePeriodSeconds
+  # ============================================================================
+  - it: should set terminationGracePeriodSeconds when specified
+    template: templates/deployment.yaml
+    values:
+      - ./fixtures/required.yaml
+    set:
+      terminationGracePeriodSeconds: 60
+    asserts:
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 60
+
+  - it: should not set terminationGracePeriodSeconds by default
+    template: templates/deployment.yaml
+    values:
+      - ./fixtures/required.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.terminationGracePeriodSeconds
+
+  # ============================================================================
+  # lifecycle / preStop
+  # ============================================================================
+  - it: should render preStop lifecycle hook when specified
+    template: templates/deployment.yaml
+    values:
+      - ./fixtures/required.yaml
+    set:
+      lifecycle:
+        preStop:
+          exec:
+            command: ["/bin/sleep", "15"]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].lifecycle.preStop.exec.command
+          value: ["/bin/sleep", "15"]
+
+  - it: should not render lifecycle by default
+    template: templates/deployment.yaml
+    values:
+      - ./fixtures/required.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].lifecycle
+
+  # ============================================================================
+  # PodDisruptionBudget
+  # ============================================================================
+  - it: should not render a PDB by default
+    template: templates/pdb.yaml
+    values:
+      - ./fixtures/required.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render a PDB with maxUnavailable when enabled
+    template: templates/pdb.yaml
+    values:
+      - ./fixtures/required.yaml
+    set:
+      podDisruptionBudget:
+        enabled: true
+        maxUnavailable: 1
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: PodDisruptionBudget
+      - equal:
+          path: spec.maxUnavailable
+          value: 1
+      - notExists:
+          path: spec.minAvailable
+
+  - it: should render a PDB with minAvailable when set
+    template: templates/pdb.yaml
+    values:
+      - ./fixtures/required.yaml
+    set:
+      podDisruptionBudget:
+        enabled: true
+        minAvailable: 2
+        maxUnavailable: null
+    asserts:
+      - equal:
+          path: spec.minAvailable
+          value: 2
+      - notExists:
+          path: spec.maxUnavailable

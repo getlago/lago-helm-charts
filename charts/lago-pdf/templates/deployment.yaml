@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "lago-pdf.fullname" . }}
+  {{- with .Values.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "lago-pdf.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.gotenberg.autoscaling.enabled }}
+  replicas: {{ .Values.gotenberg.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "lago-pdf.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.gotenberg.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "lago-pdf.labels" . | nindent 8 }}
+        {{- with .Values.gotenberg.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.gotenberg.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "lago-pdf.serviceAccountName" . }}
+      {{- with .Values.gotenberg.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ default "gotenberg" .Values.gotenberg.container.name }}
+          {{- with .Values.gotenberg.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.gotenberg.image.repository }}:{{ .Values.gotenberg.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.gotenberg.image.pullPolicy }}
+          {{- with .Values.gotenberg.container.command }}
+          command: {{ toJson . }}
+          {{- end }}
+          {{- with .Values.gotenberg.container.args }}
+          args: {{ toJson . }}
+          {{- end }}
+          {{- with .Values.gotenberg.extraEnvFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.gotenberg.extraEnv }}
+          env:
+            {{- range $name, $val := .Values.gotenberg.extraEnv }}
+            {{- if kindIs "map" $val }}
+            - name: {{ $name }}
+              {{- toYaml $val | nindent 14 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- end }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.gotenberg.container.ports.http }}
+              protocol: TCP
+          {{- with .Values.gotenberg.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.gotenberg.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.gotenberg.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.gotenberg.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.gotenberg.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.gotenberg.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.gotenberg.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.gotenberg.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.gotenberg.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,128 @@
+# Production resource requests/limits and HPA autoscaling.
+#
+# Layer on top of basic_workers.yaml:
+#   helm install lago ./charts/lago \
+#     -f charts/lago/examples/basic_workers.yaml \
+#     -f charts/lago/examples/basic_workers_resources.yaml
+#
+# All components use:
+#   - No CPU limits (avoids kernel throttling)
+#   - Memory request = memory limit (guaranteed QoS for memory)
+#   - HPA starting at minReplicas: 1 (conservative, scales up on demand)
+
+api:
+  resources:
+    requests:
+      cpu: "4"
+      memory: 4Gi
+    limits:
+      memory: 4Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 30
+
+front:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 128Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+
+clock:
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 812Mi
+    limits:
+      memory: 812Mi
+
+worker:
+  resources:
+    requests:
+      cpu: 1100m
+      memory: 2Gi
+    limits:
+      memory: 2Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+
+billing-worker:
+  resources:
+    requests:
+      cpu: 1100m
+      memory: 1100Mi
+    limits:
+      memory: 1100Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+
+clock-worker:
+  resources:
+    requests:
+      cpu: "3"
+      memory: 8Gi
+    limits:
+      memory: 8Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+
+events-worker:
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      memory: 1Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+
+webhook-worker:
+  resources:
+    requests:
+      cpu: 1100m
+      memory: 1Gi
+    limits:
+      memory: 1Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 10
+
+pdf:
+  worker:
+    resources:
+      requests:
+        cpu: 1100m
+        memory: 1Gi
+      limits:
+        memory: 1Gi
+    autoscaling:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 3
+  gotenberg:
+    resources:
+      requests:
+        cpu: "2"
+        memory: 1Gi
+      limits:
+        memory: 1Gi
+    autoscaling:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 4

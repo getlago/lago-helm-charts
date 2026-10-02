@@ -1,0 +1,187 @@
+global:
+  lago:
+    env: staging
+    cloud: true
+
+  urls:
+    pdf: http://pdf-web.default.svc.cluster.local
+
+  s3:
+    enabled: true
+    region: us-east-1
+    bucket: lago-staging
+
+  smtp:
+    enabled: true
+    from: noreply@getlago.com
+    port: 1025
+    address: mailhog-web.default.svc.cluster.local
+
+  google:
+    enabled: true
+
+  gocardless:
+    enabled: true
+    proxy: https://proxy.staging.getlago.com
+
+  mcp:
+    enabled: true
+    endpoint: http://lago-mcp-server.mcp-server.svc.cluster.local/mcp
+
+  streaming_ingestion:
+    clickhouse:
+      port: 8123
+      address: k8s-clickhou-clickhou-779359d44e-3152ea1ee79e9b43.elb.us-east-1.amazonaws.com
+
+    kafka:
+      bootstrapServers:
+        - redpanda.redpanda.svc.cluster.local:9093
+
+
+config:
+  secret:
+    create: false
+  secretStreaming:
+    create: false
+
+api:
+  config:
+    enabled: false
+    log:
+      level: debug
+  image:
+    repository: 201661579678.dkr.ecr.us-east-1.amazonaws.com/lago-api-staging
+  container:
+    command: ["./scripts/start.sh"]
+  web:
+    sidekiq: true
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: 50m
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+  autoscaling:
+    enabled: true
+    external: true
+  extraObjects:
+    - |-
+      kind: HTTPScaledObject
+      apiVersion: http.keda.sh/v1alpha1
+      metadata:
+        name: {{ include "lago-rails.fullname" . }}
+        annotations:
+          'argocd.argoproj.io/sync-wave': '1'
+        labels:
+          {{- include "lago-rails.labels" . | nindent 4 }}
+      spec:
+        hosts:
+          - {{ index .Values.ingress.hostsRaw 0 "host" }}
+        scaleTargetRef:
+          name: {{ include "lago-rails.fullname" . }}
+          kind: Deployment
+          apiVersion: apps/v1
+          service: {{ include "lago-rails.fullname" . }}
+          portName: http
+        replicas:
+          min: 0
+          max: 1
+        scaledownPeriod: 300
+        scalingMetric:
+          requestRate:
+            granularity: 1s
+            targetValue: 10
+    - |-
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        annotations:
+          {{- toYaml .Values.ingress.annotations | nindent 4}}
+          nginx.ingress.kubernetes.io/backend-protocol: HTTP
+          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+          external-dns.alpha.kubernetes.io/enabled: "true"
+        labels:
+          {{- include "lago-rails.labels" . | nindent 4 }}
+        name: {{ include "lago-rails.fullname" . }}-webhooks
+      spec:
+        ingressClassName: public-nginx
+        rules:
+        - host: {{ .Values.global.hosts.webhook }}
+          http:
+            paths:
+            - backend:
+                service:
+                  name: {{ include "lago-rails.fullname" . }}
+                  port:
+                    number: {{ .Values.service.port }}
+              path: /webhooks
+              pathType: Prefix
+        tls:
+        - hosts:
+          - {{ .Values.global.hosts.webhook }}
+          secretName: wildcard-cert-tls
+
+front:
+  config:
+    enabled: false
+  image:
+    repository: 201661579678.dkr.ecr.us-east-1.amazonaws.com/lago-front-staging
+
+  # we need to point to the keda interceptor
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: 50m
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+  autoscaling:
+    enabled: true
+    external: true
+  extraObjects:
+    - |-
+      kind: HTTPScaledObject
+      apiVersion: http.keda.sh/v1alpha1
+      metadata:
+        name: {{ include "lago-front.fullname" . }}
+        labels:
+          {{- include "lago-front.labels" . | nindent 4 }}
+      spec:
+        hosts:
+          - {{ index .Values.ingress.hostsRaw 0 "host" }}
+        scaleTargetRef:
+          name: {{ include "lago-front.fullname" . }}
+          kind: Deployment
+          apiVersion: apps/v1
+          service: {{ include "lago-front.fullname" . }}
+          portName: http
+        replicas:
+          min: 0
+          max: 1
+        scaledownPeriod: 300
+        scalingMetric:
+          requestRate:
+            granularity: 1s
+            targetValue: 10
+
+worker:
+  config:
+    enabled: false
+    log:
+      level: debug
+  image:
+    repository: 201661579678.dkr.ecr.us-east-1.amazonaws.com/lago-api-staging
+
+clock:
+  config:
+    enabled: false
+    log:
+      level: debug
+  image:
+    repository: 201661579678.dkr.ecr.us-east-1.amazonaws.com/lago-api-staging
+
+createTopics:
+  enabled: true

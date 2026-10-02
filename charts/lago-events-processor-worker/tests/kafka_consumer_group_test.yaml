@@ -1,0 +1,30 @@
+suite: Verify the LAGO_KAFKA_CONSUMER_GROUP extraEnv default that redirects the
+  Go events-processor at the streaming ConfigMap's
+  LAGO_KAFKA_CONSUMER_GROUP_EVENTS_PROCESSOR key
+templates:
+  - templates/deployment.yaml
+values:
+  - ../values.yaml
+
+# Baseline required to reach the deployment template. `config.enabled: true`
+# activates the bundled lago-config dep so the streaming ConfigMap-name
+# helper resolves — matches the standalone chart-testing path; the umbrella
+# lago chart wires this differently but the pod-spec output is identical.
+set:
+  config.enabled: true
+  global.streaming_ingestion.enabled: true
+  global.streaming_ingestion.kafka.bootstrapServers:
+    - kafka:9092
+
+tests:
+  - it: injects LAGO_KAFKA_CONSUMER_GROUP as a valueFrom pointing at LAGO_KAFKA_CONSUMER_GROUP_EVENTS_PROCESSOR on lago-config-streaming
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_KAFKA_CONSUMER_GROUP
+            valueFrom:
+              configMapKeyRef:
+                name: lago-config-streaming
+                key: LAGO_KAFKA_CONSUMER_GROUP_EVENTS_PROCESSOR
+                optional: true

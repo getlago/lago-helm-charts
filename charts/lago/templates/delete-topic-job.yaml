@@ -1,0 +1,92 @@
+{{- if and .Values.global.streaming_ingestion.enabled .Values.deleteTopics.enabled -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "lago.fullname" . }}-delete-kafka-topics
+  labels:
+    {{- include "lago.labels" . | nindent 4 }}
+    app.kubernetes.io/component: delete-topics
+  annotations:
+    "helm.sh/hook": post-delete
+    "helm.sh/hook-weight": {{ .Values.deleteTopics.hookWeight | quote }}
+    "helm.sh/hook-delete-policy": {{ .Values.deleteTopics.hookDeletePolicy }}
+    {{- with .Values.deleteTopics.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- with .Values.deleteTopics.ttlSecondsAfterFinished }}
+  ttlSecondsAfterFinished: {{ . }}
+  {{- end }}
+  {{- with .Values.deleteTopics.activeDeadlineSeconds }}
+  activeDeadlineSeconds: {{ . }}
+  {{- end }}
+  backoffLimit: {{ .Values.deleteTopics.backoffLimit }}
+  template:
+    metadata:
+      {{- with .Values.deleteTopics.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "lago.labels" . | nindent 8 }}
+        app.kubernetes.io/component: delete-topics
+        {{- with .Values.deleteTopics.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.deleteTopics.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deleteTopics.serviceAccountName }}
+      serviceAccountName: {{ . }}
+      {{- end }}
+      {{- with .Values.deleteTopics.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: {{ .Values.deleteTopics.restartPolicy }}
+      containers:
+        - name: delete-topics
+          image: {{ .Values.deleteTopics.image.repository }}:{{ .Values.deleteTopics.image.tag }}
+          imagePullPolicy: {{ .Values.deleteTopics.image.pullPolicy }}
+          command: [sh]
+          args:
+            - -c
+            - |
+              topics="{{ values .Values.global.streaming_ingestion.kafka.topics | join " " }}"
+              echo "Deleting Kafka topics: $topics"
+              {{- .Files.Get "scripts/delete-topics.sh" | nindent 14 }}
+          env:
+            - name: RPK_BROKERS
+              value: {{ .Values.global.streaming_ingestion.kafka.bootstrapServers | join "," }}
+            {{- range $name, $val := .Values.deleteTopics.extraEnv }}
+            {{- if kindIs "map" $val }}
+            - name: {{ $name }}
+              {{- toYaml $val | nindent 14 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- end }}
+          {{- with .Values.deleteTopics.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.deleteTopics.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.deleteTopics.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deleteTopics.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deleteTopics.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

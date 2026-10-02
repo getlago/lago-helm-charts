@@ -1,46 +1,92 @@
-{{- if .Values.global.clickhouse.enabled -}}
+{{- if and .Values.global.streaming_ingestion.enabled .Values.createTopics.enabled -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Release.Name }}-create-kafka-topics
+  name: {{ include "lago.fullname" . }}-create-kafka-topics
+  labels:
+    {{- include "lago.labels" . | nindent 4 }}
+    app.kubernetes.io/component: create-topics
   annotations:
     "helm.sh/hook": pre-install
-    "helm.sh/hook-weight": "-1"
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": {{ .Values.createTopics.hookWeight | quote }}
+    "helm.sh/hook-delete-policy": {{ .Values.createTopics.hookDeletePolicy }}
+    {{- with .Values.createTopics.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
+  {{- with .Values.createTopics.ttlSecondsAfterFinished }}
+  ttlSecondsAfterFinished: {{ . }}
+  {{- end }}
+  {{- with .Values.createTopics.activeDeadlineSeconds }}
+  activeDeadlineSeconds: {{ . }}
+  {{- end }}
+  backoffLimit: {{ .Values.createTopics.backoffLimit }}
   template:
     metadata:
-      labels:
-        {{- range $key, $value := .Values.job.topics.podLabels }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+      {{- with .Values.createTopics.podAnnotations }}
       annotations:
-        {{- range $key, $value := .Values.job.topics.podAnnotations }}
-        {{ $key }}: {{ $value | quote }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "lago.labels" . | nindent 8 }}
+        app.kubernetes.io/component: create-topics
+        {{- with .Values.createTopics.podLabels }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      restartPolicy: Never
+      {{- with .Values.createTopics.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.createTopics.serviceAccountName }}
+      serviceAccountName: {{ . }}
+      {{- end }}
+      {{- with .Values.createTopics.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: {{ .Values.createTopics.restartPolicy }}
       containers:
         - name: create-topics
-          image: alpine:3.20
+          image: {{ .Values.createTopics.image.repository }}:{{ .Values.createTopics.image.tag }}
+          imagePullPolicy: {{ .Values.createTopics.image.pullPolicy }}
           command: [sh]
           args:
             - -c
             - |
-              topics="{{ values .Values.global.clickhouse.kafka.topics | join " " }}"
+              topics="{{ values .Values.global.streaming_ingestion.kafka.topics | join " " }}"
               echo "Creating Kafka topics: $topics"
               {{- .Files.Get "scripts/create-topics.sh" | nindent 14 }}
           env:
             - name: RPK_BROKERS
-              value: {{ .Values.global.clickhouse.kafka.bootstrapServers | join "," }}
-            {{- with .Values.job.topics.extraEnv }}
-            {{- range $key, $value := . }}
-            - name: {{ $key }}
-              value: {{ $value | quote }}
+              value: {{ .Values.global.streaming_ingestion.kafka.bootstrapServers | join "," }}
+            {{- range $name, $val := .Values.createTopics.extraEnv }}
+            {{- if kindIs "map" $val }}
+            - name: {{ $name }}
+              {{- toYaml $val | nindent 14 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $val | quote }}
             {{- end }}
             {{- end }}
-          {{- with .Values.job.topics.resources }}
+          {{- with .Values.createTopics.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with .Values.createTopics.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.createTopics.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.createTopics.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.createTopics.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
 {{- end }}

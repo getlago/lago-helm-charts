@@ -1,0 +1,74 @@
+suite: Test alerts-worker and wallets-worker subcharts are wired to the
+  global.sidekiq.queues.alerts / global.sidekiq.queues.wallets toggles, and
+  that every lago-rails pod exposes the matching SIDEKIQ_ALERTS /
+  SIDEKIQ_WALLETS env vars so the queues can be consumed by any worker.
+templates:
+  - charts/alerts-worker/templates/deployment.yaml
+  - charts/wallets-worker/templates/deployment.yaml
+  - charts/api/templates/deployment.yaml
+
+set:
+  global:
+    lago:
+      env: production
+      version: v1.0.0
+    urls:
+      api: http://api.test
+      front: http://front.test
+    database:
+      uri: postgresql://localhost
+    encryption:
+      key: test-key
+      salt: test-salt
+    signing:
+      hmac: test-hmac
+      rsa: test-rsa
+    redis:
+      uri: redis://localhost
+    redisCache:
+      uri: redis://localhost
+    redisStore:
+      uri: redis://localhost
+    sidekiq:
+      queues:
+        alerts: true
+        wallets: true
+
+tests:
+  - it: renders the alerts-worker deployment with its dedicated start script
+    template: charts/alerts-worker/templates/deployment.yaml
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-lago-alerts-worker
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value: ["./scripts/start.alerts.worker.sh"]
+
+  - it: renders the wallets-worker deployment with its dedicated start script
+    template: charts/wallets-worker/templates/deployment.yaml
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-lago-wallets-worker
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value: ["./scripts/start.wallets.worker.sh"]
+
+  - it: exposes SIDEKIQ_ALERTS on lago-rails pods derived from the queue toggle
+    template: charts/api/templates/deployment.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SIDEKIQ_ALERTS
+            value: "true"
+
+  - it: exposes SIDEKIQ_WALLETS on lago-rails pods derived from the queue toggle
+    template: charts/api/templates/deployment.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SIDEKIQ_WALLETS
+            value: "true"

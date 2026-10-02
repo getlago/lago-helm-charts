@@ -1,0 +1,278 @@
+# Default values for lago-front.
+
+# -- Config section used for merging with lago-config helpers
+# @section -- Config
+config: {}
+
+global:
+  lago:
+    # -- Rails environment (`production`, `staging`, `development`)
+    # @section -- Lago
+    env: production
+    # -- Enable self-service signup
+    # @section -- Lago
+    signup: false
+    # -- Enable PDF generation support
+    # @section -- Lago
+    pdfGeneration: false
+
+  urls:
+    # -- Public URL of the Lago API
+    # @section -- URLs
+    api: ""
+    # -- Internal URL of the PDF service (Gotenberg)
+    # @section -- URLs
+    pdf: "lago-pdf"
+
+  nango:
+    # -- Nango public key for frontend OAuth flows
+    # @section -- Nango
+    publicKey: ""
+
+  sentry:
+    # -- Sentry environment name (e.g. "production", "staging"), injected as SENTRY_ENVIRONMENT
+    # @section -- Observability
+    environment: ""
+    dsn:
+      # -- Sentry DSN for the frontend
+      # @section -- Observability
+      front: ""
+
+  gocardless:
+    # -- Enable GoCardless integration
+    # @section -- GoCardless
+    enabled: false
+    # -- GoCardless API proxy URL
+    # @section -- GoCardless
+    proxy: ""
+
+container:
+  # -- Override the container name (defaults to chart fullname)
+  # @section -- Container
+  name: ""
+  # -- Container entrypoint command
+  # @section -- Container
+  command:
+  # -- Container command arguments
+  # @section -- Container
+  args:
+  ports:
+    # -- HTTP container port
+    # @section -- Container
+    http: 80
+
+# -- Number of replicas (ignored when autoscaling is enabled)
+# @section -- Deployment
+replicaCount: 1
+
+image:
+  # -- Container image repository
+  # @section -- Image
+  repository: getlago/front
+  # -- Image pull policy
+  # @section -- Image
+  pullPolicy: IfNotPresent
+  # -- Override the image tag (defaults to Chart appVersion)
+  # @section -- Image
+  tag:
+
+# -- Image pull secrets for private registries
+# @default -- `[]`
+# @section -- Image
+imagePullSecrets: []
+# -- Deployment metadata annotations (e.g. Stakater Reloader)
+# @section -- Deployment
+annotations: {}
+
+# -- Override the chart name
+# @section -- Deployment
+nameOverride: ""
+# -- Override the full release name
+# @section -- Deployment
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Create a ServiceAccount
+  # @section -- Service Account
+  create: true
+  # -- Automount the ServiceAccount API credentials
+  # @section -- Service Account
+  automount: true
+  # -- Annotations to add to the ServiceAccount
+  # @section -- Service Account
+  annotations: {}
+  # -- ServiceAccount name (generated from fullname if not set)
+  # @section -- Service Account
+  name: ""
+
+# -- Additional pod annotations
+# @section -- Pod
+podAnnotations: {}
+# -- Additional pod labels
+# @section -- Pod
+podLabels: {}
+
+# -- Pod-level security context
+# @section -- Pod
+podSecurityContext: {}
+
+# -- Container-level security context
+# @section -- Pod
+securityContext: {}
+
+# -- Extra environment variables (map format, deep-mergeable)
+# @section -- Pod
+extraEnv: {}
+  # Simple value:
+  #   MY_VAR: "value"
+  # From a Secret:
+  #   MY_SECRET:
+  #     valueFrom:
+  #       secretKeyRef:
+  #         name: secret-name
+  #         key: secret-key
+  # From a ConfigMap:
+  #   MY_CONFIG:
+  #     valueFrom:
+  #       configMapKeyRef:
+  #         name: configmap-name
+  #         key: config-key
+
+# -- Extra envFrom sources
+# @default -- `[]` (See [values.yaml])
+# @section -- Pod
+extraEnvFrom: []
+  # - configMapRef:
+  #     name: config-map-name
+  # - secretRef:
+  #     name: secret-name
+
+service:
+  # -- Create a Service
+  # @section -- Service
+  enabled: true
+  # -- Service type (`ClusterIP`, `NodePort`, `LoadBalancer`)
+  # @section -- Service
+  type: ClusterIP
+  # -- Service port
+  # @section -- Service
+  port: 80
+
+ingress:
+  # -- Enable Ingress
+  # @section -- Ingress
+  enabled: false
+  # -- Ingress class name
+  # @section -- Ingress
+  className: ""
+  # -- Ingress annotations
+  # @section -- Ingress
+  annotations: {}
+  # -- Raw ingress host entries (unstructured, for advanced use)
+  # @section -- Ingress
+  hostsRaw: []
+  # -- Ingress host rules
+  # @default -- See [values.yaml](./values.yaml#L168)
+  # @section -- Ingress
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  # -- Ingress TLS configuration
+  # @section -- Ingress
+  tls: []
+
+# -- Expose the service via Gateway API HTTPRoute
+# @default -- See [values.yaml](./values.yaml#L180)
+# @section -- HTTPRoute
+httpRoute:
+  # -- Enable HTTPRoute
+  # @section -- HTTPRoute
+  enabled: false
+  # -- HTTPRoute annotations
+  # @section -- HTTPRoute
+  annotations: {}
+  # -- Parent gateway references
+  # @default -- See [values.yaml](./values.yaml#L190)
+  # @section -- HTTPRoute
+  parentRefs:
+  - name: gateway
+    sectionName: http
+  # -- Hostnames to match
+  # @section -- HTTPRoute
+  hostnames:
+  - chart-example.local
+  # -- Routing rules and filters
+  # @default -- See [values.yaml](./values.yaml#L200)
+  # @section -- HTTPRoute
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /headers
+
+# -- Resource requests and limits
+# @section -- Pod
+resources: {}
+
+# -- Liveness probe configuration
+# @default -- See [values.yaml](./values.yaml#L213)
+# @section -- Pod
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+# -- Readiness probe configuration
+# @default -- See [values.yaml](./values.yaml#L220)
+# @section -- Pod
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+autoscaling:
+  # -- Enable Horizontal Pod Autoscaler
+  # @section -- Autoscaling
+  enabled: false
+  # -- Set to true when using an external autoscaler (e.g. KEDA) to skip built-in HPA
+  # @section -- Autoscaling
+  external: false
+  # -- Minimum replicas
+  # @section -- Autoscaling
+  minReplicas: 1
+  # -- Maximum replicas
+  # @section -- Autoscaling
+  maxReplicas: 100
+  # -- Target CPU utilization percentage
+  # @section -- Autoscaling
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# -- Additional volumes
+# @section -- Pod
+volumes: []
+
+# -- Additional volume mounts
+# @section -- Pod
+volumeMounts: []
+
+# -- Node selector constraints
+# @section -- Pod
+nodeSelector: {}
+
+# -- Pod tolerations
+# @section -- Pod
+tolerations: []
+
+# -- Pod affinity rules
+# @section -- Pod
+affinity: {}
+
+# -- Pod topology spread constraints
+# @section -- Pod
+topologySpreadConstraints: []
+
+# -- Array of extra K8s manifests to deploy
+# @section -- Extra Objects
+extraObjects: []

@@ -1,6 +1,6 @@
 on:
-  push:
   pull_request:
+  push:
 
 name: Unit tests Charts
 
@@ -18,11 +18,12 @@ jobs:
         with:
           version: v3.18.4
 
-      - name: Build Helm dependencies
+      - name: Update chart dependencies
         run: |
           for chart in charts/*/; do
-            if [ -f "$chart/Chart.yaml" ]; then
-              helm dependency build "$chart"
+            if [ -f "$chart/Chart.yaml" ] && grep -q "dependencies:" "$chart/Chart.yaml"; then
+              echo "Updating dependencies for $chart"
+              helm dependency update "$chart"
             fi
           done
 

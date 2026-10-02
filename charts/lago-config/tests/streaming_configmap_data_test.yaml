@@ -1,0 +1,85 @@
+suite: Test lago-config streaming ConfigMap data keys
+templates:
+  - templates/streaming-configmap.yaml
+
+# Every test wires the minimum required to reach the data block: streaming
+# ingestion enabled + at least one Kafka bootstrap server. Individual tests
+# layer their specific values on top.
+set:
+  global.streaming_ingestion.enabled: true
+  global.streaming_ingestion.kafka.bootstrapServers:
+    - "kafka:9092"
+
+tests:
+  # ============================================================================
+  # LAGO_CLICKHOUSE_MIGRATIONS_ENABLED (configurable, default true)
+  # ============================================================================
+  - it: defaults LAGO_CLICKHOUSE_MIGRATIONS_ENABLED to "true"
+    asserts:
+      - equal:
+          path: data.LAGO_CLICKHOUSE_MIGRATIONS_ENABLED
+          value: "true"
+
+  - it: renders LAGO_CLICKHOUSE_MIGRATIONS_ENABLED as "false" when disabled
+    set:
+      global.streaming_ingestion.clickhouse.migrationsEnabled: false
+    asserts:
+      - equal:
+          path: data.LAGO_CLICKHOUSE_MIGRATIONS_ENABLED
+          value: "false"
+
+  # ============================================================================
+  # LAGO_CLICKHOUSE_HOST_READ_ONLY (optional, only rendered when set)
+  # ============================================================================
+  - it: does not render LAGO_CLICKHOUSE_HOST_READ_ONLY when hostReadOnly is unset
+    asserts:
+      - notExists:
+          path: data.LAGO_CLICKHOUSE_HOST_READ_ONLY
+
+  - it: renders LAGO_CLICKHOUSE_HOST_READ_ONLY when hostReadOnly is set
+    set:
+      global.streaming_ingestion.clickhouse.hostReadOnly: readonly-ch.example.com
+    asserts:
+      - equal:
+          path: data.LAGO_CLICKHOUSE_HOST_READ_ONLY
+          value: readonly-ch.example.com
+      # And the primary host is unchanged
+      - equal:
+          path: data.LAGO_CLICKHOUSE_HOST
+          value: clickhouse
+
+  # ============================================================================
+  # LAGO_KAFKA_CONSUMER_GROUP_EVENTS_PROCESSOR (optional, only when set)
+  # ============================================================================
+  - it: does not render LAGO_KAFKA_CONSUMER_GROUP_EVENTS_PROCESSOR by default
+    asserts:
+      - notExists:
+          path: data.LAGO_KAFKA_CONSUMER_GROUP_EVENTS_PROCESSOR
+
+  - it: renders LAGO_KAFKA_CONSUMER_GROUP_EVENTS_PROCESSOR when set
+    set:
+      global.streaming_ingestion.kafka.consumerGroupEventsProcessor: lago_us_post_process
+    asserts:
+      - equal:
+          path: data.LAGO_KAFKA_CONSUMER_GROUP_EVENTS_PROCESSOR
+          value: lago_us_post_process
+      # Primary consumer group stays the default
+      - equal:
+          path: data.LAGO_KAFKA_CONSUMER_GROUP
+          value: events_consumer
+
+  # ============================================================================
+  # LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP (optional, only when set)
+  # ============================================================================
+  - it: does not render LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP by default
+    asserts:
+      - notExists:
+          path: data.LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP
+
+  - it: renders LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP when set
+    set:
+      global.streaming_ingestion.kafka.clickhouseConsumerGroup: clickhouse
+    asserts:
+      - equal:
+          path: data.LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP
+          value: clickhouse

@@ -1,0 +1,31 @@
+{{- if and .Values.global.dbtPipeline.enabled .Values.dbtPipeline.trigger.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "lago-data.fullname" . }}-dbt-pipeline-trigger
+  labels:
+    {{- include "lago-data.labels" . | nindent 4 }}
+    app.kubernetes.io/component: dbt-pipeline-trigger
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-weight": "1"
+spec:
+  template:
+    metadata:
+      labels:
+        {{- include "lago-data.labels" . | nindent 8 }}
+        app.kubernetes.io/component: dbt-pipeline-trigger
+    spec:
+      serviceAccountName: {{ include "lago-data.fullname" . }}-dbt-pipeline-trigger
+      containers:
+        - name: trigger
+          image: {{ .Values.dbtPipeline.trigger.image.repository }}:{{ .Values.dbtPipeline.trigger.image.tag }}
+          command:
+            - kubectl
+            - create
+            - job
+            - --from=cronjob/{{ include "lago-data.fullname" . }}-dbt-pipeline
+            - {{ include "lago-data.fullname" . }}-dbt-pipeline
+      restartPolicy: Never
+{{- end }}

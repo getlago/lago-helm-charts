@@ -1,0 +1,9 @@
+global:
+  databaseAnalytical:
+    host: lago-postgres.svc.cluster.local
+    name: lago
+    user: lago
+    password: some_password
+
+  data:
+    token: some_token

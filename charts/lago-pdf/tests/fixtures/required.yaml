@@ -1,0 +1,15 @@
+# Required values for lago-pdf tests
+global:
+  urls:
+    api: "http://api.lago.dev"
+    front: "http://front.lago.dev"
+  database:
+    uri: "postgres://localhost:5432/lago"
+  encryption:
+    key: "test-encryption-key"
+    salt: "test-encryption-salt"
+  signing:
+    hmac: "test-hmac"
+    rsa: "test-rsa"
+  redis:
+    url: "redis://localhost:6379"
