@@ -1,60 +1,60 @@
 dependencies:
 - name: lago-config
   repository: file://../lago-config
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-front
   repository: file://../lago-front
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-pdf
   repository: file://../lago-pdf
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-events-processor-worker
   repository: file://../lago-events-processor-worker
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.17.0
+  version: 2.0.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 0.17.0
-digest: sha256:3f90b784a2bd9c1a7328210e81dc323c0fcc7bc7d3cff4f90e06ed078c31554c
-generated: "2026-09-30T10:20:11.913929142Z"
+  version: 2.0.0
+digest: sha256:c49578461f9b6f11fc339ebb10bf47eeeba7600934e645f3d3ba9d061cc63a42
+generated: "2026-10-02T12:29:51.925124575Z"
