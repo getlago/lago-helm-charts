@@ -42,7 +42,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.gotenberg.image.repository }}:{{ .Values.gotenberg.image.tag | default .Chart.AppVersion }}"
+          image: "{{ include "lago-pdf.imageRepository" (dict "repository" .Values.gotenberg.image.repository "global" .Values.global) }}:{{ .Values.gotenberg.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.gotenberg.image.pullPolicy }}
           {{- with .Values.gotenberg.container.command }}
           command: {{ toJson . }}

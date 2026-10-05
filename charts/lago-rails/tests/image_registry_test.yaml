@@ -1,0 +1,56 @@
+suite: Test global.image.registry prefixing
+templates:
+  - templates/deployment.yaml
+values:
+  - ../values.yaml
+  - ./fixtures/required.yaml
+set:
+  image.tag: v1.0.0
+
+tests:
+  - it: should prefix docker.io by default
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: docker.io/getlago/api:v1.0.0
+
+  - it: should prefix a custom registry
+    set:
+      global.image.registry: mirror.example.com:5000/dockerhub/
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: mirror.example.com:5000/dockerhub/getlago/api:v1.0.0
+
+  - it: should add library/ for single-segment docker.io repositories
+    set:
+      image.repository: alpine
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: docker.io/library/alpine:v1.0.0
+
+  - it: should leave a fully qualified repository untouched
+    set:
+      global.image.registry: mirror.example.com
+      image.repository: ghcr.io/getlago/api
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: ghcr.io/getlago/api:v1.0.0
+
+  - it: should treat localhost and host:port as registries
+    set:
+      image.repository: localhost:5000/api
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: localhost:5000/api:v1.0.0
+
+  - it: should not prefix when registry is empty
+    set:
+      global.image.registry: ""
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: getlago/api:v1.0.0
