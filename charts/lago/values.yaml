@@ -2,6 +2,11 @@
 
 # -- @ignore
 global:
+  image:
+    # -- Registry prefixed to image repositories that don't already name one (e.g. `getlago/api` -> `docker.io/getlago/api`). Empty disables prefixing.
+    # @section -- Image
+    registry: docker.io
+
   lago:
     # -- Override the application Docker image tag (defaults to Chart appVersion)
     # @section -- Lago
