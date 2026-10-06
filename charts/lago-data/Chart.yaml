@@ -15,16 +15,16 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 2.0.0
+version: 2.1.0
 
 dependencies:
   - name: lago-data-config
     alias: data-config
-    version: 2.0.0
+    version: 2.1.0
     repository: "file://../lago-data-config"
   - name: lago-data-api
     alias: data-api
-    version: 2.0.0
+    version: 2.1.0
     repository: "file://../lago-data-api"
 
 annotations:

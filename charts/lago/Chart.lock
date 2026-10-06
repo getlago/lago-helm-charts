@@ -1,63 +1,63 @@
 dependencies:
 - name: lago-config
   repository: file://../lago-config
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-front
   repository: file://../lago-front
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-pdf
   repository: file://../lago-pdf
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-events-processor-worker
   repository: file://../lago-events-processor-worker
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.0.0
+  version: 2.1.0
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.0.0
-digest: sha256:376827f1eacd1730591d8459c7cb6152fe93a15aa19364877324a9a72f0f70be
-generated: "2026-10-06T16:48:05.02668+02:00"
+  version: 2.1.0
+digest: sha256:e36b4d739156622831a9a9821aa2b661ae94dc02c492229e5deffa71770d0eeb
+generated: "2026-10-06T14:58:35.077458336Z"
