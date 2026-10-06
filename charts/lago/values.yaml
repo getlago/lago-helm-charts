@@ -1008,6 +1008,53 @@ events-consumer-worker:
     # @section -- Events Consumer Worker
     ports: []
 
+# -- Wallet refresh consumer worker subchart overrides (lago-rails). Runs the
+# Karafka `WalletRefreshTriggersConsumer` on the realtime usage triggers topic.
+# Requires `global.streaming_ingestion.enabled` (Kafka settings come from the
+# streaming ConfigMap/Secret).
+# @default -- See child values
+# @section -- Wallet Refresh Consumer Worker
+wallet-refresh-consumer-worker:
+  # -- Enable the wallet refresh consumer worker
+  # @section -- Wallet Refresh Consumer Worker
+  enabled: false
+  # -- Override the wallet-refresh-consumer-worker subchart release name
+  # @section -- Wallet Refresh Consumer Worker
+  nameOverride: lago-wallet-refresh-consumer-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Wallet Refresh Consumer Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- Wallet Refresh Consumer Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- Wallet Refresh Consumer Worker
+  livenessProbe:
+    enabled: false
+  # -- Readiness probe (disabled for workers)
+  # @section -- Wallet Refresh Consumer Worker
+  readinessProbe:
+    enabled: false
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- Wallet Refresh Consumer Worker
+    enabled: false
+  container:
+    # -- Karafka consumer entrypoint command (same as the events consumer)
+    # @section -- Wallet Refresh Consumer Worker
+    command: ["./scripts/start.events.consumer.sh"]
+    # -- Container ports (none needed)
+    # @section -- Wallet Refresh Consumer Worker
+    ports: []
+  # -- Routes Karafka to the wallet refresh consumer only: sets the realtime
+  # usage triggers topic and blanks the charged-in-advance topic inherited from
+  # the streaming ConfigMap, so this pod does not join the events consumer group.
+  # @section -- Wallet Refresh Consumer Worker
+  extraEnv:
+    LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC: realtime_usage_triggers
+    LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC: ""
+
 # -- Events processor worker subchart overrides (conditional on `global.streaming_ingestion.enabled`)
 # @default -- See child values
 # @section -- Events Processor Worker
