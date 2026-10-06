@@ -1,6 +1,9 @@
-suite: Test wallet-refresh-consumer-worker subchart is gated by wallet-refresh-consumer-worker.enabled,
-  runs the Karafka entrypoint and routes only the realtime usage triggers topic
-  (the charged-in-advance topic inherited from the streaming ConfigMap is blanked).
+suite: Test wallet-refresh-consumer-worker subchart is gated by
+  global.streaming_ingestion.walletRefreshConsumer, runs the Karafka entrypoint and
+  routes only the realtime usage triggers topic (the charged-in-advance topic
+  inherited from the streaming ConfigMap is blanked). The flag sits in the streaming
+  block because the worker has no Kafka connection without it; the pairing itself is
+  enforced in templates/validations.yaml and covered by validations_test.yaml.
 templates:
   - charts/wallet-refresh-consumer-worker/templates/deployment.yaml
 
@@ -35,7 +38,7 @@ set:
 tests:
   - it: renders the deployment with the Karafka entrypoint when enabled
     set:
-      wallet-refresh-consumer-worker.enabled: true
+      global.streaming_ingestion.walletRefreshConsumer: true
     asserts:
       - hasDocuments:
           count: 1
@@ -48,7 +51,7 @@ tests:
 
   - it: sets the realtime usage triggers topic and blanks the charged-in-advance topic
     set:
-      wallet-refresh-consumer-worker.enabled: true
+      global.streaming_ingestion.walletRefreshConsumer: true
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -63,7 +66,7 @@ tests:
 
   - it: allows overriding the realtime usage triggers topic
     set:
-      wallet-refresh-consumer-worker.enabled: true
+      global.streaming_ingestion.walletRefreshConsumer: true
       wallet-refresh-consumer-worker.extraEnv.LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC: custom_triggers
     asserts:
       - contains:

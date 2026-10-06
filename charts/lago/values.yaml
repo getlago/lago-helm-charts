@@ -333,6 +333,13 @@ global:
     # -- Enable streaming ingestion (ClickHouse + Kafka)
     # @section -- Streaming Ingestion
     enabled: false
+    # -- Run the Karafka `WalletRefreshTriggersConsumer`
+    # (`wallet-refresh-consumer-worker`) on the realtime usage triggers topic.
+    # Lives here, not on the subchart, because the worker is useless without
+    # `enabled` above: the Kafka connection comes from the streaming
+    # ConfigMap/Secret, which only the streaming gate attaches.
+    # @section -- Streaming Ingestion
+    walletRefreshConsumer: false
     # -- Name of an existing ConfigMap for streaming config
     # @section -- Streaming Ingestion
     configmap: ""
@@ -1008,16 +1015,13 @@ events-consumer-worker:
     # @section -- Events Consumer Worker
     ports: []
 
-# -- Wallet refresh consumer worker subchart overrides (lago-rails). Runs the
-# Karafka `WalletRefreshTriggersConsumer` on the realtime usage triggers topic.
-# Requires `global.streaming_ingestion.enabled` (Kafka settings come from the
-# streaming ConfigMap/Secret).
+# -- Wallet refresh consumer worker subchart overrides (lago-rails, conditional
+# on `global.streaming_ingestion.walletRefreshConsumer`). Runs the Karafka
+# `WalletRefreshTriggersConsumer` on the realtime usage triggers topic; the
+# Kafka settings come from the streaming ConfigMap/Secret.
 # @default -- See child values
 # @section -- Wallet Refresh Consumer Worker
 wallet-refresh-consumer-worker:
-  # -- Enable the wallet refresh consumer worker
-  # @section -- Wallet Refresh Consumer Worker
-  enabled: false
   # -- Override the wallet-refresh-consumer-worker subchart release name
   # @section -- Wallet Refresh Consumer Worker
   nameOverride: lago-wallet-refresh-consumer-worker
