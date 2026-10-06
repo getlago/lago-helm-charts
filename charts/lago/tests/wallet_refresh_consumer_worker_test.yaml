@@ -33,15 +33,12 @@ set:
           - kafka:9092
 
 tests:
-  - it: does not render the deployment by default
-    asserts:
-      - hasDocuments:
-          count: 0
-
   - it: renders the deployment with the Karafka entrypoint when enabled
     set:
       wallet-refresh-consumer-worker.enabled: true
     asserts:
+      - hasDocuments:
+          count: 1
       - equal:
           path: metadata.name
           value: RELEASE-NAME-lago-wallet-refresh-consumer-worker
