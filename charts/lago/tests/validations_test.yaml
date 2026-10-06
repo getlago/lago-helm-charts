@@ -1,0 +1,53 @@
+suite: Test the umbrella deploy-time guards in templates/validations.yaml. Helm's
+  `condition` field takes a single path, so a dependency that needs two flags set
+  together cannot express the pairing — the guard does, and fails the render with a
+  readable message instead of rolling out a pod that crash-loops.
+templates:
+  - templates/validations.yaml
+
+set:
+  global:
+    lago:
+      env: production
+      version: v1.0.0
+    urls:
+      api: http://api.test
+      front: http://front.test
+    database:
+      uri: postgresql://localhost
+    encryption:
+      key: test-key
+      salt: test-salt
+    signing:
+      hmac: test-hmac
+      rsa: test-rsa
+    redis:
+      uri: redis://localhost
+    redisCache:
+      uri: redis://localhost
+    redisStore:
+      uri: redis://localhost
+
+tests:
+  - it: refuses the wallet refresh consumer when streaming ingestion is off
+    set:
+      global:
+        streaming_ingestion:
+          enabled: false
+          walletRefreshConsumer: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "global.streaming_ingestion.walletRefreshConsumer requires global.streaming_ingestion.enabled: the wallet refresh consumer takes its Kafka connection from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on"
+
+  - it: renders nothing once both flags agree
+    set:
+      global:
+        streaming_ingestion:
+          enabled: true
+          walletRefreshConsumer: true
+          kafka:
+            bootstrapServers:
+              - kafka:9092
+    asserts:
+      - hasDocuments:
+          count: 0

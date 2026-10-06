@@ -216,6 +216,21 @@ A Helm chart for Kubernetes
 | events-consumer-worker.container.command | list | `["./scripts/start.events.consumer.sh"]` | Events consumer entrypoint command |
 | events-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
 
+### Wallet Refresh Consumer Worker
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| wallet-refresh-consumer-worker | object | See child values | Wallet refresh consumer worker subchart overrides (lago-rails, conditional on `global.streaming_ingestion.walletRefreshConsumer`). Runs the Karafka `WalletRefreshTriggersConsumer` on the realtime usage triggers topic; the Kafka settings come from the streaming ConfigMap/Secret. |
+| wallet-refresh-consumer-worker.nameOverride | string | `"lago-wallet-refresh-consumer-worker"` | Override the wallet-refresh-consumer-worker subchart release name |
+| wallet-refresh-consumer-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
+| wallet-refresh-consumer-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
+| wallet-refresh-consumer-worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for workers) |
+| wallet-refresh-consumer-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |
+| wallet-refresh-consumer-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
+| wallet-refresh-consumer-worker.container.command | list | `["./scripts/start.events.consumer.sh"]` | Karafka consumer entrypoint command (same as the events consumer) |
+| wallet-refresh-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
+| wallet-refresh-consumer-worker.extraEnv | object | `{"LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC":"","LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC":"realtime_usage_triggers"}` | Routes Karafka to the wallet refresh consumer only: sets the realtime usage triggers topic and blanks the charged-in-advance topic inherited from the streaming ConfigMap, so this pod does not join the events consumer group. |
+
 ### Events Processor Worker
 
 | Key | Type | Default | Description |

@@ -79,6 +79,11 @@ dependencies:
     version: 2.0.0
     repository: "file://../lago-rails"
     condition: global.streaming_ingestion.enabled
+  - name: lago-rails
+    alias: wallet-refresh-consumer-worker
+    version: 2.0.0
+    repository: "file://../lago-rails"
+    condition: global.streaming_ingestion.walletRefreshConsumer
   - name: lago-events-processor-worker
     alias: events-processor-worker
     version: 2.0.0
