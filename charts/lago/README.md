@@ -220,8 +220,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| wallet-refresh-consumer-worker | object | See child values | Wallet refresh consumer worker subchart overrides (lago-rails). Runs the Karafka `WalletRefreshTriggersConsumer` on the realtime usage triggers topic. Requires `global.streaming_ingestion.enabled` (Kafka settings come from the streaming ConfigMap/Secret). |
-| wallet-refresh-consumer-worker.enabled | bool | `false` | Enable the wallet refresh consumer worker |
+| wallet-refresh-consumer-worker | object | See child values | Wallet refresh consumer worker subchart overrides (lago-rails, conditional on `global.streaming_ingestion.walletRefreshConsumer`). Runs the Karafka `WalletRefreshTriggersConsumer` on the realtime usage triggers topic; the Kafka settings come from the streaming ConfigMap/Secret. |
 | wallet-refresh-consumer-worker.nameOverride | string | `"lago-wallet-refresh-consumer-worker"` | Override the wallet-refresh-consumer-worker subchart release name |
 | wallet-refresh-consumer-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | wallet-refresh-consumer-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
