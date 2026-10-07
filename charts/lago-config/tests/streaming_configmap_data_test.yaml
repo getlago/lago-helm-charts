@@ -83,3 +83,27 @@ tests:
       - equal:
           path: data.LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP
           value: clickhouse
+
+  # ============================================================================
+  # LAGO_KAFKA_CATALOG_{RAW,ENRICHED}_EVENTS_TOPIC (configurable, with defaults)
+  # ============================================================================
+  - it: defaults the catalog events topics
+    asserts:
+      - equal:
+          path: data.LAGO_KAFKA_CATALOG_RAW_EVENTS_TOPIC
+          value: catalog_events_raw
+      - equal:
+          path: data.LAGO_KAFKA_CATALOG_ENRICHED_EVENTS_TOPIC
+          value: catalog_events_enriched
+
+  - it: renders the catalog events topics when overridden
+    set:
+      global.streaming_ingestion.kafka.topics.catalogEventsRaw: catalog-events-raw
+      global.streaming_ingestion.kafka.topics.catalogEventsEnriched: catalog-events-enriched
+    asserts:
+      - equal:
+          path: data.LAGO_KAFKA_CATALOG_RAW_EVENTS_TOPIC
+          value: catalog-events-raw
+      - equal:
+          path: data.LAGO_KAFKA_CATALOG_ENRICHED_EVENTS_TOPIC
+          value: catalog-events-enriched

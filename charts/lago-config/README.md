@@ -197,6 +197,8 @@ A Helm chart for Kubernetes
 | global.streaming_ingestion.kafka.tls | bool | `false` | Enable TLS for Kafka connections |
 | global.streaming_ingestion.kafka.topics.activityLogs | string | `"activity_logs"` | Kafka topic for activity logs |
 | global.streaming_ingestion.kafka.topics.apiLogs | string | `"api_logs"` | Kafka topic for API logs |
+| global.streaming_ingestion.kafka.topics.catalogEventsEnriched | string | `"catalog_events_enriched"` | Kafka topic for enriched catalog events |
+| global.streaming_ingestion.kafka.topics.catalogEventsRaw | string | `"catalog_events_raw"` | Kafka topic for raw catalog events |
 | global.streaming_ingestion.kafka.topics.eventsChargedInAdvance | string | `"events_charged_in_advance"` | Kafka topic for charged-in-advance events |
 | global.streaming_ingestion.kafka.topics.eventsDeadLetter | string | `"events_dead_letter"` | Kafka topic for dead-letter events |
 | global.streaming_ingestion.kafka.topics.eventsEnriched | string | `"events_enriched"` | Kafka topic for enriched events |

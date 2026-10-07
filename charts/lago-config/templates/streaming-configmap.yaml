@@ -30,6 +30,8 @@ data:
   LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC: {{ $kafka.topics.eventsChargedInAdvance }}
   LAGO_KAFKA_EVENTS_DEAD_LETTER_TOPIC: {{ $kafka.topics.eventsDeadLetter }}
   LAGO_KAFKA_RAW_EVENTS_TOPIC: {{ $kafka.topics.eventsRaw }}
+  LAGO_KAFKA_CATALOG_RAW_EVENTS_TOPIC: {{ $kafka.topics.catalogEventsRaw | default "catalog_events_raw" }}
+  LAGO_KAFKA_CATALOG_ENRICHED_EVENTS_TOPIC: {{ $kafka.topics.catalogEventsEnriched | default "catalog_events_enriched" }}
   {{- with $kafka.saslMechanisms }}
   LAGO_KAFKA_SCRAM_ALGORITHM: {{ $kafka.saslMechanisms }}
   LAGO_KAFKA_SASL_MECHANISMS: {{ $kafka.saslMechanisms }}
