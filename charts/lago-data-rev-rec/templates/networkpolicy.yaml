@@ -48,12 +48,19 @@ spec:
       ports:
         - protocol: TCP
           port: 8081
-    # RPC and blob server: this release's TaskManagers.
+    # RPC and blob server: this release's TaskManagers, and the JobManagers
+    # themselves. With jobManager.replicas > 1 the standby dials the leader on
+    # 6123 to join the HA cluster; without this peer it never associates, its
+    # readiness probe never passes and there is no usable failover target.
     - from:
         - podSelector:
             matchLabels:
               app: {{ include "lago-data-rev-rec.fullname" . }}
               component: taskmanager
+        - podSelector:
+            matchLabels:
+              app: {{ include "lago-data-rev-rec.fullname" . }}
+              component: jobmanager
       ports:
         - protocol: TCP
           port: 6123
