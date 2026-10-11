@@ -143,3 +143,14 @@ tests:
     asserts:
       - notExists:
           path: data["sentry.environment"]
+
+  - it: should render non-string s3 values as strings
+    set:
+      global.s3.enabled: true
+      global.s3.bucket: bucket
+      global.s3.region: us-east-1
+      global.s3.pathStyle: true
+    asserts:
+      - equal:
+          path: data["s3.pathStyle"]
+          value: "true"
