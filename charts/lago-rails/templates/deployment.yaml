@@ -306,6 +306,38 @@ spec:
                   key: s3.secretAccessKey
                   optional: true
             {{- end }}
+            {{- if .Values.global.gcs.enabled }}
+            - name: LAGO_USE_GCS
+              value: "true"
+            - name: LAGO_GCS_PROJECT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: gcs.project
+            - name: LAGO_GCS_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: gcs.bucket
+            - name: LAGO_GCS_IAM
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: gcs.iam
+                  optional: true
+            - name: LAGO_GCS_GSA_EMAIL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: gcs.gsaEmail
+                  optional: true
+            - name: LAGO_GCS_KEYFILE_JSON_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "lago-rails.configMapName" . }}
+                  key: gcs.keyfileJsonPath
+                  optional: true
+            {{- end }}
             {{- if .Values.global.smtp.enabled }}
             - name: LAGO_FROM_EMAIL
               valueFrom:

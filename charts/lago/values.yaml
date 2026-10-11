@@ -259,6 +259,26 @@ global:
     # @section -- S3
     pathStyle:
 
+  gcs:
+    # -- Enable Google Cloud Storage. Mutually exclusive with `global.s3.enabled`.
+    # @section -- GCS
+    enabled: false
+    # -- GCP project ID that owns the bucket
+    # @section -- GCS
+    project: ""
+    # -- GCS bucket name
+    # @section -- GCS
+    bucket: ""
+    # -- (bool) Sign URLs through the IAM API instead of a keyfile's private key. Requires `gsaEmail`.
+    # @section -- GCS
+    iam:
+    # -- Google service account email used to sign URLs when `iam` is true
+    # @section -- GCS
+    gsaEmail: ""
+    # -- Path to a service account keyfile inside the container. The chart does not mount it; use the Rails components' `volumes` / `volumeMounts`.
+    # @section -- GCS
+    keyfileJsonPath: ""
+
   smtp:
     # -- Enable SMTP for outbound email
     # @section -- SMTP

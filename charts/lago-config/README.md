@@ -120,6 +120,17 @@ A Helm chart for Kubernetes
 | global.s3.region | string | `""` | S3 region |
 | global.s3.secretAccessKey | string | `""` | S3 secret access key. Leave empty to authenticate via IRSA / EKS Pod Identity. |
 
+### GCS
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| global.gcs.bucket | string | `""` | GCS bucket name |
+| global.gcs.enabled | bool | `false` | Enable Google Cloud Storage. Mutually exclusive with `global.s3.enabled`. |
+| global.gcs.gsaEmail | string | `""` | Google service account email used to sign URLs when `iam` is true |
+| global.gcs.iam | bool | `nil` | Sign URLs through the IAM API instead of a keyfile's private key. Requires `gsaEmail`. |
+| global.gcs.keyfileJsonPath | string | `""` | Path to a service account keyfile inside the container. The chart does not mount it; use `volumes` / `volumeMounts` on the Rails components. |
+| global.gcs.project | string | `""` | GCP project ID that owns the bucket |
+
 ### Observability
 
 | Key | Type | Default | Description |
