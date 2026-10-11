@@ -48,7 +48,7 @@ spec:
       restartPolicy: {{ .Values.deleteTopics.restartPolicy }}
       containers:
         - name: delete-topics
-          image: {{ .Values.deleteTopics.image.repository }}:{{ .Values.deleteTopics.image.tag }}
+          image: "{{ include "lago.imageRepository" (dict "repository" .Values.deleteTopics.image.repository "global" .Values.global) }}:{{ .Values.deleteTopics.image.tag }}"
           imagePullPolicy: {{ .Values.deleteTopics.image.pullPolicy }}
           command: [sh]
           args:
