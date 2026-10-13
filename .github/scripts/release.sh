@@ -43,7 +43,14 @@ bump_versions() {
 }
 
 update_deps() {
+  # CHARTS order, not glob order: a file:// dependency is vendored as it
+  # stands, so `lago` must fetch its leaves before `lago-staging` vendors it.
+  local chart charts=()
+  for chart in "${CHARTS[@]}"; do charts+=("charts/$chart/"); done
   for chart in charts/*/; do
+    [[ " ${charts[*]} " == *" $chart "* ]] || charts+=("$chart")
+  done
+  for chart in "${charts[@]}"; do
     if [ -f "$chart/Chart.lock" ] || grep -q 'dependencies:' "$chart/Chart.yaml" 2>/dev/null; then
       rm -f "$chart/Chart.lock"
       helm dependency update "$chart"
@@ -91,7 +98,7 @@ strip_nested_subdeps() {
   # After `helm dependency update`, subchart deps are tarballs (.tgz).
   # Extract each, remove nested charts/ dirs (sub-dependencies already
   # provided by the umbrella chart), and repack.
-  local tmpdir
+  local tmpdir tgz subchart
   for tgz in "$charts_dir"/*.tgz; do
     [ -f "$tgz" ] || continue
     tmpdir=$(mktemp -d)
@@ -99,7 +106,13 @@ strip_nested_subdeps() {
 
     local subchart_name
     subchart_name=$(ls "$tmpdir")
-    if [ -d "$tmpdir/$subchart_name/charts" ]; then
+    if is_umbrella "$subchart_name"; then
+      # An umbrella nested in an umbrella (lago in lago-staging) owns its
+      # leaves: strip inside it, never drop its charts/.
+      echo "  Recursing into nested umbrella $subchart_name"
+      strip_nested_subdeps "$tmpdir/$subchart_name"
+      COPYFILE_DISABLE=1 tar czf "$tgz" -C "$tmpdir" "$subchart_name"
+    elif [ -d "$tmpdir/$subchart_name/charts" ]; then
       echo "  Stripping nested subdeps from $subchart_name"
       rm -rf "$tmpdir/$subchart_name/charts"
       COPYFILE_DISABLE=1 tar czf "$tgz" -C "$tmpdir" "$subchart_name"
@@ -110,9 +123,13 @@ strip_nested_subdeps() {
 
   # `helm dependency update` resolves a file:// dependency into a directory
   # rather than a tarball, so the loop above never sees those. Same treatment.
-  local subchart
   for subchart in "$charts_dir"/*/; do
     [ -d "$subchart/charts" ] || continue
+    if is_umbrella "$(basename "$subchart")"; then
+      echo "  Recursing into nested umbrella $(basename "$subchart")"
+      strip_nested_subdeps "${subchart%/}"
+      continue
+    fi
     echo "  Stripping nested subdeps from $(basename "$subchart")"
     rm -rf "$subchart/charts"
   done
