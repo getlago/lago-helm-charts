@@ -6,4 +6,4 @@ dependencies:
   repository: file://../lago-data-api
   version: 2.1.2
 digest: sha256:ea429d3331e2f085a21857fee80d85b3ef0a329cbc8bba8aa2ebc58b92eb4593
-generated: "2026-10-14T09:14:50.005399583Z"
+generated: "2026-10-14T09:16:16.679931907Z"
