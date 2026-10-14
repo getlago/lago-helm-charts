@@ -85,25 +85,25 @@ tests:
           value: clickhouse
 
   # ============================================================================
-  # LAGO_KAFKA_CATALOG_{RAW,ENRICHED}_EVENTS_TOPIC (configurable, with defaults)
+  # LAGO_KAFKA_PRODUCT_{RAW,ENRICHED}_EVENTS_TOPIC (configurable, with defaults)
   # ============================================================================
-  - it: defaults the catalog events topics
+  - it: defaults the product events topics
     asserts:
       - equal:
-          path: data.LAGO_KAFKA_CATALOG_RAW_EVENTS_TOPIC
-          value: catalog_events_raw
+          path: data.LAGO_KAFKA_PRODUCT_RAW_EVENTS_TOPIC
+          value: product_events_raw
       - equal:
-          path: data.LAGO_KAFKA_CATALOG_ENRICHED_EVENTS_TOPIC
-          value: catalog_events_enriched
+          path: data.LAGO_KAFKA_PRODUCT_ENRICHED_EVENTS_TOPIC
+          value: product_events_enriched
 
-  - it: renders the catalog events topics when overridden
+  - it: renders the product events topics when overridden
     set:
-      global.streaming_ingestion.kafka.topics.catalogEventsRaw: catalog-events-raw
-      global.streaming_ingestion.kafka.topics.catalogEventsEnriched: catalog-events-enriched
+      global.streaming_ingestion.kafka.topics.productEventsRaw: product-events-raw
+      global.streaming_ingestion.kafka.topics.productEventsEnriched: product-events-enriched
     asserts:
       - equal:
-          path: data.LAGO_KAFKA_CATALOG_RAW_EVENTS_TOPIC
-          value: catalog-events-raw
+          path: data.LAGO_KAFKA_PRODUCT_RAW_EVENTS_TOPIC
+          value: product-events-raw
       - equal:
-          path: data.LAGO_KAFKA_CATALOG_ENRICHED_EVENTS_TOPIC
-          value: catalog-events-enriched
+          path: data.LAGO_KAFKA_PRODUCT_ENRICHED_EVENTS_TOPIC
+          value: product-events-enriched
