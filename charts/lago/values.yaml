@@ -403,12 +403,12 @@ global:
         # -- Kafka topic for raw events
         # @section -- Streaming Ingestion / Kafka
         eventsRaw: events_raw
-        # -- Kafka topic for raw catalog events
+        # -- Kafka topic for raw product events
         # @section -- Streaming Ingestion / Kafka
-        catalogEventsRaw: catalog_events_raw
-        # -- Kafka topic for enriched catalog events
+        productEventsRaw: product_events_raw
+        # -- Kafka topic for enriched product events
         # @section -- Streaming Ingestion / Kafka
-        catalogEventsEnriched: catalog_events_enriched
+        productEventsEnriched: product_events_enriched
         # -- Kafka topic for activity logs
         # @section -- Streaming Ingestion / Kafka
         activityLogs: activity_logs
