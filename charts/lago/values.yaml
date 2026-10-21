@@ -308,10 +308,12 @@ global:
     # -- Enable MCP (Model Context Protocol) integration
     # @section -- MCP
     enabled: false
-    # -- MCP client ID
+    # -- Mistral agent ID used by the AI assistant (exported to the api as `MISTRAL_AGENT_ID`).
+    # Same value as the lago-mcp-server chart's `config.mistral.agentID`
     # @section -- MCP
     clientId:
-    # -- MCP client secret
+    # -- Mistral API key used by the AI assistant (exported to the api as `MISTRAL_API_KEY`).
+    # Same value as the lago-mcp-server chart's `config.mistral.apiKey`
     # @section -- MCP
     clientSecret:
     # -- MCP endpoint URL
