@@ -1,6 +1,6 @@
 # lago-front
 
-![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.41.0](https://img.shields.io/badge/AppVersion-v1.41.0-informational?style=flat-square)
+![Version: 2.1.2](https://img.shields.io/badge/Version-2.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.41.0](https://img.shields.io/badge/AppVersion-v1.41.0-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -8,7 +8,7 @@ A Helm chart for Kubernetes
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../lago-config | config(lago-config) | 0.5.0 |
+| file://../lago-config | config(lago-config) | 2.1.2 |
 
 ## Values
 
@@ -43,7 +43,8 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| global.sentryDsn | string | `""` | Sentry DSN for error tracking |
+| global.sentry.environment | string | `""` | Sentry environment name (e.g. "production", "staging"), injected as SENTRY_ENVIRONMENT |
+| global.sentry.dsn.front | string | `""` | Sentry DSN for the frontend |
 
 ### GoCardless
 
@@ -59,16 +60,16 @@ A Helm chart for Kubernetes
 | container.name | string | `""` | Override the container name (defaults to chart fullname) |
 | container.command | string | `nil` | Container entrypoint command |
 | container.args | string | `nil` | Container command arguments |
-| container.ports.http | int | `80` | HTTP container port |
+| container.ports.http | int | `8080` | HTTP container port. The image runs nginx as uid 65532, which cannot bind a port below 1024, so it listens on 8080. Set 80 only for a getlago/front tag older than the hardened image. |
 
 ### Deployment
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | replicaCount | int | `1` | Number of replicas (ignored when autoscaling is enabled) |
+| annotations | object | `{}` | Deployment metadata annotations (e.g. Stakater Reloader) |
 | nameOverride | string | `""` | Override the chart name |
 | fullnameOverride | string | `""` | Override the full release name |
-| annotations | object | `{}` | Deployment metadata annotations |
 
 ### Image
 
@@ -94,15 +95,15 @@ A Helm chart for Kubernetes
 |-----|------|---------|-------------|
 | podAnnotations | object | `{}` | Additional pod annotations |
 | podLabels | object | `{}` | Additional pod labels |
-| podSecurityContext | object | `{}` | Pod-level security context |
-| securityContext | object | `{}` | Container-level security context |
+| podSecurityContext | object | runAsNonRoot, uid/gid/fsGroup 65532, RuntimeDefault seccomp | Pod-level security context. Matches the hardened getlago/front image, which runs as uid 65532. Set `null` for a tag older than that image, which runs as root. |
+| securityContext | object | no privilege escalation, drop ALL capabilities, read-only root filesystem | Container-level security context. The root filesystem is read-only: the image writes only to /tmp, which `volumes` mounts as an emptyDir. |
 | extraEnv | object | `{}` | Extra environment variables (map format, deep-mergeable) |
 | extraEnvFrom | list | `[]` (See [values.yaml]) | Extra envFrom sources |
 | resources | object | `{}` | Resource requests and limits |
 | livenessProbe | object | See [values.yaml](./values.yaml#L213) | Liveness probe configuration |
 | readinessProbe | object | See [values.yaml](./values.yaml#L220) | Readiness probe configuration |
-| volumes | list | `[]` | Additional volumes |
-| volumeMounts | list | `[]` | Additional volume mounts |
+| volumes | list | a `tmp` emptyDir | Pod volumes. The default `tmp` emptyDir is where the image writes its pid file, nginx temp paths, env-config.js and csp.conf. If you set this list, keep the `tmp` entry: it replaces the default, it does not merge. |
+| volumeMounts | list | `tmp` mounted at `/tmp` | Container volume mounts. If you set this list, keep the `/tmp` mount. |
 | nodeSelector | object | `{}` | Node selector constraints |
 | tolerations | list | `[]` | Pod tolerations |
 | affinity | object | `{}` | Pod affinity rules |
