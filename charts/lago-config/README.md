@@ -85,8 +85,8 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| global.mcp.clientId | string | `nil` | MCP client ID |
-| global.mcp.clientSecret | string | `nil` | MCP client secret |
+| global.mcp.clientId | string | `nil` | Mistral agent ID used by the AI assistant (exported to the api as `MISTRAL_AGENT_ID`). Same value as the lago-mcp-server chart's `config.mistral.agentID` |
+| global.mcp.clientSecret | string | `nil` | Mistral API key used by the AI assistant (exported to the api as `MISTRAL_API_KEY`). Same value as the lago-mcp-server chart's `config.mistral.apiKey` |
 | global.mcp.enabled | bool | `false` | Enable MCP (Model Context Protocol) integration |
 | global.mcp.endpoint | string | `nil` | MCP endpoint URL |
 
