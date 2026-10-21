@@ -13,8 +13,9 @@ A Helm chart for Kubernetes
 | config.mistral.agentID | string | `nil` | Mistral AI agent ID |
 | config.mistral.apiKey | string | `nil` | Mistral AI API key |
 | config.logLevel | string | `nil` | Log level (`debug`, `info`, `warn`, `error`) |
-| config.api.url | string | `nil` | Lago API URL for the MCP server to connect to |
-| existingSecret | string | `nil` | Name of an existing Secret containing MCP server credentials |
+| config.api.url | string | `nil` | Lago API URL for the MCP server to connect to. Rendered with `tpl`, so it can reference the release (e.g. `http://{{ .Release.Name }}-lago-api/api/v1`) |
+| existingSecret | string | `nil` | Name of an existing Secret containing MCP server credentials. Rendered with `tpl` |
+| existingSecretKeys | object | `{"agentID":"mistral.agentID","apiKey":"mistral.apiKey"}` | Keys of `existingSecret` that hold the Mistral agent ID and API key. The defaults match the chart-rendered Secret; set `mcp.clientId` / `mcp.clientSecret` to read the lago-config Secret of the `lago` chart. |
 
 ### Image
 

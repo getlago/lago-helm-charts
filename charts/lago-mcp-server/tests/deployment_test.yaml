@@ -1,0 +1,66 @@
+suite: Test lago-mcp-server deployment env
+templates:
+  - templates/deployment.yaml
+values:
+  - fixtures/required.yaml
+
+tests:
+  - it: should read the chart-rendered Secret with the default keys
+    release:
+      name: rel
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MISTRAL_AGENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: rel-lago-mcp-server
+                key: mistral.agentID
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MISTRAL_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: rel-lago-mcp-server
+                key: mistral.apiKey
+
+  - it: should read custom keys from an existing Secret
+    set:
+      existingSecret: shared-config
+      existingSecretKeys.agentID: mcp.clientId
+      existingSecretKeys.apiKey: mcp.clientSecret
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MISTRAL_AGENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: shared-config
+                key: mcp.clientId
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MISTRAL_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: shared-config
+                key: mcp.clientSecret
+
+  - it: should render the API URL and the Secret name with tpl
+    release:
+      name: rel
+    set:
+      config.api.url: 'http://{{ .Release.Name }}-lago-api/api/v1'
+      existingSecret: '{{ .Release.Name }}-lago-config'
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_API_URL
+            value: http://rel-lago-api/api/v1
+      - equal:
+          path: spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.name
+          value: rel-lago-config

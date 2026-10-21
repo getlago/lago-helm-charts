@@ -1336,6 +1336,36 @@ deleteTopics:
   # @section -- Delete Topics Job
   affinity: {}
 
+# -- MCP server subchart overrides (lago-mcp-server, conditional on
+# `mcp-server.enabled`). Backs the AI Billing Assistant: point
+# `global.mcp.endpoint` at `http://<release>-lago-mcp-server/mcp` and enable
+# `global.mcp`. By default it calls this release's api and reads the Mistral
+# credentials from this release's lago-config Secret (`mcp.clientId` /
+# `mcp.clientSecret`, rendered when `global.mcp.enabled`).
+# @default -- See child values
+# @section -- MCP Server
+mcp-server:
+  # -- Deploy the MCP server with this release
+  # @section -- MCP Server
+  enabled: false
+  # -- Override the mcp-server subchart release name
+  # @section -- MCP Server
+  nameOverride: lago-mcp-server
+  config:
+    api:
+      # -- Lago API URL the MCP server calls (rendered with `tpl`)
+      # @section -- MCP Server
+      url: 'http://{{ .Release.Name }}-lago-api/api/v1'
+  # -- Secret holding the Mistral credentials (rendered with `tpl`): the
+  # lago-config Secret of this release
+  # @section -- MCP Server
+  existingSecret: '{{ dig "config" "secret" "" .Values.global | default (printf "%s-lago-config" .Release.Name) }}'
+  # -- Keys of `existingSecret` holding the Mistral agent ID and API key
+  # @section -- MCP Server
+  existingSecretKeys:
+    agentID: mcp.clientId
+    apiKey: mcp.clientSecret
+
 # -- Array of extra K8s manifests to deploy
 # @section -- Extra Objects
 extraObjects: []

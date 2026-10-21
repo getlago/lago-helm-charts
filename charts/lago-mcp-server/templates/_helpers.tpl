@@ -68,8 +68,20 @@ Get the name of the secret
 */}}
 {{- define "lago-mcp-server.secretName" -}}
 {{- if .Values.existingSecret }}
-{{- .Values.existingSecret }}
+{{- tpl .Values.existingSecret . }}
 {{- else }}
 {{- include "lago-mcp-server.fullname" . }}
 {{- end }}
+{{- end }}
+
+{{/*
+Secret keys holding the Mistral credentials. Configurable only with
+existingSecret: the chart-rendered Secret always uses the defaults.
+*/}}
+{{- define "lago-mcp-server.secretKey.agentID" -}}
+{{- if .Values.existingSecret }}{{ .Values.existingSecretKeys.agentID }}{{ else }}mistral.agentID{{ end }}
+{{- end }}
+
+{{- define "lago-mcp-server.secretKey.apiKey" -}}
+{{- if .Values.existingSecret }}{{ .Values.existingSecretKeys.apiKey }}{{ else }}mistral.apiKey{{ end }}
 {{- end }}
