@@ -57,9 +57,11 @@ container:
   # @section -- Container
   args:
   ports:
-    # -- HTTP container port
+    # -- HTTP container port. The image runs nginx as uid 65532, which cannot
+    # bind a port below 1024, so it listens on 8080. Set 80 only for a
+    # getlago/front tag older than the hardened image.
     # @section -- Container
-    http: 80
+    http: 8080
 
 # -- Number of replicas (ignored when autoscaling is enabled)
 # @section -- Deployment
@@ -112,13 +114,29 @@ podAnnotations: {}
 # @section -- Pod
 podLabels: {}
 
-# -- Pod-level security context
+# -- Pod-level security context. Matches the hardened getlago/front image,
+# which runs as uid 65532. Set `null` for a tag older than that image, which
+# runs as root.
+# @default -- runAsNonRoot, uid/gid/fsGroup 65532, RuntimeDefault seccomp
 # @section -- Pod
-podSecurityContext: {}
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+  seccompProfile:
+    type: RuntimeDefault
 
-# -- Container-level security context
+# -- Container-level security context. The root filesystem is read-only: the
+# image writes only to /tmp, which `volumes` mounts as an emptyDir.
+# @default -- no privilege escalation, drop ALL capabilities, read-only root filesystem
 # @section -- Pod
-securityContext: {}
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
 
 # -- Extra environment variables (map format, deep-mergeable)
 # @section -- Pod
@@ -249,13 +267,21 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
-# -- Additional volumes
+# -- Pod volumes. The default `tmp` emptyDir is where the image writes its
+# pid file, nginx temp paths, env-config.js and csp.conf. If you set this
+# list, keep the `tmp` entry: it replaces the default, it does not merge.
+# @default -- a `tmp` emptyDir
 # @section -- Pod
-volumes: []
+volumes:
+  - name: tmp
+    emptyDir: {}
 
-# -- Additional volume mounts
+# -- Container volume mounts. If you set this list, keep the `/tmp` mount.
+# @default -- `tmp` mounted at `/tmp`
 # @section -- Pod
-volumeMounts: []
+volumeMounts:
+  - name: tmp
+    mountPath: /tmp
 
 # -- Node selector constraints
 # @section -- Pod
