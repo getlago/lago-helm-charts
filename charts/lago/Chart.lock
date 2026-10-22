@@ -59,5 +59,8 @@ dependencies:
 - name: lago-rails
   repository: file://../lago-rails
   version: 2.1.2
-digest: sha256:0758253c6e7ebacc542670bba47b1dfd8c59922ea00c71a10b4f41aa7b53b5ed
-generated: "2026-10-14T09:16:16.745386252Z"
+- name: lago-mcp-server
+  repository: file://../lago-mcp-server
+  version: 2.1.2
+digest: sha256:3001af04907c9a51f373481ec8919834facf61ba22f21b4c1de84b2c29bcda73
+generated: "2026-10-21T17:17:17.584737+02:00"

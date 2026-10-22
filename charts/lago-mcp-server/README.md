@@ -13,7 +13,8 @@ A Helm chart for Kubernetes
 | config.mistral.agentID | string | `nil` | Mistral AI agent ID |
 | config.mistral.apiKey | string | `nil` | Mistral AI API key |
 | config.logLevel | string | `nil` | Log level (`debug`, `info`, `warn`, `error`) |
-| config.api.url | string | `nil` | Lago API URL for the MCP server to connect to |
+| config.nameOverride | string | `"lago-config"` | Name of the lago-config chart, to find its Secret when `global.mcp.enabled` |
+| config.api.url | string | `nil` | Lago API URL for the MCP server to connect to (defaults to `global.urls.api` + `/api/v1`) |
 | existingSecret | string | `nil` | Name of an existing Secret containing MCP server credentials |
 
 ### Image

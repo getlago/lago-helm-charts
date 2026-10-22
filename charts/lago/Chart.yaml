@@ -114,6 +114,11 @@ dependencies:
     version: 2.1.2
     repository: "file://../lago-rails"
     condition: global.sidekiq.queues.streaming
+  - name: lago-mcp-server
+    alias: mcp-server
+    version: 2.1.2
+    repository: "file://../lago-mcp-server"
+    condition: mcp-server.enabled
 
 annotations:
   org.opencontainers.image.source: "https://github.com/getlago/lago-helm-charts"

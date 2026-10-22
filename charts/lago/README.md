@@ -24,6 +24,7 @@ A Helm chart for Kubernetes
 | file://../lago-rails | api(lago-rails) | 0.6.0 |
 | file://../lago-rails | alerts-worker(lago-rails) | 0.6.0 |
 | file://../lago-rails | wallets-worker(lago-rails) | 0.6.0 |
+| file://../lago-mcp-server | mcp-server(lago-mcp-server) | 2.1.2 |
 
 ## Values
 
@@ -339,6 +340,14 @@ A Helm chart for Kubernetes
 | deleteTopics.nodeSelector | object | `{}` | Node selector constraints |
 | deleteTopics.tolerations | list | `[]` | Pod tolerations |
 | deleteTopics.affinity | object | `{}` | Pod affinity rules |
+
+### MCP Server
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| mcp-server | object | See child values | MCP server subchart overrides (lago-mcp-server, conditional on `mcp-server.enabled`). Backs the AI Billing Assistant: point `global.mcp.endpoint` at `http://<release>-lago-mcp-server/mcp` and enable `global.mcp`. It calls `global.urls.api` and reads the Mistral credentials from the lago-config Secret (`mcp.clientId` / `mcp.clientSecret`). |
+| mcp-server.enabled | bool | `false` | Deploy the MCP server with this release |
+| mcp-server.nameOverride | string | `"lago-mcp-server"` | Override the mcp-server subchart release name |
 
 ### Extra Objects
 

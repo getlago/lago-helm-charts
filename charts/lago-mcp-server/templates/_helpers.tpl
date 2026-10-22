@@ -64,12 +64,33 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+Inside the lago chart (`global.mcp.enabled`), read the Mistral credentials
+from the lago-config Secret, like the other subcharts.
+*/}}
+{{- define "lago-mcp-server.lagoConfig" -}}
+{{- if and (not .Values.existingSecret) .Values.global .Values.global.mcp .Values.global.mcp.enabled }}true{{ end }}
+{{- end }}
+
+{{/*
 Get the name of the secret
 */}}
 {{- define "lago-mcp-server.secretName" -}}
 {{- if .Values.existingSecret }}
 {{- .Values.existingSecret }}
+{{- else if include "lago-mcp-server.lagoConfig" . }}
+{{- mustMergeOverwrite .Values .Values.config | set . "Values" | include "lago-config.secretName" }}
 {{- else }}
 {{- include "lago-mcp-server.fullname" . }}
+{{- end }}
+{{- end }}
+
+{{/*
+Lago API URL: config.api.url, else global.urls.api.
+*/}}
+{{- define "lago-mcp-server.apiURL" -}}
+{{- if .Values.config.api.url }}
+{{- .Values.config.api.url }}
+{{- else if and .Values.global .Values.global.urls .Values.global.urls.api }}
+{{- printf "%s/api/v1" .Values.global.urls.api }}
 {{- end }}
 {{- end }}

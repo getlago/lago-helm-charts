@@ -1,6 +1,10 @@
 # Default values for lago-mcp-server.
 
 config:
+  # -- Name of the lago-config chart, to find its Secret when `global.mcp.enabled`
+  # @section -- Config
+  nameOverride: lago-config
+
   mistral:
     # -- Mistral AI agent ID
     # @section -- Config
@@ -14,7 +18,7 @@ config:
   logLevel:
 
   api:
-    # -- Lago API URL for the MCP server to connect to
+    # -- Lago API URL for the MCP server to connect to (defaults to `global.urls.api` + `/api/v1`)
     # @section -- Config
     url:
 

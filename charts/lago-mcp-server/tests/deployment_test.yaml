@@ -1,0 +1,62 @@
+suite: Test lago-mcp-server deployment env
+templates:
+  - templates/deployment.yaml
+
+tests:
+  - it: should read the chart-rendered Secret
+    release:
+      name: rel
+    values:
+      - fixtures/required.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MISTRAL_AGENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: rel-lago-mcp-server
+                key: mistral.agentID
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MISTRAL_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: rel-lago-mcp-server
+                key: mistral.apiKey
+
+  - it: should read an existing Secret with the same keys
+    values:
+      - fixtures/required.yaml
+    set:
+      existingSecret: lago-mcp-server
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MISTRAL_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: lago-mcp-server
+                key: mistral.apiKey
+
+  - it: should fall back to global.urls.api for the API URL
+    set:
+      config.mistral.agentID: a
+      config.mistral.apiKey: b
+      global.urls.api: https://api.test
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_API_URL
+            value: https://api.test/api/v1
+
+  - it: should fail without an API URL
+    set:
+      config.mistral.agentID: a
+      config.mistral.apiKey: b
+    asserts:
+      - failedTemplate:
+          errorMessage: config.api.url or global.urls.api must be provided

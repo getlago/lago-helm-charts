@@ -52,17 +52,17 @@ spec:
           {{- end }}
           env:
             - name: LAGO_API_URL
-              value: {{ required "config.api.url must be provided " .Values.config.api.url }}
+              value: {{ include "lago-mcp-server.apiURL" . | required "config.api.url or global.urls.api must be provided" | quote }}
             - name: MISTRAL_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ include "lago-mcp-server.secretName" . }}
-                  key: mistral.apiKey
+                  key: {{ if include "lago-mcp-server.lagoConfig" . }}mcp.clientSecret{{ else }}mistral.apiKey{{ end }}
             - name: MISTRAL_AGENT_ID
               valueFrom:
                 secretKeyRef:
                   name: {{ include "lago-mcp-server.secretName" . }}
-                  key: mistral.agentID
+                  key: {{ if include "lago-mcp-server.lagoConfig" . }}mcp.clientId{{ else }}mistral.agentID{{ end }}
             {{- with .Values.config.logLevel }}
             - name: RUST_LOG
               value: {{ . }}
