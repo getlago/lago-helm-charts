@@ -52,6 +52,13 @@ global:
       # -- Enable the webhook background queue
       # @section -- Sidekiq
       webhook: false
+      # -- Enable the webhook alert worker (isolates the usage alert webhooks,
+      # `alert.triggered`, `subscription.usage_threshold_reached` and
+      # `wallet.depleted_ongoing_balance`, on the `webhook_alert_worker` queue
+      # of a separate deployment). Takes precedence over `webhook` for these
+      # webhook types.
+      # @section -- Sidekiq
+      webhookAlert: false
       # -- Enable the PDF background queue
       # @section -- Sidekiq
       pdf: false
@@ -937,6 +944,40 @@ webhook-worker:
     command: ["./scripts/start.webhook.worker.sh"]
     # -- Container ports (none needed)
     # @section -- Webhook Worker
+    ports: []
+
+# -- Webhook alert worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.webhookAlert`)
+# @default -- See child values
+# @section -- Webhook Alert Worker
+webhook-alert-worker:
+  # -- Override the webhook-alert-worker subchart release name
+  # @section -- Webhook Alert Worker
+  nameOverride: lago-webhook-alert-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Webhook Alert Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- Webhook Alert Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- Webhook Alert Worker
+  livenessProbe:
+    enabled: false
+  # -- Readiness probe (disabled for workers)
+  # @section -- Webhook Alert Worker
+  readinessProbe:
+    enabled: false
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- Webhook Alert Worker
+    enabled: false
+  container:
+    # -- Webhook alert worker entrypoint command
+    # @section -- Webhook Alert Worker
+    command: ["./scripts/start.webhook_alert.worker.sh"]
+    # -- Container ports (none needed)
+    # @section -- Webhook Alert Worker
     ports: []
 
 # -- PDF worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.pdf`)
