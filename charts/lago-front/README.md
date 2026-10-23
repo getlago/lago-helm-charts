@@ -1,6 +1,6 @@
 # lago-front
 
-![Version: 2.1.2](https://img.shields.io/badge/Version-2.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.41.0](https://img.shields.io/badge/AppVersion-v1.41.0-informational?style=flat-square)
+![Version: 2.1.2](https://img.shields.io/badge/Version-2.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.56.0](https://img.shields.io/badge/AppVersion-v1.56.0-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -77,7 +77,7 @@ A Helm chart for Kubernetes
 |-----|------|---------|-------------|
 | image.repository | string | `"getlago/front"` | Container image repository |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
-| image.tag | string | `nil` | Override the image tag (defaults to Chart appVersion) |
+| image.tag | string | `nil` | Override the image tag (defaults to `global.lago.version`, then Chart appVersion) |
 | imagePullSecrets | list | `[]` | Image pull secrets for private registries |
 
 ### Service Account

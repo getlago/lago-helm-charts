@@ -74,7 +74,7 @@ image:
   # -- Image pull policy
   # @section -- Image
   pullPolicy: IfNotPresent
-  # -- Override the image tag (defaults to Chart appVersion)
+  # -- Override the image tag (defaults to `global.lago.version`, then Chart appVersion)
   # @section -- Image
   tag:
 
