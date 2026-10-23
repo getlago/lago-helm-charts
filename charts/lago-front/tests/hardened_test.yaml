@@ -71,3 +71,26 @@ tests:
           path: spec.template.spec.containers[0].securityContext
       - notExists:
           path: spec.template.spec.volumes
+
+  - it: should follow global.lago.version, like the rails charts
+    set:
+      global.lago.version: v9.9.9
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: getlago/front:v9.9.9
+
+  - it: should prefer image.tag over global.lago.version
+    set:
+      global.lago.version: v9.9.9
+      image.tag: v1.2.3
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: getlago/front:v1.2.3
+
+  - it: should default to the chart appVersion, the first hardened release
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: getlago/front:v1.56.0
