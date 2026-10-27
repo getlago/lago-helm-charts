@@ -143,3 +143,107 @@ tests:
     asserts:
       - notExists:
           path: data["sentry.environment"]
+
+  - it: should emit gcs project and bucket when gcs is enabled
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: "my-project"
+      global.gcs.bucket: "my-bucket"
+    asserts:
+      - equal:
+          path: data["gcs.project"]
+          value: "my-project"
+      - equal:
+          path: data["gcs.bucket"]
+          value: "my-bucket"
+      - notExists:
+          path: data["gcs.iam"]
+      - notExists:
+          path: data["gcs.gsaEmail"]
+      - notExists:
+          path: data["gcs.keyfileJsonPath"]
+
+  - it: should emit gcs iam keys when iam is enabled
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: "my-project"
+      global.gcs.bucket: "my-bucket"
+      global.gcs.iam: true
+      global.gcs.gsaEmail: "lago@my-project.iam.gserviceaccount.com"
+    asserts:
+      - equal:
+          path: data["gcs.iam"]
+          value: "true"
+      - equal:
+          path: data["gcs.gsaEmail"]
+          value: "lago@my-project.iam.gserviceaccount.com"
+
+  - it: should emit gcs keyfile path when set
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: "my-project"
+      global.gcs.bucket: "my-bucket"
+      global.gcs.keyfileJsonPath: "/etc/gcs/keyfile.json"
+    asserts:
+      - equal:
+          path: data["gcs.keyfileJsonPath"]
+          value: "/etc/gcs/keyfile.json"
+
+  - it: should keep a numeric gcs bucket name a string
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: "my-project"
+      global.gcs.bucket: "123456"
+    asserts:
+      - equal:
+          path: data["gcs.bucket"]
+          value: "123456"
+
+  - it: should omit gcs keys when gcs is disabled
+    set:
+      global.gcs.enabled: false
+      global.gcs.project: "my-project"
+      global.gcs.bucket: "my-bucket"
+    asserts:
+      - notExists:
+          path: data["gcs.project"]
+      - notExists:
+          path: data["gcs.bucket"]
+
+  - it: should require gcs project when gcs is enabled
+    set:
+      global.gcs.enabled: true
+      global.gcs.bucket: "my-bucket"
+    asserts:
+      - failedTemplate:
+          errorMessage: global.gcs.project is required
+
+  - it: should require gcs bucket when gcs is enabled
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: "my-project"
+    asserts:
+      - failedTemplate:
+          errorMessage: global.gcs.bucket is required
+
+  - it: should require gcs gsaEmail when iam is enabled
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: "my-project"
+      global.gcs.bucket: "my-bucket"
+      global.gcs.iam: true
+    asserts:
+      - failedTemplate:
+          errorMessage: global.gcs.gsaEmail is required when global.gcs.iam is true
+
+  - it: should reject gcs and s3 enabled together
+    set:
+      global.gcs.enabled: true
+      global.gcs.project: "my-project"
+      global.gcs.bucket: "my-bucket"
+      global.s3.enabled: true
+      global.s3.bucket: "my-bucket"
+      global.s3.region: "us-east-1"
+    asserts:
+      - failedTemplate:
+          errorMessage: global.gcs.enabled and global.s3.enabled are mutually exclusive
