@@ -18,6 +18,7 @@ A Helm chart for Kubernetes
 | file://../lago-rails | clock-worker(lago-rails) | 0.6.0 |
 | file://../lago-rails | clock(lago-rails) | 0.6.0 |
 | file://../lago-rails | webhook-worker(lago-rails) | 0.6.0 |
+| file://../lago-rails | webhook-alert-worker(lago-rails) | 2.1.2 |
 | file://../lago-rails | worker(lago-rails) | 0.6.0 |
 | file://../lago-rails | pdf-worker(lago-rails) | 0.6.0 |
 | file://../lago-rails | events-consumer-worker(lago-rails) | 0.6.0 |
@@ -178,6 +179,20 @@ A Helm chart for Kubernetes
 | webhook-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
 | webhook-worker.container.command | list | `["./scripts/start.webhook.worker.sh"]` | Webhook worker entrypoint command |
 | webhook-worker.container.ports | list | `[]` | Container ports (none needed) |
+
+### Webhook Alert Worker
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| webhook-alert-worker | object | See child values | Webhook alert worker subchart overrides (lago-rails, conditional on `global.sidekiq.queues.webhookAlert`) |
+| webhook-alert-worker.nameOverride | string | `"lago-webhook-alert-worker"` | Override the webhook-alert-worker subchart release name |
+| webhook-alert-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
+| webhook-alert-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
+| webhook-alert-worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for workers) |
+| webhook-alert-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |
+| webhook-alert-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
+| webhook-alert-worker.container.command | list | `["./scripts/start.webhook_alert.worker.sh"]` | Webhook alert worker entrypoint command |
+| webhook-alert-worker.container.ports | list | `[]` | Container ports (none needed) |
 
 ### PDF Worker
 
