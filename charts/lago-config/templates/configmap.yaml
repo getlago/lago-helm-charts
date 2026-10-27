@@ -37,6 +37,20 @@ data:
   s3.pathStyle: {{ . }}
   {{- end }}
   {{- end }}
+  {{- if .Values.global.gcs.enabled }}
+  {{- if .Values.global.s3.enabled }}
+  {{- fail "global.gcs.enabled and global.s3.enabled are mutually exclusive" }}
+  {{- end }}
+  gcs.project: {{ required "global.gcs.project is required" .Values.global.gcs.project | quote }}
+  gcs.bucket: {{ required "global.gcs.bucket is required" .Values.global.gcs.bucket | quote }}
+  {{- if .Values.global.gcs.iam }}
+  gcs.iam: "true"
+  gcs.gsaEmail: {{ required "global.gcs.gsaEmail is required when global.gcs.iam is true" .Values.global.gcs.gsaEmail | quote }}
+  {{- end }}
+  {{- with .Values.global.gcs.keyfileJsonPath }}
+  gcs.keyfileJsonPath: {{ . | quote }}
+  {{- end }}
+  {{- end }}
   {{- if .Values.global.smtp.enabled }}
   smtp.port: {{ .Values.global.smtp.port | quote | required "global.smtp.port is required" }}
   smtp.address: {{ required "global.smtp.address is required" .Values.global.smtp.address }}
