@@ -38,7 +38,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ default .Chart.Name .Values.container.name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ include "lago-front.imageRepository" (dict "repository" .Values.image.repository "global" .Values.global) }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- with .Values.container.command }}
           command: {{ toJson . }}
