@@ -1,66 +1,66 @@
 dependencies:
 - name: lago-config
   repository: file://../lago-config
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-front
   repository: file://../lago-front
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-pdf
   repository: file://../lago-pdf
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-events-processor-worker
   repository: file://../lago-events-processor-worker
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
+  version: 2.1.3
 - name: lago-rails
   repository: file://../lago-rails
-  version: 2.1.2
-digest: sha256:a56b792f3aedea4570e68f8a04051695b3c100d09b5d503498489e8321d33560
-generated: "2026-10-22T17:01:22.650886065+02:00"
+  version: 2.1.3
+digest: sha256:9cd637f2245324eec824d28b7fac9600725231baa6c89b4c662f9c8340c6c4e0
+generated: "2026-10-30T10:09:18.430523782Z"
