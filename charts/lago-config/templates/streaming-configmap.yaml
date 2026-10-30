@@ -43,6 +43,11 @@ data:
   LAGO_KAFKA_ACTIVITY_LOGS_TOPIC: {{ $kafka.topics.activityLogs }}
   LAGO_KAFKA_API_LOGS_TOPIC: {{ $kafka.topics.apiLogs }}
   LAGO_KAFKA_SECURITY_LOGS_TOPIC: {{ $kafka.topics.securityLogs }}
+  {{- /* Producers route wallet alerts to Kafka as soon as the topic is set, so
+         only expose it once the consumer that drains it is deployed. */}}
+  {{- if .Values.global.streaming_ingestion.walletAlertsConsumer }}
+  LAGO_KAFKA_WALLET_ALERTS_TOPIC: {{ $kafka.topics.walletAlerts }}
+  {{- end }}
   {{- with $kafka.clickhouseConsumerGroup }}
   LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP: {{ . }}
   {{- end }}

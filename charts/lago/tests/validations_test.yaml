@@ -51,3 +51,26 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+
+  - it: refuses the wallet alerts consumer when streaming ingestion is off
+    set:
+      global:
+        streaming_ingestion:
+          enabled: false
+          walletAlertsConsumer: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "global.streaming_ingestion.walletAlertsConsumer requires global.streaming_ingestion.enabled: the wallet alerts consumer and the wallet alerts topic come from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on"
+
+  - it: renders nothing once the wallet alerts consumer and streaming ingestion agree
+    set:
+      global:
+        streaming_ingestion:
+          enabled: true
+          walletAlertsConsumer: true
+          kafka:
+            bootstrapServers:
+              - kafka:9092
+    asserts:
+      - hasDocuments:
+          count: 0

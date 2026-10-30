@@ -1,0 +1,43 @@
+suite: Test events-consumer-worker blanks the wallet alerts topic inherited from the
+  streaming ConfigMap, so it never joins the wallet alerts consumer group.
+templates:
+  - charts/events-consumer-worker/templates/deployment.yaml
+
+set:
+  global:
+    lago:
+      env: production
+      version: v1.0.0
+    urls:
+      api: http://api.test
+      front: http://front.test
+    database:
+      uri: postgresql://localhost
+    encryption:
+      key: test-key
+      salt: test-salt
+    signing:
+      hmac: test-hmac
+      rsa: test-rsa
+    redis:
+      uri: redis://localhost
+    redisCache:
+      uri: redis://localhost
+    redisStore:
+      uri: redis://localhost
+    streaming_ingestion:
+      enabled: true
+      kafka:
+        bootstrapServers:
+          - kafka:9092
+
+tests:
+  - it: blanks the wallet alerts topic
+    set:
+      global.streaming_ingestion.walletAlertsConsumer: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_KAFKA_WALLET_ALERTS_TOPIC
+            value: ""

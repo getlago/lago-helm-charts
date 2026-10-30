@@ -7,3 +7,6 @@ instead of rolling out a pod that crash-loops.
 {{- if and .Values.global.streaming_ingestion.walletRefreshConsumer (not .Values.global.streaming_ingestion.enabled) }}
 {{- fail "global.streaming_ingestion.walletRefreshConsumer requires global.streaming_ingestion.enabled: the wallet refresh consumer takes its Kafka connection from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on" }}
 {{- end }}
+{{- if and .Values.global.streaming_ingestion.walletAlertsConsumer (not .Values.global.streaming_ingestion.enabled) }}
+{{- fail "global.streaming_ingestion.walletAlertsConsumer requires global.streaming_ingestion.enabled: the wallet alerts consumer and the wallet alerts topic come from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on" }}
+{{- end }}

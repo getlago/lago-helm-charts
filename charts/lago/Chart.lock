@@ -44,6 +44,9 @@ dependencies:
 - name: lago-rails
   repository: file://../lago-rails
   version: 2.1.3
+- name: lago-rails
+  repository: file://../lago-rails
+  version: 2.1.3
 - name: lago-events-processor-worker
   repository: file://../lago-events-processor-worker
   version: 2.1.3
@@ -62,5 +65,5 @@ dependencies:
 - name: lago-rails
   repository: file://../lago-rails
   version: 2.1.3
-digest: sha256:9cd637f2245324eec824d28b7fac9600725231baa6c89b4c662f9c8340c6c4e0
-generated: "2026-10-30T10:09:18.430523782Z"
+digest: sha256:3e8356e690a25dc458500aaca9b618fe16d1fbd4c6186795b264090b36cbd9fe
+generated: "2026-10-30T15:37:54.523373714+01:00"

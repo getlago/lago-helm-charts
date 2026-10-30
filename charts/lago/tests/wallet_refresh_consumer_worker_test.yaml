@@ -1,7 +1,8 @@
 suite: Test wallet-refresh-consumer-worker subchart is gated by
-  global.streaming_ingestion.walletRefreshConsumer, runs the Karafka entrypoint and
-  routes only the realtime usage triggers topic (the charged-in-advance topic
-  inherited from the streaming ConfigMap is blanked). The flag sits in the streaming
+  global.streaming_ingestion.walletRefreshConsumer, runs the Karafka server pinned to
+  the wallet refresh consumer group (so the wallet alerts topic it produces to is not
+  consumed here) and routes only the realtime usage triggers topic (the
+  charged-in-advance topic inherited from the streaming ConfigMap is blanked). The flag sits in the streaming
   block because the worker has no Kafka connection without it; the pairing itself is
   enforced in templates/validations.yaml and covered by validations_test.yaml.
 templates:
@@ -36,7 +37,7 @@ set:
           - kafka:9092
 
 tests:
-  - it: renders the deployment with the Karafka entrypoint when enabled
+  - it: renders the deployment with the Karafka server pinned to its consumer group when enabled
     set:
       global.streaming_ingestion.walletRefreshConsumer: true
     asserts:
@@ -47,7 +48,7 @@ tests:
           value: RELEASE-NAME-lago-wallet-refresh-consumer-worker
       - equal:
           path: spec.template.spec.containers[0].command
-          value: ["./scripts/start.events.consumer.sh"]
+          value: ["bundle", "exec", "karafka", "server", "--include_consumer_groups", "lago_wallet_refresh_triggers_consumer"]
 
   - it: sets the realtime usage triggers topic and blanks the charged-in-advance topic
     set:
