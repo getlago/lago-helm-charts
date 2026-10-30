@@ -37,7 +37,7 @@ data:
   s3.pathStyle: {{ . }}
   {{- end }}
   {{- end }}
-  {{- if .Values.global.gcs.enabled }}
+  {{- if dig "gcs" "enabled" false .Values.global }}
   {{- if .Values.global.s3.enabled }}
   {{- fail "global.gcs.enabled and global.s3.enabled are mutually exclusive" }}
   {{- end }}

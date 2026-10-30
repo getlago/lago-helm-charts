@@ -308,7 +308,7 @@ spec:
                   key: s3.secretAccessKey
                   optional: true
             {{- end }}
-            {{- if .Values.global.gcs.enabled }}
+            {{- if dig "gcs" "enabled" false .Values.global }}
             - name: LAGO_USE_GCS
               value: "true"
             - name: LAGO_GCS_PROJECT
