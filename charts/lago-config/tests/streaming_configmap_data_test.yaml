@@ -107,3 +107,28 @@ tests:
       - equal:
           path: data.LAGO_KAFKA_PRODUCT_ENRICHED_EVENTS_TOPIC
           value: product-events-enriched
+
+  # ============================================================================
+  # LAGO_KAFKA_WALLET_ALERTS_TOPIC (only with the wallet alerts consumer)
+  # ============================================================================
+  - it: does not render LAGO_KAFKA_WALLET_ALERTS_TOPIC by default
+    asserts:
+      - notExists:
+          path: data.LAGO_KAFKA_WALLET_ALERTS_TOPIC
+
+  - it: renders LAGO_KAFKA_WALLET_ALERTS_TOPIC when the wallet alerts consumer is on
+    set:
+      global.streaming_ingestion.walletAlertsConsumer: true
+    asserts:
+      - equal:
+          path: data.LAGO_KAFKA_WALLET_ALERTS_TOPIC
+          value: wallet_alerts
+
+  - it: renders an overridden wallet alerts topic
+    set:
+      global.streaming_ingestion.walletAlertsConsumer: true
+      global.streaming_ingestion.kafka.topics.walletAlerts: custom_wallet_alerts
+    asserts:
+      - equal:
+          path: data.LAGO_KAFKA_WALLET_ALERTS_TOPIC
+          value: custom_wallet_alerts
