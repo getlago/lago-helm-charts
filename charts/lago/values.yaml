@@ -373,7 +373,9 @@ global:
     # and expose `LAGO_KAFKA_WALLET_ALERTS_TOPIC` to every Lago workload, so
     # that the wallet alerts of the organizations on realtime usage are
     # evaluated from Kafka instead of the `ProcessWalletAlertsJob`. Requires
-    # `enabled` above, like `walletRefreshConsumer`.
+    # `enabled` above, like `walletRefreshConsumer`. The chart does not restart
+    # the other Lago pods when this changes: after turning it off, restart the
+    # Lago deployments so they stop producing to the wallet alerts topic.
     # @section -- Streaming Ingestion
     walletAlertsConsumer: false
     # -- Name of an existing ConfigMap for streaming config

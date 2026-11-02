@@ -193,7 +193,7 @@ A Helm chart for Kubernetes
 | global.streaming_ingestion.configmap | string | `""` | Name of an existing ConfigMap for streaming config |
 | global.streaming_ingestion.enabled | bool | `false` | Enable streaming ingestion (ClickHouse + Kafka) |
 | global.streaming_ingestion.secret | string | `""` | Name of an existing Secret for streaming credentials |
-| global.streaming_ingestion.walletAlertsConsumer | bool | `false` | Expose `LAGO_KAFKA_WALLET_ALERTS_TOPIC` in the streaming ConfigMap, so that wallet changes are produced to the wallet alerts topic. Set by the umbrella chart alongside the `wallet-alerts-consumer-worker`. |
+| global.streaming_ingestion.walletAlertsConsumer | bool | `false` | Expose `LAGO_KAFKA_WALLET_ALERTS_TOPIC` in the streaming ConfigMap, so that wallet changes are produced to the wallet alerts topic. Set by the umbrella chart alongside the `wallet-alerts-consumer-worker`. The Lago pods are not restarted when this changes: after turning it off, restart the Lago deployments so they stop producing to the topic. |
 
 ### Streaming Ingestion / Kafka
 
