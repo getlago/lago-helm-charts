@@ -18,7 +18,16 @@ spec:
       {{- include "lago-rails.architecture.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- /* envFrom does not roll pods when the streaming ConfigMap changes.
+             Carry the wallet alerts toggle on the pod template so that turning
+             it off restarts every pod still holding LAGO_KAFKA_WALLET_ALERTS_TOPIC,
+             instead of leaving them producing to a topic nobody drains. */}}
+      {{- $podAnnotations := dict }}
+      {{- if .Values.global.streaming_ingestion.enabled }}
+      {{- $_ := set $podAnnotations "lago.getlago.com/wallet-alerts-consumer" (.Values.global.streaming_ingestion.walletAlertsConsumer | default false | toString) }}
+      {{- end }}
+      {{- $podAnnotations = merge (deepCopy (.Values.podAnnotations | default dict)) $podAnnotations }}
+      {{- with $podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

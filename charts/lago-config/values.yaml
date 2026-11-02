@@ -297,6 +297,11 @@ global:
     # -- Enable streaming ingestion (ClickHouse + Kafka)
     # @section -- Streaming Ingestion
     enabled: false
+    # -- Expose `LAGO_KAFKA_WALLET_ALERTS_TOPIC` in the streaming ConfigMap,
+    # so that wallet changes are produced to the wallet alerts topic. Set by
+    # the umbrella chart alongside the `wallet-alerts-consumer-worker`.
+    # @section -- Streaming Ingestion
+    walletAlertsConsumer: false
     # -- Name of an existing ConfigMap for streaming config
     # @section -- Streaming Ingestion
     configmap: ""
@@ -422,6 +427,9 @@ global:
         # -- Kafka topic for security logs
         # @section -- Streaming Ingestion / Kafka
         securityLogs: security_logs
+        # -- Kafka topic for wallet alerts evaluation
+        # @section -- Streaming Ingestion / Kafka
+        walletAlerts: wallet_alerts
         # -- Kafka topic for unprocessed events (dead-letter for pre-enrichment failures)
         # @section -- Streaming Ingestion / Kafka
         unprocessedEvents: unprocessed_events

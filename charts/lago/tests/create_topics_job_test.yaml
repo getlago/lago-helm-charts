@@ -1,0 +1,53 @@
+suite: Test the create-topics job creates every topic listed under
+  global.streaming_ingestion.kafka.topics, including the wallet alerts topic
+  the wallet-alerts-consumer-worker reads.
+templates:
+  - templates/create-topic-job.yaml
+
+set:
+  global:
+    lago:
+      env: production
+      version: v1.0.0
+    urls:
+      api: http://api.test
+      front: http://front.test
+    database:
+      uri: postgresql://localhost
+    encryption:
+      key: test-key
+      salt: test-salt
+    signing:
+      hmac: test-hmac
+      rsa: test-rsa
+    redis:
+      uri: redis://localhost
+    streaming_ingestion:
+      enabled: true
+      kafka:
+        bootstrapServers:
+          - kafka:9092
+  createTopics:
+    enabled: true
+
+tests:
+  - it: includes the wallet alerts topic in the topics to create
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[1]
+          pattern: 'topics="[^"]*\bwallet_alerts\b[^"]*"'
+
+  - it: follows an overridden wallet alerts topic name
+    set:
+      global.streaming_ingestion.kafka.topics.walletAlerts: custom_wallet_alerts
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[1]
+          pattern: 'topics="[^"]*\bcustom_wallet_alerts\b[^"]*"'
+
+  - it: renders nothing when the job is disabled
+    set:
+      createTopics.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0

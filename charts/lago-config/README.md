@@ -193,6 +193,7 @@ A Helm chart for Kubernetes
 | global.streaming_ingestion.configmap | string | `""` | Name of an existing ConfigMap for streaming config |
 | global.streaming_ingestion.enabled | bool | `false` | Enable streaming ingestion (ClickHouse + Kafka) |
 | global.streaming_ingestion.secret | string | `""` | Name of an existing Secret for streaming credentials |
+| global.streaming_ingestion.walletAlertsConsumer | bool | `false` | Expose `LAGO_KAFKA_WALLET_ALERTS_TOPIC` in the streaming ConfigMap, so that wallet changes are produced to the wallet alerts topic. Set by the umbrella chart alongside the `wallet-alerts-consumer-worker`. |
 
 ### Streaming Ingestion / Kafka
 
@@ -217,6 +218,7 @@ A Helm chart for Kubernetes
 | global.streaming_ingestion.kafka.topics.productEventsRaw | string | `"product_events_raw"` | Kafka topic for raw product events |
 | global.streaming_ingestion.kafka.topics.securityLogs | string | `"security_logs"` | Kafka topic for security logs |
 | global.streaming_ingestion.kafka.topics.unprocessedEvents | string | `"unprocessed_events"` | Kafka topic for unprocessed events (dead-letter for pre-enrichment failures) |
+| global.streaming_ingestion.kafka.topics.walletAlerts | string | `"wallet_alerts"` | Kafka topic for wallet alerts evaluation |
 | global.streaming_ingestion.kafka.username | string | `""` | Kafka username (not required when using an external secret) |
 
 ### URLs
