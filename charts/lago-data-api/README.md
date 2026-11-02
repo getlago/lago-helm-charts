@@ -60,8 +60,8 @@ A Helm chart for Kubernetes
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | container.name | string | `""` | Override the container name (defaults to chart fullname) |
-| container.command | list | `[]` | Container entrypoint command. Unset, the image ENTRYPOINT runs |
-| container.args | list | `[]` | Container command arguments. Unset, the image CMD runs |
+| container.command | list | `[]` | Container entrypoint command. Empty, the image ENTRYPOINT runs. Set it together with `args`: alone, it drops the image CMD |
+| container.args | list | `[]` | Container command arguments. Empty, the image CMD runs. Set it together with `command`: alone, it replaces the image CMD |
 | container.ports.http | int | `80` | HTTP container port |
 
 ### Service Account
