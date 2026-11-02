@@ -299,9 +299,7 @@ global:
     enabled: false
     # -- Expose `LAGO_KAFKA_WALLET_ALERTS_TOPIC` in the streaming ConfigMap,
     # so that wallet changes are produced to the wallet alerts topic. Set by
-    # the umbrella chart alongside the `wallet-alerts-consumer-worker`. The
-    # Lago pods are not restarted when this changes: after turning it off,
-    # restart the Lago deployments so they stop producing to the topic.
+    # the umbrella chart alongside the `wallet-alerts-consumer-worker`.
     # @section -- Streaming Ingestion
     walletAlertsConsumer: false
     # -- Name of an existing ConfigMap for streaming config

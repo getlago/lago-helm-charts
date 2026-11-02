@@ -1,0 +1,70 @@
+suite: Test that the lago-rails pods carry the wallet alerts toggle as a pod
+  template annotation, so that flipping global.streaming_ingestion.walletAlertsConsumer
+  rolls every pod that reads LAGO_KAFKA_WALLET_ALERTS_TOPIC from the streaming
+  ConfigMap (envFrom alone does not restart them).
+templates:
+  - charts/api/templates/deployment.yaml
+  - charts/worker/templates/deployment.yaml
+
+set:
+  global:
+    lago:
+      env: production
+      version: v1.0.0
+    urls:
+      api: http://api.test
+      front: http://front.test
+    database:
+      uri: postgresql://localhost
+    encryption:
+      key: test-key
+      salt: test-salt
+    signing:
+      hmac: test-hmac
+      rsa: test-rsa
+    redis:
+      uri: redis://localhost
+    redisCache:
+      uri: redis://localhost
+    redisStore:
+      uri: redis://localhost
+    streaming_ingestion:
+      enabled: true
+      kafka:
+        bootstrapServers:
+          - kafka:9092
+
+tests:
+  - it: annotates the pod template with the toggle when it is on
+    set:
+      global.streaming_ingestion.walletAlertsConsumer: true
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations["lago.getlago.com/wallet-alerts-consumer"]
+          value: "true"
+
+  - it: annotates the pod template with the toggle when it is off
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations["lago.getlago.com/wallet-alerts-consumer"]
+          value: "false"
+
+  - it: keeps the user pod annotations next to the toggle
+    set:
+      api.podAnnotations:
+        example.com/foo: bar
+    template: charts/api/templates/deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations["example.com/foo"]
+          value: bar
+      - equal:
+          path: spec.template.metadata.annotations["lago.getlago.com/wallet-alerts-consumer"]
+          value: "false"
+
+  - it: renders no toggle annotation without streaming ingestion
+    set:
+      global.streaming_ingestion.enabled: false
+    asserts:
+      - notExists:
+          path: spec.template.metadata.annotations["lago.getlago.com/wallet-alerts-consumer"]

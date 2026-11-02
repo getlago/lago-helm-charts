@@ -373,9 +373,10 @@ global:
     # and expose `LAGO_KAFKA_WALLET_ALERTS_TOPIC` to every Lago workload, so
     # that the wallet alerts of the organizations on realtime usage are
     # evaluated from Kafka instead of the `ProcessWalletAlertsJob`. Requires
-    # `enabled` above, like `walletRefreshConsumer`. The chart does not restart
-    # the other Lago pods when this changes: after turning it off, restart the
-    # Lago deployments so they stop producing to the wallet alerts topic.
+    # `enabled` above, like `walletRefreshConsumer`. Changing it rolls every
+    # lago-rails pod, so that none keeps the topic after it is turned off. The
+    # create-topics job only runs on install: on an existing release, create
+    # the `kafka.topics.walletAlerts` topic before turning this on.
     # @section -- Streaming Ingestion
     walletAlertsConsumer: false
     # -- Name of an existing ConfigMap for streaming config
@@ -1316,7 +1317,10 @@ migrate:
 # @default -- See child values
 # @section -- Create Topics Job
 createTopics:
-  # -- Enable the Kafka topic creation job
+  # -- Enable the Kafka topic creation job. It is a `pre-install` hook, so it
+  # only runs on the first install: topics added to
+  # `global.streaming_ingestion.kafka.topics` later (e.g. `walletAlerts`) must
+  # be created by hand on an existing release.
   # @section -- Create Topics Job
   enabled: false
   image:
