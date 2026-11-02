@@ -60,8 +60,8 @@ A Helm chart for Kubernetes
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | container.name | string | `""` | Override the container name (defaults to chart fullname) |
-| container.command | list | `["uv"]` | Container entrypoint command |
-| container.args | list | `["run","fastapi","run","app/main.py","--port","80"]` | Container command arguments |
+| container.command | list | `[]` | Container entrypoint command. Unset, the image ENTRYPOINT runs |
+| container.args | list | `[]` | Container command arguments. Unset, the image CMD runs |
 | container.ports.http | int | `80` | HTTP container port |
 
 ### Service Account
