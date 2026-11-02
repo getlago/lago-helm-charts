@@ -71,14 +71,14 @@ container:
   # -- Override the container name (defaults to chart fullname)
   # @section -- Container
   name: ""
-  # -- Container entrypoint command. Empty, the image ENTRYPOINT runs. Set it together with `args`: alone, it drops the image CMD
+  # -- Container entrypoint command. Deprecated default for the Debian image: the next major release defaults to `[]` (image ENTRYPOINT). Set it together with `args`
   # @section -- Container
-  command: []
-  # -- Container command arguments. Empty, the image CMD runs. Set it together with `command`: alone, it replaces the image CMD
+  command: ["uv"]
+  # -- Container command arguments. Deprecated default for the Debian image: the next major release defaults to `[]` (image CMD). Set it together with `command`
   # @section -- Container
-  args: []
+  args: ["run", "fastapi", "run", "app/main.py", "--port", "80"]
   ports:
-    # -- HTTP container port
+    # -- HTTP container port. Deprecated default for the Debian image: the next major release defaults to 8080 (non-root image)
     # @section -- Container
     http: 80
 

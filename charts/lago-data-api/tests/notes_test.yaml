@@ -1,0 +1,28 @@
+suite: Test the Debian-image deprecation warning
+templates:
+  - templates/NOTES.txt
+values:
+  - fixtures/required.yaml
+
+tests:
+  - it: should warn with the default Debian-image settings
+    asserts:
+      - matchRegexRaw:
+          pattern: "WARNING: lago-data-api runs with the Debian image settings"
+
+  - it: should warn when the port is still 80
+    set:
+      container.command: []
+      container.args: []
+    asserts:
+      - matchRegexRaw:
+          pattern: "WARNING: lago-data-api runs with the Debian image settings"
+
+  - it: should not warn with the hardened-image settings
+    set:
+      container.command: null
+      container.args: null
+      container.ports.http: 8080
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "WARNING"

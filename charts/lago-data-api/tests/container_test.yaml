@@ -5,7 +5,19 @@ values:
   - fixtures/required.yaml
 
 tests:
-  - it: should leave command and args to the image by default
+  - it: should render the deprecated Debian-image command by default
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value: ["uv"]
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value: ["run", "fastapi", "run", "app/main.py", "--port", "80"]
+
+  - it: should leave command and args to the image when they are empty
+    set:
+      container.command: []
+      container.args: []
     asserts:
       - notExists:
           path: spec.template.spec.containers[0].command
@@ -22,22 +34,11 @@ tests:
       - notExists:
           path: spec.template.spec.containers[0].args
 
-  - it: should render command and args when they are set
-    set:
-      container.command: ["uv"]
-      container.args: ["run", "fastapi", "run", "app/main.py", "--port", "80"]
-    asserts:
-      - equal:
-          path: spec.template.spec.containers[0].command
-          value: ["uv"]
-      - equal:
-          path: spec.template.spec.containers[0].args
-          value: ["run", "fastapi", "run", "app/main.py", "--port", "80"]
-
   # Kubernetes keeps the image ENTRYPOINT and replaces its CMD with args: an
   # override must set both keys (see values.yaml).
   - it: should render args alone when only args are set
     set:
+      container.command: []
       container.args: ["run", "app/main.py", "--workers", "2"]
     asserts:
       - notExists:
@@ -45,4 +46,3 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].args
           value: ["run", "app/main.py", "--workers", "2"]
-
