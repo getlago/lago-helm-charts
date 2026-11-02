@@ -33,3 +33,16 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].args
           value: ["run", "fastapi", "run", "app/main.py", "--port", "80"]
+
+  # Kubernetes keeps the image ENTRYPOINT and replaces its CMD with args: an
+  # override must set both keys (see values.yaml).
+  - it: should render args alone when only args are set
+    set:
+      container.args: ["run", "app/main.py", "--workers", "2"]
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].command
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value: ["run", "app/main.py", "--workers", "2"]
+

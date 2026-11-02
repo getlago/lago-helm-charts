@@ -71,10 +71,10 @@ container:
   # -- Override the container name (defaults to chart fullname)
   # @section -- Container
   name: ""
-  # -- Container entrypoint command. Unset, the image ENTRYPOINT runs
+  # -- Container entrypoint command. Empty, the image ENTRYPOINT runs. Set it together with `args`: alone, it drops the image CMD
   # @section -- Container
   command: []
-  # -- Container command arguments. Unset, the image CMD runs
+  # -- Container command arguments. Empty, the image CMD runs. Set it together with `command`: alone, it replaces the image CMD
   # @section -- Container
   args: []
   ports:
