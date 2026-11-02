@@ -52,10 +52,10 @@ container:
   name: ""
   # -- Container entrypoint command
   # @section -- Container
-  command:
+  command: []
   # -- Container command arguments
   # @section -- Container
-  args:
+  args: []
   ports:
     # -- HTTP container port
     # @section -- Container

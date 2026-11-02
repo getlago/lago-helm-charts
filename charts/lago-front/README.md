@@ -57,8 +57,8 @@ A Helm chart for Kubernetes
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | container.name | string | `""` | Override the container name (defaults to chart fullname) |
-| container.command | string | `nil` | Container entrypoint command |
-| container.args | string | `nil` | Container command arguments |
+| container.command | list | `[]` | Container entrypoint command |
+| container.args | list | `[]` | Container command arguments |
 | container.ports.http | int | `80` | HTTP container port |
 
 ### Deployment
