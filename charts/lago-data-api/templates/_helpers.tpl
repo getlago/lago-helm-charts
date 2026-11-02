@@ -70,3 +70,19 @@ Create the name of the service account to use
 {{- define "lago-data-api.secretName" -}}
 {{- mustMergeOverwrite .Values .Values.config | set . "Values" | include "lago-data-config.secretName" }}
 {{- end }}
+
+{{/*
+Deprecation warning for the Debian-image defaults. Takes a dict with `container` (the data-api
+container values) and `prefix` (where they sit): Helm shows only the top-level chart's NOTES.
+*/}}
+{{- define "lago-data-api.debianImageWarning" -}}
+{{- $c := .container -}}
+{{- $p := .prefix -}}
+{{- if or (has "uv" (default (list) $c.command)) (eq (int $c.ports.http) 80) }}
+WARNING: lago-data-api runs with the Debian image settings (`uv` command or port 80).
+The next major release of this chart runs the hardened image: no uv, non-root, port 8080.
+Its defaults become {{ $p }}container.command: [], {{ $p }}container.args: [] and
+{{ $p }}container.ports.http: 8080. If you pin an older data-api image, set these three
+values explicitly before you upgrade.
+{{- end }}
+{{- end }}

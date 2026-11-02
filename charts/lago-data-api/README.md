@@ -60,9 +60,9 @@ A Helm chart for Kubernetes
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | container.name | string | `""` | Override the container name (defaults to chart fullname) |
-| container.command | list | `[]` | Container entrypoint command. Empty, the image ENTRYPOINT runs. Set it together with `args`: alone, it drops the image CMD |
-| container.args | list | `[]` | Container command arguments. Empty, the image CMD runs. Set it together with `command`: alone, it replaces the image CMD |
-| container.ports.http | int | `80` | HTTP container port |
+| container.command | list | `["uv"]` | Container entrypoint command. Deprecated default for the Debian image: the next major release defaults to `[]` (image ENTRYPOINT). Set it together with `args` |
+| container.args | list | `["run","fastapi","run","app/main.py","--port","80"]` | Container command arguments. Deprecated default for the Debian image: the next major release defaults to `[]` (image CMD). Set it together with `command` |
+| container.ports.http | int | `80` | HTTP container port. Deprecated default for the Debian image: the next major release defaults to 8080 (non-root image) |
 
 ### Service Account
 
