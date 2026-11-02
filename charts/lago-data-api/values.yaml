@@ -71,12 +71,12 @@ container:
   # -- Override the container name (defaults to chart fullname)
   # @section -- Container
   name: ""
-  # -- Container entrypoint command
+  # -- Container entrypoint command. Unset, the image ENTRYPOINT runs
   # @section -- Container
-  command: ["uv"]
-  # -- Container command arguments
+  command: []
+  # -- Container command arguments. Unset, the image CMD runs
   # @section -- Container
-  args: ["run", "fastapi", "run", "app/main.py", "--port", "80"]
+  args: []
   ports:
     # -- HTTP container port
     # @section -- Container

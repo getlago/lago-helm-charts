@@ -38,8 +38,12 @@ spec:
       {{- end }}
       containers:
         - name: {{ default .Chart.Name .Values.container.name }}
-          command: {{ toJson .Values.container.command }}
-          args: {{ toJson .Values.container.args }}
+          {{- with .Values.container.command }}
+          command: {{ toJson . }}
+          {{- end }}
+          {{- with .Values.container.args }}
+          args: {{ toJson . }}
+          {{- end }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
