@@ -32,6 +32,7 @@ data:
   LAGO_KAFKA_RAW_EVENTS_TOPIC: {{ $kafka.topics.eventsRaw }}
   LAGO_KAFKA_PRODUCT_RAW_EVENTS_TOPIC: {{ $kafka.topics.productEventsRaw }}
   LAGO_KAFKA_PRODUCT_ENRICHED_EVENTS_TOPIC: {{ $kafka.topics.productEventsEnriched }}
+  LAGO_KAFKA_PRODUCT_EVENTS_DEAD_LETTER_TOPIC: {{ $kafka.topics.productEventsDeadLetter }}
   {{- with $kafka.saslMechanisms }}
   LAGO_KAFKA_SCRAM_ALGORITHM: {{ $kafka.saslMechanisms }}
   LAGO_KAFKA_SASL_MECHANISMS: {{ $kafka.saslMechanisms }}
