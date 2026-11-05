@@ -85,7 +85,8 @@ tests:
           value: clickhouse
 
   # ============================================================================
-  # LAGO_KAFKA_PRODUCT_{RAW,ENRICHED}_EVENTS_TOPIC (configurable, with defaults)
+  # LAGO_KAFKA_PRODUCT_{RAW,ENRICHED}_EVENTS_TOPIC and
+  # LAGO_KAFKA_PRODUCT_EVENTS_DEAD_LETTER_TOPIC (configurable, with defaults)
   # ============================================================================
   - it: defaults the product events topics
     asserts:
@@ -95,11 +96,15 @@ tests:
       - equal:
           path: data.LAGO_KAFKA_PRODUCT_ENRICHED_EVENTS_TOPIC
           value: product_events_enriched
+      - equal:
+          path: data.LAGO_KAFKA_PRODUCT_EVENTS_DEAD_LETTER_TOPIC
+          value: product_events_dead_letter
 
   - it: renders the product events topics when overridden
     set:
       global.streaming_ingestion.kafka.topics.productEventsRaw: product-events-raw
       global.streaming_ingestion.kafka.topics.productEventsEnriched: product-events-enriched
+      global.streaming_ingestion.kafka.topics.productEventsDeadLetter: product-events-dead-letter
     asserts:
       - equal:
           path: data.LAGO_KAFKA_PRODUCT_RAW_EVENTS_TOPIC
@@ -107,3 +112,6 @@ tests:
       - equal:
           path: data.LAGO_KAFKA_PRODUCT_ENRICHED_EVENTS_TOPIC
           value: product-events-enriched
+      - equal:
+          path: data.LAGO_KAFKA_PRODUCT_EVENTS_DEAD_LETTER_TOPIC
+          value: product-events-dead-letter

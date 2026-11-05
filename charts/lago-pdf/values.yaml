@@ -287,6 +287,9 @@ global:
         # -- Kafka topic for enriched product events
         # @section -- Streaming Ingestion / Kafka
         productEventsEnriched: product_events_enriched
+        # -- Kafka topic for dead-letter product events
+        # @section -- Streaming Ingestion / Kafka
+        productEventsDeadLetter: product_events_dead_letter
         # -- Kafka topic for activity logs
         # @section -- Streaming Ingestion / Kafka
         activityLogs: activity_logs
