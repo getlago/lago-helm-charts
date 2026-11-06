@@ -373,10 +373,18 @@ global:
     # and expose `LAGO_KAFKA_WALLET_ALERTS_TOPIC` to every Lago workload, so
     # that the wallet alerts of the organizations on realtime usage are
     # evaluated from Kafka instead of the `ProcessWalletAlertsJob`. Requires
-    # `enabled` above, like `walletRefreshConsumer`. Changing it rolls every
-    # lago-rails pod, so that none keeps the topic after it is turned off. The
-    # create-topics job only runs on install: on an existing release, create
-    # the `kafka.topics.walletAlerts` topic before turning this on.
+    # `enabled` above, like `walletRefreshConsumer`. Create the
+    # `kafka.topics.walletAlerts` topic before turning it on (see
+    # `createTopics.enabled`). Changing it rolls every lago-rails pod, as their
+    # pod template carries a checksum of the streaming ConfigMap. To turn it
+    # off without dropping the alerts still in the topic: (1) with plain Helm,
+    # annotate the `wallet-alerts-consumer-worker` Deployment with
+    # `helm.sh/resource-policy=keep` so that the upgrade leaves it running
+    # (Argo CD without prune already does); (2) set this to false and upgrade,
+    # then wait for every Lago rollout to finish, so that no pod produces to
+    # the topic any more; (3) wait for the lag of the
+    # `lago_wallet_alerts_consumer` group to reach 0; (4) delete the Deployment,
+    # then the consumer group.
     # @section -- Streaming Ingestion
     walletAlertsConsumer: false
     # -- Name of an existing ConfigMap for streaming config
@@ -1317,8 +1325,9 @@ migrate:
 # @default -- See child values
 # @section -- Create Topics Job
 createTopics:
-  # -- Enable the Kafka topic creation job. It is a `pre-install` hook, so it
-  # only runs on the first install: topics added to
+  # -- Enable the Kafka topic creation job. It is a `pre-install` hook, so
+  # with plain Helm it only runs on the first install (Argo CD runs it as a
+  # PreSync hook on every sync): with plain Helm, topics added to
   # `global.streaming_ingestion.kafka.topics` later (e.g. `walletAlerts`) must
   # be created by hand on an existing release.
   # @section -- Create Topics Job

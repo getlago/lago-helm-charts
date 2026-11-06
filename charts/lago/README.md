@@ -320,7 +320,7 @@ A Helm chart for Kubernetes
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | createTopics | object | See child values | Kafka topic creation job configuration |
-| createTopics.enabled | bool | `false` | Enable the Kafka topic creation job. It is a `pre-install` hook, so it only runs on the first install: topics added to `global.streaming_ingestion.kafka.topics` later (e.g. `walletAlerts`) must be created by hand on an existing release. |
+| createTopics.enabled | bool | `false` | Enable the Kafka topic creation job. It is a `pre-install` hook, so with plain Helm it only runs on the first install (Argo CD runs it as a PreSync hook on every sync): with plain Helm, topics added to `global.streaming_ingestion.kafka.topics` later (e.g. `walletAlerts`) must be created by hand on an existing release. |
 | createTopics.image.repository | string | `"alpine"` | Topic job image repository |
 | createTopics.image.tag | string | `"3.20"` | Topic job image tag |
 | createTopics.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
