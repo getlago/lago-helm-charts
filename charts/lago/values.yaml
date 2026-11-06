@@ -369,6 +369,13 @@ global:
     # ConfigMap/Secret, which only the streaming gate attaches.
     # @section -- Streaming Ingestion
     walletRefreshConsumer: false
+    # -- Run the events processor's product events pipeline
+    # (`product-events-processor-worker`), which enriches the events of
+    # product catalog organizations. Lives here for the same reason as
+    # `walletRefreshConsumer`: its Kafka connection and topics come from the
+    # streaming ConfigMap/Secret.
+    # @section -- Streaming Ingestion
+    productEventsProcessor: false
     # -- Name of an existing ConfigMap for streaming config
     # @section -- Streaming Ingestion
     configmap: ""
@@ -1145,6 +1152,30 @@ events-processor-worker:
     # -- Config subchart name override
     # @section -- Events Processor Worker
     nameOverride: lago-config
+
+# -- Product events processor worker subchart overrides (lago-events-processor-worker,
+# conditional on `global.streaming_ingestion.productEventsProcessor`). Same image as
+# the events processor, running its product events pipeline in its own deployment so
+# a product events failure or backlog never holds back subscription events.
+# @default -- See child values
+# @section -- Product Events Processor Worker
+product-events-processor-worker:
+  # -- Override the product-events-processor-worker subchart release name
+  # @section -- Product Events Processor Worker
+  nameOverride: lago-product-events-processor-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Product Events Processor Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- Product Events Processor Worker
+    nameOverride: lago-config
+  # -- Selects the product events pipeline. Merged with the subchart's default
+  # `extraEnv`, so the consumer group override still applies; the processor
+  # derives each pipeline's group name from its topic, so they never share one.
+  # @section -- Product Events Processor Worker
+  extraEnv:
+    LAGO_EVENTS_PROCESSOR_PIPELINE: product_events
 
 # -- Database migration job configuration
 # @default -- See child values
