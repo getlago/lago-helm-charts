@@ -25,6 +25,8 @@ The canonical reference is `charts/lago-data-rev-rec/` — most recently restruc
 - **No hardcoded ArgoCD annotations** — `argocd.argoproj.io/*` is supplied via values by the caller (Argo). Templates never bake them in.
 - **Labels/annotations merge:** template-generated labels (from `<chart>.labels`) come first, user `.Values.labels` after (override-friendly). Annotations come entirely from values (no template defaults), gated with `with`.
 - **Helper naming:** `<chart-name>.<function>` — `<chart>.fullname`, `<chart>.labels`, `<chart>.selectorLabels`, `<chart>.serviceAccountName`.
+- **Container `command` / `args`:** both default to `[]`, never to null or an empty key, so the value type is known. Render each one only when it is set (`{{- with .Values.container.command }}command: {{ toJson . }}{{- end }}`), so the image ENTRYPOINT and CMD run by default. Put a command in the defaults only when one image serves several roles and the command picks the role (lago-rails: API, worker, clock). Reference: `charts/lago-front/templates/deployment.yaml`.
+- **Changing a default that breaks running deployments** (a start command, a port, an image layout) takes two releases. First release: keep the old default, document the next one in the value's helm-docs comment, and print a warning from `NOTES.txt` while the old setting is in use. Helm shows only the top-level chart's NOTES, so a subchart warning lives in a named template that the umbrella's `NOTES.txt` also includes. Argo CD never shows NOTES, so the release notes carry the same warning. Next major release: change the default, and `fail` on a setting that no longer works. Reference: `lago-data-api.debianImageWarning`.
 
 ## Chart.yaml versioning
 
