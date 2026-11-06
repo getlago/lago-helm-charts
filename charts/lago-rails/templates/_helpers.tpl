@@ -141,3 +141,7 @@ Create the name of the service account to use
 {{- define "lago-rails.streaming.secretName" -}}
 {{- mustMergeOverwrite .Values .Values.config | set . "Values" | include "lago-config.streaming.secretName" }}
 {{- end }}
+
+{{- define "lago-rails.streaming.configMapChecksum" -}}
+{{- include "lago-config.streaming.configMapData" . | sha256sum }}
+{{- end }}

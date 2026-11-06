@@ -1,7 +1,7 @@
-suite: Test that the lago-rails pods carry the wallet alerts toggle as a pod
-  template annotation, so that flipping global.streaming_ingestion.walletAlertsConsumer
-  rolls every pod that reads LAGO_KAFKA_WALLET_ALERTS_TOPIC from the streaming
-  ConfigMap (envFrom alone does not restart them).
+suite: Test that the lago-rails pods carry a checksum of the streaming ConfigMap
+  data as a pod template annotation, so that any change to it (e.g. flipping
+  global.streaming_ingestion.walletAlertsConsumer, which adds or drops
+  LAGO_KAFKA_WALLET_ALERTS_TOPIC) rolls every pod that reads it through envFrom.
 templates:
   - charts/api/templates/deployment.yaml
   - charts/worker/templates/deployment.yaml
@@ -35,21 +35,31 @@ set:
           - kafka:9092
 
 tests:
-  - it: annotates the pod template with the toggle when it is on
+  - it: annotates the pod template with the streaming ConfigMap checksum
+    asserts:
+      - matchRegex:
+          path: spec.template.metadata.annotations["checksum/streaming-config"]
+          pattern: ^[0-9a-f]{64}$
+
+  - it: changes the checksum when the wallet alerts toggle changes
     set:
       global.streaming_ingestion.walletAlertsConsumer: true
+    template: charts/api/templates/deployment.yaml
     asserts:
-      - equal:
-          path: spec.template.metadata.annotations["lago.getlago.com/wallet-alerts-consumer"]
-          value: "true"
+      - notEqual:
+          path: spec.template.metadata.annotations["checksum/streaming-config"]
+          value: 62167b5b820f029a668fb2ba510216c15bdde0f2dd75eb692edae66018d8b290
 
-  - it: annotates the pod template with the toggle when it is off
+  - it: changes the checksum when a streaming topic changes
+    set:
+      global.streaming_ingestion.kafka.topics.eventsRaw: other_events_raw
+    template: charts/api/templates/deployment.yaml
     asserts:
-      - equal:
-          path: spec.template.metadata.annotations["lago.getlago.com/wallet-alerts-consumer"]
-          value: "false"
+      - notEqual:
+          path: spec.template.metadata.annotations["checksum/streaming-config"]
+          value: 62167b5b820f029a668fb2ba510216c15bdde0f2dd75eb692edae66018d8b290
 
-  - it: keeps the user pod annotations next to the toggle
+  - it: keeps the user pod annotations next to the checksum
     set:
       api.podAnnotations:
         example.com/foo: bar
@@ -59,12 +69,12 @@ tests:
           path: spec.template.metadata.annotations["example.com/foo"]
           value: bar
       - equal:
-          path: spec.template.metadata.annotations["lago.getlago.com/wallet-alerts-consumer"]
-          value: "false"
+          path: spec.template.metadata.annotations["checksum/streaming-config"]
+          value: 62167b5b820f029a668fb2ba510216c15bdde0f2dd75eb692edae66018d8b290
 
-  - it: renders no toggle annotation without streaming ingestion
+  - it: renders no checksum without streaming ingestion
     set:
       global.streaming_ingestion.enabled: false
     asserts:
       - notExists:
-          path: spec.template.metadata.annotations["lago.getlago.com/wallet-alerts-consumer"]
+          path: spec.template.metadata.annotations["checksum/streaming-config"]

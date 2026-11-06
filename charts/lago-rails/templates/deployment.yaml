@@ -19,12 +19,12 @@ spec:
   template:
     metadata:
       {{- /* envFrom does not roll pods when the streaming ConfigMap changes.
-             Carry the wallet alerts toggle on the pod template so that turning
-             it off restarts every pod still holding LAGO_KAFKA_WALLET_ALERTS_TOPIC,
-             instead of leaving them producing to a topic nobody drains. */}}
+             Hash its data on the pod template so that any change to it (e.g. a
+             topic gated by a toggle, like LAGO_KAFKA_WALLET_ALERTS_TOPIC)
+             restarts every pod still holding the old values. */}}
       {{- $podAnnotations := dict }}
       {{- if .Values.global.streaming_ingestion.enabled }}
-      {{- $_ := set $podAnnotations "lago.getlago.com/wallet-alerts-consumer" (.Values.global.streaming_ingestion.walletAlertsConsumer | default false | toString) }}
+      {{- $_ := set $podAnnotations "checksum/streaming-config" (include "lago-rails.streaming.configMapChecksum" .) }}
       {{- end }}
       {{- $podAnnotations = merge (deepCopy (.Values.podAnnotations | default dict)) $podAnnotations }}
       {{- with $podAnnotations }}
