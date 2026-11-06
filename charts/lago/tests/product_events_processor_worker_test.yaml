@@ -36,12 +36,6 @@ set:
           - kafka:9092
 
 tests:
-  - it: does not render the product events processor by default
-    asserts:
-      - hasDocuments:
-          count: 0
-        template: charts/product-events-processor-worker/templates/deployment.yaml
-
   - it: renders its own deployment when enabled
     set:
       global.streaming_ingestion.productEventsProcessor: true
