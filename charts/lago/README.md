@@ -255,6 +255,16 @@ A Helm chart for Kubernetes
 | events-processor-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | events-processor-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
 
+### Product Events Processor Worker
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| product-events-processor-worker | object | See child values | Product events processor worker subchart overrides (lago-events-processor-worker, conditional on `global.streaming_ingestion.productEventsProcessor`). Same image as the events processor, running its product events pipeline in its own deployment so a product events failure or backlog never holds back subscription events. |
+| product-events-processor-worker.nameOverride | string | `"lago-product-events-processor-worker"` | Override the product-events-processor-worker subchart release name |
+| product-events-processor-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
+| product-events-processor-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
+| product-events-processor-worker.extraEnv | object | `{"LAGO_EVENTS_PROCESSOR_PIPELINE":"product_events"}` | Selects the product events pipeline. Merged with the subchart's default `extraEnv`, so the consumer group override still applies; the processor derives each pipeline's group name from its topic, so they never share one. |
+
 ### Database Migration
 
 | Key | Type | Default | Description |

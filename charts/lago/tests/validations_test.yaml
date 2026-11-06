@@ -51,3 +51,26 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+
+  - it: refuses the product events processor when streaming ingestion is off
+    set:
+      global:
+        streaming_ingestion:
+          enabled: false
+          productEventsProcessor: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "global.streaming_ingestion.productEventsProcessor requires global.streaming_ingestion.enabled: the product events processor takes its Kafka connection and topics from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on"
+
+  - it: renders nothing once the product events processor flags agree
+    set:
+      global:
+        streaming_ingestion:
+          enabled: true
+          productEventsProcessor: true
+          kafka:
+            bootstrapServers:
+              - kafka:9092
+    asserts:
+      - hasDocuments:
+          count: 0

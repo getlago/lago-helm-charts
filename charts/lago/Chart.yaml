@@ -94,6 +94,11 @@ dependencies:
     version: 2.1.3
     repository: "file://../lago-events-processor-worker"
     condition: global.streaming_ingestion.enabled
+  - name: lago-events-processor-worker
+    alias: product-events-processor-worker
+    version: 2.1.3
+    repository: "file://../lago-events-processor-worker"
+    condition: global.streaming_ingestion.productEventsProcessor
   - name: lago-rails
     alias: alerts-worker
     version: 2.1.3
