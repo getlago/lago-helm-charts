@@ -75,3 +75,19 @@ tests:
           content:
             name: LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC
             value: custom_triggers
+
+  - it: keeps the wallet alerts topic from the streaming ConfigMap, as it produces wallet alerts
+    set:
+      global.streaming_ingestion.walletRefreshConsumer: true
+      global.streaming_ingestion.walletAlertsConsumer: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].envFrom
+          content:
+            configMapRef:
+              name: RELEASE-NAME-lago-config-streaming
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_KAFKA_WALLET_ALERTS_TOPIC
+          any: true
