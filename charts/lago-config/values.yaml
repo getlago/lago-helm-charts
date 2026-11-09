@@ -297,6 +297,11 @@ global:
     # -- Enable streaming ingestion (ClickHouse + Kafka)
     # @section -- Streaming Ingestion
     enabled: false
+    # -- Expose the product events topics in the streaming ConfigMap, so that
+    # the events of product catalog organizations are produced to them. Set by
+    # the umbrella chart alongside the `product-events-processor-worker`.
+    # @section -- Streaming Ingestion
+    productEventsProcessor: false
     # -- Name of an existing ConfigMap for streaming config
     # @section -- Streaming Ingestion
     configmap: ""
