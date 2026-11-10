@@ -362,6 +362,13 @@ global:
         # -- Kafka topic for wallet alerts evaluation
         # @section -- Streaming Ingestion / Kafka
         walletAlerts: wallet_alerts
+        # -- Kafka topic of the realtime usage triggers that refresh wallets
+        # @section -- Streaming Ingestion / Kafka
+        realtimeUsageTriggers: realtime_usage_triggers
+        # -- Kafka topic on which the events processor reports the usage
+        # attribution values (account tree) to lago-api
+        # @section -- Streaming Ingestion / Kafka
+        usageAttributionValues: usage_attribution_values
         # -- Kafka topic for activity logs
         # @section -- Streaming Ingestion / Kafka
         activityLogs: activity_logs
@@ -460,11 +467,12 @@ config:
     name: ""
 
 karafka:
-  # -- Streaming consumer (a key of `global.streaming_ingestion.consumers`)
-  # whose Karafka group this pod runs. Replaces `container.command` with
-  # `bundle exec karafka server --include_consumer_groups <consumerGroup>`.
+  # -- Streaming consumers (keys of `global.streaming_ingestion.consumers`)
+  # whose Karafka groups this pod runs. When set, replaces `container.command`
+  # with `bundle exec karafka server --include_consumer_groups <groups>`, with
+  # the groups of the listed consumers that are on.
   # @section -- Container
-  consumer: ""
+  consumers: []
 
 container:
   # -- Override the container name (defaults to chart fullname)

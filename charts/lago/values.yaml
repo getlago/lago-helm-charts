@@ -362,28 +362,31 @@ global:
     # -- Enable streaming ingestion (ClickHouse + Kafka)
     # @section -- Streaming Ingestion
     enabled: false
-    # -- Deprecated: use `consumers.walletRefresh.enabled`. Wins while set.
-    # @section -- Streaming Ingestion
-    walletRefreshConsumer: null
-    # -- Deprecated: use `consumers.productEvents.enabled`. Wins while set.
-    # @section -- Streaming Ingestion
-    productEventsProcessor: null
-    # Optional streaming consumers, like `global.sidekiq.queues`: each flag
-    # deploys one worker (Chart.yaml condition) and renders that consumer's
-    # topic keys in the streaming ConfigMap, because lago-api produces to a
-    # topic as soon as it is set. Each needs `enabled` above
-    # (`templates/validations.yaml`). A Karafka worker names its consumer in
-    # `karafka.consumer`, and lago-rails runs `karafka server
-    # --include_consumer_groups <consumerGroup>`. Turning a consumer off sends
+    # Streaming consumers, like `global.sidekiq.queues`. An optional consumer
+    # has `enabled`: it gates its worker (Chart.yaml condition, when it has a
+    # worker of its own) and renders its topic keys in the streaming ConfigMap,
+    # because lago-api produces to a topic as soon as it is set. It needs
+    # `enabled` above (`templates/validations.yaml`). A consumer with no
+    # `enabled` runs whenever streaming ingestion is on. A Karafka worker lists
+    # its consumers in `karafka.consumers`, and lago-rails runs `karafka server
+    # --include_consumer_groups` with the groups of the ones that are on, so no
+    # pod joins a group by accident. Turning a consumer off sends
     # the work back to the Sidekiq path (wallet alerts) or to the subscription
     # pipeline (product events). The unread messages stay in the topic, and the
     # consumer resumes them from its offset (within the topic retention) when
     # turned on again. Restart the Lago pods after a change unless Stakater
     # Reloader watches the streaming ConfigMap.
     consumers:
+      eventsChargedInAdvance:
+        # -- Karafka consumer group of the events consumer
+        # (`events-consumer-worker`), always on with streaming ingestion.
+        # Must match lago-api `karafka.rb`.
+        # @section -- Streaming Ingestion
+        consumerGroup: lago_events_charged_in_advance_consumer
       walletRefresh:
         # -- Run the Karafka `WalletRefreshTriggersConsumer`
-        # (`wallet-refresh-consumer-worker`) on the realtime usage triggers topic
+        # (`wallet-refresh-consumer-worker`) and expose
+        # `LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC`
         # @section -- Streaming Ingestion
         enabled: false
         # -- Karafka consumer group. Must match lago-api `karafka.rb`.
@@ -408,6 +411,16 @@ global:
         # enriched.
         # @section -- Streaming Ingestion
         enabled: false
+      usageAttribution:
+        # -- Run the Karafka `UsageAttributionValuesConsumer` (in
+        # `events-consumer-worker`) and expose
+        # `LAGO_KAFKA_USAGE_ATTRIBUTION_VALUES_TOPIC`, so that the events
+        # processor reports the usage attribution values (account tree).
+        # @section -- Streaming Ingestion
+        enabled: false
+        # -- Karafka consumer group. Must match lago-api `karafka.rb`.
+        # @section -- Streaming Ingestion
+        consumerGroup: lago_usage_attribution_values_consumer
     # -- Name of an existing ConfigMap for streaming config
     # @section -- Streaming Ingestion
     configmap: ""
@@ -483,6 +496,13 @@ global:
         # -- Kafka topic for wallet alerts evaluation
         # @section -- Streaming Ingestion / Kafka
         walletAlerts: wallet_alerts
+        # -- Kafka topic of the realtime usage triggers that refresh wallets
+        # @section -- Streaming Ingestion / Kafka
+        realtimeUsageTriggers: realtime_usage_triggers
+        # -- Kafka topic on which the events processor reports the usage
+        # attribution values (account tree) to lago-api
+        # @section -- Streaming Ingestion / Kafka
+        usageAttributionValues: usage_attribution_values
         # -- Kafka topic for activity logs
         # @section -- Streaming Ingestion / Kafka
         activityLogs: activity_logs
@@ -1122,18 +1142,14 @@ events-consumer-worker:
     # @section -- Events Consumer Worker
     enabled: false
   container:
-    # -- Events consumer entrypoint command
-    # @section -- Events Consumer Worker
-    command: ["./scripts/start.events.consumer.sh"]
     # -- Container ports (none needed)
     # @section -- Events Consumer Worker
     ports: []
-  # -- Blanks the wallet alerts topic inherited from the streaming ConfigMap,
-  # so this pod does not join the wallet alerts consumer group. The events
-  # consumer only enqueues jobs, it never produces wallet alerts itself.
-  # @section -- Events Consumer Worker
-  extraEnv:
-    LAGO_KAFKA_WALLET_ALERTS_TOPIC: ""
+  karafka:
+    # -- Streaming consumers whose Karafka groups this pod runs (the ones
+    # that are on)
+    # @section -- Events Consumer Worker
+    consumers: [eventsChargedInAdvance, usageAttribution]
 
 # -- Wallet refresh consumer worker subchart overrides (lago-rails, conditional
 # on `global.streaming_ingestion.consumers.walletRefresh.enabled`). Runs the Karafka
@@ -1165,20 +1181,15 @@ wallet-refresh-consumer-worker:
     # @section -- Wallet Refresh Consumer Worker
     enabled: false
   karafka:
-    # -- Streaming consumer whose Karafka group this pod runs. The pod keeps
+    # -- Streaming consumers whose Karafka groups this pod runs. The pod keeps
     # the wallet alerts topic, as it produces wallet alerts, but does not
     # consume them.
     # @section -- Wallet Refresh Consumer Worker
-    consumer: walletRefresh
+    consumers: [walletRefresh]
   container:
     # -- Container ports (none needed)
     # @section -- Wallet Refresh Consumer Worker
     ports: []
-  # -- Sets the realtime usage triggers topic, which draws the wallet refresh
-  # consumer group that `karafka.consumer` restricts the pod to.
-  # @section -- Wallet Refresh Consumer Worker
-  extraEnv:
-    LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC: realtime_usage_triggers
 
 # -- Wallet alerts consumer worker subchart overrides (lago-rails, conditional
 # on `global.streaming_ingestion.consumers.walletAlerts.enabled`). Runs the Karafka
@@ -1210,9 +1221,9 @@ wallet-alerts-consumer-worker:
     # @section -- Wallet Alerts Consumer Worker
     enabled: false
   karafka:
-    # -- Streaming consumer whose Karafka group this pod runs
+    # -- Streaming consumers whose Karafka groups this pod runs
     # @section -- Wallet Alerts Consumer Worker
-    consumer: walletAlerts
+    consumers: [walletAlerts]
   container:
     # -- Container ports (none needed)
     # @section -- Wallet Alerts Consumer Worker

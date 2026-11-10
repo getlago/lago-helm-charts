@@ -1,7 +1,7 @@
 suite: Test the umbrella deploy-time guards in templates/validations.yaml. Helm's
   `condition` field cannot express two flags set together, so one loop over
   global.streaming_ingestion.consumers fails the render with a readable message
-  instead of rolling out a pod that crash-loops. The deprecated flat flags count too.
+  instead of rolling out a pod that crash-loops.
 templates:
   - templates/validations.yaml
 
@@ -53,21 +53,13 @@ tests:
       - failedTemplate:
           errorMessage: "global.streaming_ingestion.consumers.productEvents requires global.streaming_ingestion.enabled: the consumer takes its Kafka connection and topics from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on"
 
-  - it: refuses the deprecated walletRefreshConsumer when streaming ingestion is off
+  - it: refuses the usage attribution consumer when streaming ingestion is off
     set:
       global.streaming_ingestion.enabled: false
-      global.streaming_ingestion.walletRefreshConsumer: true
+      global.streaming_ingestion.consumers.usageAttribution.enabled: true
     asserts:
       - failedTemplate:
-          errorMessage: "global.streaming_ingestion.consumers.walletRefresh requires global.streaming_ingestion.enabled: the consumer takes its Kafka connection and topics from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on"
-
-  - it: refuses the deprecated productEventsProcessor when streaming ingestion is off
-    set:
-      global.streaming_ingestion.enabled: false
-      global.streaming_ingestion.productEventsProcessor: true
-    asserts:
-      - failedTemplate:
-          errorMessage: "global.streaming_ingestion.consumers.productEvents requires global.streaming_ingestion.enabled: the consumer takes its Kafka connection and topics from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on"
+          errorMessage: "global.streaming_ingestion.consumers.usageAttribution requires global.streaming_ingestion.enabled: the consumer takes its Kafka connection and topics from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on"
 
   - it: renders nothing once every consumer has streaming ingestion
     set:
@@ -76,6 +68,7 @@ tests:
       global.streaming_ingestion.consumers.walletRefresh.enabled: true
       global.streaming_ingestion.consumers.walletAlerts.enabled: true
       global.streaming_ingestion.consumers.productEvents.enabled: true
+      global.streaming_ingestion.consumers.usageAttribution.enabled: true
     asserts:
       - hasDocuments:
           count: 0

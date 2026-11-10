@@ -45,8 +45,8 @@ spec:
         - name: {{ default .Chart.Name .Values.container.name }}
           image: "{{ .Values.image.repository }}:{{ include "lago-rails.version" .}}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- with .Values.karafka.consumer }}
-          command: {{ include "lago-config.streaming.karafkaCommand" (dict "name" . "global" $.Values.global) }}
+          {{- with .Values.karafka.consumers }}
+          command: {{ include "lago-config.streaming.karafkaCommand" (dict "consumers" . "global" $.Values.global) }}
           {{- else }}
           command: {{ toJson .Values.container.command }}
           {{- end }}

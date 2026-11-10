@@ -1,0 +1,66 @@
+suite: Test events-consumer-worker runs the Karafka server with only the consumer
+  groups it lists in karafka.consumers that are on, so it never joins the group of a
+  dedicated consumer worker, and needs no blanked topic.
+templates:
+  - charts/events-consumer-worker/templates/deployment.yaml
+
+set:
+  global:
+    lago:
+      env: production
+      version: v1.0.0
+    urls:
+      api: http://api.test
+      front: http://front.test
+    database:
+      uri: postgresql://localhost
+    encryption:
+      key: test-key
+      salt: test-salt
+    signing:
+      hmac: test-hmac
+      rsa: test-rsa
+    redis:
+      uri: redis://localhost
+    redisCache:
+      uri: redis://localhost
+    redisStore:
+      uri: redis://localhost
+    streaming_ingestion:
+      enabled: true
+      kafka:
+        bootstrapServers:
+          - kafka:9092
+
+tests:
+  - it: runs only the charged-in-advance group by default
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value: ["bundle", "exec", "karafka", "server", "--include_consumer_groups", "lago_events_charged_in_advance_consumer"]
+
+  - it: adds the usage attribution group when that consumer is on
+    set:
+      global.streaming_ingestion.consumers.usageAttribution.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value: ["bundle", "exec", "karafka", "server", "--include_consumer_groups", "lago_events_charged_in_advance_consumer,lago_usage_attribution_values_consumer"]
+
+  - it: blanks no topic, even with every dedicated consumer on
+    set:
+      global.streaming_ingestion.consumers.walletRefresh.enabled: true
+      global.streaming_ingestion.consumers.walletAlerts.enabled: true
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            value: ""
+          any: true
+
+  - it: fails on a consumer that is not in the map
+    set:
+      events-consumer-worker.karafka.consumers: [unknown]
+    asserts:
+      - failedTemplate:
+          errorMessage: 'karafka.consumers: "unknown" is not a key of global.streaming_ingestion.consumers'

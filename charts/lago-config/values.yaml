@@ -302,7 +302,8 @@ global:
     # when it is on, because lago-api produces to a topic as soon as it is set.
     consumers:
       walletRefresh:
-        # -- Wallet refresh consumer (`wallet-refresh-consumer-worker`)
+        # -- Wallet refresh consumer (`wallet-refresh-consumer-worker`).
+        # Exposes `LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC`.
         # @section -- Streaming Ingestion
         enabled: false
       walletAlerts:
@@ -313,6 +314,11 @@ global:
       productEvents:
         # -- Product events processor (`product-events-processor-worker`).
         # Exposes the 3 product events topics.
+        # @section -- Streaming Ingestion
+        enabled: false
+      usageAttribution:
+        # -- Usage attribution values consumer (in `events-consumer-worker`).
+        # Exposes `LAGO_KAFKA_USAGE_ATTRIBUTION_VALUES_TOPIC`.
         # @section -- Streaming Ingestion
         enabled: false
     # -- Name of an existing ConfigMap for streaming config
@@ -437,6 +443,13 @@ global:
         # -- Kafka topic for wallet alerts evaluation
         # @section -- Streaming Ingestion / Kafka
         walletAlerts: wallet_alerts
+        # -- Kafka topic of the realtime usage triggers that refresh wallets
+        # @section -- Streaming Ingestion / Kafka
+        realtimeUsageTriggers: realtime_usage_triggers
+        # -- Kafka topic on which the events processor reports the usage
+        # attribution values (account tree) to lago-api
+        # @section -- Streaming Ingestion / Kafka
+        usageAttributionValues: usage_attribution_values
         # -- Kafka topic for activity logs
         # @section -- Streaming Ingestion / Kafka
         activityLogs: activity_logs

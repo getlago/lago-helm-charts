@@ -155,20 +155,29 @@ tests:
           value: custom_wallet_alerts
 
   # ============================================================================
-  # Deprecated flat consumer flags
+  # LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC and
+  # LAGO_KAFKA_USAGE_ATTRIBUTION_VALUES_TOPIC (only with their consumer)
   # ============================================================================
-  - it: renders the product events topics with the deprecated productEventsProcessor flag
-    set:
-      global.streaming_ingestion.productEventsProcessor: true
-    asserts:
-      - equal:
-          path: data.LAGO_KAFKA_PRODUCT_RAW_EVENTS_TOPIC
-          value: product_events_raw
-
-  - it: lets the deprecated productEventsProcessor flag win while it is set
-    set:
-      global.streaming_ingestion.productEventsProcessor: false
-      global.streaming_ingestion.consumers.productEvents.enabled: true
+  - it: does not render the triggers and usage attribution topics by default
     asserts:
       - notExists:
-          path: data.LAGO_KAFKA_PRODUCT_RAW_EVENTS_TOPIC
+          path: data.LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC
+      - notExists:
+          path: data.LAGO_KAFKA_USAGE_ATTRIBUTION_VALUES_TOPIC
+
+  - it: renders the realtime usage triggers topic with the wallet refresh consumer
+    set:
+      global.streaming_ingestion.consumers.walletRefresh.enabled: true
+      global.streaming_ingestion.kafka.topics.realtimeUsageTriggers: custom_triggers
+    asserts:
+      - equal:
+          path: data.LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC
+          value: custom_triggers
+
+  - it: renders the usage attribution topic with the usage attribution consumer
+    set:
+      global.streaming_ingestion.consumers.usageAttribution.enabled: true
+    asserts:
+      - equal:
+          path: data.LAGO_KAFKA_USAGE_ATTRIBUTION_VALUES_TOPIC
+          value: usage_attribution_values

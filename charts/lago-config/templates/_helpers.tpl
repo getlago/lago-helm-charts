@@ -101,30 +101,31 @@ Create the name of the secret to use
 {{- end }}
 
 {{/*
-"true" when the streaming consumer `.name` is on, else "". A deprecated flat
-flag (walletRefreshConsumer, productEventsProcessor) wins while it is set, as
-in the umbrella Chart.yaml conditions. Takes (dict "name" <consumer> "global"
-.Values.global).
+"true" when `global.streaming_ingestion.consumers.<name>.enabled` is on, else "".
+Takes (dict "name" <consumer> "global" .Values.global).
 */}}
 {{- define "lago-config.streaming.consumerEnabled" -}}
-{{- $si := .global.streaming_ingestion -}}
-{{- $legacy := get (dict "walletRefresh" "walletRefreshConsumer" "productEvents" "productEventsProcessor") .name -}}
-{{- $flag := ternary (get $si $legacy) nil (and (ne $legacy "") (hasKey $si $legacy)) -}}
-{{- if kindIs "bool" $flag -}}
-{{- if $flag }}true{{ end -}}
-{{- else if dig "consumers" .name "enabled" false $si -}}
-true
-{{- end -}}
+{{- if dig "streaming_ingestion" "consumers" .name "enabled" false .global }}true{{ end -}}
 {{- end -}}
 
 {{/*
-Karafka command restricted to the consumer group of the streaming consumer
-`.name`. Takes (dict "name" <consumer> "global" .Values.global).
+Karafka command that runs only the consumer groups of the listed streaming
+consumers. A consumer with no `enabled` key is always on; one that is off is
+skipped. Takes (dict "consumers" <list> "global" .Values.global).
 */}}
 {{- define "lago-config.streaming.karafkaCommand" -}}
-{{- $group := dig "streaming_ingestion" "consumers" .name "consumerGroup" "" .global -}}
-{{- if not $group -}}
-{{- fail (printf "karafka.consumer %q needs global.streaming_ingestion.consumers.%s.consumerGroup" .name .name) -}}
+{{- $groups := list -}}
+{{- range $name := .consumers -}}
+{{- $c := dig "streaming_ingestion" "consumers" $name nil $.global -}}
+{{- if not $c -}}
+{{- fail (printf "karafka.consumers: %q is not a key of global.streaming_ingestion.consumers" $name) -}}
 {{- end -}}
-{{- toJson (list "bundle" "exec" "karafka" "server" "--include_consumer_groups" $group) -}}
+{{- if or (not (hasKey $c "enabled")) $c.enabled -}}
+{{- $groups = append $groups (required (printf "global.streaming_ingestion.consumers.%s.consumerGroup is required" $name) $c.consumerGroup) -}}
+{{- end -}}
+{{- end -}}
+{{- if not $groups -}}
+{{- fail (printf "karafka.consumers %v: none of these consumers is on" .consumers) -}}
+{{- end -}}
+{{- toJson (list "bundle" "exec" "karafka" "server" "--include_consumer_groups" (join "," $groups)) -}}
 {{- end -}}

@@ -1,12 +1,10 @@
 suite: Test wallet-alerts-consumer-worker subchart is gated by
   global.streaming_ingestion.consumers.walletAlerts.enabled and runs the Karafka server pinned
-  to the wallet alerts consumer group, and events-consumer-worker does not consume
-  that topic. The topic comes from the streaming ConfigMap (covered in lago-config); the
+  to the wallet alerts consumer group. The topic comes from the streaming ConfigMap (covered in lago-config); the
   pairing with streaming ingestion is enforced in templates/validations.yaml and
   covered by validations_test.yaml.
 templates:
   - charts/wallet-alerts-consumer-worker/templates/deployment.yaml
-  - charts/events-consumer-worker/templates/deployment.yaml
 
 set:
   global:
@@ -69,14 +67,3 @@ tests:
             name: LAGO_KAFKA_WALLET_ALERTS_TOPIC
           any: true
         template: charts/wallet-alerts-consumer-worker/templates/deployment.yaml
-
-  - it: blanks the wallet alerts topic on the events consumer
-    set:
-      global.streaming_ingestion.consumers.walletAlerts.enabled: true
-    asserts:
-      - contains:
-          path: spec.template.spec.containers[0].env
-          content:
-            name: LAGO_KAFKA_WALLET_ALERTS_TOPIC
-            value: ""
-        template: charts/events-consumer-worker/templates/deployment.yaml

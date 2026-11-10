@@ -83,11 +83,3 @@ tests:
             name: LAGO_EVENTS_PROCESSOR_PIPELINE
             value: product_events
         template: charts/events-processor-worker/templates/deployment.yaml
-
-  - it: still renders with the deprecated productEventsProcessor flag
-    set:
-      global.streaming_ingestion.productEventsProcessor: true
-    asserts:
-      - hasDocuments:
-          count: 1
-        template: charts/product-events-processor-worker/templates/deployment.yaml

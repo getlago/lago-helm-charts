@@ -40,6 +40,12 @@ data:
   {{- if include "lago-config.streaming.consumerEnabled" (dict "name" "walletAlerts" "global" .Values.global) }}
   LAGO_KAFKA_WALLET_ALERTS_TOPIC: {{ $kafka.topics.walletAlerts }}
   {{- end }}
+  {{- if include "lago-config.streaming.consumerEnabled" (dict "name" "walletRefresh" "global" .Values.global) }}
+  LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC: {{ $kafka.topics.realtimeUsageTriggers }}
+  {{- end }}
+  {{- if include "lago-config.streaming.consumerEnabled" (dict "name" "usageAttribution" "global" .Values.global) }}
+  LAGO_KAFKA_USAGE_ATTRIBUTION_VALUES_TOPIC: {{ $kafka.topics.usageAttributionValues }}
+  {{- end }}
   {{- with $kafka.saslMechanisms }}
   LAGO_KAFKA_SCRAM_ALGORITHM: {{ $kafka.saslMechanisms }}
   LAGO_KAFKA_SASL_MECHANISMS: {{ $kafka.saslMechanisms }}
