@@ -377,6 +377,25 @@ global:
     # connection and topics come from the streaming ConfigMap/Secret.
     # @section -- Streaming Ingestion
     productEventsProcessor: false
+    # -- Run the Karafka `WalletAlertsConsumer` (`wallet-alerts-consumer-worker`)
+    # and expose `LAGO_KAFKA_WALLET_ALERTS_TOPIC` to every Lago workload, so
+    # that the wallet alerts of the organizations on realtime usage are
+    # evaluated from Kafka instead of the `ProcessWalletAlertsJob`. Lives here
+    # for the same reason as `walletRefreshConsumer`. Create the
+    # `kafka.topics.walletAlerts` topic before turning it on (see
+    # `createTopics.enabled`). The pods read the topic through `envFrom`, so
+    # restart the Lago pods after a change (Stakater Reloader does it when it
+    # watches the streaming ConfigMap). To turn it off without dropping the
+    # alerts still in the topic: (1) keep the `wallet-alerts-consumer-worker`
+    # Deployment (with plain Helm, annotate it with
+    # `helm.sh/resource-policy=keep`; Argo CD without prune keeps it) and set
+    # `LAGO_KAFKA_WALLET_ALERTS_TOPIC` on it directly, so that a restart still
+    # finds the topic; (2) set this to false, upgrade and restart the other
+    # Lago pods, so that none produces to the topic any more; (3) wait for the
+    # lag of the `lago_wallet_alerts_consumer` group to reach 0; (4) delete the
+    # Deployment, then the consumer group.
+    # @section -- Streaming Ingestion
+    walletAlertsConsumer: false
     # -- Name of an existing ConfigMap for streaming config
     # @section -- Streaming Ingestion
     configmap: ""
@@ -449,6 +468,9 @@ global:
         # -- Kafka topic for dead-letter product events
         # @section -- Streaming Ingestion / Kafka
         productEventsDeadLetter: product_events_dead_letter
+        # -- Kafka topic for wallet alerts evaluation
+        # @section -- Streaming Ingestion / Kafka
+        walletAlerts: wallet_alerts
         # -- Kafka topic for activity logs
         # @section -- Streaming Ingestion / Kafka
         activityLogs: activity_logs
@@ -1094,6 +1116,12 @@ events-consumer-worker:
     # -- Container ports (none needed)
     # @section -- Events Consumer Worker
     ports: []
+  # -- Blanks the wallet alerts topic inherited from the streaming ConfigMap,
+  # so this pod does not join the wallet alerts consumer group. The events
+  # consumer only enqueues jobs, it never produces wallet alerts itself.
+  # @section -- Events Consumer Worker
+  extraEnv:
+    LAGO_KAFKA_WALLET_ALERTS_TOPIC: ""
 
 # -- Wallet refresh consumer worker subchart overrides (lago-rails, conditional
 # on `global.streaming_ingestion.walletRefreshConsumer`). Runs the Karafka
@@ -1125,9 +1153,11 @@ wallet-refresh-consumer-worker:
     # @section -- Wallet Refresh Consumer Worker
     enabled: false
   container:
-    # -- Karafka consumer entrypoint command (same as the events consumer)
+    # -- Karafka consumer entrypoint command, restricted to the wallet refresh
+    # consumer group. The pod keeps the wallet alerts topic, as it produces
+    # wallet alerts when it refreshes a wallet, but must not consume them.
     # @section -- Wallet Refresh Consumer Worker
-    command: ["./scripts/start.events.consumer.sh"]
+    command: ["bundle", "exec", "karafka", "server", "--include_consumer_groups", "lago_wallet_refresh_triggers_consumer"]
     # -- Container ports (none needed)
     # @section -- Wallet Refresh Consumer Worker
     ports: []
@@ -1137,6 +1167,49 @@ wallet-refresh-consumer-worker:
   # @section -- Wallet Refresh Consumer Worker
   extraEnv:
     LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC: realtime_usage_triggers
+    LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC: ""
+
+# -- Wallet alerts consumer worker subchart overrides (lago-rails, conditional
+# on `global.streaming_ingestion.walletAlertsConsumer`). Runs the Karafka
+# `WalletAlertsConsumer` on the wallet alerts topic; the Kafka settings and the
+# topic come from the streaming ConfigMap/Secret.
+# @default -- See child values
+# @section -- Wallet Alerts Consumer Worker
+wallet-alerts-consumer-worker:
+  # -- Override the wallet-alerts-consumer-worker subchart release name
+  # @section -- Wallet Alerts Consumer Worker
+  nameOverride: lago-wallet-alerts-consumer-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Wallet Alerts Consumer Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- Wallet Alerts Consumer Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- Wallet Alerts Consumer Worker
+  livenessProbe:
+    enabled: false
+  # -- Readiness probe (disabled for workers)
+  # @section -- Wallet Alerts Consumer Worker
+  readinessProbe:
+    enabled: false
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- Wallet Alerts Consumer Worker
+    enabled: false
+  container:
+    # -- Karafka consumer entrypoint command (same as the events consumer)
+    # @section -- Wallet Alerts Consumer Worker
+    command: ["./scripts/start.events.consumer.sh"]
+    # -- Container ports (none needed)
+    # @section -- Wallet Alerts Consumer Worker
+    ports: []
+  # -- Routes Karafka to the wallet alerts consumer only: blanks the
+  # charged-in-advance topic inherited from the streaming ConfigMap, so this
+  # pod does not join the events consumer group.
+  # @section -- Wallet Alerts Consumer Worker
+  extraEnv:
     LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC: ""
 
 # -- Events processor worker subchart overrides (conditional on `global.streaming_ingestion.enabled`)
@@ -1292,7 +1365,10 @@ migrate:
 # @default -- See child values
 # @section -- Create Topics Job
 createTopics:
-  # -- Enable the Kafka topic creation job
+  # -- Enable the Kafka topic creation job. It is a `pre-install` hook, so
+  # with plain Helm it only runs on the first install: topics added to
+  # `global.streaming_ingestion.kafka.topics` later (e.g. `walletAlerts`)
+  # must be created by hand on an existing release.
   # @section -- Create Topics Job
   enabled: false
   image:
