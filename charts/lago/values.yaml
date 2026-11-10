@@ -375,6 +375,10 @@ global:
     # every Lago workload: lago-api produces to them as soon as they are set.
     # Lives here for the same reason as `walletRefreshConsumer`: its Kafka
     # connection and topics come from the streaming ConfigMap/Secret.
+    # Turning it off leaves the unread events in the topic; the processor
+    # resumes them from its offset (within the topic retention) when turned on
+    # again. Restart the Lago pods after a change unless Stakater Reloader
+    # watches the streaming ConfigMap.
     # @section -- Streaming Ingestion
     productEventsProcessor: false
     # -- Name of an existing ConfigMap for streaming config
