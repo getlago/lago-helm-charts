@@ -38,6 +38,11 @@ data:
   LAGO_KAFKA_PRODUCT_ENRICHED_EVENTS_TOPIC: {{ $kafka.topics.productEventsEnriched }}
   LAGO_KAFKA_PRODUCT_EVENTS_DEAD_LETTER_TOPIC: {{ $kafka.topics.productEventsDeadLetter }}
   {{- end }}
+  {{- /* lago-api produces wallet alerts as soon as the topic is set, so only
+         expose it once the consumer that reads it is deployed. */}}
+  {{- if .Values.global.streaming_ingestion.walletAlertsConsumer }}
+  LAGO_KAFKA_WALLET_ALERTS_TOPIC: {{ $kafka.topics.walletAlerts }}
+  {{- end }}
   {{- with $kafka.saslMechanisms }}
   LAGO_KAFKA_SCRAM_ALGORITHM: {{ $kafka.saslMechanisms }}
   LAGO_KAFKA_SASL_MECHANISMS: {{ $kafka.saslMechanisms }}
