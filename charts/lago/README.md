@@ -245,7 +245,7 @@ A Helm chart for Kubernetes
 | wallet-refresh-consumer-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
 | wallet-refresh-consumer-worker.container.command | list | `["bundle","exec","karafka","server","--include_consumer_groups","lago_wallet_refresh_triggers_consumer"]` | Karafka consumer entrypoint command, restricted to the wallet refresh consumer group. The pod keeps the wallet alerts topic, as it produces wallet alerts when it refreshes a wallet, but must not consume them. |
 | wallet-refresh-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
-| wallet-refresh-consumer-worker.extraEnv | object | `{"LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC":"","LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC":"realtime_usage_triggers"}` | Routes Karafka to the wallet refresh consumer only: sets the realtime usage triggers topic and blanks the charged-in-advance topic inherited from the streaming ConfigMap, so this pod does not join the events consumer group. |
+| wallet-refresh-consumer-worker.extraEnv | object | `{"LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC":"realtime_usage_triggers"}` | Sets the realtime usage triggers topic, which draws the wallet refresh consumer group that `container.command` restricts the pod to. |
 
 ### Wallet Alerts Consumer Worker
 
@@ -258,9 +258,8 @@ A Helm chart for Kubernetes
 | wallet-alerts-consumer-worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for workers) |
 | wallet-alerts-consumer-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |
 | wallet-alerts-consumer-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
-| wallet-alerts-consumer-worker.container.command | list | `["./scripts/start.events.consumer.sh"]` | Karafka consumer entrypoint command (same as the events consumer) |
+| wallet-alerts-consumer-worker.container.command | list | `["bundle","exec","karafka","server","--include_consumer_groups","lago_wallet_alerts_consumer"]` | Karafka consumer entrypoint command, restricted to the wallet alerts consumer group |
 | wallet-alerts-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
-| wallet-alerts-consumer-worker.extraEnv | object | `{"LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC":""}` | Routes Karafka to the wallet alerts consumer only: blanks the charged-in-advance topic inherited from the streaming ConfigMap, so this pod does not join the events consumer group. |
 
 ### Events Processor Worker
 

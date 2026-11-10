@@ -387,17 +387,11 @@ global:
     # evaluated from Kafka instead of the `ProcessWalletAlertsJob`. Lives here
     # for the same reason as `walletRefreshConsumer`. Create the
     # `kafka.topics.walletAlerts` topic before turning it on (see
-    # `createTopics.enabled`). The pods read the topic through `envFrom`, so
-    # restart the Lago pods after a change (Stakater Reloader does it when it
-    # watches the streaming ConfigMap). To turn it off without dropping the
-    # alerts still in the topic: (1) keep the `wallet-alerts-consumer-worker`
-    # Deployment (with plain Helm, annotate it with
-    # `helm.sh/resource-policy=keep`; Argo CD without prune keeps it) and set
-    # `LAGO_KAFKA_WALLET_ALERTS_TOPIC` on it directly, so that a restart still
-    # finds the topic; (2) set this to false, upgrade and restart the other
-    # Lago pods, so that none produces to the topic any more; (3) wait for the
-    # lag of the `lago_wallet_alerts_consumer` group to reach 0; (4) delete the
-    # Deployment, then the consumer group.
+    # `createTopics.enabled`). Turning it off sends the alerts back to the job
+    # and leaves the unread messages in the topic; the consumer resumes them
+    # from its offset (within the topic retention) when turned on again.
+    # Restart the Lago pods after a change unless Stakater Reloader watches
+    # the streaming ConfigMap.
     # @section -- Streaming Ingestion
     walletAlertsConsumer: false
     # -- Name of an existing ConfigMap for streaming config
@@ -1165,13 +1159,11 @@ wallet-refresh-consumer-worker:
     # -- Container ports (none needed)
     # @section -- Wallet Refresh Consumer Worker
     ports: []
-  # -- Routes Karafka to the wallet refresh consumer only: sets the realtime
-  # usage triggers topic and blanks the charged-in-advance topic inherited from
-  # the streaming ConfigMap, so this pod does not join the events consumer group.
+  # -- Sets the realtime usage triggers topic, which draws the wallet refresh
+  # consumer group that `container.command` restricts the pod to.
   # @section -- Wallet Refresh Consumer Worker
   extraEnv:
     LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC: realtime_usage_triggers
-    LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC: ""
 
 # -- Wallet alerts consumer worker subchart overrides (lago-rails, conditional
 # on `global.streaming_ingestion.walletAlertsConsumer`). Runs the Karafka
@@ -1203,18 +1195,13 @@ wallet-alerts-consumer-worker:
     # @section -- Wallet Alerts Consumer Worker
     enabled: false
   container:
-    # -- Karafka consumer entrypoint command (same as the events consumer)
+    # -- Karafka consumer entrypoint command, restricted to the wallet alerts
+    # consumer group
     # @section -- Wallet Alerts Consumer Worker
-    command: ["./scripts/start.events.consumer.sh"]
+    command: ["bundle", "exec", "karafka", "server", "--include_consumer_groups", "lago_wallet_alerts_consumer"]
     # -- Container ports (none needed)
     # @section -- Wallet Alerts Consumer Worker
     ports: []
-  # -- Routes Karafka to the wallet alerts consumer only: blanks the
-  # charged-in-advance topic inherited from the streaming ConfigMap, so this
-  # pod does not join the events consumer group.
-  # @section -- Wallet Alerts Consumer Worker
-  extraEnv:
-    LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC: ""
 
 # -- Events processor worker subchart overrides (conditional on `global.streaming_ingestion.enabled`)
 # @default -- See child values
