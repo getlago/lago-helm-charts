@@ -39,18 +39,19 @@ tests:
           path: spec.template.spec.containers[0].command
           value: ["bundle", "exec", "karafka", "server", "--include_consumer_groups", "lago_events_charged_in_advance_consumer"]
 
-  - it: adds the usage attribution group when that consumer is on
+  - it: leaves the usage attribution group to its own worker
     set:
       global.streaming_ingestion.consumers.usageAttribution.enabled: true
     asserts:
       - equal:
           path: spec.template.spec.containers[0].command
-          value: ["bundle", "exec", "karafka", "server", "--include_consumer_groups", "lago_events_charged_in_advance_consumer,lago_usage_attribution_values_consumer"]
+          value: ["bundle", "exec", "karafka", "server", "--include_consumer_groups", "lago_events_charged_in_advance_consumer"]
 
   - it: blanks no topic, even with every dedicated consumer on
     set:
       global.streaming_ingestion.consumers.walletRefresh.enabled: true
       global.streaming_ingestion.consumers.walletAlerts.enabled: true
+      global.streaming_ingestion.consumers.usageAttribution.enabled: true
     asserts:
       - notContains:
           path: spec.template.spec.containers[0].env

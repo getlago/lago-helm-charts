@@ -412,8 +412,8 @@ global:
         # @section -- Streaming Ingestion
         enabled: false
       usageAttribution:
-        # -- Run the Karafka `UsageAttributionValuesConsumer` (in
-        # `events-consumer-worker`) and expose
+        # -- Run the Karafka `UsageAttributionValuesConsumer`
+        # (`usage-attribution-consumer-worker`) and expose
         # `LAGO_KAFKA_USAGE_ATTRIBUTION_VALUES_TOPIC`, so that the events
         # processor reports the usage attribution values (account tree).
         # @section -- Streaming Ingestion
@@ -1149,7 +1149,7 @@ events-consumer-worker:
     # -- Streaming consumers whose Karafka groups this pod runs (the ones
     # that are on)
     # @section -- Events Consumer Worker
-    consumers: [eventsChargedInAdvance, usageAttribution]
+    consumers: [eventsChargedInAdvance]
 
 # -- Wallet refresh consumer worker subchart overrides (lago-rails, conditional
 # on `global.streaming_ingestion.consumers.walletRefresh.enabled`). Runs the Karafka
@@ -1227,6 +1227,44 @@ wallet-alerts-consumer-worker:
   container:
     # -- Container ports (none needed)
     # @section -- Wallet Alerts Consumer Worker
+    ports: []
+
+# -- Usage attribution consumer worker subchart overrides (lago-rails, conditional
+# on `global.streaming_ingestion.consumers.usageAttribution.enabled`). Runs the Karafka
+# `UsageAttributionValuesConsumer` on the usage attribution values topic; the
+# Kafka settings and the topic come from the streaming ConfigMap/Secret.
+# @default -- See child values
+# @section -- Usage Attribution Consumer Worker
+usage-attribution-consumer-worker:
+  # -- Override the usage-attribution-consumer-worker subchart release name
+  # @section -- Usage Attribution Consumer Worker
+  nameOverride: lago-usage-attribution-consumer-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Usage Attribution Consumer Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- Usage Attribution Consumer Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- Usage Attribution Consumer Worker
+  livenessProbe:
+    enabled: false
+  # -- Readiness probe (disabled for workers)
+  # @section -- Usage Attribution Consumer Worker
+  readinessProbe:
+    enabled: false
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- Usage Attribution Consumer Worker
+    enabled: false
+  karafka:
+    # -- Streaming consumers whose Karafka groups this pod runs
+    # @section -- Usage Attribution Consumer Worker
+    consumers: [usageAttribution]
+  container:
+    # -- Container ports (none needed)
+    # @section -- Usage Attribution Consumer Worker
     ports: []
 
 # -- Events processor worker subchart overrides (conditional on `global.streaming_ingestion.enabled`)

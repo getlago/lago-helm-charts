@@ -225,7 +225,7 @@ A Helm chart for Kubernetes
 | events-consumer-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | events-consumer-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
 | events-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
-| events-consumer-worker.karafka.consumers | list | `["eventsChargedInAdvance","usageAttribution"]` | Streaming consumers whose Karafka groups this pod runs (the ones that are on) |
+| events-consumer-worker.karafka.consumers | list | `["eventsChargedInAdvance"]` | Streaming consumers whose Karafka groups this pod runs (the ones that are on) |
 | events-consumer-worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for workers) |
 | events-consumer-worker.nameOverride | string | `"lago-events-consumer-worker"` | Override the events-consumer-worker subchart release name |
 | events-consumer-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |
@@ -258,6 +258,20 @@ A Helm chart for Kubernetes
 | wallet-alerts-consumer-worker.nameOverride | string | `"lago-wallet-alerts-consumer-worker"` | Override the wallet-alerts-consumer-worker subchart release name |
 | wallet-alerts-consumer-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |
 | wallet-alerts-consumer-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
+
+### Usage Attribution Consumer Worker
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| usage-attribution-consumer-worker | object | See child values | Usage attribution consumer worker subchart overrides (lago-rails, conditional on `global.streaming_ingestion.consumers.usageAttribution.enabled`). Runs the Karafka `UsageAttributionValuesConsumer` on the usage attribution values topic; the Kafka settings and the topic come from the streaming ConfigMap/Secret. |
+| usage-attribution-consumer-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
+| usage-attribution-consumer-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
+| usage-attribution-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
+| usage-attribution-consumer-worker.karafka.consumers | list | `["usageAttribution"]` | Streaming consumers whose Karafka groups this pod runs |
+| usage-attribution-consumer-worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for workers) |
+| usage-attribution-consumer-worker.nameOverride | string | `"lago-usage-attribution-consumer-worker"` | Override the usage-attribution-consumer-worker subchart release name |
+| usage-attribution-consumer-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |
+| usage-attribution-consumer-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
 
 ### Events Processor Worker
 

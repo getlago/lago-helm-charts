@@ -317,7 +317,7 @@ global:
         # @section -- Streaming Ingestion
         enabled: false
       usageAttribution:
-        # -- Usage attribution values consumer (in `events-consumer-worker`).
+        # -- Usage attribution values consumer (`usage-attribution-consumer-worker`).
         # Exposes `LAGO_KAFKA_USAGE_ATTRIBUTION_VALUES_TOPIC`.
         # @section -- Streaming Ingestion
         enabled: false

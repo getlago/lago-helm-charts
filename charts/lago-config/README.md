@@ -193,7 +193,7 @@ A Helm chart for Kubernetes
 | global.streaming_ingestion.configmap | string | `""` | Name of an existing ConfigMap for streaming config |
 | global.streaming_ingestion.enabled | bool | `false` | Enable streaming ingestion (ClickHouse + Kafka) |
 | global.streaming_ingestion.consumers.productEvents.enabled | bool | `false` | Product events processor (`product-events-processor-worker`). Exposes the 3 product events topics. |
-| global.streaming_ingestion.consumers.usageAttribution.enabled | bool | `false` | Usage attribution values consumer (in `events-consumer-worker`). Exposes `LAGO_KAFKA_USAGE_ATTRIBUTION_VALUES_TOPIC`. |
+| global.streaming_ingestion.consumers.usageAttribution.enabled | bool | `false` | Usage attribution values consumer (`usage-attribution-consumer-worker`). Exposes `LAGO_KAFKA_USAGE_ATTRIBUTION_VALUES_TOPIC`. |
 | global.streaming_ingestion.consumers.walletAlerts.enabled | bool | `false` | Wallet alerts consumer (`wallet-alerts-consumer-worker`). Exposes `LAGO_KAFKA_WALLET_ALERTS_TOPIC`. |
 | global.streaming_ingestion.consumers.walletRefresh.enabled | bool | `false` | Wallet refresh consumer (`wallet-refresh-consumer-worker`). Exposes `LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC`. |
 | global.streaming_ingestion.secret | string | `""` | Name of an existing Secret for streaming credentials |

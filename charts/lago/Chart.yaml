@@ -94,6 +94,11 @@ dependencies:
     version: 2.1.4
     repository: "file://../lago-rails"
     condition: global.streaming_ingestion.consumers.walletAlerts.enabled
+  - name: lago-rails
+    alias: usage-attribution-consumer-worker
+    version: 2.1.4
+    repository: "file://../lago-rails"
+    condition: global.streaming_ingestion.consumers.usageAttribution.enabled
   - name: lago-events-processor-worker
     alias: events-processor-worker
     version: 2.1.4
