@@ -302,6 +302,11 @@ global:
     # the umbrella chart alongside the `product-events-processor-worker`.
     # @section -- Streaming Ingestion
     productEventsProcessor: false
+    # -- Expose `LAGO_KAFKA_WALLET_ALERTS_TOPIC` in the streaming ConfigMap,
+    # so that wallet changes are produced to the wallet alerts topic. Set by
+    # the umbrella chart alongside the `wallet-alerts-consumer-worker`.
+    # @section -- Streaming Ingestion
+    walletAlertsConsumer: false
     # -- Name of an existing ConfigMap for streaming config
     # @section -- Streaming Ingestion
     configmap: ""
@@ -421,6 +426,9 @@ global:
         # -- Kafka topic for dead-letter product events
         # @section -- Streaming Ingestion / Kafka
         productEventsDeadLetter: product_events_dead_letter
+        # -- Kafka topic for wallet alerts evaluation
+        # @section -- Streaming Ingestion / Kafka
+        walletAlerts: wallet_alerts
         # -- Kafka topic for activity logs
         # @section -- Streaming Ingestion / Kafka
         activityLogs: activity_logs
