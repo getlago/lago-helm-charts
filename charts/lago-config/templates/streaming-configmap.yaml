@@ -30,17 +30,14 @@ data:
   LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC: {{ $kafka.topics.eventsChargedInAdvance }}
   LAGO_KAFKA_EVENTS_DEAD_LETTER_TOPIC: {{ $kafka.topics.eventsDeadLetter }}
   LAGO_KAFKA_RAW_EVENTS_TOPIC: {{ $kafka.topics.eventsRaw }}
-  {{- /* lago-api produces product events as soon as the raw topic is set,
-         so only expose the topics once the processor that reads them is
-         deployed. */}}
-  {{- if .Values.global.streaming_ingestion.productEventsProcessor }}
+  {{- /* lago-api produces to a topic as soon as it is set, so a consumer's
+         topics render only when that consumer is on. */}}
+  {{- if include "lago-config.streaming.consumerEnabled" (dict "name" "productEvents" "global" .Values.global) }}
   LAGO_KAFKA_PRODUCT_RAW_EVENTS_TOPIC: {{ $kafka.topics.productEventsRaw }}
   LAGO_KAFKA_PRODUCT_ENRICHED_EVENTS_TOPIC: {{ $kafka.topics.productEventsEnriched }}
   LAGO_KAFKA_PRODUCT_EVENTS_DEAD_LETTER_TOPIC: {{ $kafka.topics.productEventsDeadLetter }}
   {{- end }}
-  {{- /* lago-api produces wallet alerts as soon as the topic is set, so only
-         expose it once the consumer that reads it is deployed. */}}
-  {{- if .Values.global.streaming_ingestion.walletAlertsConsumer }}
+  {{- if include "lago-config.streaming.consumerEnabled" (dict "name" "walletAlerts" "global" .Values.global) }}
   LAGO_KAFKA_WALLET_ALERTS_TOPIC: {{ $kafka.topics.walletAlerts }}
   {{- end }}
   {{- with $kafka.saslMechanisms }}

@@ -459,6 +459,13 @@ config:
     # @section -- Config
     name: ""
 
+karafka:
+  # -- Streaming consumer (a key of `global.streaming_ingestion.consumers`)
+  # whose Karafka group this pod runs. Replaces `container.command` with
+  # `bundle exec karafka server --include_consumer_groups <consumerGroup>`.
+  # @section -- Container
+  consumer: ""
+
 container:
   # -- Override the container name (defaults to chart fullname)
   # @section -- Container

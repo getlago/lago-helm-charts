@@ -42,6 +42,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| karafka.consumer | string | `""` | Streaming consumer (a key of `global.streaming_ingestion.consumers`) whose Karafka group this pod runs. Replaces `container.command` with `bundle exec karafka server --include_consumer_groups <consumerGroup>`. |
 | container.name | string | `""` | Override the container name (defaults to chart fullname) |
 | container.command | list | `["./scripts/start.api.sh"]` | Container entrypoint command |
 | container.args | list | `[]` | Container command arguments |

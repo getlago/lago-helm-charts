@@ -1,7 +1,7 @@
 suite: Test the umbrella deploy-time guards in templates/validations.yaml. Helm's
-  `condition` field takes a single path, so a dependency that needs two flags set
-  together cannot express the pairing — the guard does, and fails the render with a
-  readable message instead of rolling out a pod that crash-loops.
+  `condition` field cannot express two flags set together, so one loop over
+  global.streaming_ingestion.consumers fails the render with a readable message
+  instead of rolling out a pod that crash-loops. The deprecated flat flags count too.
 templates:
   - templates/validations.yaml
 
@@ -31,69 +31,51 @@ set:
 tests:
   - it: refuses the wallet refresh consumer when streaming ingestion is off
     set:
-      global:
-        streaming_ingestion:
-          enabled: false
-          walletRefreshConsumer: true
+      global.streaming_ingestion.enabled: false
+      global.streaming_ingestion.consumers.walletRefresh.enabled: true
     asserts:
       - failedTemplate:
-          errorMessage: "global.streaming_ingestion.walletRefreshConsumer requires global.streaming_ingestion.enabled: the wallet refresh consumer takes its Kafka connection from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on"
-
-  - it: renders nothing once both flags agree
-    set:
-      global:
-        streaming_ingestion:
-          enabled: true
-          walletRefreshConsumer: true
-          kafka:
-            bootstrapServers:
-              - kafka:9092
-    asserts:
-      - hasDocuments:
-          count: 0
-
-  - it: refuses the product events processor when streaming ingestion is off
-    set:
-      global:
-        streaming_ingestion:
-          enabled: false
-          productEventsProcessor: true
-    asserts:
-      - failedTemplate:
-          errorMessage: "global.streaming_ingestion.productEventsProcessor requires global.streaming_ingestion.enabled: the product events processor takes its Kafka connection and topics from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on"
-
-  - it: renders nothing once the product events processor flags agree
-    set:
-      global:
-        streaming_ingestion:
-          enabled: true
-          productEventsProcessor: true
-          kafka:
-            bootstrapServers:
-              - kafka:9092
-    asserts:
-      - hasDocuments:
-          count: 0
+          errorMessage: "global.streaming_ingestion.consumers.walletRefresh requires global.streaming_ingestion.enabled: the consumer takes its Kafka connection and topics from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on"
 
   - it: refuses the wallet alerts consumer when streaming ingestion is off
     set:
-      global:
-        streaming_ingestion:
-          enabled: false
-          walletAlertsConsumer: true
+      global.streaming_ingestion.enabled: false
+      global.streaming_ingestion.consumers.walletAlerts.enabled: true
     asserts:
       - failedTemplate:
-          errorMessage: "global.streaming_ingestion.walletAlertsConsumer requires global.streaming_ingestion.enabled: the wallet alerts consumer and the wallet alerts topic come from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on"
+          errorMessage: "global.streaming_ingestion.consumers.walletAlerts requires global.streaming_ingestion.enabled: the consumer takes its Kafka connection and topics from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on"
 
-  - it: renders nothing once the wallet alerts consumer flags agree
+  - it: refuses the product events processor when streaming ingestion is off
     set:
-      global:
-        streaming_ingestion:
-          enabled: true
-          walletAlertsConsumer: true
-          kafka:
-            bootstrapServers:
-              - kafka:9092
+      global.streaming_ingestion.enabled: false
+      global.streaming_ingestion.consumers.productEvents.enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "global.streaming_ingestion.consumers.productEvents requires global.streaming_ingestion.enabled: the consumer takes its Kafka connection and topics from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on"
+
+  - it: refuses the deprecated walletRefreshConsumer when streaming ingestion is off
+    set:
+      global.streaming_ingestion.enabled: false
+      global.streaming_ingestion.walletRefreshConsumer: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "global.streaming_ingestion.consumers.walletRefresh requires global.streaming_ingestion.enabled: the consumer takes its Kafka connection and topics from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on"
+
+  - it: refuses the deprecated productEventsProcessor when streaming ingestion is off
+    set:
+      global.streaming_ingestion.enabled: false
+      global.streaming_ingestion.productEventsProcessor: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "global.streaming_ingestion.consumers.productEvents requires global.streaming_ingestion.enabled: the consumer takes its Kafka connection and topics from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on"
+
+  - it: renders nothing once every consumer has streaming ingestion
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers: [kafka:9092]
+      global.streaming_ingestion.consumers.walletRefresh.enabled: true
+      global.streaming_ingestion.consumers.walletAlerts.enabled: true
+      global.streaming_ingestion.consumers.productEvents.enabled: true
     asserts:
       - hasDocuments:
           count: 0

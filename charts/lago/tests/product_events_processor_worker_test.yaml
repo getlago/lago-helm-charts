@@ -1,5 +1,5 @@
 suite: Test product-events-processor-worker subchart is gated by
-  global.streaming_ingestion.productEventsProcessor and runs the events processor's
+  global.streaming_ingestion.consumers.productEvents.enabled and runs the events processor's
   product events pipeline in its own Deployment, next to events-processor-worker. The
   pairing with global.streaming_ingestion.enabled is enforced in
   templates/validations.yaml and covered by validations_test.yaml.
@@ -38,7 +38,7 @@ set:
 tests:
   - it: renders its own deployment when enabled
     set:
-      global.streaming_ingestion.productEventsProcessor: true
+      global.streaming_ingestion.consumers.productEvents.enabled: true
     asserts:
       - hasDocuments:
           count: 1
@@ -54,7 +54,7 @@ tests:
 
   - it: selects the product events pipeline and keeps the consumer group override
     set:
-      global.streaming_ingestion.productEventsProcessor: true
+      global.streaming_ingestion.consumers.productEvents.enabled: true
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -75,7 +75,7 @@ tests:
 
   - it: leaves the events processor on its default pipeline
     set:
-      global.streaming_ingestion.productEventsProcessor: true
+      global.streaming_ingestion.consumers.productEvents.enabled: true
     asserts:
       - notContains:
           path: spec.template.spec.containers[0].env
@@ -83,3 +83,11 @@ tests:
             name: LAGO_EVENTS_PROCESSOR_PIPELINE
             value: product_events
         template: charts/events-processor-worker/templates/deployment.yaml
+
+  - it: still renders with the deprecated productEventsProcessor flag
+    set:
+      global.streaming_ingestion.productEventsProcessor: true
+    asserts:
+      - hasDocuments:
+          count: 1
+        template: charts/product-events-processor-worker/templates/deployment.yaml
