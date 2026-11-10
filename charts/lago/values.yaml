@@ -371,9 +371,10 @@ global:
     walletRefreshConsumer: false
     # -- Run the events processor's product events pipeline
     # (`product-events-processor-worker`), which enriches the events of
-    # product catalog organizations. Lives here for the same reason as
-    # `walletRefreshConsumer`: its Kafka connection and topics come from the
-    # streaming ConfigMap/Secret.
+    # product catalog organizations, and expose the product events topics to
+    # every Lago workload: lago-api produces to them as soon as they are set.
+    # Lives here for the same reason as `walletRefreshConsumer`: its Kafka
+    # connection and topics come from the streaming ConfigMap/Secret.
     # @section -- Streaming Ingestion
     productEventsProcessor: false
     # -- Name of an existing ConfigMap for streaming config

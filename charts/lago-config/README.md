@@ -192,6 +192,7 @@ A Helm chart for Kubernetes
 |-----|------|---------|-------------|
 | global.streaming_ingestion.configmap | string | `""` | Name of an existing ConfigMap for streaming config |
 | global.streaming_ingestion.enabled | bool | `false` | Enable streaming ingestion (ClickHouse + Kafka) |
+| global.streaming_ingestion.productEventsProcessor | bool | `false` | Expose the product events topics in the streaming ConfigMap, so that the events of product catalog organizations are produced to them. Set by the umbrella chart alongside the `product-events-processor-worker`. |
 | global.streaming_ingestion.secret | string | `""` | Name of an existing Secret for streaming credentials |
 
 ### Streaming Ingestion / Kafka
