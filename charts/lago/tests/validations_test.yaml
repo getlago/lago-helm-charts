@@ -72,3 +72,67 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+
+  - it: refuses a 2.1.4 flag without its new key
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers: [kafka:9092]
+      global.streaming_ingestion.walletRefreshConsumer: true
+    asserts:
+      - failedTemplate:
+          errorMessage: 'global.streaming_ingestion.walletRefreshConsumer was replaced by global.streaming_ingestion.consumers.walletRefresh.enabled: set the new key (you can keep both for one upgrade)'
+
+  - it: accepts a 2.1.4 flag next to its new key, for one upgrade
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers: [kafka:9092]
+      global.streaming_ingestion.productEventsProcessor: true
+      global.streaming_ingestion.consumers.productEvents.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: refuses an unknown consumer
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers: [kafka:9092]
+      global.streaming_ingestion.consumers.walletAlert.enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: 'global.streaming_ingestion.consumers.walletAlert is not an optional consumer; use one of: productEvents, usageAttribution, walletAlerts, walletRefresh'
+
+  - it: refuses a switch on the always-on consumer
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers: [kafka:9092]
+      global.streaming_ingestion.consumers.eventsChargedInAdvance.enabled: false
+    asserts:
+      - failedTemplate:
+          errorMessage: 'global.streaming_ingestion.consumers.eventsChargedInAdvance is not an optional consumer; use one of: productEvents, usageAttribution, walletAlerts, walletRefresh'
+
+  - it: refuses a consumer that is not a map
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers: [kafka:9092]
+      global.streaming_ingestion.consumers.walletAlerts: true
+    asserts:
+      - failedTemplate:
+          errorMessage: 'global.streaming_ingestion.consumers.walletAlerts must be a map, for example {enabled: true}'
+
+  - it: refuses a Karafka worker with no consumer
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers: [kafka:9092]
+      events-consumer-worker.karafka.consumer: ""
+    asserts:
+      - failedTemplate:
+          errorMessage: 'events-consumer-worker.karafka.consumer must be "eventsChargedInAdvance" (got ""): it is the worker of that consumer'
+
+  - it: refuses a consumer in a worker that is not its own
+    set:
+      global.streaming_ingestion.enabled: true
+      global.streaming_ingestion.kafka.bootstrapServers: [kafka:9092]
+      api.karafka.consumer: walletAlerts
+    asserts:
+      - failedTemplate:
+          errorMessage: 'api.karafka.consumer "walletAlerts": that consumer runs in wallet-alerts-consumer-worker, one consumer per worker'

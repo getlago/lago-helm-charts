@@ -467,18 +467,18 @@ config:
     name: ""
 
 karafka:
-  # -- Streaming consumers (keys of `global.streaming_ingestion.consumers`)
-  # whose Karafka groups this pod runs. When set, replaces `container.command`
-  # with `bundle exec karafka server --include_consumer_groups <groups>`, with
-  # the groups of the listed consumers that are on.
+  # -- Streaming consumer whose Karafka group this pod runs (one per pod):
+  # eventsChargedInAdvance, walletRefresh, walletAlerts or usageAttribution.
+  # When set, it replaces `container.command` with
+  # `bundle exec karafka server --include_consumer_groups <group>`.
   # @section -- Container
-  consumers: []
+  consumer: ""
 
 container:
   # -- Override the container name (defaults to chart fullname)
   # @section -- Container
   name: ""
-  # -- Container entrypoint command
+  # -- Container entrypoint command. Ignored when `karafka.consumer` is set.
   # @section -- Container
   command: ["./scripts/start.api.sh"]
   # -- Container command arguments

@@ -1,0 +1,23 @@
+suite: Test karafka.consumer replaces container.command with the Karafka server
+  restricted to that consumer's group
+templates:
+  - templates/deployment.yaml
+values:
+  - ../values.yaml
+  - ./fixtures/required.yaml
+
+tests:
+  - it: keeps container.command when karafka.consumer is empty
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value: ["./scripts/start.api.sh"]
+
+  - it: runs only the group of karafka.consumer, whatever container.command is
+    set:
+      karafka.consumer: walletAlerts
+      container.command: ["./scripts/start.api.sh"]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value: ["bundle", "exec", "karafka", "server", "--include_consumer_groups", "lago_wallet_alerts_consumer"]

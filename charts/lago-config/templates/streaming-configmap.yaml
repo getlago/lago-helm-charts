@@ -30,8 +30,9 @@ data:
   LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC: {{ $kafka.topics.eventsChargedInAdvance }}
   LAGO_KAFKA_EVENTS_DEAD_LETTER_TOPIC: {{ $kafka.topics.eventsDeadLetter }}
   LAGO_KAFKA_RAW_EVENTS_TOPIC: {{ $kafka.topics.eventsRaw }}
-  {{- /* lago-api produces to a topic as soon as it is set, so a consumer's
-         topics render only when that consumer is on. */}}
+  {{- /* A consumer's topic keys render only when that consumer is on: lago-api
+         (wallet alerts, product events) and the events processor (usage
+         attribution) produce to a topic as soon as its key is set. */}}
   {{- if include "lago-config.streaming.consumerEnabled" (dict "name" "productEvents" "global" .Values.global) }}
   LAGO_KAFKA_PRODUCT_RAW_EVENTS_TOPIC: {{ $kafka.topics.productEventsRaw }}
   LAGO_KAFKA_PRODUCT_ENRICHED_EVENTS_TOPIC: {{ $kafka.topics.productEventsEnriched }}

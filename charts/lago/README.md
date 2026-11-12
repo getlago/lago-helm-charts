@@ -225,7 +225,7 @@ A Helm chart for Kubernetes
 | events-consumer-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | events-consumer-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
 | events-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
-| events-consumer-worker.karafka.consumers | list | `["eventsChargedInAdvance"]` | Streaming consumers whose Karafka groups this pod runs (the ones that are on) |
+| events-consumer-worker.karafka.consumer | string | `"eventsChargedInAdvance"` | Streaming consumer whose Karafka group this pod runs |
 | events-consumer-worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for workers) |
 | events-consumer-worker.nameOverride | string | `"lago-events-consumer-worker"` | Override the events-consumer-worker subchart release name |
 | events-consumer-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |
@@ -239,7 +239,7 @@ A Helm chart for Kubernetes
 | wallet-refresh-consumer-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | wallet-refresh-consumer-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
 | wallet-refresh-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
-| wallet-refresh-consumer-worker.karafka.consumers | list | `["walletRefresh"]` | Streaming consumers whose Karafka groups this pod runs. The pod keeps the wallet alerts topic, as it produces wallet alerts, but does not consume them. |
+| wallet-refresh-consumer-worker.karafka.consumer | string | `"walletRefresh"` | Streaming consumer whose Karafka group this pod runs. The pod keeps the wallet alerts topic, as it produces wallet alerts, but does not consume them. |
 | wallet-refresh-consumer-worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for workers) |
 | wallet-refresh-consumer-worker.nameOverride | string | `"lago-wallet-refresh-consumer-worker"` | Override the wallet-refresh-consumer-worker subchart release name |
 | wallet-refresh-consumer-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |
@@ -253,7 +253,7 @@ A Helm chart for Kubernetes
 | wallet-alerts-consumer-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | wallet-alerts-consumer-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
 | wallet-alerts-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
-| wallet-alerts-consumer-worker.karafka.consumers | list | `["walletAlerts"]` | Streaming consumers whose Karafka groups this pod runs |
+| wallet-alerts-consumer-worker.karafka.consumer | string | `"walletAlerts"` | Streaming consumer whose Karafka group this pod runs |
 | wallet-alerts-consumer-worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for workers) |
 | wallet-alerts-consumer-worker.nameOverride | string | `"lago-wallet-alerts-consumer-worker"` | Override the wallet-alerts-consumer-worker subchart release name |
 | wallet-alerts-consumer-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |
@@ -267,7 +267,7 @@ A Helm chart for Kubernetes
 | usage-attribution-consumer-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | usage-attribution-consumer-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
 | usage-attribution-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
-| usage-attribution-consumer-worker.karafka.consumers | list | `["usageAttribution"]` | Streaming consumers whose Karafka groups this pod runs |
+| usage-attribution-consumer-worker.karafka.consumer | string | `"usageAttribution"` | Streaming consumer whose Karafka group this pod runs |
 | usage-attribution-consumer-worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for workers) |
 | usage-attribution-consumer-worker.nameOverride | string | `"lago-usage-attribution-consumer-worker"` | Override the usage-attribution-consumer-worker subchart release name |
 | usage-attribution-consumer-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |

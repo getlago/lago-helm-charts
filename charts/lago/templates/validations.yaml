@@ -4,8 +4,42 @@ combination Helm's `condition` field cannot express (a dependency gated on one
 flag that also needs another) fails at template time with a readable message,
 instead of rolling out a pod that crash-loops.
 */}}
-{{- range $name := keys .Values.global.streaming_ingestion.consumers | sortAlpha }}
-{{- if and (include "lago-config.streaming.consumerEnabled" (dict "name" $name "global" $.Values.global)) (not $.Values.global.streaming_ingestion.enabled) }}
+{{- $si := .Values.global.streaming_ingestion }}
+{{- $registry := include "lago-config.streaming.consumers" . | fromJson }}
+
+{{- /* Switches: known consumers only, one shape, streaming ingestion on. */}}
+{{- range $name, $c := $si.consumers }}
+{{- if or (not (hasKey $registry $name)) (eq $name "eventsChargedInAdvance") }}
+{{- fail (printf "global.streaming_ingestion.consumers.%s is not an optional consumer; use one of: %s" $name (without (keys $registry | sortAlpha) "eventsChargedInAdvance" | join ", ")) }}
+{{- end }}
+{{- if not (kindIs "map" $c) }}
+{{- fail (printf "global.streaming_ingestion.consumers.%s must be a map, for example {enabled: true}" $name) }}
+{{- end }}
+{{- if and $c.enabled (not $si.enabled) }}
 {{- fail (printf "global.streaming_ingestion.consumers.%s requires global.streaming_ingestion.enabled: the consumer takes its Kafka connection and topics from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on" $name) }}
+{{- end }}
+{{- end }}
+
+{{- /* Flags of chart 2.1.4: refuse an upgrade that would drop their worker. */}}
+{{- range $old, $new := dict "walletRefreshConsumer" "walletRefresh" "productEventsProcessor" "productEvents" }}
+{{- if and (index $si $old) (not (include "lago-config.streaming.consumerEnabled" (dict "name" $new "global" $.Values.global))) }}
+{{- fail (printf "global.streaming_ingestion.%s was replaced by global.streaming_ingestion.consumers.%s.enabled: set the new key (you can keep both for one upgrade)" $old $new) }}
+{{- end }}
+{{- end }}
+
+{{- /* Karafka workers: each runs exactly its registered consumer. */}}
+{{- range $name, $r := $registry }}
+{{- if $r.group }}
+{{- $on := ternary $si.enabled (include "lago-config.streaming.consumerEnabled" (dict "name" $name "global" $.Values.global)) (eq $name "eventsChargedInAdvance") }}
+{{- $set := dig "karafka" "consumer" "" (index $.Values $r.worker | default dict) }}
+{{- if and $on (ne $set $name) }}
+{{- fail (printf "%s.karafka.consumer must be %q (got %q): it is the worker of that consumer" $r.worker $name $set) }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- range $alias, $w := .Values }}
+{{- $set := dig "karafka" "consumer" "" (ternary $w dict (kindIs "map" $w)) }}
+{{- if and $set (ne (dig $set "worker" "" $registry) $alias) }}
+{{- fail (printf "%s.karafka.consumer %q: that consumer runs in %s, one consumer per worker" $alias $set (dig $set "worker" "no worker" $registry)) }}
 {{- end }}
 {{- end }}

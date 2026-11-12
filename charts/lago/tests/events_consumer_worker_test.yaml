@@ -1,6 +1,6 @@
-suite: Test events-consumer-worker runs the Karafka server with only the consumer
-  groups it lists in karafka.consumers that are on, so it never joins the group of a
-  dedicated consumer worker, and needs no blanked topic.
+suite: Test events-consumer-worker runs the Karafka server with only the group of its
+  karafka.consumer, so it never joins the group of a dedicated consumer worker, and
+  needs no blanked topic.
 templates:
   - charts/events-consumer-worker/templates/deployment.yaml
 
@@ -59,9 +59,9 @@ tests:
             value: ""
           any: true
 
-  - it: fails on a consumer that is not in the map
+  - it: fails on a consumer that is not a Karafka consumer
     set:
-      events-consumer-worker.karafka.consumers: [unknown]
+      events-consumer-worker.karafka.consumer: productEvents
     asserts:
       - failedTemplate:
-          errorMessage: 'karafka.consumers: "unknown" is not a key of global.streaming_ingestion.consumers'
+          errorMessage: 'karafka.consumer "productEvents" is not a Karafka consumer of lago-config.streaming.consumers'
