@@ -37,9 +37,6 @@ data:
   LAGO_KAFKA_PRODUCT_RAW_EVENTS_TOPIC: {{ $kafka.topics.productEventsRaw }}
   LAGO_KAFKA_PRODUCT_ENRICHED_EVENTS_TOPIC: {{ $kafka.topics.productEventsEnriched }}
   LAGO_KAFKA_PRODUCT_EVENTS_DEAD_LETTER_TOPIC: {{ $kafka.topics.productEventsDeadLetter }}
-  {{- /* Optional, and blank by default: the events processor produces to it and
-         lago-api consumes it as soon as it is set, so it is named only once the
-         topic exists. */}}
   {{- with $kafka.topics.productEventsChargedInAdvance }}
   LAGO_KAFKA_PRODUCT_EVENTS_CHARGED_IN_ADVANCE_TOPIC: {{ . }}
   {{- end }}
