@@ -88,12 +88,17 @@ dependencies:
     alias: wallet-refresh-consumer-worker
     version: 2.1.4
     repository: "file://../lago-rails"
-    condition: global.streaming_ingestion.walletRefreshConsumer
+    condition: global.streaming_ingestion.consumers.walletRefresh.enabled
   - name: lago-rails
     alias: wallet-alerts-consumer-worker
     version: 2.1.4
     repository: "file://../lago-rails"
-    condition: global.streaming_ingestion.walletAlertsConsumer
+    condition: global.streaming_ingestion.consumers.walletAlerts.enabled
+  - name: lago-rails
+    alias: usage-attribution-consumer-worker
+    version: 2.1.4
+    repository: "file://../lago-rails"
+    condition: global.streaming_ingestion.consumers.usageAttribution.enabled
   - name: lago-events-processor-worker
     alias: events-processor-worker
     version: 2.1.4
@@ -103,7 +108,7 @@ dependencies:
     alias: product-events-processor-worker
     version: 2.1.4
     repository: "file://../lago-events-processor-worker"
-    condition: global.streaming_ingestion.productEventsProcessor
+    condition: global.streaming_ingestion.consumers.productEvents.enabled
   - name: lago-rails
     alias: alerts-worker
     version: 2.1.4

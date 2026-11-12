@@ -42,8 +42,9 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| karafka.consumer | string | `""` | Streaming consumer whose Karafka group this pod runs (one per pod): eventsChargedInAdvance, walletRefresh, walletAlerts or usageAttribution. When set, it replaces `container.command` with `bundle exec karafka server --include_consumer_groups <group>`. |
 | container.name | string | `""` | Override the container name (defaults to chart fullname) |
-| container.command | list | `["./scripts/start.api.sh"]` | Container entrypoint command |
+| container.command | list | `["./scripts/start.api.sh"]` | Container entrypoint command. Ignored when `karafka.consumer` is set. |
 | container.args | list | `[]` | Container command arguments |
 | container.ports.http | int | `3000` | HTTP container port |
 

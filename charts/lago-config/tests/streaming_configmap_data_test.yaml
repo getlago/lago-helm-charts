@@ -100,7 +100,7 @@ tests:
 
   - it: defaults the product events topics when the product events processor is on
     set:
-      global.streaming_ingestion.productEventsProcessor: true
+      global.streaming_ingestion.consumers.productEvents.enabled: true
     asserts:
       - equal:
           path: data.LAGO_KAFKA_PRODUCT_RAW_EVENTS_TOPIC
@@ -114,7 +114,7 @@ tests:
 
   - it: renders the product events topics when overridden
     set:
-      global.streaming_ingestion.productEventsProcessor: true
+      global.streaming_ingestion.consumers.productEvents.enabled: true
       global.streaming_ingestion.kafka.topics.productEventsRaw: product-events-raw
       global.streaming_ingestion.kafka.topics.productEventsEnriched: product-events-enriched
       global.streaming_ingestion.kafka.topics.productEventsDeadLetter: product-events-dead-letter
@@ -139,7 +139,7 @@ tests:
 
   - it: renders LAGO_KAFKA_WALLET_ALERTS_TOPIC when the wallet alerts consumer is on
     set:
-      global.streaming_ingestion.walletAlertsConsumer: true
+      global.streaming_ingestion.consumers.walletAlerts.enabled: true
     asserts:
       - equal:
           path: data.LAGO_KAFKA_WALLET_ALERTS_TOPIC
@@ -147,9 +147,37 @@ tests:
 
   - it: renders an overridden wallet alerts topic
     set:
-      global.streaming_ingestion.walletAlertsConsumer: true
+      global.streaming_ingestion.consumers.walletAlerts.enabled: true
       global.streaming_ingestion.kafka.topics.walletAlerts: custom_wallet_alerts
     asserts:
       - equal:
           path: data.LAGO_KAFKA_WALLET_ALERTS_TOPIC
           value: custom_wallet_alerts
+
+  # ============================================================================
+  # LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC and
+  # LAGO_KAFKA_USAGE_ATTRIBUTION_VALUES_TOPIC (only with their consumer)
+  # ============================================================================
+  - it: does not render the triggers and usage attribution topics by default
+    asserts:
+      - notExists:
+          path: data.LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC
+      - notExists:
+          path: data.LAGO_KAFKA_USAGE_ATTRIBUTION_VALUES_TOPIC
+
+  - it: renders the realtime usage triggers topic with the wallet refresh consumer
+    set:
+      global.streaming_ingestion.consumers.walletRefresh.enabled: true
+      global.streaming_ingestion.kafka.topics.realtimeUsageTriggers: custom_triggers
+    asserts:
+      - equal:
+          path: data.LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC
+          value: custom_triggers
+
+  - it: renders the usage attribution topic with the usage attribution consumer
+    set:
+      global.streaming_ingestion.consumers.usageAttribution.enabled: true
+    asserts:
+      - equal:
+          path: data.LAGO_KAFKA_USAGE_ATTRIBUTION_VALUES_TOPIC
+          value: usage_attribution_values

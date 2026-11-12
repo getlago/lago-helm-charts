@@ -99,3 +99,43 @@ Create the name of the secret to use
 {{- include "lago-config.fullname" . }}-streaming
 {{- end }}
 {{- end }}
+
+{{/*
+Registry of the streaming consumers: name -> {group, worker}. `group` is the
+Karafka consumer group ("" when the consumer is not Karafka); lago-api fixes
+these names in `karafka.rb`, so they are constants, not values. `worker` is
+the umbrella alias that runs the consumer. eventsChargedInAdvance is always on
+with streaming ingestion; the others are switched by
+`global.streaming_ingestion.consumers.<name>.enabled`.
+*/}}
+{{- define "lago-config.streaming.consumers" -}}
+{{- dict
+  "eventsChargedInAdvance" (dict "group" "lago_events_charged_in_advance_consumer" "worker" "events-consumer-worker")
+  "walletRefresh" (dict "group" "lago_wallet_refresh_triggers_consumer" "worker" "wallet-refresh-consumer-worker")
+  "walletAlerts" (dict "group" "lago_wallet_alerts_consumer" "worker" "wallet-alerts-consumer-worker")
+  "usageAttribution" (dict "group" "lago_usage_attribution_values_consumer" "worker" "usage-attribution-consumer-worker")
+  "productEvents" (dict "group" "" "worker" "product-events-processor-worker")
+  | toJson -}}
+{{- end -}}
+
+{{/*
+"true" when `global.streaming_ingestion.consumers.<name>.enabled` is on, else "".
+Takes (dict "name" <consumer> "global" .Values.global).
+*/}}
+{{- define "lago-config.streaming.consumerEnabled" -}}
+{{- $c := dig "streaming_ingestion" "consumers" .name nil .global -}}
+{{- if and (kindIs "map" $c) $c.enabled }}true{{ end -}}
+{{- end -}}
+
+{{/*
+Karafka command that runs only the consumer group of the streaming consumer
+`.name`: one consumer per process, so each scales and reports on its own.
+Takes (dict "name" <consumer> "context" $).
+*/}}
+{{- define "lago-config.streaming.karafkaCommand" -}}
+{{- $group := dig .name "group" "" (include "lago-config.streaming.consumers" .context | fromJson) -}}
+{{- if not $group -}}
+{{- fail (printf "karafka.consumer %q is not a Karafka consumer of lago-config.streaming.consumers" .name) -}}
+{{- end -}}
+{{- toJson (list "bundle" "exec" "karafka" "server" "--include_consumer_groups" $group) -}}
+{{- end -}}

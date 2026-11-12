@@ -192,9 +192,11 @@ A Helm chart for Kubernetes
 |-----|------|---------|-------------|
 | global.streaming_ingestion.configmap | string | `""` | Name of an existing ConfigMap for streaming config |
 | global.streaming_ingestion.enabled | bool | `false` | Enable streaming ingestion (ClickHouse + Kafka) |
-| global.streaming_ingestion.productEventsProcessor | bool | `false` | Expose the product events topics in the streaming ConfigMap, so that the events of product catalog organizations are produced to them. Set by the umbrella chart alongside the `product-events-processor-worker`. |
+| global.streaming_ingestion.consumers.productEvents.enabled | bool | `false` | Product events processor (`product-events-processor-worker`). Exposes the 3 product events topics. |
+| global.streaming_ingestion.consumers.usageAttribution.enabled | bool | `false` | Usage attribution values consumer (`usage-attribution-consumer-worker`). Exposes `LAGO_KAFKA_USAGE_ATTRIBUTION_VALUES_TOPIC`. |
+| global.streaming_ingestion.consumers.walletAlerts.enabled | bool | `false` | Wallet alerts consumer (`wallet-alerts-consumer-worker`). Exposes `LAGO_KAFKA_WALLET_ALERTS_TOPIC`. |
+| global.streaming_ingestion.consumers.walletRefresh.enabled | bool | `false` | Wallet refresh consumer (`wallet-refresh-consumer-worker`). Exposes `LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC`. |
 | global.streaming_ingestion.secret | string | `""` | Name of an existing Secret for streaming credentials |
-| global.streaming_ingestion.walletAlertsConsumer | bool | `false` | Expose `LAGO_KAFKA_WALLET_ALERTS_TOPIC` in the streaming ConfigMap, so that wallet changes are produced to the wallet alerts topic. Set by the umbrella chart alongside the `wallet-alerts-consumer-worker`. |
 
 ### Streaming Ingestion / Kafka
 
@@ -218,8 +220,10 @@ A Helm chart for Kubernetes
 | global.streaming_ingestion.kafka.topics.productEventsDeadLetter | string | `"product_events_dead_letter"` | Kafka topic for dead-letter product events |
 | global.streaming_ingestion.kafka.topics.productEventsEnriched | string | `"product_events_enriched"` | Kafka topic for enriched product events |
 | global.streaming_ingestion.kafka.topics.productEventsRaw | string | `"product_events_raw"` | Kafka topic for raw product events |
+| global.streaming_ingestion.kafka.topics.realtimeUsageTriggers | string | `"realtime_usage_triggers"` | Kafka topic of the realtime usage triggers that refresh wallets |
 | global.streaming_ingestion.kafka.topics.securityLogs | string | `"security_logs"` | Kafka topic for security logs |
 | global.streaming_ingestion.kafka.topics.unprocessedEvents | string | `"unprocessed_events"` | Kafka topic for unprocessed events (dead-letter for pre-enrichment failures) |
+| global.streaming_ingestion.kafka.topics.usageAttributionValues | string | `"usage_attribution_values"` | Kafka topic on which the events processor reports the usage attribution values (account tree) to lago-api |
 | global.streaming_ingestion.kafka.topics.walletAlerts | string | `"wallet_alerts"` | Kafka topic for wallet alerts evaluation |
 | global.streaming_ingestion.kafka.username | string | `""` | Kafka username (not required when using an external secret) |
 

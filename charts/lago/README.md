@@ -222,45 +222,56 @@ A Helm chart for Kubernetes
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | events-consumer-worker | object | See child values | Events consumer worker subchart overrides (lago-rails, conditional on `global.streaming_ingestion.enabled`) |
-| events-consumer-worker.nameOverride | string | `"lago-events-consumer-worker"` | Override the events-consumer-worker subchart release name |
 | events-consumer-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | events-consumer-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
+| events-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
+| events-consumer-worker.karafka.consumer | string | `"eventsChargedInAdvance"` | Streaming consumer whose Karafka group this pod runs |
 | events-consumer-worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for workers) |
+| events-consumer-worker.nameOverride | string | `"lago-events-consumer-worker"` | Override the events-consumer-worker subchart release name |
 | events-consumer-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |
 | events-consumer-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
-| events-consumer-worker.container.command | list | `["./scripts/start.events.consumer.sh"]` | Events consumer entrypoint command |
-| events-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
-| events-consumer-worker.extraEnv | object | `{"LAGO_KAFKA_WALLET_ALERTS_TOPIC":""}` | Blanks the wallet alerts topic inherited from the streaming ConfigMap, so this pod does not join the wallet alerts consumer group. The events consumer only enqueues jobs, it never produces wallet alerts itself. |
 
 ### Wallet Refresh Consumer Worker
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| wallet-refresh-consumer-worker | object | See child values | Wallet refresh consumer worker subchart overrides (lago-rails, conditional on `global.streaming_ingestion.walletRefreshConsumer`). Runs the Karafka `WalletRefreshTriggersConsumer` on the realtime usage triggers topic; the Kafka settings come from the streaming ConfigMap/Secret. |
-| wallet-refresh-consumer-worker.nameOverride | string | `"lago-wallet-refresh-consumer-worker"` | Override the wallet-refresh-consumer-worker subchart release name |
+| wallet-refresh-consumer-worker | object | See child values | Wallet refresh consumer worker subchart overrides (lago-rails, conditional on `global.streaming_ingestion.consumers.walletRefresh.enabled`). Runs the Karafka `WalletRefreshTriggersConsumer` on the realtime usage triggers topic; the Kafka settings come from the streaming ConfigMap/Secret. |
 | wallet-refresh-consumer-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | wallet-refresh-consumer-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
+| wallet-refresh-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
+| wallet-refresh-consumer-worker.karafka.consumer | string | `"walletRefresh"` | Streaming consumer whose Karafka group this pod runs. The pod keeps the wallet alerts topic, as it produces wallet alerts, but does not consume them. |
 | wallet-refresh-consumer-worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for workers) |
+| wallet-refresh-consumer-worker.nameOverride | string | `"lago-wallet-refresh-consumer-worker"` | Override the wallet-refresh-consumer-worker subchart release name |
 | wallet-refresh-consumer-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |
 | wallet-refresh-consumer-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
-| wallet-refresh-consumer-worker.container.command | list | `["bundle","exec","karafka","server","--include_consumer_groups","lago_wallet_refresh_triggers_consumer"]` | Karafka consumer entrypoint command, restricted to the wallet refresh consumer group. The pod keeps the wallet alerts topic, as it produces wallet alerts when it refreshes a wallet, but must not consume them. |
-| wallet-refresh-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
-| wallet-refresh-consumer-worker.extraEnv | object | `{"LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC":"","LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC":"realtime_usage_triggers"}` | Routes Karafka to the wallet refresh consumer only: sets the realtime usage triggers topic and blanks the charged-in-advance topic inherited from the streaming ConfigMap, so this pod does not join the events consumer group. |
 
 ### Wallet Alerts Consumer Worker
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| wallet-alerts-consumer-worker | object | See child values | Wallet alerts consumer worker subchart overrides (lago-rails, conditional on `global.streaming_ingestion.walletAlertsConsumer`). Runs the Karafka `WalletAlertsConsumer` on the wallet alerts topic; the Kafka settings and the topic come from the streaming ConfigMap/Secret. |
-| wallet-alerts-consumer-worker.nameOverride | string | `"lago-wallet-alerts-consumer-worker"` | Override the wallet-alerts-consumer-worker subchart release name |
+| wallet-alerts-consumer-worker | object | See child values | Wallet alerts consumer worker subchart overrides (lago-rails, conditional on `global.streaming_ingestion.consumers.walletAlerts.enabled`). Runs the Karafka `WalletAlertsConsumer` on the wallet alerts topic; the Kafka settings and the topic come from the streaming ConfigMap/Secret. |
 | wallet-alerts-consumer-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | wallet-alerts-consumer-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
+| wallet-alerts-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
+| wallet-alerts-consumer-worker.karafka.consumer | string | `"walletAlerts"` | Streaming consumer whose Karafka group this pod runs |
 | wallet-alerts-consumer-worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for workers) |
+| wallet-alerts-consumer-worker.nameOverride | string | `"lago-wallet-alerts-consumer-worker"` | Override the wallet-alerts-consumer-worker subchart release name |
 | wallet-alerts-consumer-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |
 | wallet-alerts-consumer-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
-| wallet-alerts-consumer-worker.container.command | list | `["./scripts/start.events.consumer.sh"]` | Karafka consumer entrypoint command (same as the events consumer) |
-| wallet-alerts-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
-| wallet-alerts-consumer-worker.extraEnv | object | `{"LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC":""}` | Routes Karafka to the wallet alerts consumer only: blanks the charged-in-advance topic inherited from the streaming ConfigMap, so this pod does not join the events consumer group. |
+
+### Usage Attribution Consumer Worker
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| usage-attribution-consumer-worker | object | See child values | Usage attribution consumer worker subchart overrides (lago-rails, conditional on `global.streaming_ingestion.consumers.usageAttribution.enabled`). Runs the Karafka `UsageAttributionValuesConsumer` on the usage attribution values topic; the Kafka settings and the topic come from the streaming ConfigMap/Secret. |
+| usage-attribution-consumer-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
+| usage-attribution-consumer-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
+| usage-attribution-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
+| usage-attribution-consumer-worker.karafka.consumer | string | `"usageAttribution"` | Streaming consumer whose Karafka group this pod runs |
+| usage-attribution-consumer-worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for workers) |
+| usage-attribution-consumer-worker.nameOverride | string | `"lago-usage-attribution-consumer-worker"` | Override the usage-attribution-consumer-worker subchart release name |
+| usage-attribution-consumer-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |
+| usage-attribution-consumer-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
 
 ### Events Processor Worker
 
@@ -275,7 +286,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| product-events-processor-worker | object | See child values | Product events processor worker subchart overrides (lago-events-processor-worker, conditional on `global.streaming_ingestion.productEventsProcessor`). Same image as the events processor, running its product events pipeline in its own deployment so a product events failure or backlog never holds back subscription events. |
+| product-events-processor-worker | object | See child values | Product events processor worker subchart overrides (lago-events-processor-worker, conditional on `global.streaming_ingestion.consumers.productEvents.enabled`). Same image as the events processor, running its product events pipeline in its own deployment so a product events failure or backlog never holds back subscription events. |
 | product-events-processor-worker.nameOverride | string | `"lago-product-events-processor-worker"` | Override the product-events-processor-worker subchart release name |
 | product-events-processor-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
 | product-events-processor-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |

@@ -1,12 +1,10 @@
 suite: Test wallet-alerts-consumer-worker subchart is gated by
-  global.streaming_ingestion.walletAlertsConsumer and runs the Karafka entrypoint on
-  the wallet alerts topic only, and events-consumer-worker does not consume that
-  topic. The topic comes from the streaming ConfigMap (covered in lago-config); the
+  global.streaming_ingestion.consumers.walletAlerts.enabled and runs the Karafka server pinned
+  to the wallet alerts consumer group. The topic comes from the streaming ConfigMap (covered in lago-config); the
   pairing with streaming ingestion is enforced in templates/validations.yaml and
   covered by validations_test.yaml.
 templates:
   - charts/wallet-alerts-consumer-worker/templates/deployment.yaml
-  - charts/events-consumer-worker/templates/deployment.yaml
 
 set:
   global:
@@ -37,9 +35,9 @@ set:
           - kafka:9092
 
 tests:
-  - it: renders its own deployment with the Karafka entrypoint when enabled
+  - it: renders the deployment with the Karafka server pinned to its consumer group when enabled
     set:
-      global.streaming_ingestion.walletAlertsConsumer: true
+      global.streaming_ingestion.consumers.walletAlerts.enabled: true
     asserts:
       - hasDocuments:
           count: 1
@@ -50,12 +48,12 @@ tests:
         template: charts/wallet-alerts-consumer-worker/templates/deployment.yaml
       - equal:
           path: spec.template.spec.containers[0].command
-          value: ["./scripts/start.events.consumer.sh"]
+          value: ["bundle", "exec", "karafka", "server", "--include_consumer_groups", "lago_wallet_alerts_consumer"]
         template: charts/wallet-alerts-consumer-worker/templates/deployment.yaml
 
-  - it: reads the wallet alerts topic and blanks the charged-in-advance topic
+  - it: reads the wallet alerts topic from the streaming ConfigMap, with no override
     set:
-      global.streaming_ingestion.walletAlertsConsumer: true
+      global.streaming_ingestion.consumers.walletAlerts.enabled: true
     asserts:
       - contains:
           path: spec.template.spec.containers[0].envFrom
@@ -63,20 +61,9 @@ tests:
             configMapRef:
               name: RELEASE-NAME-lago-config-streaming
         template: charts/wallet-alerts-consumer-worker/templates/deployment.yaml
-      - contains:
-          path: spec.template.spec.containers[0].env
-          content:
-            name: LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC
-            value: ""
-        template: charts/wallet-alerts-consumer-worker/templates/deployment.yaml
-
-  - it: blanks the wallet alerts topic on the events consumer
-    set:
-      global.streaming_ingestion.walletAlertsConsumer: true
-    asserts:
-      - contains:
+      - notContains:
           path: spec.template.spec.containers[0].env
           content:
             name: LAGO_KAFKA_WALLET_ALERTS_TOPIC
-            value: ""
-        template: charts/events-consumer-worker/templates/deployment.yaml
+          any: true
+        template: charts/wallet-alerts-consumer-worker/templates/deployment.yaml

@@ -297,16 +297,30 @@ global:
     # -- Enable streaming ingestion (ClickHouse + Kafka)
     # @section -- Streaming Ingestion
     enabled: false
-    # -- Expose the product events topics in the streaming ConfigMap, so that
-    # the events of product catalog organizations are produced to them. Set by
-    # the umbrella chart alongside the `product-events-processor-worker`.
-    # @section -- Streaming Ingestion
-    productEventsProcessor: false
-    # -- Expose `LAGO_KAFKA_WALLET_ALERTS_TOPIC` in the streaming ConfigMap,
-    # so that wallet changes are produced to the wallet alerts topic. Set by
-    # the umbrella chart alongside the `wallet-alerts-consumer-worker`.
-    # @section -- Streaming Ingestion
-    walletAlertsConsumer: false
+    # Optional streaming consumers, set by the umbrella chart with their
+    # workers. A consumer's topic key renders in the streaming ConfigMap only
+    # when it is on, because lago-api produces to a topic as soon as it is set.
+    consumers:
+      walletRefresh:
+        # -- Wallet refresh consumer (`wallet-refresh-consumer-worker`).
+        # Exposes `LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC`.
+        # @section -- Streaming Ingestion
+        enabled: false
+      walletAlerts:
+        # -- Wallet alerts consumer (`wallet-alerts-consumer-worker`). Exposes
+        # `LAGO_KAFKA_WALLET_ALERTS_TOPIC`.
+        # @section -- Streaming Ingestion
+        enabled: false
+      productEvents:
+        # -- Product events processor (`product-events-processor-worker`).
+        # Exposes the 3 product events topics.
+        # @section -- Streaming Ingestion
+        enabled: false
+      usageAttribution:
+        # -- Usage attribution values consumer (`usage-attribution-consumer-worker`).
+        # Exposes `LAGO_KAFKA_USAGE_ATTRIBUTION_VALUES_TOPIC`.
+        # @section -- Streaming Ingestion
+        enabled: false
     # -- Name of an existing ConfigMap for streaming config
     # @section -- Streaming Ingestion
     configmap: ""
@@ -429,6 +443,13 @@ global:
         # -- Kafka topic for wallet alerts evaluation
         # @section -- Streaming Ingestion / Kafka
         walletAlerts: wallet_alerts
+        # -- Kafka topic of the realtime usage triggers that refresh wallets
+        # @section -- Streaming Ingestion / Kafka
+        realtimeUsageTriggers: realtime_usage_triggers
+        # -- Kafka topic on which the events processor reports the usage
+        # attribution values (account tree) to lago-api
+        # @section -- Streaming Ingestion / Kafka
+        usageAttributionValues: usage_attribution_values
         # -- Kafka topic for activity logs
         # @section -- Streaming Ingestion / Kafka
         activityLogs: activity_logs
