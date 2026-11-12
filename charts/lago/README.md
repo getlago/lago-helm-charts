@@ -4,6 +4,10 @@
 
 A Helm chart for Kubernetes
 
+## Documentation
+
+- [Streaming consumers](docs/streaming-consumers.md): how `global.streaming_ingestion.consumers` turns on a Kafka consumer, its worker and its topic.
+
 ## Requirements
 
 | Repository | Name | Version |
