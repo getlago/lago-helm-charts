@@ -468,6 +468,10 @@ global:
         # -- Kafka topic for dead-letter product events
         # @section -- Streaming Ingestion / Kafka
         productEventsDeadLetter: product_events_dead_letter
+        # -- Kafka topic for product events charged in advance. Optional: blank (the default)
+        # charges no product event in advance
+        # @section -- Streaming Ingestion / Kafka
+        productEventsChargedInAdvance: ""
         # -- Kafka topic for wallet alerts evaluation
         # @section -- Streaming Ingestion / Kafka
         walletAlerts: wallet_alerts
@@ -1206,11 +1210,12 @@ wallet-alerts-consumer-worker:
     # @section -- Wallet Alerts Consumer Worker
     ports: []
   # -- Routes Karafka to the wallet alerts consumer only: blanks the
-  # charged-in-advance topic inherited from the streaming ConfigMap, so this
-  # pod does not join the events consumer group.
+  # charged-in-advance topics inherited from the streaming ConfigMap, so this
+  # pod does not join the events or product events consumer groups.
   # @section -- Wallet Alerts Consumer Worker
   extraEnv:
     LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC: ""
+    LAGO_KAFKA_PRODUCT_EVENTS_CHARGED_IN_ADVANCE_TOPIC: ""
 
 # -- Events processor worker subchart overrides (conditional on `global.streaming_ingestion.enabled`)
 # @default -- See child values

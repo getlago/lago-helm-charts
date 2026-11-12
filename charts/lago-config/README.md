@@ -215,6 +215,7 @@ A Helm chart for Kubernetes
 | global.streaming_ingestion.kafka.topics.eventsEnriched | string | `"events_enriched"` | Kafka topic for enriched events |
 | global.streaming_ingestion.kafka.topics.eventsEnrichedExpanded | string | `"events_enriched_expanded"` | Kafka topic for expanded enriched events |
 | global.streaming_ingestion.kafka.topics.eventsRaw | string | `"events_raw"` | Kafka topic for raw events |
+| global.streaming_ingestion.kafka.topics.productEventsChargedInAdvance | string | `""` | Kafka topic for product events charged in advance. Optional: blank (the default) charges no product event in advance |
 | global.streaming_ingestion.kafka.topics.productEventsDeadLetter | string | `"product_events_dead_letter"` | Kafka topic for dead-letter product events |
 | global.streaming_ingestion.kafka.topics.productEventsEnriched | string | `"product_events_enriched"` | Kafka topic for enriched product events |
 | global.streaming_ingestion.kafka.topics.productEventsRaw | string | `"product_events_raw"` | Kafka topic for raw product events |

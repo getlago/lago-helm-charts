@@ -37,6 +37,9 @@ data:
   LAGO_KAFKA_PRODUCT_RAW_EVENTS_TOPIC: {{ $kafka.topics.productEventsRaw }}
   LAGO_KAFKA_PRODUCT_ENRICHED_EVENTS_TOPIC: {{ $kafka.topics.productEventsEnriched }}
   LAGO_KAFKA_PRODUCT_EVENTS_DEAD_LETTER_TOPIC: {{ $kafka.topics.productEventsDeadLetter }}
+  {{- with $kafka.topics.productEventsChargedInAdvance }}
+  LAGO_KAFKA_PRODUCT_EVENTS_CHARGED_IN_ADVANCE_TOPIC: {{ . }}
+  {{- end }}
   {{- end }}
   {{- /* lago-api produces wallet alerts as soon as the topic is set, so only
          expose it once the consumer that reads it is deployed. */}}

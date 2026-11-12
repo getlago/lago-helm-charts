@@ -130,6 +130,33 @@ tests:
           value: product-events-dead-letter
 
   # ============================================================================
+  # LAGO_KAFKA_PRODUCT_EVENTS_CHARGED_IN_ADVANCE_TOPIC (only with the product
+  # events processor, and only once a topic name is set)
+  # ============================================================================
+  - it: does not render the product events charged in advance topic by default
+    set:
+      global.streaming_ingestion.productEventsProcessor: true
+    asserts:
+      - notExists:
+          path: data.LAGO_KAFKA_PRODUCT_EVENTS_CHARGED_IN_ADVANCE_TOPIC
+
+  - it: renders the product events charged in advance topic when set
+    set:
+      global.streaming_ingestion.productEventsProcessor: true
+      global.streaming_ingestion.kafka.topics.productEventsChargedInAdvance: product_events_charged_in_advance
+    asserts:
+      - equal:
+          path: data.LAGO_KAFKA_PRODUCT_EVENTS_CHARGED_IN_ADVANCE_TOPIC
+          value: product_events_charged_in_advance
+
+  - it: does not render the product events charged in advance topic without the product events processor
+    set:
+      global.streaming_ingestion.kafka.topics.productEventsChargedInAdvance: product_events_charged_in_advance
+    asserts:
+      - notExists:
+          path: data.LAGO_KAFKA_PRODUCT_EVENTS_CHARGED_IN_ADVANCE_TOPIC
+
+  # ============================================================================
   # LAGO_KAFKA_WALLET_ALERTS_TOPIC (only with the wallet alerts consumer)
   # ============================================================================
   - it: does not render LAGO_KAFKA_WALLET_ALERTS_TOPIC by default

@@ -53,7 +53,7 @@ tests:
           value: ["./scripts/start.events.consumer.sh"]
         template: charts/wallet-alerts-consumer-worker/templates/deployment.yaml
 
-  - it: reads the wallet alerts topic and blanks the charged-in-advance topic
+  - it: reads the wallet alerts topic and blanks the charged-in-advance topics
     set:
       global.streaming_ingestion.walletAlertsConsumer: true
     asserts:
@@ -67,6 +67,12 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC
+            value: ""
+        template: charts/wallet-alerts-consumer-worker/templates/deployment.yaml
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LAGO_KAFKA_PRODUCT_EVENTS_CHARGED_IN_ADVANCE_TOPIC
             value: ""
         template: charts/wallet-alerts-consumer-worker/templates/deployment.yaml
 
