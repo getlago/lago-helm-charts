@@ -22,14 +22,24 @@ Topic names are in `global.streaming_ingestion.kafka.topics`. Change them only i
 ## What one switch does
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#66758F', 'primaryTextColor': '#19212E'}}}%%
 flowchart TD
-    S["consumers.walletAlerts.enabled: true"]
-    S --> W["1. Deploy the worker<br/>Chart.yaml condition<br/>wallet-alerts-consumer-worker"]
-    S --> T["2. Publish the topic key<br/>streaming ConfigMap<br/>LAGO_KAFKA_WALLET_ALERTS_TOPIC"]
-    S --> G["3. Check the configuration<br/>templates/validations.yaml"]
-    T --> P["Producers see the key<br/>and start to write to the topic"]
-    W --> C["The worker reads the topic"]
+    S["consumers.walletAlerts.enabled: true"]:::switch
+    S --> W["1. Deploy the worker<br/>Chart.yaml condition<br/>wallet-alerts-consumer-worker"]:::worker
+    S --> T["2. Publish the topic key<br/>streaming ConfigMap<br/>LAGO_KAFKA_WALLET_ALERTS_TOPIC"]:::topic
+    S --> G["3. Check the configuration<br/>templates/validations.yaml"]:::check
+    T --> P["Producers see the key<br/>and start to write to the topic"]:::producer
+    W --> C["The worker reads the topic"]:::neutral
+    classDef switch fill:#DEECFF,stroke:#006CFA,stroke-width:2px,color:#19212E
+    classDef producer fill:#FFF7E6,stroke:#FF7E1D,color:#19212E
+    classDef topic fill:#EAE6FF,stroke:#422CC1,color:#19212E
+    classDef worker fill:#E3FCF4,stroke:#008559,color:#19212E
+    classDef check fill:#FFEBE6,stroke:#DC3309,color:#19212E
+    classDef neutral fill:#F3F4F6,stroke:#66758F,color:#19212E
+    classDef external fill:#F3F4F6,stroke:#66758F,stroke-dasharray:4 3,color:#19212E
 ```
+
+Colors: blue is the value you set, yellow a producer, purple a topic, green a worker, red the checks.
 
 The switch turns on the producers and the consumer together. A producer never writes to a topic that no consumer reads.
 
@@ -38,12 +48,20 @@ The switch turns on the producers and the consumer together. A producer never wr
 Each row is one consumer: who writes the topic, the topic, and the worker that reads it.
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#66758F', 'primaryTextColor': '#19212E'}}}%%
 flowchart LR
-    P1["events processor"] --> T1["events_charged_in_advance"] --> W1["events-consumer-worker<br/>(always on)"]
-    P2["external producer<br/>(outside this chart)"] --> T2["realtime_usage_triggers"] --> W2["wallet-refresh-consumer-worker"]
-    P3["lago-api<br/>(api, workers, wallet refresh)"] --> T3["wallet_alerts"] --> W3["wallet-alerts-consumer-worker"]
-    P4["events processor"] --> T4["usage_attribution_values"] --> W4["usage-attribution-consumer-worker"]
-    P5["lago-api"] --> T5["product_events_raw"] --> W5["product-events-processor-worker"]
+    P1["events processor"]:::producer --> T1["events_charged_in_advance"]:::topic --> W1["events-consumer-worker<br/>(always on)"]:::worker
+    P2["external producer<br/>(outside this chart)"]:::external --> T2["realtime_usage_triggers"]:::topic --> W2["wallet-refresh-consumer-worker"]:::worker
+    P3["lago-api<br/>(api, workers, wallet refresh)"]:::producer --> T3["wallet_alerts"]:::topic --> W3["wallet-alerts-consumer-worker"]:::worker
+    P4["events processor"]:::producer --> T4["usage_attribution_values"]:::topic --> W4["usage-attribution-consumer-worker"]:::worker
+    P5["lago-api"]:::producer --> T5["product_events_raw"]:::topic --> W5["product-events-processor-worker"]:::worker
+    classDef switch fill:#DEECFF,stroke:#006CFA,stroke-width:2px,color:#19212E
+    classDef producer fill:#FFF7E6,stroke:#FF7E1D,color:#19212E
+    classDef topic fill:#EAE6FF,stroke:#422CC1,color:#19212E
+    classDef worker fill:#E3FCF4,stroke:#008559,color:#19212E
+    classDef check fill:#FFEBE6,stroke:#DC3309,color:#19212E
+    classDef neutral fill:#F3F4F6,stroke:#66758F,color:#19212E
+    classDef external fill:#F3F4F6,stroke:#66758F,stroke-dasharray:4 3,color:#19212E
 ```
 
 | Consumer | Topic key | Karafka consumer group | Worker |
