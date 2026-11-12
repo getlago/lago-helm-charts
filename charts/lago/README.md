@@ -260,7 +260,7 @@ A Helm chart for Kubernetes
 | wallet-alerts-consumer-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
 | wallet-alerts-consumer-worker.container.command | list | `["./scripts/start.events.consumer.sh"]` | Karafka consumer entrypoint command (same as the events consumer) |
 | wallet-alerts-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
-| wallet-alerts-consumer-worker.extraEnv | object | `{"LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC":""}` | Routes Karafka to the wallet alerts consumer only: blanks the charged-in-advance topic inherited from the streaming ConfigMap, so this pod does not join the events consumer group. |
+| wallet-alerts-consumer-worker.extraEnv | object | `{"LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC":"","LAGO_KAFKA_PRODUCT_EVENTS_CHARGED_IN_ADVANCE_TOPIC":""}` | Routes Karafka to the wallet alerts consumer only: blanks the charged-in-advance topics inherited from the streaming ConfigMap, so this pod does not join the events or product events consumer groups. |
 
 ### Events Processor Worker
 

@@ -1210,11 +1210,12 @@ wallet-alerts-consumer-worker:
     # @section -- Wallet Alerts Consumer Worker
     ports: []
   # -- Routes Karafka to the wallet alerts consumer only: blanks the
-  # charged-in-advance topic inherited from the streaming ConfigMap, so this
-  # pod does not join the events consumer group.
+  # charged-in-advance topics inherited from the streaming ConfigMap, so this
+  # pod does not join the events or product events consumer groups.
   # @section -- Wallet Alerts Consumer Worker
   extraEnv:
     LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC: ""
+    LAGO_KAFKA_PRODUCT_EVENTS_CHARGED_IN_ADVANCE_TOPIC: ""
 
 # -- Events processor worker subchart overrides (conditional on `global.streaming_ingestion.enabled`)
 # @default -- See child values
