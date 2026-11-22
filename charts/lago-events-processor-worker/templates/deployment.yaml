@@ -41,7 +41,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ default .Chart.Name .Values.container.name }}
-          image: "{{ .Values.image.repository }}:{{ include "lago-events-processor-worker.version" .}}"
+          image: "{{ include "lago-events-processor-worker.imageRepository" (dict "repository" .Values.image.repository "global" .Values.global) }}:{{ include "lago-events-processor-worker.version" .}}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: {{ toJson .Values.container.command }}
           args: {{ toJson .Values.container.args }}

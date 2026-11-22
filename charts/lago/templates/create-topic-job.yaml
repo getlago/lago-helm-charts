@@ -48,7 +48,7 @@ spec:
       restartPolicy: {{ .Values.createTopics.restartPolicy }}
       containers:
         - name: create-topics
-          image: {{ .Values.createTopics.image.repository }}:{{ .Values.createTopics.image.tag }}
+          image: "{{ include "lago.imageRepository" (dict "repository" .Values.createTopics.image.repository "global" .Values.global) }}:{{ .Values.createTopics.image.tag }}"
           imagePullPolicy: {{ .Values.createTopics.image.pullPolicy }}
           command: [sh]
           args:

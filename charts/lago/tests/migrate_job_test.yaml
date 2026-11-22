@@ -126,7 +126,7 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: "getlago/api:v1.0.0"
+          value: "docker.io/getlago/api:v1.0.0"
 
   - it: should use the correct command
     asserts:

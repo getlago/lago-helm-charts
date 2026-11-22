@@ -77,3 +77,20 @@ Checks migrate.image.tag, api.image.tag, global.version, then Chart.AppVersion
 {{- define "lago.secretName" -}}
 {{- mustMergeOverwrite .Values .Values.config | set . "Values" | include "lago-config.secretName" }}
 {{- end }}
+
+{{/*
+Prefix a repository with global.image.registry unless it already names a registry (getlago/lago-helm-charts#203).
+Usage: include "lago.imageRepository" (dict "repository" .Values.image.repository "global" .Values.global)
+*/}}
+{{- define "lago.imageRepository" -}}
+{{- $repo := .repository -}}
+{{- $registry := dig "image" "registry" "" (.global | default dict) -}}
+{{- $host := regexSplit "/" $repo 2 | first -}}
+{{- if or (not $registry) (and (contains "/" $repo) (or (contains "." $host) (contains ":" $host) (eq $host "localhost"))) -}}
+{{- $repo -}}
+{{- else if and (eq $registry "docker.io") (not (contains "/" $repo)) -}}
+{{- printf "docker.io/library/%s" $repo -}}
+{{- else -}}
+{{- printf "%s/%s" (trimSuffix "/" $registry) $repo -}}
+{{- end -}}
+{{- end }}

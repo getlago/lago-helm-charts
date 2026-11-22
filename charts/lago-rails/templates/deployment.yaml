@@ -43,7 +43,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ default .Chart.Name .Values.container.name }}
-          image: "{{ .Values.image.repository }}:{{ include "lago-rails.version" .}}"
+          image: "{{ include "lago-rails.imageRepository" (dict "repository" .Values.image.repository "global" .Values.global) }}:{{ include "lago-rails.version" .}}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: {{ toJson .Values.container.command }}
           args: {{ toJson .Values.container.args }}

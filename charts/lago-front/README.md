@@ -74,6 +74,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| global.image.registry | string | `"docker.io"` | Registry prefixed to image repositories that don't already name one (e.g. `getlago/api` -> `docker.io/getlago/api`). Empty disables prefixing. |
 | image.repository | string | `"getlago/front"` | Container image repository |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.tag | string | `nil` | Override the image tag (defaults to Chart appVersion) |

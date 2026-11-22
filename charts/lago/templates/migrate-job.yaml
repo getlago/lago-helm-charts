@@ -52,7 +52,7 @@ spec:
       {{- end }}
       containers:
         - name: migrate
-          image: "{{ .Values.migrate.image.repository }}:{{ include "lago.version" . }}"
+          image: "{{ include "lago.imageRepository" (dict "repository" .Values.migrate.image.repository "global" .Values.global) }}:{{ include "lago.version" . }}"
           imagePullPolicy: {{ .Values.migrate.image.pullPolicy }}
           command: {{ toJson .Values.migrate.command }}
           args: {{ toJson .Values.migrate.args }}

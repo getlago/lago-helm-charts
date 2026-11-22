@@ -5,6 +5,11 @@
 config: {}
 
 global:
+  image:
+    # -- Registry prefixed to image repositories that don't already name one (e.g. `getlago/api` -> `docker.io/getlago/api`). Empty disables prefixing.
+    # @section -- Image
+    registry: docker.io
+
   lago:
     # -- Rails environment (`production`, `staging`, `development`)
     # @section -- Lago
