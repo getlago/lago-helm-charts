@@ -396,6 +396,14 @@ global:
     # Deployment, then the consumer group.
     # @section -- Streaming Ingestion
     walletAlertsConsumer: false
+    # -- Run the Karafka `SubscriptionUsageAlertsConsumer`
+    # (`usage-alerts-consumer-worker`) on the realtime usage triggers topic, in
+    # its own consumer group. It evaluates the current usage alerts of the
+    # organizations with the `realtime_usage_alerts` flag seconds after their
+    # usage buckets land; the clock sweep keeps evaluating them too. Lives here
+    # for the same reason as `walletRefreshConsumer`.
+    # @section -- Streaming Ingestion
+    usageAlertsConsumer: false
     # -- Name of an existing ConfigMap for streaming config
     # @section -- Streaming Ingestion
     configmap: ""
@@ -1172,6 +1180,56 @@ wallet-refresh-consumer-worker:
   extraEnv:
     LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC: realtime_usage_triggers
     LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC: ""
+
+# -- Usage alerts consumer worker subchart overrides (lago-rails, conditional
+# on `global.streaming_ingestion.usageAlertsConsumer`). Runs the Karafka
+# `SubscriptionUsageAlertsConsumer` on the realtime usage triggers topic; the
+# Kafka settings come from the streaming ConfigMap/Secret.
+# @default -- See child values
+# @section -- Usage Alerts Consumer Worker
+usage-alerts-consumer-worker:
+  # -- Override the usage-alerts-consumer-worker subchart release name
+  # @section -- Usage Alerts Consumer Worker
+  nameOverride: lago-usage-alerts-consumer-worker
+  config:
+    # -- Disable nested config (uses parent config subchart)
+    # @section -- Usage Alerts Consumer Worker
+    enabled: false
+    # -- Config subchart name override
+    # @section -- Usage Alerts Consumer Worker
+    nameOverride: lago-config
+  # -- Liveness probe (disabled for workers)
+  # @section -- Usage Alerts Consumer Worker
+  livenessProbe:
+    enabled: false
+  # -- Readiness probe (disabled for workers)
+  # @section -- Usage Alerts Consumer Worker
+  readinessProbe:
+    enabled: false
+  service:
+    # -- Disable service (no inbound traffic)
+    # @section -- Usage Alerts Consumer Worker
+    enabled: false
+  container:
+    # -- Karafka consumer entrypoint command, restricted to the usage alerts
+    # consumer group, so this pod never joins the wallet refresh group that
+    # reads the same topic.
+    # @section -- Usage Alerts Consumer Worker
+    command: ["bundle", "exec", "karafka", "server", "--include_consumer_groups", "lago_usage_alerts_consumer"]
+    # -- Container ports (none needed)
+    # @section -- Usage Alerts Consumer Worker
+    ports: []
+  # -- Sets the realtime usage triggers topic and turns the lane on in this pod
+  # (each organization still needs the `realtime_usage_alerts` flag), and
+  # blanks the charged-in-advance topics inherited from the streaming ConfigMap.
+  # Like the wallet refresh worker, the pod reads `LAGO_REALTIME_USAGE_ENABLED`
+  # from the install's own values.
+  # @section -- Usage Alerts Consumer Worker
+  extraEnv:
+    LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC: realtime_usage_triggers
+    LAGO_REALTIME_USAGE_ALERTS_ENABLED: "true"
+    LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC: ""
+    LAGO_KAFKA_PRODUCT_EVENTS_CHARGED_IN_ADVANCE_TOPIC: ""
 
 # -- Wallet alerts consumer worker subchart overrides (lago-rails, conditional
 # on `global.streaming_ingestion.walletAlertsConsumer`). Runs the Karafka

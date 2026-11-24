@@ -52,6 +52,16 @@ tests:
       - hasDocuments:
           count: 0
 
+  - it: refuses the usage alerts consumer when streaming ingestion is off
+    set:
+      global:
+        streaming_ingestion:
+          enabled: false
+          usageAlertsConsumer: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "global.streaming_ingestion.usageAlertsConsumer requires global.streaming_ingestion.enabled: the usage alerts consumer takes its Kafka connection from the streaming ConfigMap/Secret, which is only rendered when streaming ingestion is on"
+
   - it: refuses the product events processor when streaming ingestion is off
     set:
       global:
