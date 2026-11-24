@@ -262,6 +262,21 @@ A Helm chart for Kubernetes
 | wallet-alerts-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
 | wallet-alerts-consumer-worker.extraEnv | object | `{"LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC":"","LAGO_KAFKA_PRODUCT_EVENTS_CHARGED_IN_ADVANCE_TOPIC":""}` | Routes Karafka to the wallet alerts consumer only: blanks the charged-in-advance topics inherited from the streaming ConfigMap, so this pod does not join the events or product events consumer groups. |
 
+### Usage Alerts Consumer Worker
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| usage-alerts-consumer-worker | object | See child values | Usage alerts consumer worker subchart overrides (lago-rails, conditional on `global.streaming_ingestion.usageAlertsConsumer`). Runs the Karafka `SubscriptionUsageAlertsConsumer` on the realtime usage triggers topic; the Kafka settings come from the streaming ConfigMap/Secret. |
+| usage-alerts-consumer-worker.nameOverride | string | `"lago-usage-alerts-consumer-worker"` | Override the usage-alerts-consumer-worker subchart release name |
+| usage-alerts-consumer-worker.config.enabled | bool | `false` | Disable nested config (uses parent config subchart) |
+| usage-alerts-consumer-worker.config.nameOverride | string | `"lago-config"` | Config subchart name override |
+| usage-alerts-consumer-worker.livenessProbe | object | `{"enabled":false}` | Liveness probe (disabled for workers) |
+| usage-alerts-consumer-worker.readinessProbe | object | `{"enabled":false}` | Readiness probe (disabled for workers) |
+| usage-alerts-consumer-worker.service.enabled | bool | `false` | Disable service (no inbound traffic) |
+| usage-alerts-consumer-worker.container.command | list | `["bundle","exec","karafka","server","--include_consumer_groups","lago_usage_alerts_consumer"]` | Karafka consumer entrypoint command, restricted to the usage alerts consumer group, so this pod never joins the wallet refresh group that reads the same topic. |
+| usage-alerts-consumer-worker.container.ports | list | `[]` | Container ports (none needed) |
+| usage-alerts-consumer-worker.extraEnv | object | `{"LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC":"","LAGO_KAFKA_PRODUCT_EVENTS_CHARGED_IN_ADVANCE_TOPIC":"","LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC":"realtime_usage_triggers","LAGO_REALTIME_USAGE_ALERTS_ENABLED":"true"}` | Sets the realtime usage triggers topic, allows the lane in this pod and blanks the charged-in-advance topics inherited from the streaming ConfigMap. The lane still skips every message until the install also sets `LAGO_REALTIME_USAGE_ENABLED: "true"` here, as for the wallet refresh worker, and each organization has the `realtime_usage_alerts` flag. Needs a lago-api image that draws the `lago_usage_alerts_consumer` group: Karafka refuses to boot on an unknown group. |
+
 ### Events Processor Worker
 
 | Key | Type | Default | Description |
