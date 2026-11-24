@@ -54,6 +54,11 @@ tests:
       global.streaming_ingestion.usageAlertsConsumer: true
     asserts:
       - contains:
+          path: spec.template.spec.containers[0].envFrom
+          content:
+            configMapRef:
+              name: RELEASE-NAME-lago-config-streaming
+      - contains:
           path: spec.template.spec.containers[0].env
           content:
             name: LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC

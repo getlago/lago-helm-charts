@@ -1219,11 +1219,13 @@ usage-alerts-consumer-worker:
     # -- Container ports (none needed)
     # @section -- Usage Alerts Consumer Worker
     ports: []
-  # -- Sets the realtime usage triggers topic and turns the lane on in this pod
-  # (each organization still needs the `realtime_usage_alerts` flag), and
+  # -- Sets the realtime usage triggers topic, allows the lane in this pod and
   # blanks the charged-in-advance topics inherited from the streaming ConfigMap.
-  # Like the wallet refresh worker, the pod reads `LAGO_REALTIME_USAGE_ENABLED`
-  # from the install's own values.
+  # The lane still skips every message until the install also sets
+  # `LAGO_REALTIME_USAGE_ENABLED: "true"` here, as for the wallet refresh worker,
+  # and each organization has the `realtime_usage_alerts` flag. Needs a lago-api
+  # image that draws the `lago_usage_alerts_consumer` group: Karafka refuses to
+  # boot on an unknown group.
   # @section -- Usage Alerts Consumer Worker
   extraEnv:
     LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC: realtime_usage_triggers
